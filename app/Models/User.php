@@ -23,6 +23,7 @@ class User extends Authenticatable
         'cargo',
         'rol_id',
         'unidad_id',
+        'activo',
     ];
 
     // Laravel busca 'password' por defecto, le decimos que la tuya se llama distinto
@@ -42,5 +43,10 @@ class User extends Authenticatable
     public function rol(): BelongsTo
     {
         return $this->belongsTo(Rol::class, 'rol_id');
+    }
+
+    public function unidad(): BelongsTo
+    {
+        return $this->belongsTo(Unidad::class, 'unidad_id');
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ticket', function (Blueprint $table) {
+        Schema::create('tickets', function (Blueprint $table) {
             $table->id();
 
             $table->string('asunto');
@@ -21,16 +21,16 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
 
             //--relacion estado del ticket
-            $table->foreignId('estado_id')->constrained('estado');
+            $table->foreignId('estado_id')->constrained('estados');
 
             //--relacion con categoria
-            $table->foreignId('categoria_id')->constrained('categoria');
+            $table->foreignId('categoria_id')->constrained('categorias');
 
             //--relacion con tipo de solicitud
-            $table->foreignId('tipo_solicitud_id')->constrained('tipo_solicitud');
+            $table->foreignId('tipo_solicitud_id')->constrained('tipo_solicitudes');
 
             //--relacion con prioridad
-            $table->foreignId('prioridad_id')->constrained('prioridad');
+            $table->foreignId('prioridad_id')->constrained('prioridades');
 
 
             //--tecnico asignado

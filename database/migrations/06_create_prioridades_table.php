@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('unidad', function (Blueprint $table) {
+        Schema::create('prioridades', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre_unidad'); //--finanzas, it, rrhh
+            $table->string('nombre_prioridad');
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('unidads');
+        Schema::dropIfExists('prioridads');
     }
 };

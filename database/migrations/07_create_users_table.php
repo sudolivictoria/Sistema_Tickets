@@ -32,8 +32,11 @@ return new class extends Migration
             $table->string('cargo')->nullable();
 
             //----Relaciones para los Filtros (Unidad y Rol)
-            $table->foreignId('rol_id')->nullable()->constrained('rol');
-            $table->foreignId('unidad_id')->nullable()->constrained('unidad');
+            $table->unsignedBigInteger('rol_id')->nullable();
+            $table->foreign('rol_id')->references('id')->on('roles'); 
+
+            $table->unsignedBigInteger('unidad_id')->nullable();
+            $table->foreign('unidad_id')->references('id')->on('unidades');
 
             $table->rememberToken();
             $table->timestamps();
