@@ -22,9 +22,19 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirect('/dashboard', navigate: true);
     }
 }; ?>
+
+<style>
+    /*-------fuente para el login-------*/
+    @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap');
+
+    .login-container,
+    .login-container * {
+        font-family: 'Bree Serif', serif !important;
+    }
+</style>
 
 <div>
     <!-- Session Status -->
@@ -46,14 +56,14 @@ new #[Layout('layouts.guest')] class extends Component
                     </a>
                 </div>
 
-                <h1 style="text-align: center; font-size: 24px; font-weight: bolder; color: #005797; margin-bottom: 30px;">Help Desk Istu</h1>
+                <h1 style="text-align: center; font-size: 24px; font-weight: bolder; color: #005797; margin-bottom: 30px; font-family: 'Bree Serif', serif;">Help Desk Istu</h1>
 
                 <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
 
-                <form wire:submit="login" style="display: flex; flex-direction: column; gap: 15px;">
+                <form wire:submit.prevent="login" style="display: flex; flex-direction: column; gap: 15px;">
                     <div>
                         <label style="display: block; font-size: 11px; font-weight: bold; color: #005c0c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Correo</label>
-                        <input wire:model="form.email" type="email" required autofocus
+                        <input wire:model="form.email" type="email" required autofocus autocomplete="username"
                             style="width: 100%; padding: 12px; border: 1px solid #f3f4f6; border-radius: 12px; background: #f9fafb; outline: none; transition: 0.3s;"
                             onfocus="this.style.border='1px solid #bef264'">
                         <x-input-error :messages="$errors->get('form.email')" class="mt-1" />
@@ -62,7 +72,7 @@ new #[Layout('layouts.guest')] class extends Component
                     <div>
                         <label style="display: block; font-size: 11px; font-weight: bold; color: #005c0c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Contraseña</label>
                         <div style="position: relative; width: 100%;">
-                            <input id="password-input" wire:model="form.password" type="password" required
+                            <input id="password-input" wire:model="form.password" type="password" required autocomplete="current-password"
                                 style="width: 100%; padding: 12px 40px 12px 12px; border: 1px solid #f3f4f6; border-radius: 12px; background: #f9fafb; outline: none; transition: 0.3s;"
                                 onfocus="this.style.border='1px solid #bef264'">
                             <button type="button" id="toggle-password"

@@ -24,7 +24,8 @@ class LoginController extends Controller
         ]);
 
         //----intentar inicio de sesion
-        if (Auth::attempt($credentials)) {
+        $remember = $request->boolean('remember');
+        if (Auth::attempt($credentials, $remember)) {
 
             //-----verificar si el usuario esta activo
             if (!Auth::user()->activo) {
