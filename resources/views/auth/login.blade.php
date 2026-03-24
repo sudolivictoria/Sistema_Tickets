@@ -72,11 +72,6 @@
                     </button>
                 </div>
 
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom: 5px;">
-                    <input id="remember" type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                    <label for="remember" style="font-size: 13px;">Recuérdame</label>
-                </div>
-
                 <button type="submit" class="button">Iniciar sesión</button>
             </form>
         </div>
