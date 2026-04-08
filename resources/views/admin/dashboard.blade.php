@@ -89,7 +89,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200">
-                                    @foreach($ticketsUrgentisimos as $ticket)
+                                    @foreach($ticketsRecientes as $ticket)
                                     <tr>
                                         <td class="px-6 py-4 text-primary font-bold">#{{ $ticket->id }}</td>
                                         <td class="px-6 py-4 font-medium">{{ $ticket->asunto }}</td>
