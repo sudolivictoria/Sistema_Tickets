@@ -110,12 +110,15 @@
                     </nav>
 
                     <div class="mt-auto pt-6 border-t border-white/10">
-                        <button
-                            class="w-full flex items-center gap-3 px-4 py-3 text-red-300 hover:text-white hover:bg-red-500/20 rounded-xl transition-all font-bold group">
-                            <span
-                                class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
-                            <span class="text-sm">Cerrar Sesión</span>
-                        </button>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                class="w-full flex items-center gap-3 px-4 py-3 text-red-300 hover:text-white hover:bg-red-500/20 rounded-xl transition-all font-bold group">
+                                <span
+                                    class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
+                                <span class="text-sm">Cerrar Sesión</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </aside>
@@ -262,7 +265,7 @@
                                                 <th class="px-4 py-4">Técnico</th>
                                                 <th class="px-4 py-4">Estado</th>
                                                 <th class="px-4 py-4">Apertura</th>
-                                                <th class="px-4 py-4 text-right pr-8">Cierre</th>
+                                                <th class="px-4 py-4">Cierre</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-100 text-[11px]">
