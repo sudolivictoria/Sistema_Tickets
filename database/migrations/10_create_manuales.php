@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('manuales', function (Blueprint $table) {
             $table->id();
             $table->string('titulo');
-            $table->string('archivo_path'); // Ruta del PDF
+            $table->string('archivo_path'); //Ruta del PDF
             $table->foreignId('categoria_id')->constrained('categoria_manuales')->onDelete('cascade');
             $table->timestamps();
         });
