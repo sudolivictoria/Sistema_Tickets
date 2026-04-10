@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
+use App\Models\Categoria;
 use App\Models\Manual;
 use App\Models\Ticket;
+use App\Models\TipoSolicitud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +21,7 @@ class ClienteController extends Controller
         //----estadisticas tickets del cliente autenticado
         $abiertos = Ticket::where('user_id', $userId)
             ->whereNull('tecnico_id')
-            ->where('estado_id', '!=', 3) 
+            ->where('estado_id', '!=', 3)
             ->count();
 
         $enProceso = Ticket::where('user_id', $userId)
@@ -45,7 +47,36 @@ class ClienteController extends Controller
 
     public function create()
     {
-        return "Formulario para crear Ticket (En construcción)";
+        $categorias = Categoria::all();
+        $tipos = TipoSolicitud::all();
+
+        return view('cliente.crear-ticket', compact('categorias', 'tipos'));
+    }
+
+
+    public function store(Request $request)
+    {
+        //-----validacion datos
+        $request->validate([
+            'asunto' => 'required|max:255',
+            'categoria_id' => 'required|exists:categorias,id',
+            'tipo_solicitud_id' => 'required',
+            'descripcion' => 'required',
+        ]);
+
+        //--crear ticket
+        Ticket::create([
+            'asunto' => $request->asunto,
+            'descripcion' => $request->descripcion,
+            'categoria_id' => $request->categoria_id,
+            'tipo_solicitud_id' => $request->tipo_solicitud_id,
+            'user_id' => Auth::id(), //----asignar el ticket al usuario autenticado
+            'estado_id' => 1, //---abierto
+            'prioridad' => null,
+            'tecnico_id' => null, //---vacio inicial 
+        ]);
+
+        return redirect()->route('cliente.dashboard')->with('success', 'Ticket creado correctamente.');
     }
 
     public function misTickets()

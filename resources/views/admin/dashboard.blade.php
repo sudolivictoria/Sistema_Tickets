@@ -384,7 +384,7 @@
                                     <p class="text-[14px] text-slate-300 leading-relaxed font-medium">
                                         Tickets con estado <span
                                             class="text-primary font-bold italic underline">CRÍTICO</span> requieren
-                                        respuesta inmediata.
+                                        solución inmediata.
                                     </p>
                                 </div>
                                 <span

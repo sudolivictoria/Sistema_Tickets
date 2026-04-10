@@ -60,6 +60,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/crear-ticket', [ClienteController::class, 'create'])->name('crear-ticket');
         Route::get('/mis-tickets', [ClienteController::class, 'misTickets'])->name('mis-tickets');
         Route::get('/recursos', [ClienteController::class, 'recursos'])->name('recursos');
+        Route::post('/crear-ticket', [ClienteController::class, 'store'])->name('tickets.store');
+
     });
 });
 
