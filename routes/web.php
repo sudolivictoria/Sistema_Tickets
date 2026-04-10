@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LoginController;
-
+use App\Http\Controllers\Cliente\ClienteController;
 
 Volt::route('/test-livewire', 'pages.test-livewire')->name('test.livewire');
 
@@ -25,21 +25,41 @@ Route::middleware(['auth'])->group(function () {
 
         if ($user->rol_id == 1) { //----admin
             return redirect()->route('admin.dashboard');
+        } elseif ($user->rol_id == 2) {
+            return redirect()->route('cliente.dashboard');
+        } else {
+            return redirect('/'); //---si el rol no es admin ni cliente, redirige al login
         }
-        return redirect()->route('cliente.dashboard');
     })->name('dashboard');
 
     //---Rol Admin
-    Route::middleware(['role:Admin'])->prefix('admin')->group(function () {
-        //-----controller
-        Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+
+        //--dashboard principal
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+
+        //--seccion administracion
+        Route::get('/asignar-tickets', [AdminController::class, 'asignarTickets'])->name('asignar-tickets');
+        Route::get('/mis-asignados', [AdminController::class, 'misAsignados'])->name('mis-asignados');
+        Route::get('/gestion-usuarios', [AdminController::class, 'gestionUsuarios'])->name('gestion-usuarios');
+        Route::get('/gestion-recursos', [AdminController::class, 'gestionRecursos'])->name('gestion-recursos');
+
+        //--seccion servicios-
+        Route::get('/crear-ticket', [AdminController::class, 'create'])->name('crear-ticket');
+        Route::get('/mis-tickets', [AdminController::class, 'misTickets'])->name('mis-tickets');
+        Route::get('/recursos', [AdminController::class, 'recursos'])->name('recursos');
     });
 
     //---Rol Cliente
-    Route::middleware(['role:Cliente'])->prefix('cliente')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('cliente.dashboard');
-        })->name('cliente.dashboard');
+    Route::middleware(['role:Cliente'])->prefix('cliente')->name('cliente.')->group(function () {
+        //-----dashboard principal
+        Route::get('/dashboard', [ClienteController::class, 'index'])->name('dashboard');
+
+
+        //---seccion operativa
+        Route::get('/crear-ticket', [ClienteController::class, 'create'])->name('crear-ticket');
+        Route::get('/mis-tickets', [ClienteController::class, 'misTickets'])->name('mis-tickets');
+        Route::get('/recursos', [ClienteController::class, 'recursos'])->name('recursos');
     });
 });
 

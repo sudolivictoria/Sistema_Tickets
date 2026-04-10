@@ -12,7 +12,10 @@ class AdminController extends Controller
     public function index()
     {
         //----tickets sin asignar
-        $noAsignados = Ticket::whereNull('tecnico_id')->count();
+        $noAsignados = Ticket::whereNull('tecnico_id')
+            ->where('estado_id', '!=', 3)
+            ->count();
+
 
         //-----tickets no terminados (estado_id != 3, asumiendo que 3 es resuelto)
         $pendientes = Ticket::whereNotNull('tecnico_id')
@@ -52,11 +55,50 @@ class AdminController extends Controller
         //----ultimos tickets
         $todosLosTickets = Ticket::with(['user', 'prioridad'])
             ->latest()
-            ->paginate(15);
+            ->paginate(25);
 
 
+        //----manuales
         $manuales = Manual::latest()->take(3)->get();
 
         return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'manuales'));
+    }
+
+
+    //---metodos para las paginas---
+
+    public function asignarTickets()
+    {
+        return "Página de Asignar Tickets (En construcción)";
+    }
+
+    public function misAsignados()
+    {
+        return "Página de Mis Asignados (En construcción)";
+    }
+
+    public function gestionUsuarios()
+    {
+        return "Página de Gestión de Usuarios (En construcción)";
+    }
+
+    public function gestionRecursos()
+    {
+        return "Página de Gestión de Recursos (En construcción)";
+    }
+
+    public function create()
+    {
+        return "Formulario para crear Ticket (En construcción)";
+    }
+
+    public function misTickets()
+    {
+        return "Historial de mis tickets (En construcción)";
+    }
+
+    public function recursos()
+    {
+        return "Biblioteca de manuales (En construcción)";
     }
 }

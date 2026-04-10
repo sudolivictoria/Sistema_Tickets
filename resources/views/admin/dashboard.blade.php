@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Help Desk - Dashboard</title>
+    <title>Help Desk Istu</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
@@ -38,9 +38,33 @@
             background: #cbd5e1;
             border-radius: 10px;
         }
+          /*size*/
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        /*pista*/
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        /*thumb*/
+        ::-webkit-scrollbar-thumb {
+            background: #1e3a8a;
+            border-radius: 10px;
+            border: 2px solid #f1f5f9;
+        }
+
+        /*hover thumb*/
+        ::-webkit-scrollbar-thumb:hover {
+            background: #84cc16;
+        }
     </style>
 </head>
 
+<!--cuerpo principal-->
 <body
     class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display overflow-hidden">
     <div class="relative flex h-screen flex-col">
@@ -53,12 +77,6 @@
                 </div>
                 <h2 class="text-xl font-bold text-secondary tracking-tight">Help Desk Istu</h2>
             </div>
-            <div class="flex items-center gap-4">
-                <span class="text-sm font-medium text-slate-600">
-                    Hola, <span
-                        class="text-secondary font-bold">{{ auth()->user()->nombre_completo ?? 'Administrador'}}</span>
-                </span>
-            </div>
         </header>
 
         <div class="flex flex-1 overflow-hidden">
@@ -67,25 +85,30 @@
                 <div class="p-6 flex flex-col h-full overflow-y-auto">
                     <nav class="flex flex-col gap-1.5 flex-1">
                         <a class="flex items-center gap-3 px-4 py-3 bg-primary text-secondary rounded-xl font-bold shadow-lg mb-4"
-                            href="#">
+                            href="{{ route('admin.dashboard') }}">
                             <span class="material-symbols-outlined">dashboard</span>
                             <span class="text-sm">Dashboard</span>
                         </a>
                         <!--admin-->
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-4 px-4 font-black">
                             Administración</p>
-                             <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="#">
+                        <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                            href="{{ route('admin.asignar-tickets') }}">
                             <span class="material-symbols-outlined text-xl">confirmation_number</span>
                             <span class="text-sm font-medium">Asignar Tickets</span>
                         </a>
+                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                            href="{{ route('admin.mis-asignados') }}">
+                            <span class="material-symbols-outlined text-xl">assignment_ind</span>
+                            <span class="text-sm font-medium">Mis Asignados</span>
+                        </a>
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="#">
+                            href="{{ route('admin.gestion-usuarios') }}">
                             <span class="material-symbols-outlined text-xl">group</span>
                             <span class="text-sm font-medium">Gestión Usuarios</span>
                         </a>
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="#">
+                            href="{{ route('admin.gestion-recursos') }}">
                             <span class="material-symbols-outlined text-xl">folder_shared</span>
                             <span class="text-sm font-medium">Gestión Recursos</span>
                         </a>
@@ -93,17 +116,17 @@
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-6 px-4 font-black">Servicios
                         </p>
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="#">
+                            href="{{ route('admin.crear-ticket') }}">
                             <span class="material-symbols-outlined text-xl">add_circle</span>
                             <span class="text-sm font-medium">Crear Ticket</span>
                         </a>
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="#">
+                            href="{{ route('admin.mis-tickets') }}">
                             <span class="material-symbols-outlined text-xl">history</span>
                             <span class="text-sm font-medium">Mis Tickets</span>
                         </a>
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="#">
+                            href="{{ route('admin.recursos') }}">
                             <span class="material-symbols-outlined text-xl">library_books</span>
                             <span class="text-sm font-medium">Recursos</span>
                         </a>
@@ -113,7 +136,7 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"
-                                class="w-full flex items-center gap-3 px-4 py-3 text-red-300 hover:text-white hover:bg-red-500/20 rounded-xl transition-all font-bold group">
+                                class="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-white hover:bg-blue-200/20 rounded-xl transition-all font-bold group">
                                 <span
                                     class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
                                 <span class="text-sm">Cerrar Sesión</span>
@@ -129,8 +152,12 @@
 
                     <div class="flex justify-between items-center mb-8">
                         <div>
-                            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Panel de Control</h1>
-                            <p class="text-slate-500 text-sm font-medium">Bienvenido al sistema de gestión de incidencias.</p>
+                            <div class="flex items-center gap-4">
+                                <span class="text-4xl font-medium text-slate-600">
+                                    Hola, <span class="text-secondary font-bold">{{ auth()->user()->nombre_completo ?? 'Administrador'}}</span>
+                                </span>
+                            </div>
+                            <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y resolución eficiente de incidencias para el ISTU.</p>
                         </div>
                         <div
                             class="min-w-[180px] px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-end">
@@ -227,6 +254,7 @@
                                     @endforeach
                                 </div>
                             </div>
+                            <!--final rendimiento anual-->
 
                             <!--tickets registrados-->
                             <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -238,7 +266,7 @@
                                             <button
                                                 class="px-4 py-1.5 bg-secondary text-white rounded-xl text-[10px] font-black uppercase shadow-md transition-all">Todos</button>
                                             <button
-                                                class="px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase hover:bg-orange-100 hover:text-orange-600 transition-all">Abierto</button>
+                                                class="px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase hover:bg-orange-100 hover:text-orange-600 transition-all">Pendiente</button>
                                             <button
                                                 class="px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[10px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Proceso</button>
                                             <button
@@ -261,11 +289,12 @@
                                                 <th class="px-6 py-4 text-center">ID</th>
                                                 <th class="px-4 py-4">Usuario</th>
                                                 <th class="px-4 py-4">Asunto</th>
+                                                <th class="px-4 py-4">Categoría</th>
                                                 <th class="px-4 py-4">Prioridad</th>
                                                 <th class="px-4 py-4">Técnico</th>
-                                                <th class="px-4 py-4">Estado</th>
                                                 <th class="px-4 py-4">Apertura</th>
                                                 <th class="px-4 py-4">Cierre</th>
+                                            
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-100 text-[11px]">
@@ -274,27 +303,26 @@
                                                     <td class="px-6 py-4 font-black text-secondary text-center">
                                                         #{{ $ticket->id }}</td>
                                                     <td class="px-4 py-4 font-bold text-slate-700 uppercase">
-                                                        {{ $ticket->user->name ?? 'N/A' }}</td>
+                                                        {{ $ticket->user->nombre_completo ?? 'N/A' }}</td>
                                                     <td class="px-4 py-4">
                                                         <div class="max-w-[150px] truncate font-medium text-slate-600"
                                                             title="{{ $ticket->asunto }}">{{ $ticket->asunto }}</div>
                                                     </td>
+                                                     <td class="px-4 py-4">
+                                                        <div class="max-w-[150px] truncate font-medium text-slate-600"
+                                                            title="{{ $ticket->categoria->nombre_categoria }}">{{ $ticket->categoria->nombre_categoria }}</div>
+                                                    </td>
                                                     <td class="px-4 py-4">
                                                         <span
-                                                            class="font-black uppercase tracking-tighter {{ ($ticket->prioridad->nombre ?? '') == 'Alta' ? 'text-red-600' : 'text-slate-500' }}">
-                                                            {{ $ticket->prioridad->nombre ?? 'Normal' }}
+                                                            class="font-black uppercase tracking-tighter {{ ($ticket->prioridad->nombre_prioridad ?? '') == 'Alta' ? 'text-red-600' : 'text-slate-500' }}">
+                                                            {{ $ticket->prioridad->nombre_prioridad ?? 'Normal' }}
                                                         </span>
                                                     </td>
                                                     <td class="px-4 py-4 text-slate-500 font-bold uppercase">
-                                                        {{ $ticket->tecnico->name ?? 'Sin Asignar' }}</td>
-                                                    <td class="px-4 py-4">
-                                                        <span
-                                                            class="px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-black uppercase text-[9px] shadow-sm">
-                                                            {{ $ticket->estado ?? 'Abierto' }}
-                                                        </span>
-                                                    </td>
+                                                        {{ $ticket->tecnico->nombre_completo ?? 'Sin Asignar' }}</td>
                                                     <td class="px-4 py-4 text-slate-500 font-medium">
                                                         {{ $ticket->created_at->format('d/m/Y') }}</td>
+
                                                     <td class="px-4 py-4 text-slate-400 italic text-right pr-8">
                                                         {{ $ticket->fecha_cierre ? $ticket->fecha_cierre->format('d/m/Y') : '---' }}
                                                     </td>
@@ -305,8 +333,9 @@
                                 </div>
                             </div>
                         </div>
+                        <!--final tickets-->
 
-                        <!--recursos y protocolo critico-->
+                        <!--recursos-->
                         <div class="lg:col-span-1 space-y-6">
                             <div
                                 class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
@@ -315,7 +344,7 @@
                                     <span class="material-symbols-outlined text-primary/30">folder_open</span>
                                 </div>
                                 <h4
-                                    class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
+                                    class="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
                                     <span class="w-1.5 h-4 bg-primary rounded-full"></span>
                                     Recursos
                                 </h4>
@@ -336,12 +365,14 @@
                                         </a>
                                     @endforeach
                                 </div>
-                                <button
-                                    class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all">
-                                    Ir al Repositorio
-                                </button>
+                                    <a href="{{ route('cliente.recursos') }}"
+                                        class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center">
+                                        Ir al Repositorio
+                                    </a>
                             </div>
+                            <!--final recursos-->
 
+                            <!--protocolo critico-->
                             <div
                                 class="bg-secondary p-8 rounded-3xl text-white shadow-xl relative overflow-hidden group">
                                 <div class="relative z-10">
@@ -349,8 +380,8 @@
                                         class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-secondary mb-4 shadow-lg group-hover:scale-110 transition-transform">
                                         <span class="material-symbols-outlined font-black">emergency</span>
                                     </div>
-                                    <h4 class="text-sm font-black uppercase tracking-wider mb-2">Protocolo Crítico</h4>
-                                    <p class="text-[11px] text-slate-300 leading-relaxed font-medium">
+                                    <h4 class="text-sm font-black uppercase tracking-wider mb-2">Protocolo</h4>
+                                    <p class="text-[14px] text-slate-300 leading-relaxed font-medium">
                                         Tickets con estado <span
                                             class="text-primary font-bold italic underline">CRÍTICO</span> requieren
                                         respuesta inmediata.
@@ -359,6 +390,7 @@
                                 <span
                                     class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/5 pointer-events-none">warning</span>
                             </div>
+                            <!--protocolo critico-->
                         </div>
                     </div>
                 </div>
@@ -366,5 +398,4 @@
         </div>
     </div>
 </body>
-
 </html>

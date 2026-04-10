@@ -5,29 +5,43 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth; 
 
 class CheckRole
 {
+    /**
+     * Maneja una solicitud entrante.
+     */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!auth()->check()) {
-            return redirect('/');
+        //---verfifica si el usuario esta logueado
+        if (!Auth::check()) {
+            return redirect('/login');
         }
 
-        $user = auth()->user();
+        //----obtiene el usuario autenticado
+        $user = Auth::user();
 
+        //----diccionario de roles 
         $roles = [
             'Admin'   => 1,
             'Cliente' => 2,
+            '1'       => 1,
+            '2'       => 2,
+
         ];
 
         $requiredRoleId = $roles[$role] ?? null;
-        
-        if ($user->rol_id != $requiredRoleId) {
-            abort(403, "Acceso denegado. Tu rol ID es {$user->rol_id} y se requiere ID {$requiredRoleId}");
+
+        //----evitar error si el rol no existe en el diccionario
+       if (intval($user->rol_id) === 1) {
+            return $next($request);
         }
 
-        return $next($request);
+       if (intval($user->rol_id) === intval($requiredRoleId)) {
+            return $next($request);
+        }
+
+        abort(403, "Acceso denegado.");
     }
 }

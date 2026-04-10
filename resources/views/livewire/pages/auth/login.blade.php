@@ -37,19 +37,21 @@ new #[Layout('layouts.guest')] class extends Component
 </style>
 
 <div>
-    <!-- Session Status -->
+    <!--Estado Sesion-->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <div style="background: linear-gradient(to bottom, #001764 0%, #004e23 50%, #5b8f00 100%); min-height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; z-index: 999; font-family: 'Bree Serif', serif;">
 
         <div style="position: relative; width: 90%; max-width: 400px;">
 
+            <!--Fondos decorativos-->
             <div style="position: absolute; inset: 0; background-color: #0c003f; border-radius: 2rem; transform: rotate(6deg) scale(1.05); z-index: 1;"></div>
-            <div style="position: absolute; inset: 0; background-color: #120064; border-radius: 2rem; transform: rotate(-6deg) scale(1.05); z-index: 1;"></div>
+            <div style="position: absolute; inset: 0; background-color: #1e058d; border-radius: 2rem; transform: rotate(-6deg) scale(1.05); z-index: 1;"></div>
 
 
             <div style="position: relative; background: white; border-radius: 2rem; padding-left:40px; padding-right:40px; padding-bottom:40px; padding-top:10px; z-index: 10;">
 
+                <!--logo-->
                 <div style="text-align: center; margin: 0; padding: 0; margin-bottom: 0;">
                     <a href="/" style="display: flex; justify-content: center;">
                         <img src="{{ asset('images/logo_istu.png') }}" alt="Logo" style="height: 150px; width: 150px; object-fit: contain; margin: 0; padding: 0; display: block;">
@@ -60,6 +62,7 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
 
+                <!--login form-->
                 <form wire:submit.prevent="login" style="display: flex; flex-direction: column; gap: 15px;">
                     <div>
                         <label style="display: block; font-size: 11px; font-weight: bold; color: #005c0c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Correo</label>
@@ -77,7 +80,7 @@ new #[Layout('layouts.guest')] class extends Component
                                 onfocus="this.style.border='1px solid #bef264'">
                             <button type="button" id="toggle-password"
                                 style="position: absolute; top: 50%; right: 12px; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; padding: 0;">
-                                <!-- simple eye icon -->
+                                <!--ver contraseña-->
                                 <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#005c0c" viewBox="0 0 24 24">
                                     <path d="M12 5c-7.633 0-11 6.52-11 7s3.367 7 11 7 11-6.52 11-7-3.367-7-11-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5zm0-8.5c-1.931 0-3.5 1.569-3.5 3.5s1.569 3.5 3.5 3.5 3.5-1.569 3.5-3.5-1.569-3.5-3.5-3.5z" />
                                 </svg>
@@ -89,12 +92,16 @@ new #[Layout('layouts.guest')] class extends Component
                         <x-input-error :messages="$errors->get('form.password')" class="mt-1" />
                     </div>
 
+                    <!--boton para iniciar sesion-->
                     <button type="submit" style="width: 100%; background-color: #006625; color: white; font-weight: bold; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; margin-top: 10px; transition: 0.3s;"
                         onmouseout="this.style.backgroundColor='#006625'"
                         onmouseover="this.style.backgroundColor='#004e1d'">
                         Iniciar Sesión
                     </button>
                 </form>
+                <!--final login form-->
+
+                <!--script para mostrar/ocultar contraseña-->
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         const pwdInput = document.getElementById('password-input');
