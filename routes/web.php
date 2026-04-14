@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\AdminUnidad\AdminUnidadController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use Illuminate\Support\Facades\Auth;
@@ -63,6 +64,24 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/crear-ticket', [ClienteController::class, 'store'])->name('tickets.store');
 
     });
+
+
+    //---Rol Admin Unidad
+    Route::middleware(['auth', 'role:AdminUnidad'])->prefix('admin-unidad')->name('admin_unidad.')->group(function () {
+    
+        //--dashboard principal
+        Route::get('/dashboard', [AdminUnidadController::class, 'index'])->name('dashboard');
+
+        //--seccion administracion
+        Route::get('/asignar-tickets', [AdminUnidadController::class, 'asignarTickets'])->name('asignar-tickets');
+        Route::get('/mis-asignados', [AdminUnidadController::class, 'misAsignados'])->name('mis-asignados');
+
+        //--seccion servicios-
+        Route::get('/crear-ticket', [AdminUnidadController::class, 'create'])->name('crear-ticket');
+        Route::get('/mis-tickets', [AdminUnidadController::class, 'misTickets'])->name('mis-tickets');
+        Route::get('/recursos', [AdminUnidadController::class, 'recursos'])->name('recursos');
+    });
+
 });
 
 // Comenta o borra esta línea si te da error

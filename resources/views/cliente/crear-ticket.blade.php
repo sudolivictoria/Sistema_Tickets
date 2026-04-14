@@ -182,6 +182,19 @@
                                 class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
                         </div>
                     </div>
+
+                    <!--info extra-->
+                    <div id="info-extra"
+                        class="hidden mt-3 p-4 bg-blue-50 border-l-4 border-primary rounded-r-xl transition-all animate-fade-in">
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-primary">info</span>
+                            <div>
+                                <p class="text-xs font-black text-primary uppercase tracking-wider">Información del
+                                    servicio</p>
+                                <p id="texto-ayuda" class="text-sm text-slate-600 mt-1 italic"></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!--descripcion detallada-->
@@ -203,8 +216,8 @@
                             <label class="cursor-pointer">
                                 <input class="hidden peer" name="prioridad" type="radio" value="{{ $prio }}" {{ $prio == 'Media' ? 'checked' : '' }} />
                                 <div class="py-3 px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center transition-all 
-                                            peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary peer-checked:shadow-sm
-                                            hover:border-slate-200">
+                                                        peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary peer-checked:shadow-sm
+                                                        hover:border-slate-200">
                                     {{ $prio }}
                                 </div>
                             </label>
@@ -230,6 +243,51 @@
             </form>
         </div>
     </main>
+
+
+    //------------filtrado dinamico tipo de solicitud segun categoria seleccionada----------------
+    <script>
+        //---captura de datos de tipos de solicitud desde el backend 
+        const todosLosTipos = @json($tipos);
+
+        //----cambio select en categoria para filtrar tipos de solicitud
+        document.querySelector('select[name="categoria_id"]').addEventListener('change', function () {
+            const categoriaId = this.value;
+            const selectTipo = document.querySelector('select[name="tipo_solicitud_id"]');
+
+            //---limpiamos opciones anteriores
+            selectTipo.innerHTML = '<option value="" disabled selected>Seleccione tipo</option>';
+
+            //--filtrar tipos de solicitud que pertenecen a la categoria seleccionada
+            const filtrados = todosLosTipos.filter(tipo => tipo.categoria_id == categoriaId);
+
+            //--nuevas opciones 
+            filtrados.forEach(tipo => {
+                const option = document.createElement('option');
+                option.value = tipo.id;
+                option.textContent = tipo.nombre_tipo_solicitud;
+                selectTipo.appendChild(option);
+            });
+        });
+
+
+        //----mostrar info extra segun tipo de solicitud seleccionada
+        document.querySelector('select[name="tipo_solicitud_id"]').addEventListener('change', function () {
+            const tipoId = this.value;
+            const infoDiv = document.getElementById('info-extra');
+            const textoAyuda = document.getElementById('texto-ayuda');
+
+            //---buscar tipo seleccionado   
+            const tipoSeleccionado = todosLosTipos.find(t => t.id == tipoId);
+
+            if (tipoSeleccionado && tipoSeleccionado.descripcion_ayuda) {
+                textoAyuda.textContent = tipoSeleccionado.descripcion_ayuda;
+                infoDiv.classList.remove('hidden'); //---mostramos el div si hay info disponible
+            } else {
+                infoDiv.classList.add('hidden'); //--lo oculta si no hay info
+            }
+        });
+    </script>
 
 </body>
 

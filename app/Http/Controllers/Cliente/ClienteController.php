@@ -7,6 +7,7 @@ use App\Models\Categoria;
 use App\Models\Manual;
 use App\Models\Ticket;
 use App\Models\TipoSolicitud;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -53,6 +54,7 @@ class ClienteController extends Controller
         return view('cliente.crear-ticket', compact('categorias', 'tipos'));
     }
 
+   
 
     public function store(Request $request)
     {

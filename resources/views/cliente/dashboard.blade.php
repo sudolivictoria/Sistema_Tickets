@@ -282,14 +282,18 @@
                                 <span class="material-symbols-outlined text-xl font-light">headset_mic</span>
                             </div>
                             <div>
-                                <h4 class="text-[14px] font-black uppercase tracking-[0.2em] text-primary mb-2">
-                                    ASISTENCIA</h4>
-                                <p class="text-[12px] text-slate-500 font-medium">Canales de Atención</p>
+                                <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-primary mb-2">
+                                    ATENCIÓN DIRECTA</h4>
+                                <p class="text-[12px] text-slate-500 font-medium">USTS</p>
                             </div>
                         </div>
 
-                        <div class="space-y-4">
+                        <button id="toggle-canales" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined">expand_more</span>
+                            Ver Canales
+                        </button>
 
+                        <div id="canales-list" class="space-y-4" style="display: none;">
                             <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ljalvarez@istu.gob.sv"
                                 target="_blank"
                                 class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
@@ -368,6 +372,21 @@
             </div>
         </div>
     </main>
+
+    <!--script para toggle de canales de soporte tecnico-->
+    <script>
+        document.getElementById('toggle-canales').addEventListener('click', function() {
+            var list = document.getElementById('canales-list');
+            var icon = this.querySelector('.material-symbols-outlined');
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+                icon.textContent = 'expand_less';
+            } else {
+                list.style.display = 'none';
+                icon.textContent = 'expand_more';
+            }
+        });
+    </script>
 
 </body>
 

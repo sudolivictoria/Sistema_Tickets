@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\AdminUnidad;
 
 use App\Http\Controllers\Controller;
 use App\Models\Manual;
@@ -8,7 +8,7 @@ use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AdminController extends Controller
+class AdminUnidadController extends Controller
 {
     public function index()
     {
@@ -71,7 +71,7 @@ class AdminController extends Controller
         //----manuales
         $manuales = Manual::latest()->take(3)->get();
 
-        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'manuales'));
+        return view('admin_unidad.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'manuales'));
     }
 
 
@@ -85,16 +85,6 @@ class AdminController extends Controller
     public function misAsignados()
     {
         return "Página de Mis Asignados (En construcción)";
-    }
-
-    public function gestionUsuarios()
-    {
-        return "Página de Gestión de Usuarios (En construcción)";
-    }
-
-    public function gestionRecursos()
-    {
-        return "Página de Gestión de Recursos (En construcción)";
     }
 
     public function create()
