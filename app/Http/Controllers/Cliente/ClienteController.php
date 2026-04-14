@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cliente;
 use App\Http\Controllers\Controller;
 use App\Models\Categoria;
 use App\Models\Manual;
+use App\Models\Prioridad;
 use App\Models\Ticket;
 use App\Models\TipoSolicitud;
 use App\Models\User;
@@ -50,11 +51,12 @@ class ClienteController extends Controller
     {
         $categorias = Categoria::all();
         $tipos = TipoSolicitud::all();
+        $prioridades = Prioridad::all();
 
-        return view('cliente.crear-ticket', compact('categorias', 'tipos'));
+        return view('cliente.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
-   
+
 
     public function store(Request $request)
     {
@@ -62,23 +64,27 @@ class ClienteController extends Controller
         $request->validate([
             'asunto' => 'required|max:255',
             'categoria_id' => 'required|exists:categorias,id',
-            'tipo_solicitud_id' => 'required',
-            'descripcion' => 'required',
+            'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
+            'descripcion' => 'required|string',
+            'prioridad_id' => 'required|exists:prioridades,id',
+
         ]);
 
         //--crear ticket
-        Ticket::create([
+        $nuevoTicket = Ticket::create([
             'asunto' => $request->asunto,
             'descripcion' => $request->descripcion,
             'categoria_id' => $request->categoria_id,
             'tipo_solicitud_id' => $request->tipo_solicitud_id,
             'user_id' => Auth::id(), //----asignar el ticket al usuario autenticado
             'estado_id' => 1, //---abierto
-            'prioridad' => null,
+            'prioridad_id' => $request->prioridad_id,
             'tecnico_id' => null, //---vacio inicial 
         ]);
 
-        return redirect()->route('cliente.dashboard')->with('success', 'Ticket creado correctamente.');
+        //---redireccionar con mensaje de exito
+        return redirect()->route('cliente.crear-ticket')
+            ->with('success', '¡Ticket creado con éxito!');
     }
 
     public function misTickets()

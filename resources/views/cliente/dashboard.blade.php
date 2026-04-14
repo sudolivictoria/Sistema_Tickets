@@ -191,7 +191,7 @@
                             <h3 class="font-black text-xs tracking-[0.2em] text-primary uppercase">Historial de Tickets
                             </h3>
                         </div>
-                        <div class="overflow-x-auto text-[11px]">
+                        <div class="overflow-x-auto text-[13px]">
                             <table class="w-full text-left">
                                 <thead
                                     class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-slate-400">
@@ -202,27 +202,27 @@
                                         <th class="px-6 py-4">Apertura</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100 text-[11px]">
+                                <tbody class="divide-y divide-slate-100 text-[13px]">
                                     @foreach($todosLosTickets as $ticket)
                                         <tr class="hover:bg-slate-50/50 transition-colors group">
-                                            <td class="px-4 py-4">
+                                            <td class="px-6 py-4">
                                                 <div class="max-w-[150px] truncate font-medium text-slate-600"
                                                     title="{{ $ticket->asunto }}">{{ $ticket->asunto }}</div>
                                             </td>
-                                            <td class="px-4 py-4">
+                                            <td class="px-6 py-4">
                                                 <div class="max-w-[150px] truncate font-medium text-slate-600"
                                                     title="{{ $ticket->categoria->nombre_categoria }}">
                                                     {{ $ticket->categoria->nombre_categoria }}
                                                 </div>
                                             </td>
 
-                                            <td class="px-4 py-4">
+                                            <td class="px-6 py-4">
                                                 <span
-                                                    class="px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-black uppercase text-[9px] shadow-sm">
+                                                    class="px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-black uppercase text-[12px] shadow-sm">
                                                     {{ $ticket->estado->nombre_estado ?? 'Abierto' }}
                                                 </span>
                                             </td>
-                                            <td class="px-4 py-4 text-slate-500 font-medium">
+                                            <td class="px-6 py-4 text-slate-500 font-medium">
                                                 {{ $ticket->created_at->format('d/m/Y') }}
                                             </td>
                                         </tr>

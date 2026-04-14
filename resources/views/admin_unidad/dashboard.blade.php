@@ -38,7 +38,8 @@
             background: #cbd5e1;
             border-radius: 10px;
         }
-          /*size*/
+
+        /*size*/
         ::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -65,6 +66,7 @@
 </head>
 
 <!--cuerpo principal-->
+
 <body
     class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display overflow-hidden">
     <div class="relative flex h-screen flex-col">
@@ -97,12 +99,12 @@
                             <span class="material-symbols-outlined text-xl">confirmation_number</span>
                             <span class="text-sm font-medium">Asignar Tickets</span>
                         </a>
-                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                             href="{{ route('admin.mis-asignados') }}">
                             <span class="material-symbols-outlined text-xl">assignment_ind</span>
                             <span class="text-sm font-medium">Mis Asignados</span>
                         </a>
-    
+
                         <!--cliente-->
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-6 px-4 font-black">Servicios
                         </p>
@@ -145,10 +147,12 @@
                         <div>
                             <div class="flex items-center gap-4">
                                 <span class="text-4xl font-medium text-slate-600">
-                                    Hola, <span class="text-secondary font-bold">{{ auth()->user()->nombre_completo ?? 'Administrador'}}</span>
+                                    Hola, <span
+                                        class="text-secondary font-bold">{{ auth()->user()->nombre_completo ?? 'Administrador'}}</span>
                                 </span>
                             </div>
-                            <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y resolución eficiente de incidencias para el ISTU.</p>
+                            <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y
+                                resolución eficiente de incidencias para el ISTU.</p>
                         </div>
                         <div
                             class="min-w-[180px] px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-end">
@@ -285,7 +289,7 @@
                                                 <th class="px-4 py-4">Técnico</th>
                                                 <th class="px-4 py-4">Apertura</th>
                                                 <th class="px-4 py-4">Cierre</th>
-                                            
+
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-100 text-[11px]">
@@ -294,14 +298,16 @@
                                                     <td class="px-6 py-4 font-black text-secondary text-center">
                                                         #{{ $ticket->id }}</td>
                                                     <td class="px-4 py-4 font-bold text-slate-700 uppercase">
-                                                        {{ $ticket->user->nombre_completo ?? 'N/A' }}</td>
+                                                        {{ $ticket->user->nombre_completo ?? 'N/A' }}
+                                                    </td>
                                                     <td class="px-4 py-4">
                                                         <div class="max-w-[150px] truncate font-medium text-slate-600"
                                                             title="{{ $ticket->asunto }}">{{ $ticket->asunto }}</div>
                                                     </td>
-                                                     <td class="px-4 py-4">
+                                                    <td class="px-4 py-4">
                                                         <div class="max-w-[150px] truncate font-medium text-slate-600"
-                                                            title="{{ $ticket->categoria->nombre_categoria }}">{{ $ticket->categoria->nombre_categoria }}</div>
+                                                            title="{{ $ticket->categoria->nombre_categoria }}">
+                                                            {{ $ticket->categoria->nombre_categoria }}</div>
                                                     </td>
                                                     <td class="px-4 py-4">
                                                         <span
@@ -310,9 +316,11 @@
                                                         </span>
                                                     </td>
                                                     <td class="px-4 py-4 text-slate-500 font-bold uppercase">
-                                                        {{ $ticket->tecnico->nombre_completo ?? 'Sin Asignar' }}</td>
+                                                        {{ $ticket->tecnico->nombre_completo ?? 'Sin Asignar' }}
+                                                    </td>
                                                     <td class="px-4 py-4 text-slate-500 font-medium">
-                                                        {{ $ticket->created_at->format('d/m/Y') }}</td>
+                                                        {{ $ticket->created_at->format('d/m/Y') }}
+                                                    </td>
 
                                                     <td class="px-4 py-4 text-slate-400 italic text-right pr-8">
                                                         {{ $ticket->fecha_cierre ? $ticket->fecha_cierre->format('d/m/Y') : '---' }}
@@ -349,19 +357,125 @@
                                             </div>
                                             <div class="overflow-hidden">
                                                 <div class="text-[11px] font-black text-slate-700 truncate">
-                                                    {{ $manual->titulo }}</div>
+                                                    {{ $manual->titulo }}
+                                                </div>
                                                 <div class="text-[9px] text-slate-400 font-bold uppercase">
-                                                    {{ $manual->categoria ?? 'General' }}</div>
+                                                    {{ $manual->categoria ?? 'General' }}
+                                                </div>
                                             </div>
                                         </a>
                                     @endforeach
                                 </div>
-                                    <a href="{{ route('cliente.recursos') }}"
-                                        class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center">
-                                        Ir al Repositorio
-                                    </a>
+                                <a href="{{ route('cliente.recursos') }}"
+                                    class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center">
+                                    Ir al Repositorio
+                                </a>
                             </div>
                             <!--final recursos-->
+
+
+                            <!--contacto de soporte tecnico-->
+                            <div
+                                class="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+                                <div class="flex items-start gap-4 mb-8">
+                                    <div
+                                        class="bg-primary size-8 rounded-xl flex items-center justify-center text-secondary shadow-lg mt-1">
+                                        <span class="material-symbols-outlined text-xl font-light">headset_mic</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-primary mb-2">
+                                            ATENCIÓN DIRECTA</h4>
+                                        <p class="text-[12px] text-slate-500 font-medium">USTS</p>
+                                    </div>
+                                </div>
+
+                                <button id="toggle-canales"
+                                    class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center mb-4">
+                                    <span class="material-symbols-outlined">expand_more</span>
+                                    Ver Canales
+                                </button>
+
+                                <div id="canales-list" class="space-y-4" style="display: none;">
+                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ljalvarez@istu.gob.sv"
+                                        target="_blank"
+                                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
+                                        <div
+                                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                                            <span class="material-symbols-outlined">mail</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-bold text-slate-700 text-[12px] truncate">
+                                                ljalvarez@istu.gob.sv
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mnrodriguez@istu.gob.sv"
+                                        target="_blank"
+                                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
+                                        <div
+                                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                                            <span class="material-symbols-outlined">mail</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-bold text-slate-700 text-[12px] truncate">
+                                                mnrodriguez@istu.gob.sv
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=matorres@istu.gob.sv"
+                                        target="_blank"
+                                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
+                                        <div
+                                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                                            <span class="material-symbols-outlined">mail</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-bold text-slate-700 text-[12px] truncate">
+                                                matorres@istu.gob.sv
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jjramirez@istu.gob.sv"
+                                        target="_blank"
+                                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
+                                        <div
+                                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                                            <span class="material-symbols-outlined">mail</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-bold text-slate-700 text-[12px] truncate">
+                                                jjramirez@istu.gob.sv
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ovquintanilla@istu.gob.sv"
+                                        target="_blank"
+                                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
+                                        <div
+                                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                                            <span class="material-symbols-outlined">mail</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-bold text-slate-700 text-[12px] truncate">
+                                                ovquintanilla@istu.gob.sv
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div
+                                    class="mt-8 p-2 bg-slate-50 rounded-2xl border border-slate-100 flex gap-1.5 items-start">
+                                    <span class="material-symbols-outlined text-primary mt-0.5">info</span>
+                                    <p class="text-[12px] text-slate-600 leading-relaxed font-medium">
+                                        Al hacer clic en un correo, se redirige automáticamente.
+                                    </p>
+                                </div>
+                            </div>
+                            <!--final contacto de soporte tecnico-->
 
                             <!--protocolo gestión-->
                             <div
@@ -385,7 +499,23 @@
                     </div>
                 </div>
             </main>
+
+            <!--script para toggle de canales de soporte tecnico-->
+            <script>
+                document.getElementById('toggle-canales').addEventListener('click', function () {
+                    var list = document.getElementById('canales-list');
+                    var icon = this.querySelector('.material-symbols-outlined');
+                    if (list.style.display === 'none') {
+                        list.style.display = 'block';
+                        icon.textContent = 'expand_less';
+                    } else {
+                        list.style.display = 'none';
+                        icon.textContent = 'expand_more';
+                    }
+                });
+            </script>
         </div>
     </div>
 </body>
+
 </html>

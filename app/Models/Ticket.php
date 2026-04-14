@@ -11,6 +11,7 @@ class Ticket extends Model
         'tecnico_id',
         'categoria_id',
         'prioridad_id',
+        'tipo_solicitud_id',
         'estado_id',
         'asunto',
         'descripcion',

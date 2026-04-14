@@ -134,8 +134,7 @@
 
             <!--formulario de creacion de ticket-->
             <form action="{{ route('cliente.tickets.store') }}" method="POST"
-                class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100"
-                enctype="multipart/form-data">
+                class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
                 @csrf
 
                 <!--asunto del ticket-->
@@ -155,9 +154,9 @@
                             <select name="categoria_id"
                                 class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none font-medium text-slate-700"
                                 required>
-                                <option value="" disabled selected>Seleccione una categoría</option>
-                                @foreach($categorias as $categoria)
-                                    <option value="{{ $categoria->id }}">{{ $categoria->nombre_categoria }}</option>
+                                <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
+                                {{ $categoria->nombre_categoria }}
+                                </option>
                                 @endforeach
                             </select>
                             <span
@@ -175,7 +174,7 @@
                                 required>
                                 <option value="" disabled selected>Seleccione tipo</option>
                                 @foreach($tipos as $tipo)
-                                    <option value="{{ $tipo->id }}">{{ $tipo->nombre_tipo }}</option>
+                                    <option value="{{ $tipo->id }}">{{ $tipo->nombre_tipo_solicitud }}</option>
                                 @endforeach
                             </select>
                             <span
@@ -212,13 +211,13 @@
                     <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Nivel de
                         Urgencia</label>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        @foreach(['Critica', 'Alta', 'Media', 'Baja'] as $prio)
+                        @foreach($prioridades as $prio) {{--iteracion en la bd--}}
                             <label class="cursor-pointer">
-                                <input class="hidden peer" name="prioridad" type="radio" value="{{ $prio }}" {{ $prio == 'Media' ? 'checked' : '' }} />
+                                <input class="hidden peer" name="prioridad_id" type="radio" value="{{ $prio->id }}" {{ $prio->nombre_prioridad == 'Media' ? 'checked' : '' }} />
                                 <div class="py-3 px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center transition-all 
-                                                        peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary peer-checked:shadow-sm
-                                                        hover:border-slate-200">
-                                    {{ $prio }}
+                                        peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary peer-checked:shadow-sm
+                                        hover:border-slate-200">
+                                    {{ $prio->nombre_prioridad }}
                                 </div>
                             </label>
                         @endforeach
@@ -235,7 +234,7 @@
                     </a>
                     <button
                         class="px-10 py-3.5 rounded-2xl bg-primary text-secondary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-3 uppercase tracking-widest text-xs"
-                        type="submit">
+                        type="submit" id="btn-enviar">
                         <span>Enviar Requerimiento</span>
                         <span class="material-symbols-outlined text-lg">send</span>
                     </button>
@@ -245,7 +244,7 @@
     </main>
 
 
-    //------------filtrado dinamico tipo de solicitud segun categoria seleccionada----------------
+    <!--script para dinamismo en formulario-->
     <script>
         //---captura de datos de tipos de solicitud desde el backend 
         const todosLosTipos = @json($tipos);
@@ -268,6 +267,8 @@
                 option.textContent = tipo.nombre_tipo_solicitud;
                 selectTipo.appendChild(option);
             });
+
+            document.getElementById('info-extra').classList.add('hidden'); //--oculta info extra al cambiar categoria para evitar confusiones
         });
 
 
@@ -280,14 +281,82 @@
             //---buscar tipo seleccionado   
             const tipoSeleccionado = todosLosTipos.find(t => t.id == tipoId);
 
-            if (tipoSeleccionado && tipoSeleccionado.descripcion_ayuda) {
-                textoAyuda.textContent = tipoSeleccionado.descripcion_ayuda;
+            if (tipoSeleccionado && tipoSeleccionado.descripcion_solicitud) {
+                textoAyuda.textContent = tipoSeleccionado.descripcion_solicitud;
                 infoDiv.classList.remove('hidden'); //---mostramos el div si hay info disponible
             } else {
                 infoDiv.classList.add('hidden'); //--lo oculta si no hay info
             }
         });
+
+
+        //---prevencion de doble envio del formulario
+        document.querySelector('form').addEventListener('submit', function () {
+            const btnEnviar = document.getElementById('btn-enviar');
+            btnEnviar.disabled = true;
+
+            btn.classList.add('cursor-not-allowed', 'opacity-50'); //---cambia apariencia del boton para indicar que ya fue enviado
+            btnEnviar.innerHTML = `
+                <span>Enviando...</span>
+                <svg class="animate-spin h-5 w-5 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            `; //---cambia texto e icono del boton para indicar proceso de envio
+        });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                title: '¡Excelente!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                confirmButtonColor: '#1e3a8a',
+                confirmButtonText: 'Entendido',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
+                }
+            });
+        </script>
+    @endif
+
+    @if(session('error'))
+        <script>
+            Swal.fire({
+                title: 'Error',
+                text: "{{ session('error') }}",
+                icon: 'error',
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Corregir',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
+                }
+            });
+        </script>
+    @endif
+
+    @if ($errors->any())
+        <script>
+            Swal.fire({
+                title: 'No se pudo enviar',
+                html: '{!! implode("<br>", $errors->all()) !!}',
+                icon: 'error',
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Corregir',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
+                }
+            });
+        </script>
+    @endif
+
+
 
 </body>
 
