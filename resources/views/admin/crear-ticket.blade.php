@@ -1,22 +1,22 @@
-@extends('layouts.cliente')
+@extends('layouts.admin')
 
 @section('content')
 <div class="max-w-4xl w-full mx-auto p-8">
     <div class="mb-10 border-b border-slate-200 pb-6">
-        <h2 class="text-3xl font-black text-primary mb-2 flex items-center gap-3">
-            <span class="material-symbols-outlined text-4xl text-secondary">confirmation_number</span>
+        <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
+            <span class="material-symbols-outlined text-4xl text-primary">confirmation_number</span>
             Enviar Nueva Solicitud
         </h2>
         <p class="text-slate-500 font-medium">Complete el formulario oficial para la gestión de su requerimiento.</p>
     </div>
 
     {{-- Formulario de Creación de Ticket --}}
-    <form action="{{ route('cliente.tickets.store') }}" method="POST"
+    <form action="{{ route('admin.tickets.store') }}" method="POST"
         class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
         @csrf
 
         <div class="flex flex-col gap-2.5">
-            <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Asunto del Ticket</label>
+            <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Asunto del Ticket</label>
             <input name="asunto" value="{{ old('asunto') }}"
                 class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all placeholder:text-slate-300 font-medium text-slate-700"
                 placeholder="Ej: Falla en equipo de cómputo" type="text" required />
@@ -24,7 +24,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="flex flex-col gap-2.5">
-                <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Categoría</label>
+                <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Categoría</label>
                 <div class="relative">
                     <select name="categoria_id"
                         class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none font-medium text-slate-700"
@@ -41,7 +41,7 @@
             </div>
 
             <div class="flex flex-col gap-2.5">
-                <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Tipo de Solicitud</label>
+                <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Tipo de Solicitud</label>
                 <div class="relative">
                     <select name="tipo_solicitud_id"
                         class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none font-medium text-slate-700"
@@ -53,18 +53,18 @@
             </div>
         </div>
 
-        <div id="info-extra" class="hidden mt-3 p-4 bg-blue-50 border-l-4 border-primary rounded-r-xl transition-all animate-fade-in">
+        <div id="info-extra" class="hidden mt-3 p-4 bg-blue-50 border-l-4 border-secondary rounded-r-xl transition-all animate-fade-in">
             <div class="flex gap-3">
-                <span class="material-symbols-outlined text-primary">info</span>
+                <span class="material-symbols-outlined text-secondary">info</span>
                 <div>
-                    <p class="text-xs font-black text-primary uppercase tracking-wider">Información del servicio</p>
+                    <p class="text-xs font-black text-secondary uppercase tracking-wider">Información del servicio</p>
                     <p id="texto-ayuda" class="text-sm text-slate-600 mt-1 italic"></p>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-col gap-2.5">
-            <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Descripción Detallada</label>
+            <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Descripción Detallada</label>
             <textarea name="descripcion"
                 class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all resize-none font-medium text-slate-700"
                 rows="5" placeholder="Explique brevemente el problema..."
@@ -72,13 +72,13 @@
         </div>
 
         <div class="flex flex-col gap-2.5">
-            <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Nivel de Urgencia</label>
+            <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Nivel de Urgencia</label>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 @foreach($prioridades as $prio)
                     <label class="cursor-pointer">
                         <input class="hidden peer" name="prioridad_id" type="radio" value="{{ $prio->id }}" {{ $prio->nombre_prioridad == 'Media' ? 'checked' : '' }} />
                         <div class="py-3 px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center transition-all 
-                                peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary peer-checked:shadow-sm
+                                peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary peer-checked:shadow-sm
                                 hover:border-slate-200">
                             {{ $prio->nombre_prioridad }}
                         </div>
@@ -94,7 +94,7 @@
                 Cancelar
             </a>
             <button
-                class="px-10 py-3.5 rounded-2xl bg-primary text-secondary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-3 uppercase tracking-widest text-xs"
+                class="px-10 py-3.5 rounded-2xl bg-secondary text-primary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-3 uppercase tracking-widest text-xs"
                 type="submit" id="btn-enviar">
                 <span>Enviar Requerimiento</span>
                 <span class="material-symbols-outlined text-lg">send</span>
@@ -179,7 +179,7 @@
                 confirmButtonText: 'Entendido',
                 customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
             }).then(() => {
-                window.location.href = "{{ route('cliente.dashboard') }}";
+                window.location.href = "{{ route('admin.dashboard') }}";
             });
         </script>
     @endif

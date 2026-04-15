@@ -65,7 +65,10 @@
             <div class="size-9 bg-secondary rounded-lg flex items-center justify-center text-primary shadow-sm">
                 <span class="material-symbols-outlined font-bold text-2xl">support_agent</span>
             </div>
-            <h2 class="text-xl font-bold text-primary tracking-tight">Help Desk Istu</h2>
+            <h2 class="text-xl font-bold text-primary tracking-tight">Help Desk Istu</h2><span
+                class="text-green-900 font-bold text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-secondary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Cliente' }}</span>
+            </h2>
+
         </div>
     </header>
 
@@ -97,7 +100,7 @@
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
-                    class="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-white hover:bg-red-500/20 rounded-xl transition-all font-bold group">
+                    class="w-full flex items-center gap-3 px-4 py-3 text-blue-300 hover:text-blue-900 hover:bg-blue-300 rounded-xl transition-all font-bold group">
                     <span
                         class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
                     <span class="text-sm">Cerrar Sesión</span>
@@ -115,4 +118,5 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('scripts')
 </body>
+
 </html>

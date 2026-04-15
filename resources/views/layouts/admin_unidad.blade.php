@@ -67,7 +67,7 @@
                     <span class="material-symbols-outlined font-bold text-2xl">support_agent</span>
                 </div>
                 <h2 class="text-xl font-bold text-secondary tracking-tight">Help Desk Istu <span
-                        class="text-primary text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">Admin</span>
+                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Admin' }}</span>
                 </h2>
             </div>
 
@@ -82,6 +82,7 @@
             <aside class="w-64 bg-secondary flex flex-col shrink-0 z-10 shadow-2xl overflow-y-auto">
                 <div class="p-6 flex flex-col h-full">
                     <nav class="flex flex-col gap-1.5 flex-1">
+                        <!--routeis para activar el menu-->
                         <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.dashboard') ? 'bg-primary text-secondary' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold shadow-lg mb-4 transition-all"
                             href="{{ route('admin.dashboard') }}">
                             <span class="material-symbols-outlined">dashboard</span>
@@ -93,13 +94,13 @@
 
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                             href="{{ route('admin.asignar-tickets') }}">
-                            <span class="material-symbols-outlined text-xl font-light">confirmation_number</span>
-                            <span class="text-sm font-medium">Asignar Tickets</span>
+                            <span class="material-symbols-outlined text-xl">confirmation_number</span>
+                            <span class="text-sm">Asignar Tickets</span>
                         </a>
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                             href="{{ route('admin.mis-asignados') }}">
-                            <span class="material-symbols-outlined text-xl font-light">assignment_ind</span>
-                            <span class="text-sm font-medium">Mis Asignados</span>
+                            <span class="material-symbols-outlined text-xl">assignment_ind</span>
+                            <span class="text-sm">Mis Asignados</span>
                         </a>
 
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-6 px-4 font-black">Servicios
@@ -107,13 +108,13 @@
 
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                             href="{{ route('admin.crear-ticket') }}">
-                            <span class="material-symbols-outlined text-xl font-light">add_circle</span>
-                            <span class="text-sm font-medium">Crear Ticket</span>
+                            <span class="material-symbols-outlined text-xl">add_circle</span>
+                            <span class="text-sm">Crear Ticket</span>
                         </a>
                         <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                             href="{{ route('admin.mis-tickets') }}">
-                            <span class="material-symbols-outlined text-xl font-light">history</span>
-                            <span class="text-sm font-medium">Mis Tickets</span>
+                            <span class="material-symbols-outlined text-xl">history</span>
+                            <span class="text-sm">Mis Tickets</span>
                         </a>
                     </nav>
 
@@ -121,7 +122,7 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"
-                                class="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-white hover:bg-red-500/20 rounded-xl transition-all font-bold group">
+                                class="w-full flex items-center gap-3 px-4 py-3 text-blue-300 hover:text-blue-900 hover:bg-blue-300 rounded-xl transition-all font-bold group">
                                 <span
                                     class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
                                 <span class="text-sm">Cerrar Sesión</span>
@@ -140,4 +141,5 @@
         </div>
     </div> @stack('scripts')
 </body>
+
 </html>

@@ -49,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/crear-ticket', [AdminController::class, 'create'])->name('crear-ticket');
         Route::get('/mis-tickets', [AdminController::class, 'misTickets'])->name('mis-tickets');
         Route::get('/recursos', [AdminController::class, 'recursos'])->name('recursos');
+        Route::post('/crear-ticket', [AdminController::class, 'store'])->name('tickets.store');
     });
 
     //---Rol Cliente
@@ -62,13 +63,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/mis-tickets', [ClienteController::class, 'misTickets'])->name('mis-tickets');
         Route::get('/recursos', [ClienteController::class, 'recursos'])->name('recursos');
         Route::post('/crear-ticket', [ClienteController::class, 'store'])->name('tickets.store');
-
     });
 
 
     //---Rol Admin Unidad
     Route::middleware(['auth', 'role:AdminUnidad'])->prefix('admin-unidad')->name('admin_unidad.')->group(function () {
-    
+
         //--dashboard principal
         Route::get('/dashboard', [AdminUnidadController::class, 'index'])->name('dashboard');
 
@@ -80,8 +80,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/crear-ticket', [AdminUnidadController::class, 'create'])->name('crear-ticket');
         Route::get('/mis-tickets', [AdminUnidadController::class, 'misTickets'])->name('mis-tickets');
         Route::get('/recursos', [AdminUnidadController::class, 'recursos'])->name('recursos');
+        Route::post('/crear-ticket', [AdminUnidadController::class, 'store'])->name('tickets.store');
     });
-
 });
 
 // Comenta o borra esta línea si te da error

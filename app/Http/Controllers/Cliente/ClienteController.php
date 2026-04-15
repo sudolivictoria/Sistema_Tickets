@@ -41,7 +41,7 @@ class ClienteController extends Controller
         //----tickets del cliente autenticado
         $todosLosTickets = Ticket::where('user_id', Auth::id())
             ->latest()
-            ->paginate(10);
+            ->paginate(5);
 
         return view('cliente.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'manuales', 'todosLosTickets'));
     }
@@ -62,12 +62,15 @@ class ClienteController extends Controller
     {
         //-----validacion datos
         $request->validate([
-            'asunto' => 'required|max:255',
+            'asunto' => 'required|string|min:5|max:50',
             'categoria_id' => 'required|exists:categorias,id',
             'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
             'descripcion' => 'required|string',
             'prioridad_id' => 'required|exists:prioridades,id',
 
+        ], [
+            'asunto.max' => 'El asunto es demasiado largo. Resume el problema en menos de 50 caracteres.',
+            'asunto.min' => 'El asunto es demasiado corto. Debe tener al menos 5 caracteres.',
         ]);
 
         //--crear ticket

@@ -1,4 +1,4 @@
-@extends('layouts.cliente')
+@extends('layouts.admin-unidad')
 
 @section('content')
 <div class="max-w-4xl w-full mx-auto p-8">
@@ -11,7 +11,7 @@
     </div>
 
     {{-- Formulario de Creación de Ticket --}}
-    <form action="{{ route('cliente.tickets.store') }}" method="POST"
+    <form action="{{ route('admin-unidad.tickets.store') }}" method="POST"
         class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
         @csrf
 
@@ -179,7 +179,7 @@
                 confirmButtonText: 'Entendido',
                 customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
             }).then(() => {
-                window.location.href = "{{ route('cliente.dashboard') }}";
+                window.location.href = "{{ route('admin_unidad.dashboard') }}";
             });
         </script>
     @endif

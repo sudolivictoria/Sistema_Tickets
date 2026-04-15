@@ -47,14 +47,14 @@
                 </div>
             </div>
 
-            {{-- Historial de Tickets --}}
+            {{-- Tickets Recientes --}}
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                 <div class="p-6 border-b border-slate-50 flex items-center justify-between">
-                    <h3 class="font-black text-xs tracking-[0.2em] text-primary uppercase">Historial de Tickets</h3>
+                    <h3 class="font-black text-lg tracking-[0.2em] text-primary uppercase">Tickets Recientes</h3>
                 </div>
                 <div class="overflow-x-auto text-[14px]">
                     <table class="w-full text-left">
-                        <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-slate-400">
+                        <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-green-900">
                             <tr>
                                 <th class="px-6 py-4">Asunto</th>
                                 <th class="px-6 py-4">Categoría</th>
@@ -65,14 +65,23 @@
                         <tbody class="divide-y divide-slate-100 text-[13px]">
                             @foreach($todosLosTickets as $ticket)
                                 <tr class="hover:bg-slate-50/50 transition-colors group">
-                                    <td class="px-6 py-4 truncate max-w-[150px]" title="{{ $ticket->asunto }}">{{ $ticket->asunto }}</td>
-                                    <td class="px-6 py-4 truncate max-w-[150px]">{{ $ticket->categoria->nombre_categoria }}</td>
+                                    <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold" title="{{ $ticket->asunto }}">{{ $ticket->asunto }}</td>
+                                    <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold">{{ $ticket->categoria->nombre_categoria }}</td>
                                     <td class="px-6 py-4">
-                                        <span class="px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-black uppercase text-[13px] shadow-sm">
-                                            {{ $ticket->estado->nombre_estado ?? 'Abierto' }}
+                                        @php
+                                            $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
+                                            $claseEstado = match ($estado) {
+                                                'abierto' => 'bg-red-100 text-red-700 border-red-200',
+                                                'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
+                                                'resuelto' => 'bg-green-100 text-green-700 border-green-200',
+                                                default => 'bg-slate-100 text-slate-600 border-slate-200',
+                                            };
+                                        @endphp
+                                        <span class="px-2 py-1 rounded-md border font-black uppercase text-[12px] {{ $claseEstado }}">
+                                            {{ ucfirst($estado) }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-slate-500 font-medium">{{ $ticket->created_at->format('d/m/Y') }}</td>
+                                    <td class="px-6 py-4 text-slate-600 font-bold">{{ $ticket->created_at->format('d/m/Y') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -112,8 +121,8 @@
                         <span class="material-symbols-outlined text-xl font-light">headset_mic</span>
                     </div>
                     <div>
-                        <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-primary mb-2">ATENCIÓN DIRECTA</h4>
-                        <p class="text-[12px] text-slate-500 font-medium">USTS</p>
+                        <h4 class="text-[14px] font-black uppercase tracking-[0.2em] text-primary mb-2">USTS</h4>
+                        <p class="text-[12px] text-slate-500 font-medium">Contacto Directo</p>
                     </div>
                 </div>
                 <button id="toggle-canales" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center mb-4">

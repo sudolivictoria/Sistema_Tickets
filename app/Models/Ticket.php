@@ -37,6 +37,11 @@ class Ticket extends Model
         return $this->belongsTo(Categoria::class);
     }
 
+    public function tipo_solicitud()
+    {
+        return $this->belongsTo(TipoSolicitud::class);
+    }
+
     public function prioridad()
     {
         return $this->belongsTo(Prioridad::class);
