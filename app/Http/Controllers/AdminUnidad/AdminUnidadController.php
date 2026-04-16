@@ -171,7 +171,12 @@ class AdminUnidadController extends Controller
 
     public function misTickets()
     {
-        return "Historial de mis tickets (En construcción)";
+        $misTickets = Ticket::where('user_id', Auth::id())
+            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin_unidad.mis-tickets', compact('misTickets'));
     }
 
     public function recursos()

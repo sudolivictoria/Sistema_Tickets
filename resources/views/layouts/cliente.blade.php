@@ -59,6 +59,16 @@
 </head>
 
 <body class="bg-slate-50 font-display text-slate-900 antialiased">
+    <div id="preloader"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-1000">
+        <div class="flex flex-col items-center">
+            <div class="h-16 w-16 animate-spin rounded-full border-4 border-slate-200 border-t-secondary"></div>
+
+            <p class="mt-4 text-sm font-black uppercase tracking-widest text-primary animate-pulse">
+                Cargando sistema...
+            </p>
+        </div>
+    </div>
     <header
         class="fixed top-0 w-full z-50 bg-white border-b border-slate-100 px-8 py-3 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-4">
@@ -117,6 +127,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('scripts')
+
+    <script>
+        window.addEventListener('load', function () {
+            const preloader = document.getElementById('preloader');
+            preloader.classList.add('opacity-0');
+            document.body.classList.remove('overflow-hidden');
+            document.body.style.overflow = 'auto';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 1000);
+        });
+    </script>
 </body>
 
 </html>

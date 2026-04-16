@@ -58,8 +58,19 @@
 <body
     class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display overflow-hidden">
 
-    <div class="flex h-screen flex-col">
+    <div id="preloader"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-1000">
+        <div class="flex flex-col items-center">
+            <div class="h-16 w-16 animate-spin rounded-full border-4 border-slate-200 border-t-primary"></div>
 
+            <p class="mt-4 text-sm font-black uppercase tracking-widest text-secondary animate-pulse">
+                Cargando sistema...
+            </p>
+        </div>
+    </div>
+
+
+    <div class="flex h-screen flex-col">
         <header
             class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-8 shrink-0 z-20 shadow-sm">
             <div class="flex items-center gap-4">
@@ -140,6 +151,18 @@
 
         </div>
     </div> @stack('scripts')
+
+    <script>
+        window.addEventListener('load', function () {
+            const preloader = document.getElementById('preloader');
+            preloader.classList.add('opacity-0');
+            document.body.classList.remove('overflow-hidden');
+            document.body.style.overflow = 'auto';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 1000);
+        });
+    </script>
 </body>
 
 </html>

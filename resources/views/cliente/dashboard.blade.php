@@ -5,10 +5,10 @@
         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
             <div>
-                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-2">Sistema de Tickets</p>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-2">Sistema de Solicitudes</p>
                 <h2 class="text-4xl font-black text-white tracking-tighter leading-tight">Hola, {{ auth()->user()->nombre_completo ?? 'Usuario' }}</h2>
                 <p class="text-white/90 mt-3 max-w-200 text-sm font-medium italic">
-                    Gestiona tus solicitudes de soporte, consulta recursos útiles y mantente al tanto del estado de tus tickets en un solo lugar. ¡Estamos aquí para ayudarte!
+                    Gestiona tus solicitudes, consulta recursos útiles y mantente al tanto del estado de tus tickets en un solo lugar. ¡Estamos aquí para ayudarte!
                 </p>
             </div>
             <div class="pb-4 px-2">

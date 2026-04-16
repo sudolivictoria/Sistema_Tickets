@@ -7,7 +7,7 @@
                 <span class="material-symbols-outlined text-4xl text-secondary">confirmation_number</span>
                 Enviar Nueva Solicitud
             </h2>
-            <p class="text-slate-500 font-medium">Complete el formulario oficial para la gestión de su requerimiento.</p>
+            <p class="text-slate-500 font-medium italic">Complete el formulario oficial para la gestión de su solicitud.</p>
         </div>
 
         {{-- Formulario de Creación de Ticket --}}
@@ -105,7 +105,7 @@
                 <button
                     class="px-10 py-3.5 rounded-2xl bg-primary text-secondary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-3 uppercase tracking-widest text-xs"
                     type="submit" id="btn-enviar">
-                    <span>Enviar Requerimiento</span>
+                    <span>Enviar Solicitud</span>
                     <span class="material-symbols-outlined text-lg">send</span>
                 </button>
             </div>
@@ -177,32 +177,32 @@
         });
     </script>
 
-    {{--alertas sweetalert--}}
-    @if(session('success'))
-        <script>
-            Swal.fire({
-                title: '¡Excelente!',
-                text: "{{ session('success') }}",
-                icon: 'success',
-                confirmButtonColor: '#1e3a8a',
-                confirmButtonText: 'Entendido',
-                customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
-            }).then(() => {
-                window.location.href = "{{ route('cliente.dashboard') }}";
-            });
-        </script>
-    @endif
+        {{--alertas sweetalert--}}
+        @if(session('success'))
+            <script>
+                Swal.fire({
+                    title: '¡Excelente!',
+                    text: "{{ session('success') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#1e3a8a',
+                    confirmButtonText: 'Entendido',
+                    customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
+                }).then(() => {
+                    window.location.href = "{{ route('cliente.dashboard') }}";
+                });
+            </script>
+        @endif
 
-    @if ($errors->any())
-        <script>
-            Swal.fire({
-                title: 'No se pudo enviar',
-                html: '{!! implode("<br>", $errors->all()) !!}',
-                icon: 'error',
-                confirmButtonColor: '#dc2626',
-                confirmButtonText: 'Corregir',
-                customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
-            });
-        </script>
-    @endif
+        @if ($errors->any())
+            <script>
+                Swal.fire({
+                    title: 'No se pudo enviar',
+                    html: '{!! implode("<br>", $errors->all()) !!}',
+                    icon: 'error',
+                    confirmButtonColor: '#dc2626',
+                    confirmButtonText: 'Corregir',
+                    customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
+                });
+            </script>
+        @endif
 @endpush

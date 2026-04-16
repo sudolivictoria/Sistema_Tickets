@@ -28,6 +28,8 @@ Route::middleware(['auth'])->group(function () {
             return redirect()->route('admin.dashboard');
         } elseif ($user->rol_id == 2) {
             return redirect()->route('cliente.dashboard');
+        } elseif ($user->rol_id == 3) {
+            return redirect()->route('admin_unidad.dashboard');
         } else {
             return redirect('/'); //---si el rol no es admin ni cliente, redirige al login
         }

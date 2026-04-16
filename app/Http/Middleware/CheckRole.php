@@ -26,8 +26,10 @@ class CheckRole
         $roles = [
             'Admin'   => 1,
             'Cliente' => 2,
+            'AdminUnidad' => 3,
             '1'       => 1,
             '2'       => 2,
+            '3'       => 3,
 
         ];
 

@@ -11,7 +11,7 @@
                 </span>
             </div>
             <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y resolución eficiente de
-                incidencias para el ISTU.</p>
+                solicitudes para el ISTU.</p>
         </div>
         <div class="min-w-[180px] px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-end">
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Fecha de
