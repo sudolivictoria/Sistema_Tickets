@@ -14,6 +14,8 @@ class User extends Authenticatable
     use Notifiable;
 
     // Campos que se pueden llenar masivamente
+
+    protected $table = 'users';
     protected $fillable = [
         'nombre_completo',
         'email',
@@ -26,15 +28,21 @@ class User extends Authenticatable
         'activo',
     ];
 
+    protected $hidden = [
+        'password',
+        'password_365',
+        'remember_token',
+    ];
+
     // Laravel busca 'password' por defecto, le decimos que la tuya se llama distinto
     public function getAuthPassword()
     {
         return $this->password;
     }
 
-    public function getEmailAttribute()
+    public function getEmailAttribute($value)
     {
-        return $this->email;
+        return $value ?? $this->attributes['email'] ?? null;
     }
 
     /**

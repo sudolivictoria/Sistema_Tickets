@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TicketCreadoMail;
 use App\Models\Categoria;
 use App\Models\Manual;
 use App\Models\Prioridad;
@@ -11,6 +12,8 @@ use App\Models\TipoSolicitud;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ClienteController extends Controller
 {
@@ -85,9 +88,32 @@ class ClienteController extends Controller
             'tecnico_id' => null, //---vacio inicial 
         ]);
 
-        //---redireccionar con mensaje de exito
+        //---cargar relaciones para el correo
+        $nuevoTicket->load(['user', 'categoria', 'prioridad', 'tipo_solicitud']);
+
+        //---envio correo capturandolo del usuario autenticado
+        try {
+            //---obtenemos el email del usuario autenticado
+            $usuario = Auth::user();
+            $destinatario = $usuario->email;
+
+            //---siempre envia el ticket, aunque falle el correo, para no perder la información del ticket creado
+            if (empty($destinatario)) {
+                Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
+                $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
+            } else {
+                Mail::to($destinatario)->send(new TicketCreadoMail($nuevoTicket));
+                $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
+            }
+        } catch (\Exception $e) {
+            //--guardar ticket aunque no se cree el correo
+            Log::error("Fallo al enviar correo de Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
+            $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
+        }
+
+        //--redireccionar con mensaje de exito o error en el correo
         return redirect()->route('cliente.crear-ticket')
-            ->with('success', '¡Ticket creado con éxito!');
+            ->with('success', $mensajeFlash);
     }
 
     public function misTickets()

@@ -58,6 +58,7 @@
                             <tr>
                                 <th class="px-6 py-4">Asunto</th>
                                 <th class="px-6 py-4">Categoría</th>
+                                <th class="px-6 py-4">Solicitud</th>
                                 <th class="px-6 py-4">Estado</th>
                                 <th class="px-6 py-4">Apertura</th>
                             </tr>
@@ -67,6 +68,7 @@
                                 <tr class="hover:bg-slate-50/50 transition-colors group">
                                     <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold" title="{{ $ticket->asunto }}">{{ $ticket->asunto }}</td>
                                     <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold">{{ $ticket->categoria->nombre_categoria }}</td>
+                                    <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold">{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}</td>
                                     <td class="px-6 py-4">
                                         @php
                                             $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
