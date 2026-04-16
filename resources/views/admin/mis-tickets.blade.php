@@ -155,8 +155,7 @@
                     </div>
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción del
-                                reporte</label>
+                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la solicitud</label>
                             <div id="modalDescripcion"
                                 class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
                                 ---

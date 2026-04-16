@@ -61,6 +61,7 @@
                                 <th class="px-6 py-4">Solicitud</th>
                                 <th class="px-6 py-4">Estado</th>
                                 <th class="px-6 py-4">Apertura</th>
+                                <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-[13px]">
@@ -84,6 +85,15 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-slate-600 font-bold">{{ $ticket->created_at->format('d/m/Y') }}</td>
+
+                                    {{-- Botón Detalle (Descripción) --}}
+                                    <td class="px-4 py-4 text-center">
+                                    <button type="button"
+                                        onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
+                                        class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
+                                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                    </button>
+                                </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -206,6 +216,41 @@
             </div>
         </div>
     </div>
+
+
+    {{------------------------------------------------MODAL DE DETALLE-----------------------------------------}}
+    <div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModal()"></div>
+            <div
+                class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-secondary">
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <h3 id="modalTitulo" class="text-xl font-black text-primary uppercase">---</h3>
+                        <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[11px] font-black text-primary uppercase tracking-widest">Descripción de la solicitud</label>
+                            <div id="modalDescripcion"
+                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
+                                ---
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <button onclick="cerrarModal()"
+                            class="w-full py-4 bg-secondary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-secondary/20">
+                            Cerrar Detalle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -221,5 +266,19 @@
             icon.textContent = 'expand_more';
         }
     });
+
+
+    //----detalles del ticket
+    function verDetalle(asunto, descripcion) {
+        document.getElementById('modalTitulo').innerText = asunto;
+        document.getElementById('modalDescripcion').innerText = descripcion;
+        document.getElementById('modalTicket').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModal() {
+        document.getElementById('modalTicket').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
 </script>
 @endpush
