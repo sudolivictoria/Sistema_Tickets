@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AdminUnidad\AdminUnidadController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use Illuminate\Support\Facades\Auth;
@@ -44,8 +45,15 @@ Route::middleware(['auth'])->group(function () {
         //--seccion administracion
         Route::get('/asignar-tickets', [AdminController::class, 'asignarTickets'])->name('asignar-tickets');
         Route::get('/mis-asignados', [AdminController::class, 'misAsignados'])->name('mis-asignados');
-        Route::get('/gestion-usuarios', [AdminController::class, 'gestionUsuarios'])->name('gestion-usuarios');
         Route::get('/gestion-recursos', [AdminController::class, 'gestionRecursos'])->name('gestion-recursos');
+
+
+
+        //---acciones para gestion de usuarios
+        Route::post('/usuarios/store', [UserController::class, 'store'])->name('usuarios.store');
+        Route::get('/gestion-usuarios', [UserController::class, 'index'])->name('gestion-usuarios');
+        Route::patch('/usuarios/{user}', [UserController::class, 'update'])->name('usuarios.update');
+        Route::patch('/usuarios/{user}/toggle', [UserController::class, 'toggleStatus'])->name('usuarios.toggle');
 
         //--seccion servicios-
         Route::get('/crear-ticket', [AdminController::class, 'create'])->name('crear-ticket');
@@ -69,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     //---Rol Admin Unidad
-    Route::middleware(['auth', 'role:AdminUnidad'])->prefix('admin-unidad')->name('admin_unidad.')->group(function () {
+    Route::middleware(['auth', 'role:AdminUnidad'])->prefix('adminunidad')->name('adminunidad.')->group(function () {
 
         //--dashboard principal
         Route::get('/dashboard', [AdminUnidadController::class, 'index'])->name('dashboard');
@@ -85,6 +93,3 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/crear-ticket', [AdminUnidadController::class, 'store'])->name('tickets.store');
     });
 });
-
-// Comenta o borra esta línea si te da error
-// require __DIR__ . '/auth.php';

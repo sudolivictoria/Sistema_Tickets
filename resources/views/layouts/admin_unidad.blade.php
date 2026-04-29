@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>@yield('title', 'Help Desk Istu - Admin')</title>
+    <title>@yield('title', 'Help Desk Istu - Admin Unidad')</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
@@ -78,13 +78,13 @@
                     <span class="material-symbols-outlined font-bold text-2xl">support_agent</span>
                 </div>
                 <h2 class="text-xl font-bold text-secondary tracking-tight">Help Desk Istu <span
-                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Admin' }}</span>
+                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Admin Unidad' }}</span>
                 </h2>
             </div>
 
             <div class="flex items-center gap-4">
                 <span
-                    class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->name ?? 'Admin' }}</span>
+                    class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->name ?? 'Admin Unidad' }}</span>
             </div>
         </header>
 
@@ -93,9 +93,8 @@
             <aside class="w-64 bg-secondary flex flex-col shrink-0 z-10 shadow-2xl overflow-y-auto">
                 <div class="p-6 flex flex-col h-full">
                     <nav class="flex flex-col gap-1.5 flex-1">
-                        <!--routeis para activar el menu-->
-                        <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.dashboard') ? 'bg-primary text-secondary' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold shadow-lg mb-4 transition-all"
-                            href="{{ route('admin.dashboard') }}">
+                        <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('adminunidad.dashboard') ? 'bg-primary text-secondary shadow-lg' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold mb-4 transition-all"
+                            href="{{ route('adminunidad.dashboard') }}">
                             <span class="material-symbols-outlined">dashboard</span>
                             <span class="text-sm">Dashboard</span>
                         </a>
@@ -103,13 +102,14 @@
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-4 px-4 font-black">
                             Administración</p>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="{{ route('admin.asignar-tickets') }}">
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.asignar-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                            href="{{ route('adminunidad.asignar-tickets') }}">
                             <span class="material-symbols-outlined text-xl">confirmation_number</span>
                             <span class="text-sm">Asignar Tickets</span>
                         </a>
-                        <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="{{ route('admin.mis-asignados') }}">
+
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.mis-asignados') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                            href="{{ route('adminunidad.mis-asignados') }}">
                             <span class="material-symbols-outlined text-xl">assignment_ind</span>
                             <span class="text-sm">Mis Asignados</span>
                         </a>
@@ -117,15 +117,22 @@
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-6 px-4 font-black">Servicios
                         </p>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="{{ route('admin.crear-ticket') }}">
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.crear-ticket') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                            href="{{ route('adminunidad.crear-ticket') }}">
                             <span class="material-symbols-outlined text-xl">add_circle</span>
                             <span class="text-sm">Crear Ticket</span>
                         </a>
-                        <a class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                            href="{{ route('admin.mis-tickets') }}">
+
+                         <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                            href="{{ route('adminunidad.mis-tickets') }}">
                             <span class="material-symbols-outlined text-xl">history</span>
                             <span class="text-sm">Mis Tickets</span>
+                        </a>
+
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.recursos') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+                            href="{{ route('adminunidad.recursos') }}">
+                            <span class="material-symbols-outlined text-xl">library_books</span>
+                            <span class="text-sm">Recursos</span>
                         </a>
                     </nav>
 

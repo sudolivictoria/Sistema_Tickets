@@ -9,6 +9,7 @@ use App\Models\Manual;
 use App\Models\Prioridad;
 use App\Models\Ticket;
 use App\Models\TipoSolicitud;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -173,7 +174,8 @@ class AdminController extends Controller
 
     public function gestionUsuarios()
     {
-        return "Página de Gestión de Usuarios (En construcción)";
+          $usuarios = User::all();
+        return view('admin.gestion-usuarios', compact('usuarios'));
     }
 
     public function gestionRecursos()

@@ -137,7 +137,7 @@
                         <p class="text-[12px] text-slate-500 font-medium">Contacto Directo</p>
                     </div>
                 </div>
-                <button id="toggle-canales" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center mb-4">
+                <button id="toggle-canales" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center mb-4">
                     <span class="material-symbols-outlined">expand_more</span> Ver Canales
                 </button>
                  <div id="canales-list" class="space-y-4" style="display: none;">
@@ -254,31 +254,5 @@
 @endsection
 
 @push('scripts')
-<script>
-    document.getElementById('toggle-canales').addEventListener('click', function() {
-        var list = document.getElementById('canales-list');
-        var icon = this.querySelector('.material-symbols-outlined');
-        if (list.style.display === 'none') {
-            list.style.display = 'block';
-            icon.textContent = 'expand_less';
-        } else {
-            list.style.display = 'none';
-            icon.textContent = 'expand_more';
-        }
-    });
-
-
-    //----detalles del ticket
-    function verDetalle(asunto, descripcion) {
-        document.getElementById('modalTitulo').innerText = asunto;
-        document.getElementById('modalDescripcion').innerText = descripcion;
-        document.getElementById('modalTicket').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function cerrarModal() {
-        document.getElementById('modalTicket').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-</script>
+    <script src="{{ asset('js/cliente.js') }}"></script>
 @endpush

@@ -235,7 +235,7 @@
                         </a>
                     @endforeach
                 </div>
-                <a href="{{ route('cliente.recursos') }}"
+                <a href="{{ route('adminunidad.recursos') }}"
                     class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center">
                     Ir al Repositorio
                 </a>
@@ -246,11 +246,11 @@
             <div class="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
                 <div class="flex items-start gap-4 mb-8">
                     <div
-                        class="bg-primary size-8 rounded-xl flex items-center justify-center text-secondary shadow-lg mt-1">
+                        class="bg-secondary size-8 rounded-xl flex items-center justify-center text-primary shadow-lg mt-1">
                         <span class="material-symbols-outlined text-xl font-light">headset_mic</span>
                     </div>
                     <div>
-                        <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-primary mb-2">ATENCIÓN DIRECTA
+                        <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-secondary mb-2">ATENCIÓN DIRECTA
                         </h4>
                         <p class="text-[12px] text-slate-500 font-medium">USTS</p>
                     </div>
@@ -263,7 +263,7 @@
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ljalvarez@istu.gob.sv" target="_blank"
                         class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
                         <div
-                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
                             <span class="material-symbols-outlined">mail</span>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -275,7 +275,7 @@
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mnrodriguez@istu.gob.sv" target="_blank"
                         class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
                         <div
-                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
                             <span class="material-symbols-outlined">mail</span>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -287,7 +287,7 @@
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=matorres@istu.gob.sv" target="_blank"
                         class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
                         <div
-                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
                             <span class="material-symbols-outlined">mail</span>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -299,7 +299,7 @@
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jjramirez@istu.gob.sv" target="_blank"
                         class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
                         <div
-                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
                             <span class="material-symbols-outlined">mail</span>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -311,7 +311,7 @@
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ovquintanilla@istu.gob.sv" target="_blank"
                         class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
                         <div
-                            class="size-8 rounded-lg flex items-center justify-center text-primary group-hover:text-secondary">
+                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
                             <span class="material-symbols-outlined">mail</span>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -327,32 +327,5 @@
 @endsection
 
 @push('scripts')
-    <script>
-        let estadoActual = 'todos';
-
-        function filtrarEstado(estado, btn) {
-            estadoActual = estado;
-
-            //--estilo botones
-            document.querySelectorAll('.filtro-btn').forEach(b => {
-                b.classList.remove('bg-secondary', 'text-white', 'shadow-md');
-                b.classList.add('bg-slate-100', 'text-slate-500');
-            });
-            btn.classList.remove('bg-slate-100', 'text-slate-500');
-            btn.classList.add('bg-secondary', 'text-white', 'shadow-md');
-
-            ejecutarFiltros();
-        }
-
-        //--Ejecuta filtros de estado
-        function ejecutarFiltros() {
-            const filas = document.querySelectorAll('.ticket-fila');
-            const estadoFiltro = estadoActual.trim().toLowerCase();
-
-            filas.forEach(fila => {
-                const estadoId = fila.dataset.estadoId?.trim() ?? '';
-                fila.style.display = estadoFiltro === 'todos' || estadoId === estadoFiltro ? '' : 'none';
-            });
-        }
-    </script>
+    <script src="{{ asset('js/admin-uni.js') }}"></script>
 @endpush

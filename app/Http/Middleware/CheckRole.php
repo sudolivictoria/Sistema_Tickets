@@ -14,7 +14,7 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        //---verfifica si el usuario esta logueado
+        //---verifica si el usuario esta logueado
         if (!Auth::check()) {
             return redirect('/login');
         }

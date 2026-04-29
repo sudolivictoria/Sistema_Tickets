@@ -133,9 +133,9 @@
                             <tr
                                 class="text-[13px] uppercase text-green-900 font-black tracking-widest border-b border-slate-200">
                                 <th class="px-4 py-4 border-b border-slate-200">Usuario</th>
-                                 <th class="px-4 py-4 border-b border-slate-200">Unidad</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Asunto</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Unidad</th>
                                 <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Asunto</th>
                                 <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
                                 <th class="px-4 py-4 border-b border-slate-200">Estado</th>
                                 <th class="px-4 py-4 border-b border-slate-200">Apertura</th>
@@ -152,14 +152,14 @@
                                         {{ $ticket->user->unidad->nombre_unidad ?? 'N/A' }}
                                     </td>
 
+                                    <td class="px-4 py-4 max-w-[150px] text-slate-600 font-bold">
+                                        {{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}
+                                    </td>
+
                                     <td class="px-4 py-4 font-bold text-slate-600 td-asunto" max-length="20">
                                         <div class="max-w-[150px]" title="{{ $ticket->asunto }}">{{ $ticket->asunto }}
                                         </div>
                                     </td>
-
-                                    <td class="px-4 py-4 max-w-[150px] text-slate-600 font-bold">
-                                        {{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}</td>
-
 
                                     <td class="px-4 py-4">
                                         @php
@@ -263,32 +263,5 @@
 @endsection
 
 @push('scripts')
-    <script>
-        let estadoActual = 'todos';
-
-        function filtrarEstado(estado, btn) {
-            estadoActual = estado;
-
-            //--estilo botones
-            document.querySelectorAll('.filtro-btn').forEach(b => {
-                b.classList.remove('bg-secondary', 'text-white', 'shadow-md');
-                b.classList.add('bg-slate-100', 'text-slate-500');
-            });
-            btn.classList.remove('bg-slate-100', 'text-slate-500');
-            btn.classList.add('bg-secondary', 'text-white', 'shadow-md');
-
-            ejecutarFiltros();
-        }
-
-        //--Ejecuta filtros de estado
-        function ejecutarFiltros() {
-            const filas = document.querySelectorAll('.ticket-fila');
-            const estadoFiltro = estadoActual.trim().toLowerCase();
-
-            filas.forEach(fila => {
-                const estadoId = fila.dataset.estadoId?.trim() ?? '';
-                fila.style.display = estadoFiltro === 'todos' || estadoId === estadoFiltro ? '' : 'none';
-            });
-        }
-    </script>
+    <script src="{{ asset('js/admin.js') }}"></script>
 @endpush

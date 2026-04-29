@@ -28,7 +28,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $remember)) {
 
             //-----verificar si el usuario esta activo
-            if (!Auth::user()->activo) {
+            if (Auth::user()->activo == 0) {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Tu cuenta está desactivada.']);
             }
@@ -42,6 +42,8 @@ class LoginController extends Controller
                 return redirect()->intended('/admin/dashboard');
             } else if ($rol === 'Cliente') {
                 return redirect()->intended('/cliente/dashboard');
+            } else if ($rol === 'AdminUnidad') {
+                return redirect()->intended('/adminunidad/dashboard');
             }
             return redirect('/');
         }

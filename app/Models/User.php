@@ -20,8 +20,6 @@ class User extends Authenticatable
         'nombre_completo',
         'email',
         'password',
-        'email_365',
-        'password_365',
         'cargo',
         'rol_id',
         'unidad_id',
@@ -30,11 +28,10 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password',
-        'password_365',
         'remember_token',
     ];
 
-    // Laravel busca 'password' por defecto, le decimos que la tuya se llama distinto
+ 
     public function getAuthPassword()
     {
         return $this->password;

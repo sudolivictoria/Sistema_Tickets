@@ -155,7 +155,8 @@
                     </div>
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la solicitud</label>
+                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la
+                                solicitud</label>
                             <div id="modalDescripcion"
                                 class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
                                 ---
@@ -174,67 +175,18 @@
     </div>
 
     {{-- SCRIPTS --}}
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
+    @push('scripts')
+        {{-- Librerías --}}
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
 
-    <script>
+        <script src="{{ asset('js/tabla-tickets.js') }}"></script>
 
-        let table;
-        $(document).ready(function () {
-            table = $('#tablaMisTickets').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json',
-                    zeroRecords: "No se encontraron resultados",
-                    emptyTable: "No hay datos disponibles en la tabla",
-                    paginate: {
-                        next: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_right</span>',
-                        previous: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>'
-                    }
-                },
-                responsive: true,
-                autoWidth: false,
-                pageLength: 5,
-                order: [[6, 'desc']],
-                dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
+        <script>
+            $(document).ready(function () {
+                inicializarTablaTickets('#tablaMisTickets');
             });
-
-            //----filtro de búsqueda personalizada
-            $('#inputBusqueda').on('keyup', function () {
-                table.search(this.value).draw();
-            });
-        });
-
-        //----detalles del ticket
-        function verDetalle(asunto, descripcion) {
-            document.getElementById('modalTitulo').innerText = asunto;
-            document.getElementById('modalDescripcion').innerText = descripcion;
-            document.getElementById('modalTicket').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalTicket').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-
-        //----filtro por estado
-        function filtrarEstado(estado, btn) {
-            //---estilos de los botones---
-            document.querySelectorAll('.filtro-btn').forEach(b => {
-                b.classList.remove('bg-secondary', 'text-white', 'shadow-md');
-                b.classList.add('bg-slate-100', 'text-slate-500');
-            });
-            btn.classList.remove('bg-slate-100', 'text-slate-500');
-            btn.classList.add('bg-secondary', 'text-white', 'shadow-md');
-
-            //---filtro aplicado a la columna estado---
-            if (estado === 'todos') {
-                table.column(3).search('').draw();
-            } else {
-                table.column(3).search('^' + estado + '$', true, false, true).draw();
-            }
-        }
-    </script>
+        </script>
+    @endpush
 @endsection

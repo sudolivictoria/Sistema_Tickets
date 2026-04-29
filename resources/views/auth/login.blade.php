@@ -25,7 +25,7 @@
         .field input { width: 100%; padding: 12px; border: 1px solid #f3f4f6; border-radius: 12px; background: #f9fafb; outline: none; transition: .3s; }
         .field input:focus { border-color: #bef264; }
         .button { width: 100%; background-color: #006625; color: white; font-weight: bold; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; transition: .3s; }
-        .button:hover { background-color: #004e1d; }
+        .button:hover { background-color: #5b8f00; }
         .error { color: #d00; margin-bottom: 12px; }
     </style>
 </head>

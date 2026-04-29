@@ -151,7 +151,7 @@ class AdminUnidadController extends Controller
         }
 
         //--redireccionar con mensaje de exito o error en el correo
-        return redirect()->route('admin_unidad.crear-ticket')
+        return redirect()->route('adminunidad.crear-ticket')
             ->with('success', $mensajeFlash);
     }
 

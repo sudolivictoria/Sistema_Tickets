@@ -104,7 +104,7 @@
                     Cancelar
                 </a>
                 <button
-                    class="px-10 py-3.5 rounded-2xl bg-secondary text-primary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-3 uppercase tracking-widest text-xs"
+                    class="px-10 py-3.5 rounded-2xl bg-primary text-secondary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-3 uppercase tracking-widest text-xs"
                     type="submit" id="btn-enviar">
                     <span>Enviar Solicitud</span>
                     <span class="material-symbols-outlined text-lg">send</span>
@@ -116,65 +116,27 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+     <script src="{{ asset('js/ticket-form.js') }}"></script>
+    
     <script>
-        const todosLosTipos = @json($tipos);
+       window.todosLosTipos = @json($tipos ?? []);
+    </script>
 
-        function filtrarTipos(categoriaId) {
-            const selectTipo = document.querySelector('select[name="tipo_solicitud_id"]');
-            selectTipo.innerHTML = '<option value="" disabled selected>Seleccione tipo</option>';
-
-            const filtrados = todosLosTipos.filter(tipo => tipo.categoria_id == categoriaId);
-            filtrados.forEach(tipo => {
-                const option = document.createElement('option');
-                option.value = tipo.id;
-                option.textContent = tipo.nombre_tipo_solicitud;
-                selectTipo.appendChild(option);
-            });
-            document.getElementById('info-extra').classList.add('hidden');
-        }
-
-        document.querySelector('select[name="categoria_id"]').addEventListener('change', function () {
-            filtrarTipos(this.value);
-        });
-
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const categoriaSelect = document.querySelector('select[name="categoria_id"]');
             const oldCategoria = '{{ old("categoria_id") }}';
-            const oldTipo = '{{ old("tipo_solicitud_id") }}';
-
             if (oldCategoria) {
-                categoriaSelect.value = oldCategoria;
+                document.querySelector('select[name="categoria_id"]').value = oldCategoria;
                 filtrarTipos(oldCategoria);
-
+                
+                const oldTipo = '{{ old("tipo_solicitud_id") }}';
                 if (oldTipo) {
                     const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
                     tipoSelect.value = oldTipo;
                     tipoSelect.dispatchEvent(new Event('change'));
                 }
             }
-        });
-
-        //----mostrar descripcion del tipo de solicitud
-        document.querySelector('select[name="tipo_solicitud_id"]').addEventListener('change', function () {
-            const tipoId = this.value;
-            const infoDiv = document.getElementById('info-extra');
-            const textoAyuda = document.getElementById('texto-ayuda');
-            const tipoSeleccionado = todosLosTipos.find(t => t.id == tipoId);
-
-            if (tipoSeleccionado && tipoSeleccionado.descripcion_solicitud) {
-                textoAyuda.textContent = tipoSeleccionado.descripcion_solicitud;
-                infoDiv.classList.remove('hidden');
-            } else {
-                infoDiv.classList.add('hidden');
-            }
-        });
-
-        //---prevencion doble click
-        document.querySelector('form').addEventListener('submit', function () {
-            const btnEnviar = document.getElementById('btn-enviar');
-            btnEnviar.disabled = true;
-            btnEnviar.classList.add('cursor-not-allowed', 'opacity-50');
-            btnEnviar.innerHTML = `<span>Enviando...</span><svg class="animate-spin h-5 w-5 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
         });
     </script>
 
