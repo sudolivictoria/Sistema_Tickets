@@ -16,26 +16,26 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-
-    //---funciones para ver detalles de los tickets
-    window.verDetalle = function (asunto, descripcion) {
-        const modal = document.getElementById("modalTicket");
-        const modalTitulo = document.getElementById("modalTitulo");
-        const modalDescripcion = document.getElementById("modalDescripcion");
-
-        if (modal && modalTitulo && modalDescripcion) {
-            modalTitulo.innerText = asunto;
-            modalDescripcion.innerText = descripcion;
-            modal.classList.remove("hidden");
-            document.body.style.overflow = "hidden";
-        }
-    };
-
-    window.cerrarModal = function () {
-        const modal = document.getElementById("modalTicket");
-        if (modal) {
-            modal.classList.add("hidden");
-            document.body.style.overflow = "auto";
-        }
-    };
 });
+
+//---funciones para ver detalles de los tickets
+window.verDetalle = function (asunto, descripcion) {
+    const modal = document.getElementById("modalTicket");
+    const modalTitulo = document.getElementById("modalTitulo");
+    const modalDescripcion = document.getElementById("modalDescripcion");
+
+    if (modal && modalTitulo && modalDescripcion) {
+        modalTitulo.innerText = asunto;
+        modalDescripcion.innerText = descripcion;
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    }
+};
+
+window.cerrarModal = function () {
+    const modal = document.getElementById("modalTicket");
+    if (modal) {
+        modal.classList.add("hidden");
+        document.body.style.overflow = "auto";
+    }
+};

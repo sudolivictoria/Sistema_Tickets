@@ -61,12 +61,12 @@
                 </thead>
                 <tbody>
                     @foreach($usuarios as $user)
-                        <tr>
-                            <td class="px-4 py-4 font-bold text-slate-600">{{ $user->nombre_completo }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-600">{{ $user->email }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-600">{{ $user->rol->nombre_rol }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-600">{{ $user->unidad->nombre_unidad }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-600">{{ $user->cargo }}</td>
+                        <tr class="text-[13px]">
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->nombre_completo }}</td>
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->email }}</td>
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->rol->nombre_rol }}</td>
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->unidad->nombre_unidad }}</td>
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->cargo }}</td>
                             <td class="px-4 py-4">
                                 <span
                                     class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">

@@ -29,7 +29,7 @@
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sin Asignar</p>
-                <h3 class="text-3xl font-black text-slate-800 leading-none">{{ $noAsignados ?? 0 }}</h3>
+                <h3 id="cont-abiertos" class="text-3xl font-black text-slate-800 leading-none">{{ $noAsignados ?? 0 }}</h3>
             </div>
         </div>
 
@@ -40,7 +40,7 @@
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">En Proceso</p>
-                <h3 class="text-3xl font-black text-slate-800 leading-none">{{ $pendientes ?? 0 }}</h3>
+                <h3 id="cont-proceso" class="text-3xl font-black text-slate-800 leading-none">{{ $pendientes ?? 0 }}</h3>
             </div>
         </div>
 
@@ -51,7 +51,7 @@
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Resueltos</p>
-                <h3 class="text-3xl font-black text-slate-800 leading-none">{{ $resueltos ?? 0 }}</h3>
+                <h3 id="cont-resueltos" class="text-3xl font-black text-slate-800 leading-none">{{ $resueltos ?? 0 }}</h3>
             </div>
         </div>
     </div>
@@ -62,7 +62,7 @@
         <div class="lg:col-span-3 space-y-8">
 
             {{--Rendimiento Anual--}}
-            <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div id="contenedor-grafico" class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
                 <div class="mb-10 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
@@ -75,11 +75,11 @@
                     <div class="flex gap-6">
                         <div class="flex items-center gap-2"><span
                                 class="size-3 rounded-full bg-primary shadow-sm"></span><span
-                                class="text-[10px] font-black text-slate-500 uppercase">Resueltos</span>
+                                class="text-[10px] font-black text-primary uppercase">Resueltos</span>
                         </div>
                         <div class="flex items-center gap-2"><span
-                                class="size-3 rounded-full bg-slate-200 shadow-sm"></span><span
-                                class="text-[10px] font-black text-slate-500 uppercase">Pendientes</span>
+                                class="size-3 rounded-full bg-red-200 shadow-sm"></span><span
+                                class="text-[10px] font-black text-red-500 uppercase">Pendientes</span>
                         </div>
                     </div>
                 </div>
@@ -89,12 +89,12 @@
                     @foreach($mesesGrafico as $mes)
                         <div class="flex-1 flex flex-col items-center gap-3 group h-full justify-end">
                             <div class="w-full max-w-[36px] flex flex-col justify-end gap-1 h-full">
-                                <div class="w-full bg-slate-200/70 rounded-t-md hover:bg-slate-300 transition-colors relative shadow-sm"
+                                <div class="w-full bg-red-500 rounded-t-md hover:brightness-110 transition-all duration-500 relative shadow-[0_-2px_10px_rgba(132,204,22,0.2)]"
                                     style="height: {{ $mes['pendientes_pct'] }}%">
                                     <span
-                                        class="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-black text-slate-600 bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity z-10">{{ $mes['pendientes_pct'] }}%</span>
+                                        class="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-black text-red-500 bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity z-10">{{ $mes['pendientes_pct'] }}%</span>
                                 </div>
-                                <div class="w-full bg-primary rounded-t-md hover:brightness-110 transition-all relative shadow-[0_-2px_10px_rgba(132,204,22,0.2)]"
+                                <div class="w-full bg-primary rounded-t-md hover:brightness-110 transition-all duration-500 relative shadow-[0_-2px_10px_rgba(132,204,22,0.2)]"
                                     style="height: {{ $mes['resueltos_pct'] }}%">
                                     <span
                                         class="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-black text-primary bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity z-10">{{ $mes['resueltos_pct'] }}%</span>
@@ -132,36 +132,30 @@
                     <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
-                                class="text-[13px] uppercase text-green-900 font-black tracking-widest border-b border-slate-200">
+                                class="text-[14px] uppercase text-green-900 font-black tracking-widest border-b border-slate-200">
                                 <th class="px-4 py-4 border-b border-slate-200">Usuario</th>
                                 <th class="px-4 py-4 border-b border-slate-200">Unidad</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Asunto</th>
                                 <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
                                 <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Estado</th>
                                 <th class="px-4 py-4 border-b border-slate-200">Apertura</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Tecnico</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Detalle</th>
                             </tr>
                         </thead>
                         <tbody id="tablaBody" class="divide-y divide-slate-100 text-[12px]">
                             @foreach($todosLosTickets as $ticket)
                                 <tr class="hover:bg-slate-50/80 transition-all ticket-fila"
                                     data-estado-id="{{ $ticket->estado_id }}">
-                                    <td class="px-4 py-4 font-bold text-slate-600 uppercase td-usuario">
+                                    <td class="px-4 py-4 font-bold text-slate-900 td-usuario">
                                         {{ $ticket->user->nombre_completo ?? 'N/A' }}
                                     </td>
-                                    <td class="px-4 py-4 font-bold text-slate-600 uppercase td-unidad">
+                                    <td class="px-4 py-4 font-bold text-slate-900 uppercase td-unidad">
                                         {{ $ticket->user->unidad->nombre_unidad ?? 'N/A' }}
                                     </td>
 
-                                    <td class="px-4 py-4 font-bold text-slate-600 td-asunto" max-length="20">
-                                        <div class="max-w-[150px]" title="{{ $ticket->asunto }}">{{ $ticket->asunto }}
-                                        </div>
-                                    </td>
-
-                                    <td class="px-4 py-4 max-w-[150px] text-slate-600 font-bold">
+                                    <td class="px-4 py-4 max-w-[150px] text-slate-900 font-bold">
                                         {{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}
                                     </td>
-
 
                                     <td class="px-4 py-4">
                                         @php
@@ -179,23 +173,21 @@
                                             {{ $prio }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-4">
-                                        @php
-                                            $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
-                                            $claseEstado = match ($estado) {
-                                                'abierto' => 'bg-red-100 text-red-700 border-red-200',
-                                                'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                                'resuelto' => 'bg-green-100 text-green-700 border-green-200',
-                                                default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                            };
-                                        @endphp
-                                        <span
-                                            class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">
-                                            {{ ucfirst($estado) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-4 font-bold text-slate-600">
+
+                                    <td class="px-4 py-4 font-bold text-slate-900">
                                         {{ $ticket->created_at->format('d/m/Y') }}
+                                    </td>
+                                    <td class="px-4 py-4 font-bold text-slate-900 italic">
+                                        {{ $ticket->tecnico->nombre_completo ?? 'Pendiente' }}
+                                    </td>
+
+                                    {{-- Botón Detalle (Descripción) --}}
+                                    <td class="px-4 py-4 text-center">
+                                        <button type="button"
+                                            onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
+                                            class="p-2 bg-slate-100 text-primary rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
+                                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -323,9 +315,45 @@
             </div>
         </div>
     </div>
+
+
+    {{------------------------------------------------MODAL DE DETALLE-----------------------------------------}}
+    <div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModal()"></div>
+            <div
+                class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-primary">
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <h3 id="modalTitulo" class="text-xl font-black text-secondary uppercase">---</h3>
+                        <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la
+                                solicitud</label>
+                            <div id="modalDescripcion"
+                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
+                                ---
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <button onclick="cerrarModal()"
+                            class="w-full py-4 bg-primary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-primary/20">
+                            Cerrar Detalle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
 @push('scripts')
     <script src="{{ asset('js/admin-uni.js') }}"></script>
+    <script src="{{ asset('js/admin-refresco.js') }}"></script>
 @endpush

@@ -46,8 +46,7 @@
 
                 <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
                     <thead>
-                        <tr class="bg-slate-50 text-[12px] uppercase text-green-900 font-black tracking-widest">
-                            <th class="px-4 py-4 border-b border-slate-200">Asunto</th>
+                        <tr class="bg-slate-50 text-[14px] uppercase text-green-900 font-black tracking-widest">
                             <th class="px-4 py-4 border-b border-slate-200">Categoría</th>
                             <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
                             <th class="px-4 py-4 border-b border-slate-200">Estado</th>
@@ -58,15 +57,9 @@
                             <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-[12px]">
+                    <tbody class="divide-y divide-slate-100 text-[13px]">
                         @foreach($misTickets as $ticket)
                             <tr class="hover:bg-slate-50/80 transition-all">
-                                {{-- Asunto --}}
-                                <td class="px-4 py-4 font-bold text-slate-900">
-                                    <div class="max-w-[150px] truncate" title="{{ $ticket->asunto }}">
-                                        {{ $ticket->asunto }}
-                                    </div>
-                                </td>
 
                                 {{-- Categoría --}}
                                 <td class="px-4 py-4 text-slate-900 font-bold uppercase">
@@ -173,20 +166,20 @@
             </div>
         </div>
     </div>
-
-    {{-- SCRIPTS --}}
-    @push('scripts')
-        {{-- Librerías --}}
-        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
-
-        <script src="{{ asset('js/tabla-tickets.js') }}"></script>
-
-        <script>
-            $(document).ready(function () {
-                inicializarTablaTickets('#tablaMisTickets');
-            });
-        </script>
-    @endpush
 @endsection
+
+{{-- SCRIPTS --}}
+@push('scripts')
+    {{-- Librerías --}}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
+
+    <script src="{{ asset('js/tabla-tickets.js') }}"></script>
+
+    <script>
+        $(document).ready(function () {
+            inicializarTablaTickets('#tablaMisTickets');
+        });
+    </script>
+@endpush

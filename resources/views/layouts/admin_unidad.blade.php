@@ -84,7 +84,7 @@
 
             <div class="flex items-center gap-4">
                 <span
-                    class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->name ?? 'Admin Unidad' }}</span>
+                    class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->nombre_completo ?? 'Administrador de Unidad' }}</span>
             </div>
         </header>
 
@@ -123,13 +123,13 @@
                             <span class="text-sm">Crear Ticket</span>
                         </a>
 
-                         <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
                             href="{{ route('adminunidad.mis-tickets') }}">
                             <span class="material-symbols-outlined text-xl">history</span>
                             <span class="text-sm">Mis Tickets</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.recursos') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
                             href="{{ route('adminunidad.recursos') }}">
                             <span class="material-symbols-outlined text-xl">library_books</span>
                             <span class="text-sm">Recursos</span>

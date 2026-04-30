@@ -60,6 +60,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/mis-tickets', [AdminController::class, 'misTickets'])->name('mis-tickets');
         Route::get('/recursos', [AdminController::class, 'recursos'])->name('recursos');
         Route::post('/crear-ticket', [AdminController::class, 'store'])->name('tickets.store');
+
+        //---actualizar prioridad y tecnico
+        Route::patch('/tickets/{ticket}/prioridad', [AdminController::class, 'actualizarPrioridad'])->name('actualizar-prioridad');
+        Route::patch('/tickets/{ticket}/tecnico', [AdminController::class, 'actualizarTecnico'])->name('actualizar-tecnico');
     });
 
     //---Rol Cliente
@@ -85,6 +89,12 @@ Route::middleware(['auth'])->group(function () {
         //--seccion administracion
         Route::get('/asignar-tickets', [AdminUnidadController::class, 'asignarTickets'])->name('asignar-tickets');
         Route::get('/mis-asignados', [AdminUnidadController::class, 'misAsignados'])->name('mis-asignados');
+
+
+         //---actualizar prioridad y tecnico
+        Route::patch('/tickets/{ticket}/prioridad', [AdminUnidadController::class, 'actualizarPrioridad'])->name('actualizar-prioridad');
+        Route::patch('/tickets/{ticket}/tecnico', [AdminUnidadController::class, 'actualizarTecnico'])->name('actualizar-tecnico');
+
 
         //--seccion servicios-
         Route::get('/crear-ticket', [AdminUnidadController::class, 'create'])->name('crear-ticket');

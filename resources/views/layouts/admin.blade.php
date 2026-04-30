@@ -87,6 +87,11 @@
                         class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Admin' }}</span>
                 </h2>
             </div>
+
+            <div class="flex items-center gap-4">
+                <span
+                    class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->nombre_completo ?? 'Administrador' }}</span>
+            </div>
         </header>
 
         <div class="flex flex-1 overflow-hidden">
@@ -143,7 +148,8 @@
                             <span class="text-sm">Mis Tickets</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.recursos') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
                             href="{{ route('admin.recursos') }}">
                             <span class="material-symbols-outlined text-xl">library_books</span>
                             <span class="text-sm">Recursos</span>

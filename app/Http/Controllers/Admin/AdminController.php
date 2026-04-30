@@ -160,11 +160,47 @@ class AdminController extends Controller
 
 
 
-    //---metodos para las paginas---
+    //---metodos para administracion---
 
     public function asignarTickets()
     {
-        return "Página de Asignar Tickets (En construcción)";
+         $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
+
+        //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
+        $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
+            ->whereHas('categoria', function ($q) use ($miUnidadId) {
+                $q->where('unidad_id', $miUnidadId);
+            })
+            ->where('estado_id', 1) //---solo tickets sin asignar
+            ->latest()
+            ->get();
+
+        $tecnicos = User::where('unidad_id', $miUnidadId)->get();
+
+        return view('admin.asignar-tickets', compact('tickets', 'tecnicos'));
+    }
+
+    //--- Actualizar Prioridad ---
+    public function actualizarPrioridad(Request $request, Ticket $ticket)
+    {
+        $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
+        
+        $ticket->update(['prioridad_id' => $request->prioridad_id]);
+
+        return back()->with('sweet_success', 'Prioridad actualizada correctamente');
+    }
+
+    //--- Actualizar Técnico ---
+    public function actualizarTecnico(Request $request, Ticket $ticket)
+    {
+        $request->validate(['tecnico_id' => 'nullable|exists:users,id']);
+        
+        $ticket->update([
+            'tecnico_id' => $request->tecnico_id,
+            'estado_id'  => $request->tecnico_id ? 2 : 1 //--cambia de estado 
+        ]);
+
+        return back()->with('sweet_success', 'Técnico asignado correctamente');
     }
 
     public function misAsignados()
@@ -174,7 +210,7 @@ class AdminController extends Controller
 
     public function gestionUsuarios()
     {
-          $usuarios = User::all();
+        $usuarios = User::all();
         return view('admin.gestion-usuarios', compact('usuarios'));
     }
 
@@ -182,6 +218,8 @@ class AdminController extends Controller
     {
         return "Página de Gestión de Recursos (En construcción)";
     }
+
+    //---metodos para cliente---
 
     public function misTickets()
     {

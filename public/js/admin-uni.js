@@ -1,7 +1,6 @@
 //----desplegable de canales directos
 document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.getElementById("toggle-canales");
-
     if (toggleBtn) {
         toggleBtn.addEventListener("click", function () {
             const list = document.getElementById("canales-list");
@@ -26,23 +25,50 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         //--destacar botón seleccionado
-        btn.classList.remove("bg-slate-100", "text-slate-500");
-        btn.classList.add("bg-secondary", "text-white", "shadow-md");
+        if (btn) {
+            btn.classList.remove("bg-slate-100", "text-slate-500");
+            btn.classList.add("bg-secondary", "text-white", "shadow-md");
+        }
 
         //--ejecutar filtrado
         ejecutarFiltros(estado);
     };
 
-    function ejecutarFiltros(estadoSeleccionado) {
-        const estadoFiltro = estadoSeleccionado.trim().toLowerCase();
+    /**
+     * Gestión de Modal de detalles
+     */
+    window.verDetalle = function (asunto, descripcion) {
+        const modal = document.getElementById("modalTicket");
+        const titulo = document.getElementById("modalTitulo");
+        const desc = document.getElementById("modalDescripcion");
 
-        document.querySelectorAll(".ticket-fila").forEach((fila) => {
-            const estadoId = fila.dataset.estadoId?.trim().toLowerCase() ?? "";
+        if (modal && titulo && desc) {
+            titulo.innerText = asunto;
+            desc.innerText = descripcion;
+            modal.classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+        }
+    };
 
-            //---toggle de visibilidad
-            const ocultar =
-                estadoFiltro !== "todos" && estadoId !== estadoFiltro;
-            fila.classList.toggle("hidden", ocultar);
-        });
-    }
+    //---cerrar modal
+    window.cerrarModal = function () {
+        const modal = document.getElementById("modalTicket");
+        if (modal) {
+            modal.classList.add("hidden");
+            document.body.style.overflow = "auto";
+        }
+    };
 });
+
+function ejecutarFiltros(estadoSeleccionado) {
+    const estadoFiltro = String(estadoSeleccionado).trim().toLowerCase();
+
+    document.querySelectorAll(".ticket-fila").forEach((fila) => {
+        const estadoIdFila = String(fila.dataset.estadoId || "")
+            .trim()
+            .toLowerCase();
+        const ocultar =
+            estadoFiltro !== "todos" && estadoIdFila !== estadoFiltro;
+        fila.classList.toggle("hidden", ocultar);
+    });
+}
