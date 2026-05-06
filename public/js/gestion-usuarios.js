@@ -9,13 +9,14 @@ $(document).ready(function () {
             emptyTable: "No hay datos disponibles en la tabla",
             paginate: {
                 next: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_right</span>',
-                previous: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
+                previous:
+                    '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
             },
         },
         responsive: true,
         autoWidth: false,
         pageLength: 5,
-        order: [[0,"asc"]],
+        order: [[0, "asc"]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
         columnDefs: [
             {
@@ -45,11 +46,10 @@ $(document).ready(function () {
         const isPassword = input.attr("type") === "password";
         input.attr("type", isPassword ? "text" : "password");
 
-        eyeOpen.toggleClass('hidden', isPassword); 
-        eyeClosed.toggleClass('hidden', !isPassword);
+        eyeOpen.toggleClass("hidden", isPassword);
+        eyeClosed.toggleClass("hidden", !isPassword);
     });
 });
-
 
 //---filtrado por estado
 window.filtrarEstado = function (estado, btn) {
@@ -69,7 +69,7 @@ window.filtrarEstado = function (estado, btn) {
 //---open/close modals
 window.abrirModal = function (tipo, data = null) {
     if (tipo === "agregar") {
-        $("#formAgregar")[0]?.reset(); 
+        $("#formAgregar")[0]?.reset();
         $("#modalAgregar").removeClass("hidden");
     } else if (tipo === "editar" && data) {
         $("#modalEditar").removeClass("hidden");
@@ -81,11 +81,12 @@ window.abrirModal = function (tipo, data = null) {
         $("#edit_cargo").val(data.cargo);
         $("#edit_rol").val(data.rol_id);
         $("#edit_unidad").val(data.unidad_id);
+        $("#edit_telefono").val(data.telefono);
     }
-    $("body").addClass("overflow-hidden"); 
+    $("body").addClass("overflow-hidden");
 };
 
 window.cerrarModal = function (id) {
     $("#" + id).addClass("hidden");
-    $("body").removeClass("overflow-hidden"); 
+    $("body").removeClass("overflow-hidden");
 };

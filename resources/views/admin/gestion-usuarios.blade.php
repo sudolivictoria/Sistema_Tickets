@@ -84,7 +84,7 @@
 
                                         <button type="submit" @disabled($user->id === auth()->id())
                                             class="p-2 rounded-lg {{ $user->activo ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }} 
-                                                                                                                                                                        {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
+                                                                                                                                                                                {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
                                             <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
                                         </button>
                                     </form>
@@ -109,8 +109,7 @@
                 @csrf
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Nombre Completo</label>
-                    <input type="text" name="name" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
-                        required>
+                    <input type="text" name="name" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                 </div>
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Email</label>
@@ -153,6 +152,14 @@
                     <label class="text-[12px] font-black uppercase text-secondary">Cargo</label>
                     <input type="text" name="cargo" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                 </div>
+
+
+                <div>
+                    <label class="text-[12px] font-black uppercase text-secondary">Telefono</label>
+                    <input type="text" name="telefono" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl">
+                </div>
+
+
                 <button type="submit"
                     class="w-full bg-secondary text-primary font-black py-4 rounded-xl shadow-lg mt-4 uppercase">Guardar
                     Usuario</button>
@@ -176,8 +183,8 @@
 
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Nombre Completo</label>
-                    <input type="text" name="name" id="edit_nombre"
-                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
+                    <input type="text" name="name" id="edit_nombre" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
+                        required>
                 </div>
 
                 <div>
@@ -227,6 +234,12 @@
                     <label class="text-[12px] font-black uppercase text-secondary">Cargo</label>
                     <input type="text" name="cargo" id="edit_cargo" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
                         required>
+                </div>
+
+                <div>
+                    <label class="text-[12px] font-black uppercase text-secondary">Telefono</label>
+                    <input type="text" name="telefono" id="edit_telefono"
+                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl">
                 </div>
 
                 <button type="submit"

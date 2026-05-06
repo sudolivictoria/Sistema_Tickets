@@ -40,6 +40,8 @@ class DatabaseSeeder extends Seeder
             'rol_id' => $adminRol->id,
             'unidad_id' => $unidadIT->id,
             'activo' => true,
+            'cargo' => 'Tecnico',
+            'telefono' => null,
         ]);
 
         //-----Usuario Gestor de prueba
@@ -50,6 +52,8 @@ class DatabaseSeeder extends Seeder
             'rol_id' => $adminUnidadRol->id,
             'unidad_id' => $unidadRRHH->id,
             'activo' => true,
+            'cargo' => 'Tecnico',
+            'telefono' => null,
         ]);
 
         //-----Usuario Cliente de prueba
@@ -60,6 +64,8 @@ class DatabaseSeeder extends Seeder
             'rol_id' => $clienteRol->id,
             'unidad_id' => $unidadRRHH->id,
             'activo' => true,
+            'cargo' => 'Tecnico',
+            'telefono' => null,
         ]);
 
 
