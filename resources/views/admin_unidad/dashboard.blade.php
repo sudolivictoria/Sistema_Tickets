@@ -7,7 +7,7 @@
             <div class="flex items-center gap-4">
                 <span class="text-4xl font-medium text-slate-600">
                     Hola, <span
-                        class="text-secondary font-bold">{{ auth()->user()->nombre_completo ?? 'Administrador'}}</span>
+                        class="text-secondary font-bold">{{ auth()->user()->name ?? 'Administrador'}}</span>
                 </span>
             </div>
             <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y resolución eficiente de
@@ -147,7 +147,7 @@
                                 <tr class="hover:bg-slate-50/80 transition-all ticket-fila"
                                     data-estado-id="{{ $ticket->estado_id }}">
                                     <td class="px-4 py-4 font-bold text-slate-900 td-usuario">
-                                        {{ $ticket->user->nombre_completo ?? 'N/A' }}
+                                        {{ $ticket->user->name ?? 'N/A' }}
                                     </td>
                                     <td class="px-4 py-4 font-bold text-slate-900 uppercase td-unidad">
                                         {{ $ticket->user->unidad->nombre_unidad ?? 'N/A' }}
@@ -178,7 +178,7 @@
                                         {{ $ticket->created_at->format('d/m/Y') }}
                                     </td>
                                     <td class="px-4 py-4 font-bold text-slate-900 italic">
-                                        {{ $ticket->tecnico->nombre_completo ?? 'Pendiente' }}
+                                        {{ $ticket->tecnico->name ?? 'Pendiente' }}
                                     </td>
 
                                     {{-- Botón Detalle (Descripción) --}}

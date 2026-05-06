@@ -90,7 +90,7 @@
 
             <div class="flex items-center gap-4">
                 <span
-                    class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->nombre_completo ?? 'Administrador' }}</span>
+                    class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->name ?? 'Administrador' }}</span>
             </div>
         </header>
 
@@ -108,26 +108,26 @@
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-4 px-4 font-black">
                             Administración</p>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.asignar-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.asignar-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
                             href="{{ route('admin.asignar-tickets') }}">
                             <span class="material-symbols-outlined text-xl">confirmation_number</span>
                             <span class="text-sm">Asignar Tickets</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.mis-asignados') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.mis-asignados') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
                             href="{{ route('admin.mis-asignados') }}">
                             <span class="material-symbols-outlined text-xl">assignment_ind</span>
                             <span class="text-sm">Mis Asignados</span>
                         </a>
 
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-usuarios') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-usuarios') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
                             href="{{ route('admin.gestion-usuarios') }}">
                             <span class="material-symbols-outlined text-xl">group</span>
                             <span class="text-sm">Gestión Usuarios</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
                             href="{{ route('admin.gestion-recursos') }}">
                             <span class="material-symbols-outlined text-xl">folder_shared</span>
                             <span class="text-sm">Gestión Recursos</span>
@@ -136,20 +136,20 @@
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-6 px-4 font-black">Servicios
                         </p>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.crear-ticket') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.crear-ticket') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
                             href="{{ route('admin.crear-ticket') }}">
                             <span class="material-symbols-outlined text-xl">add_circle</span>
                             <span class="text-sm">Crear Ticket</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
                             href="{{ route('admin.mis-tickets') }}">
                             <span class="material-symbols-outlined text-xl">history</span>
                             <span class="text-sm">Mis Tickets</span>
                         </a>
 
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg transition-all"
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
                             href="{{ route('admin.recursos') }}">
                             <span class="material-symbols-outlined text-xl">library_books</span>
                             <span class="text-sm">Recursos</span>

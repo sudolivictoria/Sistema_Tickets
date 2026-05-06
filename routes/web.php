@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     //---Rol Cliente
-    Route::middleware(['role:Cliente'])->prefix('cliente')->name('cliente.')->group(function () {
+    Route::middleware(['role:Cliente'])->prefix('usuario')->name('cliente.')->group(function () {
         //-----dashboard principal
         Route::get('/dashboard', [ClienteController::class, 'index'])->name('dashboard');
 
@@ -81,7 +81,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     //---Rol Admin Unidad
-    Route::middleware(['auth', 'role:AdminUnidad'])->prefix('adminunidad')->name('adminunidad.')->group(function () {
+    Route::middleware(['auth', 'role:AdminUnidad'])->prefix('gestor')->name('adminunidad.')->group(function () {
 
         //--dashboard principal
         Route::get('/dashboard', [AdminUnidadController::class, 'index'])->name('dashboard');

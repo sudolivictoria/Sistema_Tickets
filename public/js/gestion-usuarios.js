@@ -76,7 +76,7 @@ window.abrirModal = function (tipo, data = null) {
         $("#formEditar").attr("action", `/admin/usuarios/${data.id}`);
 
         //---llenado de campos
-        $("#edit_nombre").val(data.nombre_completo);
+        $("#edit_nombre").val(data.name);
         $("#edit_email").val(data.email);
         $("#edit_cargo").val(data.cargo);
         $("#edit_rol").val(data.rol_id);

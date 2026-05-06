@@ -62,7 +62,7 @@
                 <tbody>
                     @foreach($usuarios as $user)
                         <tr class="text-[13px]">
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->nombre_completo }}</td>
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->name }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->email }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->rol->nombre_rol }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->unidad->nombre_unidad }}</td>
@@ -109,7 +109,7 @@
                 @csrf
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Nombre Completo</label>
-                    <input type="text" name="nombre_completo" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
+                    <input type="text" name="name" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
                         required>
                 </div>
                 <div>
@@ -176,7 +176,7 @@
 
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Nombre Completo</label>
-                    <input type="text" name="nombre_completo" id="edit_nombre"
+                    <input type="text" name="name" id="edit_nombre"
                         class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                 </div>
 

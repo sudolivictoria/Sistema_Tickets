@@ -34,12 +34,13 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre_completo' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
             'rol_id' => 'required|exists:roles,id',
             'unidad_id' => 'required|exists:unidades,id',
             'cargo' => 'required|string|max:255',
+            'telefono' => 'required|string|max:15',
         ]);
 
         $validated['password'] = bcrypt($request->password);
@@ -58,12 +59,13 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
-            'nombre_completo' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'nullable|min:6',
+            'password' => 'required|min:6',
             'rol_id' => 'required|exists:roles,id',
             'unidad_id' => 'required|exists:unidades,id',
             'cargo' => 'required|string|max:255',
+            'telefono' => 'nullable|string|max:15',
         ]);
 
         if ($request->filled('password')) {

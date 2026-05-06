@@ -25,8 +25,8 @@ class CheckRole
         //----diccionario de roles 
         $roles = [
             'Admin'   => 1,
-            'Cliente' => 2,
-            'AdminUnidad' => 3,
+            'Usuario' => 2,
+            'Gestor' => 3,
             '1'       => 1,
             '2'       => 2,
             '3'       => 3,

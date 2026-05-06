@@ -105,13 +105,12 @@
 
                                 {{-- Técnico --}}
                                 <td class="px-4 py-4 text-slate-900 font-bold italic">
-                                    {{ $ticket->tecnico->nombre_completo ?? 'Pendiente' }}
+                                    {{ $ticket->tecnico->name ?? 'Pendiente' }}
                                 </td>
 
                                 {{-- Fechas --}}
-                                <td class="px-4 py-4 font-bold text-slate-900">
-                                    {{ $ticket->created_at->format('d/m/Y') }}
-                                </td>
+                                <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">{{ $ticket->created_at->format('d/m/Y') }}</td>
+                                
                                 <td class="px-4 py-4 font-bold text-slate-900">
                                     {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
                                 </td>

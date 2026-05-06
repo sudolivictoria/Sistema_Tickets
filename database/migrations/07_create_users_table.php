@@ -13,27 +13,24 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre_completo');
+            $table->string('name');
 
             //---->password sistema
             $table->string('password');
 
             //---->Gmail 
             $table->string('email')->unique();
-            $table->text('password_gmail')->nullable();
-
-            //--->365 
-            $table->string('email_365')->nullable();
-            $table->text('password_365')->nullable();
 
             //---->estado del usuario
             $table->boolean('activo')->default(true);
+
+            $table->string('telefono')->nullable();
 
             $table->string('cargo')->nullable();
 
             //----Relaciones para los Filtros (Unidad y Rol)
             $table->unsignedBigInteger('rol_id')->nullable();
-            $table->foreign('rol_id')->references('id')->on('roles'); 
+            $table->foreign('rol_id')->references('id')->on('roles');
 
             $table->unsignedBigInteger('unidad_id')->nullable();
             $table->foreign('unidad_id')->references('id')->on('unidades');

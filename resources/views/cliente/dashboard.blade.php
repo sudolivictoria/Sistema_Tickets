@@ -6,19 +6,13 @@
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
             <div>
                 <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-2">Sistema de Solicitudes</p>
-                <h2 class="text-4xl font-black text-white tracking-tighter leading-tight">Hola, {{ auth()->user()->nombre_completo ?? 'Usuario' }}</h2>
+                <h2 class="text-4xl font-black text-white tracking-tighter leading-tight">Hola, {{ auth()->user()->name ?? 'Usuario' }}</h2>
                 <p class="text-white/90 mt-3 max-w-200 text-sm font-medium italic">
                     Gestiona tus solicitudes, consulta recursos útiles y mantente al tanto del estado de tus tickets en un solo lugar. ¡Estamos aquí para ayudarte!
                 </p>
             </div>
-            <div class="pb-4 px-2">
-                <a href="{{ route('cliente.crear-ticket') }}" class="w-32 flex items-center justify-center gap-2 bg-secondary text-primary font-black py-3 rounded-xl shadow-lg hover:scale-[1.02] transition-all uppercase text-[10px] tracking-widest">
-                    <span class="material-symbols-outlined text-sm">add</span>
-                    Nuevo Ticket
-                </a>
-            </div>
         </div>
-    </section>
+    </section>  
 
     {{-- Estadísticas de Tickets --}}
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -27,21 +21,21 @@
                 <div class="bg-white p-6 rounded-2xl border-b-4 border-primary shadow-sm flex items-center gap-4">
                     <div class="p-3 bg-red-50 text-red-500 rounded-2xl"><span class="material-symbols-outlined text-2xl font-bold">priority_high</span></div>
                     <div>
-                        <div class="text-2xl font-black text-primary">{{ $abiertos ?? 0 }}</div>
+                        <div id="cont-abiertos" class="text-2xl font-black text-primary">{{ $abiertos ?? 0 }}</div>
                         <div class="text-[14px] font-black uppercase text-slate-400">Abiertos</div>
                     </div>
                 </div>
                 <div class="bg-primary p-6 rounded-2xl shadow-lg flex items-center gap-4 border-b-4 border-secondary text-white">
                     <div class="p-3 bg-blue-700 text-secondary rounded-2xl"><span class="material-symbols-outlined text-2xl">engineering</span></div>
                     <div>
-                        <div class="text-2xl font-black">{{ $enProceso ?? 0 }}</div>
+                        <div id="cont-proceso" class="text-2xl font-black">{{ $enProceso ?? 0 }}</div>
                         <div class="text-[14px] font-black uppercase text-blue-200">En Proceso</div>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border-b-4 border-primary shadow-sm flex items-center gap-4">
                     <div class="p-3 bg-lime-50 text-secondary rounded-2xl"><span class="material-symbols-outlined text-2xl font-bold">check_circle</span></div>
                     <div>
-                        <div class="text-2xl font-black text-primary">{{ $resueltos ?? 0 }}</div>
+                        <div id="cont-resueltos" class="text-2xl font-black text-primary">{{ $resueltos ?? 0 }}</div>
                         <div class="text-[14px] font-black uppercase text-slate-400">Resueltos</div>
                     </div>
                 </div>

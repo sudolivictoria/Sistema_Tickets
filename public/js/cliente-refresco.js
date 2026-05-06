@@ -20,21 +20,22 @@ function autoRefrescoCliente() {
         .catch((err) => console.warn("Error refrescando dashboard:", err));
 }
 
+/**
+ * Función para actualizar los números de las tarjetas superiores
+ */
 function actualizarContadores(nuevoDoc) {
-    //----actualiza los contadores
-    const contadoresNuevos = nuevoDoc.querySelectorAll(
-        ".font-black.text-primary, .font-black.text-2xl",
-    );
-    const contadoresActuales = document.querySelectorAll(
-        ".font-black.text-primary, .font-black.text-2xl",
-    );
+    const ids = ["cont-abiertos", "cont-proceso", "cont-resueltos"];
 
-    contadoresActuales.forEach((cont, index) => {
-        if (contadoresNuevos[index]) {
-            cont.innerText = contadoresNuevos[index].innerText;
+    ids.forEach((id) => {
+        const nuevoValor = nuevoDoc.getElementById(id);
+        const actualValor = document.getElementById(id);
+
+        if (nuevoValor && actualValor) {
+            actualValor.innerText = nuevoValor.innerText;
         }
     });
 }
+
 
 //----refresca cada 10 segundos
 if (document.getElementById("tablaBody")) {

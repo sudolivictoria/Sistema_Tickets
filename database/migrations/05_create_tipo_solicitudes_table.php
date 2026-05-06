@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('tipo_solicitudes', function (Blueprint $table) {
             $table->id();
             $table->string('nombre_tipo_solicitud');
+            $table->string('descripcion_solicitud')->nullable();
+            $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
             $table->timestamps();
         });
     }

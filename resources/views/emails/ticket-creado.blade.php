@@ -142,7 +142,7 @@
             </div>
 
             <div class="content">
-                <p class="welcome-text">Hola, {{ $ticket->user->nombre_completo }}</p>
+                <p class="welcome-text">Hola, {{ $ticket->user->name }}</p>
                 <div class="divider-green"></div>
                 
                 <p style="color: #1e3a8a; font-weight: 500;">Tu solicitud ha sido recibida con éxito. Detalles del ticket:</p>

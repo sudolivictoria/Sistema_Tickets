@@ -48,7 +48,7 @@
                             <tr class="hover:bg-slate-50/80 transition-all">
                                 {{-- Usuario --}}
                                 <td class="px-4 py-4 font-bold text-slate-900">
-                                    {{ $ticket->user->nombre_completo ?? 'N/A' }}
+                                    {{ $ticket->user->name ?? 'N/A' }}
                                 </td>
 
                                 {{-- Unidad --}}
@@ -99,7 +99,7 @@
                                             <option value="">Pendiente</option>
                                             @foreach($tecnicos as $tecnico)
                                                 <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
-                                                    {{ $tecnico->nombre_completo }}
+                                                    {{ $tecnico->name }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -107,10 +107,7 @@
                                 </td>
 
                                 {{-- Fechas --}}
-                                <td class="px-4 py-4 font-bold text-slate-900">
-                                    {{ $ticket->created_at->format('d/m/Y') }}
-                                </td>
-        
+                                <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">{{ $ticket->created_at->format('d/m/Y') }}</td>
 
                                 {{-- Botón Detalle (Descripción) --}}
                                 <td class="px-4 py-4 text-center">
