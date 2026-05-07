@@ -20,113 +20,132 @@
             {{--Tabla--}}
             <div class="p-5">
                 {{-- Cabecera con Filtros y Buscador --}}
-                <div class="p-5 flex flex-wrap gap-4 justify-between items-center bg-white">
-                    <div class="flex items-center gap-4">
-                        <h2 class="text-xl font-bold text-primary">Tickets</h2>
-                        <div class="flex gap-2" id="filtrosEstado">
+                <div
+                    class="p-4 md:p-6 flex flex-col lg:flex-row gap-6 justify-between items-center bg-white border-b border-slate-100">
+
+                    <div class="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
+                        <h2 class="text-xl font-bold text-primary hidden xl:block">Tickets</h2>
+
+                        {{-- Filtros de Estados --}}
+                        <div class="flex flex-wrap gap-2 justify-center md:justify-start w-full" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)"
-                                class="filtro-btn px-4 py-1.5 bg-primary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
+                                class="filtro-btn flex-1 sm:flex-none px-4 py-2 bg-primary text-white rounded-xl text-[11px] font-black uppercase shadow-md transition-all whitespace-nowrap">
+                                Todos
+                            </button>
                             <button type="button" onclick="filtrarEstado('abierto', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
+                                class="filtro-btn flex-1 sm:flex-none px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-red-100 transition-all whitespace-nowrap">
+                                Abierto
+                            </button>
                             <button type="button" onclick="filtrarEstado('procesando', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
+                                class="filtro-btn flex-1 sm:flex-none px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-blue-100 transition-all whitespace-nowrap">
+                                Procesando
+                            </button>
                             <button type="button" onclick="filtrarEstado('resuelto', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
+                                class="filtro-btn flex-1 sm:flex-none px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-green-100 transition-all whitespace-nowrap">
+                                Resuelto
+                            </button>
                         </div>
                     </div>
 
-                    <div class="relative w-full md:w-72">
+                    {{-- Buscador --}}
+                    <div class="relative w-full md:max-w-md lg:w-72">
                         <span
                             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
                         <input type="text" id="inputBusqueda"
-                            class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                            placeholder="Buscar por asunto, técnico...">
+                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-400 font-medium"
+                            placeholder="Buscar ticket...">
                     </div>
                 </div>
 
-                <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
-                    <thead>
-                        <tr class="bg-slate-50 text-[14px] uppercase text-green-900 font-black tracking-widest">
-                            <th class="px-4 py-4 border-b border-slate-200">Categoría</th>
-                            <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
-                            <th class="px-4 py-4 border-b border-slate-200">Estado</th>
-                            <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
-                            <th class="px-4 py-4 border-b border-slate-200">Técnico</th>
-                            <th class="px-4 py-4 border-b border-slate-200">Apertura</th>
-                            <th class="px-4 py-4 border-b border-slate-200">Cierre</th>
-                            <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-[13px]">
-                        @foreach($misTickets as $ticket)
-                            <tr class="hover:bg-slate-50/80 transition-all">
-
-                                {{-- Categoría --}}
-                                <td class="px-4 py-4 text-slate-900 font-bold uppercase">
-                                    {{ $ticket->categoria->nombre_categoria ?? 'N/A' }}
-                                </td>
-
-                                {{-- Tipo Solicitud --}}
-                                <td class="px-4 py-4 text-slate-900 font-bold">
-                                    {{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}
-                                </td>
-
-                                {{-- Estado --}}
-                                <td class="px-4 py-4">
-                                    @php
-                                        $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
-                                        $claseEstado = match ($estado) {
-                                            'abierto' => 'bg-red-100 text-red-700 border-red-200',
-                                            'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                            'resuelto' => 'bg-green-100 text-green-700 border-green-200',
-                                            default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                        };
-                                    @endphp
-                                    <span
-                                        class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
-                                </td>
-
-                                {{-- Prioridad --}}
-                                <td class="px-4 py-4">
-                                    @php
-                                        $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
-                                        $clasePrio = match ($prio) {
-                                            'Critica' => 'bg-red-100 text-red-700 border-red-200',
-                                            'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
-                                            'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                                            'Baja' => 'bg-green-100 text-green-700 border-green-200',
-                                            default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                        };
-                                    @endphp
-                                    <span class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $clasePrio }}">
-                                        {{ $prio }}
-                                    </span>
-                                </td>
-
-                                {{-- Técnico --}}
-                                <td class="px-4 py-4 text-slate-900 font-bold italic">
-                                    {{ $ticket->tecnico->name ?? 'Pendiente' }}
-                                </td>
-
-                                {{-- Fechas --}}
-                                <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">{{ $ticket->created_at->format('d/m/Y') }}</td>
-
-                                <td class="px-4 py-4 font-bold text-slate-900">
-                                    {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
-                                </td>
-
-                                {{-- Botón Detalle (Descripción) --}}
-                                <td class="px-4 py-4 text-center">
-                                    <button type="button"
-                                        onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
-                                        class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
-                                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                                    </button>
-                                </td>
+                <div class="p-0 w-full overflow-x-auto">
+                    <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
+                        <thead>
+                            <tr class="bg-slate-50 text-[14px] uppercase text-green-900 font-black tracking-widest">
+                                <th class="px-4 py-4 border-b border-slate-200">Categoría</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Estado</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Técnico</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Apertura</th>
+                                <th class="px-4 py-4 border-b border-slate-200">Cierre</th>
+                                <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-[13px]">
+                            @foreach($misTickets as $ticket)
+                                <tr class="hover:bg-slate-50/80 transition-all">
+
+                                    {{-- Categoría --}}
+                                    <td class="px-4 py-4 text-slate-900 font-bold uppercase">
+                                        {{ $ticket->categoria->nombre_categoria ?? 'N/A' }}
+                                    </td>
+
+                                    {{-- Tipo Solicitud --}}
+                                    <td class="px-4 py-4 text-slate-900 font-bold">
+                                        {{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}
+                                    </td>
+
+                                    {{-- Estado --}}
+                                    <td class="px-4 py-4">
+                                        @php
+                                            $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
+                                            $claseEstado = match ($estado) {
+                                                'abierto' => 'bg-red-100 text-red-700 border-red-200',
+                                                'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
+                                                'resuelto' => 'bg-green-100 text-green-700 border-green-200',
+                                                default => 'bg-slate-100 text-slate-600 border-slate-200',
+                                            };
+                                        @endphp
+                                        <span
+                                            class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
+                                    </td>
+
+                                    {{-- Prioridad --}}
+                                    <td class="px-4 py-4">
+                                        @php
+                                            $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
+                                            $clasePrio = match ($prio) {
+                                                'Critica' => 'bg-red-100 text-red-700 border-red-200',
+                                                'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
+                                                'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
+                                                'Baja' => 'bg-green-100 text-green-700 border-green-200',
+                                                default => 'bg-slate-100 text-slate-600 border-slate-200',
+                                            };
+                                        @endphp
+                                        <span
+                                            class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $clasePrio }}">
+                                            {{ $prio }}
+                                        </span>
+                                    </td>
+
+                                    {{-- Técnico --}}
+                                    <td class="px-4 py-4 text-slate-900 font-bold italic">
+                                        {{ $ticket->tecnico->name ?? 'Pendiente' }}
+                                    </td>
+
+                                    {{-- Fechas --}}
+                                    <td class="px-4 py-4 font-bold text-slate-900"
+                                        data-order="{{ $ticket->created_at->timestamp }}">
+                                        {{ $ticket->created_at->format('d/m/Y') }}
+                                    </td>
+
+                                    <td class="px-4 py-4 font-bold text-slate-900">
+                                        {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
+                                    </td>
+
+                                    {{-- Botón Detalle (Descripción) --}}
+                                    <td class="px-4 py-4 text-center">
+                                        <button type="button"
+                                            onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
+                                            class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
+                                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

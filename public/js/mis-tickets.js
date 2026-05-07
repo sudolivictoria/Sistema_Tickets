@@ -9,6 +9,8 @@ function inicializarTablaTickets(selectorId) {
     if (!tableElement.length) return; //--verificación de existencia del elemento
 
     table = tableElement.DataTable({
+        scrollX: true,       
+        scrollCollapse: true,
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",

@@ -151,3 +151,9 @@
     color: #5c6775;
     font-style: normal;
 }
+
+.dataTables_wrapper .dataTables_scrollBody {
+    overflow-x: auto !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch;
+}

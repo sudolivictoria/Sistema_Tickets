@@ -1,18 +1,18 @@
 @extends('layouts.usuario')
 
 @section('content')
-    <div class="max-w-4xl w-full mx-auto p-8">
-        <div class="mb-10 border-b border-slate-200 pb-6">
-            <h2 class="text-3xl font-black text-primary mb-2 flex items-center gap-3">
-                <span class="material-symbols-outlined text-4xl text-secondary">confirmation_number</span>
+    <div class="max-w-4xl w-full mx-auto p-4 md:p-8">
+        <div class="mb-6 md:mb-10 border-b border-slate-200 pb-6">
+            <h2 class="text-2xl md:text-3xl font-black text-primary mb-2 flex items-center gap-3">
+                <span class="material-symbols-outlined text-3xl md:text-4xl text-secondary">confirmation_number</span>
                 Enviar Nueva Solicitud
             </h2>
-            <p class="text-slate-500 font-medium italic">Complete el formulario oficial para la gestión de su solicitud.</p>
+            <p class="text-slate-500 text-sm md:text-base font-medium italic">Complete el formulario oficial para la gestión de su solicitud.</p>
         </div>
 
         {{-- Formulario de Creación de Ticket --}}
         <form action="{{ route('usuario.tickets.store') }}" method="POST"
-            class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+            class="space-y-6 md:space-y-8 bg-white p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
             @csrf
 
             <div class="flex flex-col gap-2.5">
@@ -22,14 +22,14 @@
                     placeholder="Ej: Falla en equipo de cómputo" type="text" required />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div class="flex flex-col gap-2.5">
                     <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Categoría</label>
                     <div class="relative">
                         <select name="categoria_id"
                             class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
-                            <option value="" disabled selected>Seleccione categoría</option>
+                            <option value="" disabled selected>Seleccione</option>
                             @foreach($categorias as $categoria)
                                 <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
                                     {{ $categoria->nombre_categoria }}
@@ -44,14 +44,12 @@
                 </div>
 
                 <div class="flex flex-col gap-2.5">
-                    <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Tipo de
-                        Solicitud</label>
+                    <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Solicitud</label>
                     <div class="relative">
                         <select name="tipo_solicitud_id"
                             class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
-                            <option value="" disabled selected>Seleccione tipo</option>
-                            {{-- Aquí iría tu foreach de tipos --}}
+                            <option value="" disabled selected>Seleccione</option>
                         </select>
                         <span
                             class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -81,11 +79,11 @@
 
             <div class="flex flex-col gap-2.5">
                 <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Nivel de Urgencia</label>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     @foreach($prioridades as $prio)
                         <label class="cursor-pointer">
                             <input class="hidden peer" name="prioridad_id" type="radio" value="{{ $prio->id }}" {{ $prio->nombre_prioridad == 'Media' ? 'checked' : '' }} />
-                            <div class="py-3 px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center transition-all 
+                            <div class="py-3 px-2 md:px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center text-xs md:text-sm transition-all 
                                         peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary peer-checked:shadow-sm
                                         hover:border-slate-200">
                                 {{ $prio->nombre_prioridad }}
@@ -93,19 +91,18 @@
                         </label>
                     @endforeach
                 </div>
-                <p class="text-[13px] text-slate-400 italic mt-1 font-medium">* La prioridad final será asignada por el
-                    técnico encargado.</p>
+                <p class="text-[13px] text-slate-400 italic mt-1 font-medium">* La prioridad final será asignada por el técnico encargado.</p>
             </div>
 
-            <div class="flex items-center justify-end gap-4 pt-8 border-t border-slate-100">
+            <div class="flex flex-col-reverse md:flex-row items-center justify-end gap-4 pt-8 border-t border-slate-100">
                 <a href="{{ route('usuario.dashboard') }}"
-                    class="px-8 py-3.5 rounded-2xl font-black text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest text-xs">
+                    class="w-full md:w-auto text-center px-8 py-3.5 rounded-2xl font-black text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest text-xs">
                     Cancelar
                 </a>
                 <button
-                    class="px-10 py-3.5 rounded-2xl bg-secondary text-primary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center gap-3 uppercase tracking-widest text-xs"
+                    class="w-full md:w-auto px-10 py-3.5 rounded-2xl bg-secondary text-primary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
                     type="submit" id="btn-enviar">
-                    <span>Enviar Solicitud</span>
+                    <span>Enviar</span>
                     <span class="material-symbols-outlined text-lg">send</span>
                 </button>
             </div>
@@ -122,18 +119,24 @@
        window.todosLosTipos = @json($tipos ?? []);
     </script>
 
+    {{-- categorias y tipos de solicitud --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const oldCategoria = '{{ old("categoria_id") }}';
             if (oldCategoria) {
-                document.querySelector('select[name="categoria_id"]').value = oldCategoria;
-                filtrarTipos(oldCategoria);
+                const catSelect = document.querySelector('select[name="categoria_id"]');
+                if(catSelect) {
+                    catSelect.value = oldCategoria;
+                    if(typeof filtrarTipos === "function") filtrarTipos(oldCategoria);
+                }
                 
                 const oldTipo = '{{ old("tipo_solicitud_id") }}';
                 if (oldTipo) {
                     const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
-                    tipoSelect.value = oldTipo;
-                    tipoSelect.dispatchEvent(new Event('change'));
+                    if(tipoSelect) {
+                        tipoSelect.value = oldTipo;
+                        tipoSelect.dispatchEvent(new Event('change'));
+                    }
                 }
             }
         });

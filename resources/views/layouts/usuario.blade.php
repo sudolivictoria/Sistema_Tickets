@@ -71,23 +71,38 @@
         </div>
     </div>
     <header
-        class="fixed top-0 w-full z-50 bg-white border-b border-slate-100 px-8 py-3 flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-4">
-            <div class="size-9 bg-secondary rounded-lg flex items-center justify-center text-primary shadow-sm">
+        class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm">
+
+        <div class="flex items-center gap-3 md:gap-4 min-w-0">
+            <button id="menu-toggle" class="md:hidden p-2 rounded-lg text-primary hover:bg-slate-100 relative z-[100]">
+                <span id="menu-icon" class="material-symbols-outlined">menu</span>
+            </button>
+
+            <div
+                class="size-9 bg-secondary rounded-lg flex items-center justify-center text-primary shadow-sm shrink-0">
                 <span class="material-symbols-outlined font-bold text-2xl">support_agent</span>
             </div>
-            <h2 class="text-xl font-bold text-primary tracking-tight">Help Desk Istu</h2><span
-                class="text-green-900 font-bold text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-secondary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Cliente' }}</span>
-            </h2>
+
+            <div class="min-w-0">
+                <h2 class="text-base md:text-xl font-bold text-primary tracking-tight truncate">
+                    Help Desk Istu
+                </h2>
+
+                <span
+                    class="hidden sm:inline-block text-green-900 font-bold text-[10px] md:text-xs uppercase tracking-widest px-2 py-0.5 bg-secondary/10 rounded-full truncate">
+                    {{ auth()->user()->unidad->nombre_unidad ?? 'Cliente' }}
+                </span>
+            </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <span
-                class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->name ?? 'Cliente' }}</span>
-        </div>
+        <span class="hidden md:block text-xs font-bold text-slate-400 uppercase tracking-widest max-w-[180px]">
+            {{ auth()->user()->name ?? 'Cliente' }}
+        </span>
     </header>
 
-    <aside class="fixed left-0 top-0 h-full w-64 z-40 bg-primary border-r border-blue-800 flex flex-col pt-20 p-4">
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-primary border-r border-blue-800 flex flex-col pt-32 p-4
+    transform -translate-x-full md:translate-x-0 transition-transform duration-300
+    z-50 md:z-40">
         <nav class="space-y-1 gap-1-5 flex-1">
             <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('usuario.dashboard') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.dashboard') }}">
@@ -124,8 +139,10 @@
         </div>
     </aside>
 
-    <main class="ml-64 pt-20 min-h-screen">
-        <div class="p-8 max-w-[1400px] mx-auto space-y-8">
+    <div id="sidebar-overlay" class="fixed inset-0 z-40 hidden md:hidden"></div>
+
+    <main class="md:ml-56 xl:ml-64 pt-20 min-h-screen">
+        <div class="p-4 md:p-8 max-w-[1400px] mx-auto space-y-6 md:space-y-8">
             @yield('content')
         </div>
     </main>
@@ -134,6 +151,7 @@
     @stack('scripts')
 
     <script>
+        //-----------preloader 
         window.addEventListener('load', function () {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
@@ -144,6 +162,9 @@
             }, 1000);
         });
     </script>
+
+
+    <script src="{{ asset('js/usuario-menu.js') }}?v={{ time() }}" defer></script>
 </body>
 
 </html>

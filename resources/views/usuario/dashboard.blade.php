@@ -1,18 +1,18 @@
 @extends('layouts.usuario')
 
 @section('content')
-    <section class="bg-primary p-10 rounded-3xl relative overflow-hidden shadow-xl border border-blue-800">
+    <section class="bg-primary p-6 md:p-10 rounded-3xl relative overflow-hidden shadow-xl border border-blue-800">
         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6">
+        <div class="relative z-10 flex flex-col xl:flex-row justify-between xl:items-end gap-6">
             <div>
                 <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-2">Sistema de Solicitudes</p>
-                <h2 class="text-4xl font-black text-white tracking-tighter leading-tight">Hola, {{ auth()->user()->name ?? 'Usuario' }}</h2>
+                <h2 class="text-2xl md:text-4xl font-black text-white tracking-tighter leading-tight">Hola, {{ auth()->user()->name ?? 'Usuario' }}</h2>
                 <p class="text-white/90 mt-3 max-w-200 text-sm font-medium italic">
                     Gestiona tus solicitudes, consulta recursos útiles y mantente al tanto del estado de tus tickets en un solo lugar. ¡Estamos aquí para ayudarte!
                 </p>
             </div>
-          <div class="pb-4 px-2">
-                <a href="{{ route('usuario.crear-ticket') }}" class="w-32 flex items-center justify-center gap-2 bg-secondary text-primary font-black py-3 rounded-xl shadow-lg hover:scale-[1.02] transition-all uppercase text-[10px] tracking-widest" style="height: 40px; min-width: 120px;">
+          <div class="w-full md:w-auto md:pb-4 md:px-2">
+                <a href="{{ route('usuario.crear-ticket') }}" class="w-full md:w-32 flex items-center justify-center gap-2 bg-secondary text-primary font-black py-3 rounded-xl shadow-lg hover:scale-[1.02] transition-all uppercase text-[10px] tracking-widest" style="height: 40px; min-width: 120px;">
                     Nuevo Ticket
                 </a>
             </div>
@@ -20,9 +20,9 @@
     </section>  
 
     {{-- Estadísticas de Tickets --}}
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div class="lg:col-span-3 space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 md:gap-8">
+        <div class="xl:col-span-3 space-y-6 md:space-y-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <div class="bg-white p-6 rounded-2xl border-b-4 border-primary shadow-sm flex items-center gap-4">
                     <div class="p-3 bg-red-50 text-red-500 rounded-2xl"><span class="material-symbols-outlined text-2xl font-bold">priority_high</span></div>
                     <div>
@@ -51,8 +51,8 @@
                 <div class="p-6 border-b border-slate-50 flex items-center justify-between">
                     <h3 class="font-black text-lg tracking-[0.2em] text-primary uppercase">Tickets Recientes</h3>
                 </div>
-                <div class="overflow-x-auto text-[14px]">
-                    <table class="w-full text-left">
+                <div class="overflow-x-auto text-[13px] md:text-[14px]">
+                    <table class="w-full min-w-[760px] text-left">
                         <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-green-900">
                             <tr>
                                 <th class="px-6 py-4">Categoría</th>
@@ -271,5 +271,5 @@
 
 @push('scripts')
     <script src="{{ asset('js/usuario.js') }}"></script>
-       <script src="{{ asset('js/usuario-refresco.js') }}"></script>
+    <script src="{{ asset('js/usuario-refresco.js') }}"></script>
 @endpush
