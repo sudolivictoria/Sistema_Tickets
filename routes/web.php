@@ -13,6 +13,7 @@ Volt::route('/test-livewire', 'pages.test-livewire')->name('test.livewire');
 
 //----------login 
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -27,7 +28,7 @@ Route::middleware(['auth'])->group(function () {
         if ($user->rol_id == 1) { //----admin
             return redirect()->route('admin.dashboard');
         } elseif ($user->rol_id == 2) {
-            return redirect()->route('cliente.dashboard');
+            return redirect()->route('usuario.dashboard');
         } elseif ($user->rol_id == 3) {
             return redirect()->route('admin_unidad.dashboard');
         } else {
@@ -65,8 +66,8 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/tickets/{ticket}/tecnico', [AdminController::class, 'actualizarTecnico'])->name('actualizar-tecnico');
     });
 
-    //---Rol Cliente
-    Route::middleware(['role:Cliente'])->prefix('usuario')->name('cliente.')->group(function () {
+    //---Rol Usuario
+    Route::middleware(['role:Usuario'])->prefix('usuario')->name('usuario.')->group(function () {
         //-----dashboard principal
         Route::get('/dashboard', [ClienteController::class, 'index'])->name('dashboard');
 
@@ -79,8 +80,8 @@ Route::middleware(['auth'])->group(function () {
     });
 
 
-    //---Rol Admin Unidad
-    Route::middleware(['auth', 'role:AdminUnidad'])->prefix('gestor')->name('adminunidad.')->group(function () {
+    //---Rol Gestor
+    Route::middleware(['auth', 'role:Gestor'])->prefix('gestor')->name('gestor.')->group(function () {
 
         //--dashboard principal
         Route::get('/dashboard', [AdminUnidadController::class, 'index'])->name('dashboard');
@@ -90,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/mis-asignados', [AdminUnidadController::class, 'misAsignados'])->name('mis-asignados');
 
 
-         //---actualizar prioridad y tecnico
+        //---actualizar prioridad y tecnico
         Route::patch('/tickets/{ticket}/prioridad', [AdminUnidadController::class, 'actualizarPrioridad'])->name('actualizar-prioridad');
         Route::patch('/tickets/{ticket}/tecnico', [AdminUnidadController::class, 'actualizarTecnico'])->name('actualizar-tecnico');
 

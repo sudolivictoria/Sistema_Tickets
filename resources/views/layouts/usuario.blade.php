@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Help Desk Istu - Cliente</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -88,23 +89,23 @@
 
     <aside class="fixed left-0 top-0 h-full w-64 z-40 bg-primary border-r border-blue-800 flex flex-col pt-20 p-4">
         <nav class="space-y-1 gap-1-5 flex-1">
-            <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('cliente.dashboard') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
-                href="{{ route('cliente.dashboard') }}">
+            <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('usuario.dashboard') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+                href="{{ route('usuario.dashboard') }}">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="text-sm">Dashboard</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('cliente.crear-ticket') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
-                href="{{ route('cliente.crear-ticket') }}">
+            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('usuario.crear-ticket') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+                href="{{ route('usuario.crear-ticket') }}">
                 <span class="material-symbols-outlined text-xl">add_circle</span>
                 <span class="text-sm">Crear Ticket</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('cliente.mis-tickets') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
-                href="{{ route('cliente.mis-tickets') }}">
+            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('usuario.mis-tickets') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+                href="{{ route('usuario.mis-tickets') }}">
                 <span class="material-symbols-outlined text-xl">history</span>
                 <span class="text-sm">Mis Tickets</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('cliente.recursos') ? 'bg-primary text-secondary' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold transition-all"
-                href="{{ route('cliente.recursos') }}">
+            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('usuario.recursos') ? 'bg-primary text-secondary' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold transition-all"
+                href="{{ route('usuario.recursos') }}">
                 <span class="material-symbols-outlined text-xl">library_books</span>
                 <span class="text-sm">Recursos</span>
             </a>

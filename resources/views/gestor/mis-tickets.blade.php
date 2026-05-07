@@ -1,19 +1,19 @@
-@extends('layouts.admin_unidad')
+@extends('layouts.gestor')
 
 @section('content')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwind.min.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-        
     <link rel="stylesheet" href="{{ asset('css/tickets.css') }}">
 
     <div class="p-1">
         <div class="mb-10 border-b border-slate-200 pb-6">
             <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
                 <span class="material-symbols-outlined text-4xl text-primary">confirmation_number</span>
-                Asignar Tickets
+                Mis tickets
             </h2>
-            <p class="text-slate-500 font-medium italic">Asigne tickets a técnicos disponibles</p>
+            <p class="text-slate-500 font-medium italic">Se detallan las solicitudes realizadas, su estado, seguimiento y
+                resolución.</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 
@@ -21,6 +21,20 @@
             <div class="p-5">
                 {{-- Cabecera con Filtros y Buscador --}}
                 <div class="p-5 flex flex-wrap gap-4 justify-between items-center bg-white">
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-xl font-bold text-secondary">Tickets</h2>
+                        <div class="flex gap-2" id="filtrosEstado">
+                            <button type="button" onclick="filtrarEstado('todos', this)"
+                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
+                            <button type="button" onclick="filtrarEstado('abierto', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
+                            <button type="button" onclick="filtrarEstado('procesando', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
+                            <button type="button" onclick="filtrarEstado('resuelto', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
+                        </div>
+                    </div>
+
                     <div class="relative w-full md:w-72">
                         <span
                             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
@@ -30,30 +44,26 @@
                     </div>
                 </div>
 
-                <table id="tablaAsignarTickets" class="w-full text-left border-separate border-spacing-0">
+                <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
                     <thead>
                         <tr class="bg-slate-50 text-[14px] uppercase text-green-900 font-black tracking-widest">
-                            <th class="px-4 py-4 border-b border-slate-200">Usuario</th>
-                            <th class="px-4 py-4 border-b border-slate-200">Unidad</th>
+                            <th class="px-4 py-4 border-b border-slate-200">Categoría</th>
                             <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
                             <th class="px-4 py-4 border-b border-slate-200">Estado</th>
                             <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
                             <th class="px-4 py-4 border-b border-slate-200">Técnico</th>
                             <th class="px-4 py-4 border-b border-slate-200">Apertura</th>
+                            <th class="px-4 py-4 border-b border-slate-200">Cierre</th>
                             <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-[13px]">
-                        @foreach($tickets as $ticket)
+                        @foreach($misTickets as $ticket)
                             <tr class="hover:bg-slate-50/80 transition-all">
-                                {{-- Usuario --}}
-                                <td class="px-4 py-4 font-bold text-slate-900">
-                                    {{ $ticket->user->name ?? 'N/A' }}
-                                </td>
 
-                                {{-- Unidad --}}
-                                <td class="px-4 py-4 font-bold text-slate-900">
-                                    {{ $ticket->user->unidad->nombre_unidad ?? 'N/A' }}
+                                {{-- Categoría --}}
+                                <td class="px-4 py-4 text-slate-900 font-bold uppercase">
+                                    {{ $ticket->categoria->nombre_categoria ?? 'N/A' }}
                                 </td>
 
                                 {{-- Tipo Solicitud --}}
@@ -78,36 +88,32 @@
 
                                 {{-- Prioridad --}}
                                 <td class="px-4 py-4">
-                                    <form action="{{ route('adminunidad.actualizar-prioridad', $ticket->id) }}" method="POST">
-                                        @csrf @method('PATCH')
-                                        <select name="prioridad_id" onchange="this.form.submit()"
-                                            class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer">
-                                            <option value="1" {{ $ticket->prioridad_id == 1 ? 'selected' : '' }}>Critica</option>
-                                            <option value="2" {{ $ticket->prioridad_id == 2 ? 'selected' : '' }}>Alta</option>
-                                            <option value="3" {{ $ticket->prioridad_id == 3 ? 'selected' : '' }}>Media</option>
-                                            <option value="4" {{ $ticket->prioridad_id == 4 ? 'selected' : '' }}>Baja</option>
-                                        </select>
-                                    </form>
+                                    @php
+                                        $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
+                                        $clasePrio = match ($prio) {
+                                            'Critica' => 'bg-red-100 text-red-700 border-red-200',
+                                            'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
+                                            'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
+                                            'Baja' => 'bg-green-100 text-green-700 border-green-200',
+                                            default => 'bg-slate-100 text-slate-600 border-slate-200',
+                                        };
+                                    @endphp
+                                    <span class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $clasePrio }}">
+                                        {{ $prio }}
+                                    </span>
                                 </td>
 
                                 {{-- Técnico --}}
-                                <td class="px-4 py-4">
-                                    <form action="{{ route('adminunidad.actualizar-tecnico', $ticket->id) }}" method="POST">
-                                        @csrf @method('PATCH')
-                                        <select name="tecnico_id" onchange="this.form.submit()"
-                                            class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer w-32">
-                                            <option value="">Pendiente</option>
-                                            @foreach($tecnicos as $tecnico)
-                                                <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
-                                                    {{ $tecnico->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </form>
+                                <td class="px-4 py-4 text-slate-900 font-bold italic">
+                                    {{ $ticket->tecnico->name ?? 'Pendiente' }}
                                 </td>
 
                                 {{-- Fechas --}}
                                 <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">{{ $ticket->created_at->format('d/m/Y') }}</td>
+
+                                <td class="px-4 py-4 font-bold text-slate-900">
+                                    {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
+                                </td>
 
                                 {{-- Botón Detalle (Descripción) --}}
                                 <td class="px-4 py-4 text-center">
@@ -159,49 +165,20 @@
             </div>
         </div>
     </div>
-
 @endsection
 
-
+{{-- SCRIPTS --}}
 @push('scripts')
     {{-- Librerías --}}
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="{{ asset('js/asignar-tickets.js') }}"></script>
+    <script src="{{ asset('js/tabla-tickets.js') }}"></script>
 
     <script>
         $(document).ready(function () {
-            inicializarTablaTickets('#tablaAsignarTickets');
+            inicializarTablaTickets('#tablaMisTickets');
         });
     </script>
-
-    @if(session('sweet_success'))
-        <script>
-            Swal.fire({
-            title: '¡Actualizado Correctamente!',
-            text: "{{ session('success') }}",
-            icon: 'success',
-            confirmButtonColor: '#1e3a8a',
-            confirmButtonText: 'Entendido',
-            customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
-        });
-        </script>
-    @endif
-
-    @if ($errors->any())
-        <script>
-            Swal.fire({
-                title: 'No se pudo actualizar',
-                html: '{!! implode("<br>", $errors->all()) !!}',
-                icon: 'error',
-                confirmButtonColor: '#dc2626',
-                confirmButtonText: 'Corregir',
-                customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
-            });
-        </script>
-    @endif
-
 @endpush

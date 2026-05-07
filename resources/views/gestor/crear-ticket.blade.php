@@ -1,4 +1,4 @@
-@extends('layouts.admin_unidad')
+@extends('layouts.gestor')
 
 @section('content')
     <div class="max-w-4xl w-full mx-auto p-8">
@@ -11,7 +11,7 @@
         </div>
 
         {{-- Formulario de Creación de Ticket --}}
-        <form action="{{ route('adminunidad.tickets.store') }}" method="POST"
+        <form action="{{ route('gestor.tickets.store') }}" method="POST"
             class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
             @csrf
 
@@ -100,7 +100,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-4 pt-8 border-t border-slate-100">
-                <a href="{{ route('adminunidad.dashboard') }}"
+                <a href="{{ route('gestor.dashboard') }}"
                     class="px-8 py-3.5 rounded-2xl font-black text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest text-xs">
                     Cancelar
                 </a>
@@ -152,7 +152,7 @@
                 confirmButtonText: 'Entendido',
                 customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
             }).then(() => {
-                window.location.href = "{{ route('adminunidad.dashboard') }}";
+                window.location.href = "{{ route('gestor.dashboard') }}";
             });
         </script>
     @endif

@@ -46,7 +46,7 @@ class ClienteController extends Controller
             ->latest()
             ->paginate(5);
 
-        return view('cliente.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'manuales', 'todosLosTickets'));
+        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'manuales', 'todosLosTickets'));
     }
 
 
@@ -56,7 +56,7 @@ class ClienteController extends Controller
         $tipos = TipoSolicitud::all();
         $prioridades = Prioridad::all();
 
-        return view('cliente.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
+        return view('usuario.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
 
@@ -112,7 +112,7 @@ class ClienteController extends Controller
         }
 
         //--redireccionar con mensaje de exito o error en el correo
-        return redirect()->route('cliente.crear-ticket')
+        return redirect()->route('usuario.crear-ticket')
             ->with('success', $mensajeFlash);
     }
 
@@ -123,7 +123,7 @@ class ClienteController extends Controller
         ->orderBy('created_at', 'desc')
         ->get();
 
-    return view('cliente.mis-tickets', compact('misTickets'));
+    return view('usuario.mis-tickets', compact('misTickets'));
     }
 
     public function recursos()

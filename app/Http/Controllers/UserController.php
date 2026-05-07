@@ -40,7 +40,7 @@ class UserController extends Controller
             'rol_id' => 'required|exists:roles,id',
             'unidad_id' => 'required|exists:unidades,id',
             'cargo' => 'required|string|max:255',
-            'telefono' => 'required|string|max:15',
+            'telefono' => 'nullable|string|max:15',
         ]);
 
         $validated['password'] = bcrypt($request->password);
@@ -61,7 +61,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'required|min:6',
+            'password' => 'nullable|min:6',
             'rol_id' => 'required|exists:roles,id',
             'unidad_id' => 'required|exists:unidades,id',
             'cargo' => 'required|string|max:255',

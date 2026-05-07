@@ -1,4 +1,4 @@
-@extends('layouts.cliente')
+@extends('layouts.usuario')
 
 @section('content')
     <div class="max-w-4xl w-full mx-auto p-8">
@@ -11,7 +11,7 @@
         </div>
 
         {{-- Formulario de Creación de Ticket --}}
-        <form action="{{ route('cliente.tickets.store') }}" method="POST"
+        <form action="{{ route('usuario.tickets.store') }}" method="POST"
             class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
             @csrf
 
@@ -98,7 +98,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-4 pt-8 border-t border-slate-100">
-                <a href="{{ route('cliente.dashboard') }}"
+                <a href="{{ route('usuario.dashboard') }}"
                     class="px-8 py-3.5 rounded-2xl font-black text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest text-xs">
                     Cancelar
                 </a>
@@ -150,7 +150,7 @@
                 confirmButtonText: 'Entendido',
                 customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
             }).then(() => {
-                window.location.href = "{{ route('cliente.dashboard') }}";
+                window.location.href = "{{ route('usuario.dashboard') }}";
             });
         </script>
     @endif

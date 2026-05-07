@@ -20,7 +20,7 @@ $(document).ready(function () {
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
         columnDefs: [
             {
-                targets: 5,
+                targets: 6,
                 render: (data, type) =>
                     type === "filter" || type === "sort"
                         ? data.includes("Activo")
@@ -61,7 +61,7 @@ window.filtrarEstado = function (estado, btn) {
         .addClass("bg-secondary text-white shadow-md");
 
     table
-        .column(5)
+        .column(6)
         .search(estado === "" ? "" : `^${estado}$`, true, false)
         .draw();
 };

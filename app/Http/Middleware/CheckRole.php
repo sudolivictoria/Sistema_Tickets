@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
 
 class CheckRole
 {
@@ -22,25 +22,14 @@ class CheckRole
         //----obtiene el usuario autenticado
         $user = Auth::user();
 
-        //----diccionario de roles 
-        $roles = [
-            'Admin'   => 1,
-            'Usuario' => 2,
-            'Gestor' => 3,
-            '1'       => 1,
-            '2'       => 2,
-            '3'       => 3,
-
-        ];
-
         $requiredRoleId = $roles[$role] ?? null;
 
         //----evitar error si el rol no existe en el diccionario
-       if (intval($user->rol_id) === 1) {
+        if (intval($user->rol_id) === 1) {
             return $next($request);
         }
 
-       if (intval($user->rol_id) === intval($requiredRoleId)) {
+        if ($user->rol && $user->rol->nombre_rol === $role) {
             return $next($request);
         }
 

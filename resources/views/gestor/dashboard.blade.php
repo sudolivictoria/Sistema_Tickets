@@ -1,4 +1,4 @@
-@extends('layouts.admin_unidad')
+@extends('layouts.gestor')
 
 @section('content')
 
@@ -28,7 +28,7 @@
                 <span class="material-symbols-outlined text-red-600 text-3xl">notification_important</span>
             </div>
             <div>
-                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sin Asignar</p>
+                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Abiertos</p>
                 <h3 id="cont-abiertos" class="text-3xl font-black text-slate-800 leading-none">{{ $noAsignados ?? 0 }}</h3>
             </div>
         </div>
@@ -227,7 +227,7 @@
                         </a>
                     @endforeach
                 </div>
-                <a href="{{ route('adminunidad.recursos') }}"
+                <a href="{{ route('gestor.recursos') }}"
                     class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center">
                     Ir al Repositorio
                 </a>
@@ -354,6 +354,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/admin-uni.js') }}"></script>
+    <script src="{{ asset('js/gestor.js') }}"></script>
     <script src="{{ asset('js/admin-refresco.js') }}"></script>
 @endpush

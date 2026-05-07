@@ -99,7 +99,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-4 pt-8 border-t border-slate-100">
-                <a href="{{ route('cliente.dashboard') }}"
+                <a href="{{ route('usuario.dashboard') }}"
                     class="px-8 py-3.5 rounded-2xl font-black text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest text-xs">
                     Cancelar
                 </a>

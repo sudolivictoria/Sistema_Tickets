@@ -52,6 +52,7 @@
                     <tr class="bg-slate-50 text-[14px] uppercase text-green-900 font-black tracking-widest">
                         <th class="px-4 py-4 border-b border-slate-200">Nombre</th>
                         <th class="px-4 py-4 border-b border-slate-200">Email</th>
+                        <th class="px-4 py-4 border-b border-slate-200">Teléfono</th>
                         <th class="px-4 py-4 border-b border-slate-200">Rol</th>
                         <th class="px-4 py-4 border-b border-slate-200">Unidad</th>
                         <th class="px-4 py-4 border-b border-slate-200">Cargo</th>
@@ -64,6 +65,7 @@
                         <tr class="text-[13px]">
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->name }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->email }}</td>
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->telefono ?? 'N/A'}}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->rol->nombre_rol }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->unidad->nombre_unidad }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->cargo }}</td>
@@ -75,16 +77,20 @@
                             </td>
                             <td class="px-4 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
+                                    {{-- BOTÓN EDITAR --}}
                                     <button type="button" onclick="abrirModal('editar', {{ json_encode($user) }})"
-                                        class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
+                                        @disabled($user->id === auth()->id())
+                                        class="p-2 rounded-lg {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-105 transition-transform' }}">
                                         <span class="material-symbols-outlined text-[18px]">edit</span>
                                     </button>
+
+                                    {{-- BOTÓN ESTADO ACTIVO / DESACTIVADO --}}
                                     <form action="{{ route('admin.usuarios.toggle', $user->id) }}" method="POST" class="m-0">
                                         @csrf @method('PATCH')
 
                                         <button type="submit" @disabled($user->id === auth()->id())
                                             class="p-2 rounded-lg {{ $user->activo ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }} 
-                                                                                                                                                                                {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
+                                                                                                                                                                                                        {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
                                             <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
                                         </button>
                                     </form>

@@ -15,7 +15,7 @@ function autoRefrescoCliente() {
                 tablaActual.innerHTML = nuevaTabla.innerHTML;
             }
             actualizarContadores(doc);
-            console.log("Dashboard de cliente actualizado");
+            console.log("Dashboard de usuario actualizado");
         })
         .catch((err) => console.warn("Error refrescando dashboard:", err));
 }

@@ -1,4 +1,4 @@
-@extends('layouts.cliente')
+@extends('layouts.usuario')
 
 @section('content')
     <section class="bg-primary p-10 rounded-3xl relative overflow-hidden shadow-xl border border-blue-800">
@@ -10,6 +10,11 @@
                 <p class="text-white/90 mt-3 max-w-200 text-sm font-medium italic">
                     Gestiona tus solicitudes, consulta recursos útiles y mantente al tanto del estado de tus tickets en un solo lugar. ¡Estamos aquí para ayudarte!
                 </p>
+            </div>
+          <div class="pb-4 px-2">
+                <a href="{{ route('usuario.crear-ticket') }}" class="w-32 flex items-center justify-center gap-2 bg-secondary text-primary font-black py-3 rounded-xl shadow-lg hover:scale-[1.02] transition-all uppercase text-[10px] tracking-widest" style="height: 40px; min-width: 120px;">
+                    Nuevo Ticket
+                </a>
             </div>
         </div>
     </section>  
@@ -132,7 +137,7 @@
                         </a>
                     @endforeach
                 </div>
-                <a href="{{ route('cliente.recursos') }}" class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center">
+                <a href="{{ route('usuario.recursos') }}" class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center">
                     Ir al Repositorio
                 </a>
             </div>
@@ -265,6 +270,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/cliente.js') }}"></script>
-       <script src="{{ asset('js/cliente-refresco.js') }}"></script>
+    <script src="{{ asset('js/usuario.js') }}"></script>
+       <script src="{{ asset('js/usuario-refresco.js') }}"></script>
 @endpush

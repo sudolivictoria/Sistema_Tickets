@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>@yield('title', 'Help Desk Istu - Admin Unidad')</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -93,8 +94,8 @@
             <aside class="w-64 bg-secondary flex flex-col shrink-0 z-10 shadow-2xl overflow-y-auto">
                 <div class="p-6 flex flex-col h-full">
                     <nav class="flex flex-col gap-1.5 flex-1">
-                        <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('adminunidad.dashboard') ? 'bg-primary text-secondary shadow-lg' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold mb-4 transition-all"
-                            href="{{ route('adminunidad.dashboard') }}">
+                        <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('gestor.dashboard') ? 'bg-primary text-secondary shadow-lg' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold mb-4 transition-all"
+                            href="{{ route('gestor.dashboard') }}">
                             <span class="material-symbols-outlined">dashboard</span>
                             <span class="text-sm">Dashboard</span>
                         </a>
@@ -102,14 +103,14 @@
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-4 px-4 font-black">
                             Administración</p>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.asignar-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('adminunidad.asignar-tickets') }}">
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.asignar-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('gestor.asignar-tickets') }}">
                             <span class="material-symbols-outlined text-xl">confirmation_number</span>
                             <span class="text-sm">Asignar Tickets</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.mis-asignados') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('adminunidad.mis-asignados') }}">
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.mis-asignados') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('gestor.mis-asignados') }}">
                             <span class="material-symbols-outlined text-xl">assignment_ind</span>
                             <span class="text-sm">Mis Asignados</span>
                         </a>
@@ -117,20 +118,20 @@
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-6 px-4 font-black">Servicios
                         </p>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.crear-ticket') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('adminunidad.crear-ticket') }}">
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.crear-ticket') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('gestor.crear-ticket') }}">
                             <span class="material-symbols-outlined text-xl">add_circle</span>
                             <span class="text-sm">Crear Ticket</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('adminunidad.mis-tickets') }}">
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('gestor.mis-tickets') }}">
                             <span class="material-symbols-outlined text-xl">history</span>
                             <span class="text-sm">Mis Tickets</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('adminunidad.recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('adminunidad.recursos') }}">
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('gestor.recursos') }}">
                             <span class="material-symbols-outlined text-xl">library_books</span>
                             <span class="text-sm">Recursos</span>
                         </a>

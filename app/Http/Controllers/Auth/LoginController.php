@@ -40,10 +40,10 @@ class LoginController extends Controller
             //-----------redireccionar segun el rol (se puede escalar)
             if ($rol === 'Admin') {
                 return redirect()->intended('/admin/dashboard');
-            } else if ($rol === 'Cliente') {
-                return redirect()->intended('/cliente/dashboard');
-            } else if ($rol === 'AdminUnidad') {
-                return redirect()->intended('/adminunidad/dashboard');
+            } else if ($rol === 'Usuario') {
+                return redirect()->intended('/usuario/dashboard');
+            } else if ($rol === 'Gestor') {
+                return redirect()->intended('/gestor/dashboard');
             }
             return redirect('/');
         }

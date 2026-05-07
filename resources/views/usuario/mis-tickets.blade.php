@@ -1,4 +1,4 @@
-@extends('layouts.admin_unidad')
+@extends('layouts.usuario')
 
 @section('content')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwind.min.css">
@@ -8,8 +8,8 @@
 
     <div class="p-1">
         <div class="mb-10 border-b border-slate-200 pb-6">
-            <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
-                <span class="material-symbols-outlined text-4xl text-primary">confirmation_number</span>
+            <h2 class="text-3xl font-black text-primary mb-2 flex items-center gap-3">
+                <span class="material-symbols-outlined text-4xl text-secondary">confirmation_number</span>
                 Mis tickets
             </h2>
             <p class="text-slate-500 font-medium italic">Se detallan las solicitudes realizadas, su estado, seguimiento y
@@ -22,10 +22,10 @@
                 {{-- Cabecera con Filtros y Buscador --}}
                 <div class="p-5 flex flex-wrap gap-4 justify-between items-center bg-white">
                     <div class="flex items-center gap-4">
-                        <h2 class="text-xl font-bold text-secondary">Tickets</h2>
+                        <h2 class="text-xl font-bold text-primary">Tickets</h2>
                         <div class="flex gap-2" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)"
-                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
+                                class="filtro-btn px-4 py-1.5 bg-primary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
                             <button type="button" onclick="filtrarEstado('abierto', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
                             <button type="button" onclick="filtrarEstado('procesando', this)"
@@ -39,7 +39,7 @@
                         <span
                             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
                         <input type="text" id="inputBusqueda"
-                            class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
+                            class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                             placeholder="Buscar por asunto, técnico...">
                     </div>
                 </div>
@@ -119,7 +119,7 @@
                                 <td class="px-4 py-4 text-center">
                                     <button type="button"
                                         onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
-                                        class="p-2 bg-slate-100 text-primary rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
+                                        class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
                                         <span class="material-symbols-outlined text-[20px]">visibility</span>
                                     </button>
                                 </td>
@@ -137,17 +137,17 @@
         <div class="flex items-center justify-center min-h-screen px-4">
             <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModal()"></div>
             <div
-                class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-primary">
+                class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-secondary">
                 <div class="p-8">
                     <div class="flex justify-between items-start mb-6">
-                        <h3 id="modalTitulo" class="text-xl font-black text-secondary uppercase">---</h3>
+                        <h3 id="modalTitulo" class="text-xl font-black text-primary uppercase">---</h3>
                         <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la
+                            <label class="text-[11px] font-black text-primary uppercase tracking-widest">Descripción de la
                                 solicitud</label>
                             <div id="modalDescripcion"
                                 class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
@@ -157,7 +157,7 @@
                     </div>
                     <div class="mt-8">
                         <button onclick="cerrarModal()"
-                            class="w-full py-4 bg-primary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-primary/20">
+                            class="w-full py-4 bg-secondary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-secondary/20">
                             Cerrar Detalle
                         </button>
                     </div>
@@ -174,7 +174,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
 
-    <script src="{{ asset('js/tabla-tickets.js') }}"></script>
+    <script src="{{ asset('js/mis-tickets.js') }}"></script>
 
     <script>
         $(document).ready(function () {
