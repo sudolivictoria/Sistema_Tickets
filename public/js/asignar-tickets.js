@@ -1,8 +1,7 @@
 var table;
 
 document.addEventListener("DOMContentLoaded", function () {
-
-    inicializarTablaTickets('#tablaAsignarTickets');
+    inicializarTablaTickets("#tablaAsignarTickets");
     /**
      * Función de inicialización
      */
@@ -32,17 +31,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     first: "Primero",
                     last: "Último",
                     next: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_right</span>',
-                    previous: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
+                    previous:
+                        '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
                 },
             },
-            responsive: false, 
+            responsive: false,
             autoWidth: false,
             pageLength: 5,
-            order: [[6, "desc"]], 
+            order: [[6, "desc"]],
             dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
         });
 
-  
         $("#inputBusqueda").on("keyup", function () {
             table.search(this.value).draw();
         });
@@ -69,6 +68,49 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     window.cerrarModal = function () {
         const modal = document.getElementById("modalTicket");
+        if (modal) {
+            modal.classList.add("hidden");
+            document.body.style.overflow = "auto";
+        }
+    };
+
+    window.verUsuario = function (name, email, unidad, cargo, telefono) {
+        const modal = document.getElementById("modalUsuario");
+        const nombre = document.getElementById("userNombre");
+        const correo = document.getElementById("userEmail");
+        const departamento = document.getElementById("userUnidad");
+        const puesto = document.getElementById("userCargo");
+        const contacto = document.getElementById("userTelefono");
+
+        //----------------envio de correos directo----------------
+        const elLinkCorreo = document.getElementById("linkCorreo");
+
+        if (nombre && correo && departamento && puesto && contacto && modal) {
+            nombre.innerText = name;
+            correo.innerText = email;
+            departamento.innerText = unidad;
+            puesto.innerText = cargo;
+            contacto.innerText = telefono;
+
+            //-----------------GMAIL--------------
+            if (email && email !== "---") {
+                //----abre gmail directamente para su redaccion
+                elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=Consulta sobre su Ticket&body=Hola ${name},`;
+                elLinkCorreo.classList.remove(
+                    "opacity-50",
+                    "pointer-events-none",
+                );
+            } else {
+                elLinkCorreo.href = "javascript:void(0)";
+                elLinkCorreo.classList.add("opacity-50", "pointer-events-none");
+            }
+            modal.classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+        }
+    };
+
+    window.cerrarModalUsuario = function () {
+        const modal = document.getElementById("modalUsuario");
         if (modal) {
             modal.classList.add("hidden");
             document.body.style.overflow = "auto";

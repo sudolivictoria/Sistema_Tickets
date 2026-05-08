@@ -6,8 +6,7 @@
         <div>
             <div class="flex items-center gap-4">
                 <span class="text-4xl font-medium text-slate-600">
-                    Hola, <span
-                        class="text-secondary font-bold">{{ auth()->user()->name ?? 'Administrador'}}</span>
+                    Hola, <span class="text-secondary font-bold">{{ auth()->user()->name ?? 'Administrador'}}</span>
                 </span>
             </div>
             <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y resolución eficiente de
@@ -132,28 +131,41 @@
                     <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
-                                class="text-[14px] uppercase text-green-900 font-black tracking-widest border-b border-slate-200">
-                                <th class="px-4 py-4 border-b border-slate-200">Usuario</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Unidad</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Apertura</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Tecnico</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Detalle</th>
+                                class="text-[14px] uppercase text-green-700 font-black tracking-widest border-b border-slate-200">
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Usuario</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Tecnico</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Detalle</th>
                             </tr>
                         </thead>
                         <tbody id="tablaBody" class="divide-y divide-slate-100 text-[12px]">
                             @foreach($todosLosTickets as $ticket)
                                 <tr class="hover:bg-slate-50/80 transition-all ticket-fila"
                                     data-estado-id="{{ $ticket->estado_id }}">
-                                    <td class="px-4 py-4 font-bold text-slate-900 td-usuario">
-                                        {{ $ticket->user->name ?? 'N/A' }}
+                                    <!--DATOS DEL USUARIO-->
+                                    <td class="px-4 py-4">
+                                        <div class="flex flex-col">
+                                            <button type="button" onclick="verUsuario(
+                                                    '{{ $ticket->user->name }}', 
+                                                    '{{ $ticket->user->email }}', 
+                                                    '{{ $ticket->user->unidad->nombre_unidad}}', 
+                                                    '{{ $ticket->user->cargo }}', 
+                                                    '{{ $ticket->user->telefono ?? 'N/A' }}'
+                                                )"
+                                                class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-2 group">
+                                                {{ $ticket->user->name }}
+                                                <span
+                                                    class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    visibility
+                                                </span>
+                                            </button>
+                                        </div>
                                     </td>
-                                    <td class="px-4 py-4 font-bold text-slate-900 uppercase td-unidad">
-                                        {{ $ticket->user->unidad->nombre_unidad ?? 'N/A' }}
-                                    </td>
-
-                                    <td class="px-4 py-4 max-w-[150px] text-slate-900 font-bold">
+                                    <!-- FINAL DATOS DE USUARIO -->
+                                    <td class="px-4 py-4 text-slate-900 font-bold">
                                         {{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}
                                     </td>
 
@@ -171,6 +183,22 @@
                                         <span
                                             class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $clasePrio }}">
                                             {{ $prio }}
+                                        </span>
+                                    </td>
+
+                                    <td class="px-4 py-4">
+                                        @php
+                                            $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
+                                            $claseEstado = match ($estado) {
+                                                'abierto' => 'bg-red-100 text-red-700 border-red-200',
+                                                'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
+                                                'resuelto' => 'bg-green-100 text-green-700 border-green-200',
+                                                default => 'bg-slate-100 text-slate-600 border-slate-200',
+                                            };
+                                        @endphp
+                                        <span
+                                            class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">
+                                            {{ ucfirst($estado) }}
                                         </span>
                                     </td>
 
@@ -345,6 +373,91 @@
                         <button onclick="cerrarModal()"
                             class="w-full py-4 bg-primary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-primary/20">
                             Cerrar Detalle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{------------------------------------------ MODAL DE USUARIO ------------------------------------------}}
+    <div id="modalUsuario" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 py-6">
+            <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModalUsuario()"></div>
+
+            <div
+                class="relative bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border-b-8 border-t-8 border-primary">
+                <div class="p-8 text-center">
+                    <div
+                        class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md">
+                        <span class="material-symbols-outlined text-4xl text-secondary">account_circle</span>
+                    </div>
+
+                    <h3 id="userNombre" class="text-xl font-black text-secondary uppercase leading-tight mb-4">---</h3>
+
+                    <div class="space-y-3 text-left">
+
+                        {{-- Correo --}}
+                        <a id="linkCorreo" href="#" target="_blank"
+                            class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3 transition-all hover:bg-blue-50 hover:border-blue-200 group cursor-pointer no-underline block">
+
+                            <span
+                                class="material-symbols-outlined text-secondary group-hover:text-primary text-xl">email</span>
+
+                            <div class="flex-1">
+                                <label
+                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block group-hover:text-primary">
+                                    Correo
+                                </label>
+                                <p id="userEmail" class="text-sm text-slate-700 font-bold">---</p>
+                                <span
+                                    class="text-[9px] text-slate-400 font-medium italic hidden group-hover:block transition-all">
+                                    Abrir en Gmail
+                                </span>
+                            </div>
+
+                            <span
+                                class="material-symbols-outlined text-slate-300 group-hover:text-primary text-sm self-center">
+                                open_in_new
+                            </span>
+                        </a>
+
+                        {{-- Unidad --}}
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
+                            <span class="material-symbols-outlined text-secondary text-xl">domain</span>
+                            <div>
+                                <label
+                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad</label>
+                                <p id="userUnidad" class="text-sm text-slate-700 font-bold">---</p>
+                            </div>
+                        </div>
+
+                        {{-- Cargo --}}
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
+                            <span class="material-symbols-outlined text-secondary text-xl">work</span>
+                            <div>
+                                <label
+                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Cargo</label>
+                                <p id="userCargo" class="text-sm text-slate-700 font-bold">---</p>
+                            </div>
+                        </div>
+
+                        {{-- Teléfono --}}
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
+                            <span class="material-symbols-outlined text-secondary text-xl">call</span>
+                            <div>
+                                <label
+                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Teléfono /
+                                    Ext.</label>
+                                <p id="userTelefono" class="text-sm text-slate-700 font-bold">---</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <button onclick="cerrarModalUsuario()"
+                            class="w-full py-3 bg-slate-100 text-slate-500 font-black rounded-2xl hover:bg-slate-200 transition-all uppercase tracking-widest text-xs">
+                            Cerrar Perfil
                         </button>
                     </div>
                 </div>

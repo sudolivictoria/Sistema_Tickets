@@ -36,5 +36,5 @@
             });
     }
 
-    setInterval(autoRefrescoAsignar, 10000);
+    setInterval(autoRefrescoAsignar, 30000);
 })();

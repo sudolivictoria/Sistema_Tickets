@@ -51,16 +51,22 @@
                 <div class="p-6 border-b border-slate-50 flex items-center justify-between">
                     <h3 class="font-black text-lg tracking-[0.2em] text-primary uppercase">Tickets Recientes</h3>
                 </div>
+
+                <div class="flex items-center gap-2 mb-2 lg:hidden text-slate-400">
+                    <span class="material-symbols-outlined text-[18px] animate-bounce-x">swipe_left</span>
+                    <span class="text-[11px] font-medium italic">Desliza para ver más detalles</span>
+                </div>
+                
                 <div class="overflow-x-auto text-[13px] md:text-[14px]">
                     <table class="w-full min-w-[760px] text-left">
-                        <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-green-900">
+                        <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-green-700">
                             <tr>
-                                <th class="px-6 py-4">Categoría</th>
-                                <th class="px-6 py-4">Solicitud</th>
-                                <th class="px-6 py-4">Estado</th>
-                                 <th class="px-6 py-4">Prioridad</th>
-                                <th class="px-6 py-4">Apertura</th>
-                                <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
+                                <th class="px-6 py-4 font-black">Categoría</th>
+                                <th class="px-6 py-4 font-black">Solicitud</th>
+                                <th class="px-6 py-4 font-black">Estado</th>
+                                 <th class="px-6 py-4 font-black">Prioridad</th>
+                                <th class="px-6 py-4 font-black">Apertura</th>
+                                <th class="px-4 py-4 border-b border-slate-200 text-center font-black">Detalle</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-[13px]" id="tablaBody">

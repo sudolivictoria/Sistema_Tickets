@@ -57,18 +57,25 @@
                     </div>
                 </div>
 
+
+                <div class="flex items-center gap-2 mb-2 lg:hidden text-slate-400">
+                    <span class="material-symbols-outlined text-[18px] animate-bounce-x">swipe_left</span>
+                    <span class="text-[11px] font-medium italic">Desliza para ver más detalles</span>
+                </div>
+
+
                 <div class="p-0 w-full overflow-x-auto">
                     <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
                         <thead>
-                            <tr class="bg-slate-50 text-[14px] uppercase text-green-900 font-black tracking-widest">
-                                <th class="px-4 py-4 border-b border-slate-200">Categoría</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Estado</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Técnico</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Apertura</th>
-                                <th class="px-4 py-4 border-b border-slate-200">Cierre</th>
-                                <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
+                            <tr class="bg-slate-50 text-[14px] uppercase text-green-700 font-black tracking-widest">
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Categoría</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Técnico</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Cierre</th>
+                                <th class="px-4 py-4 border-b border-slate-200 text-center font-black">Detalle</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-[13px]">

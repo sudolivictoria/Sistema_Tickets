@@ -59,5 +59,5 @@ function actualizarContadores(nuevoDoc) {
 
 //----ejecutar cada 10 s
 if (document.getElementById("tablaBody")) {
-    setInterval(autoRefresco, 10000);
+    setInterval(autoRefresco, 30000);
 }

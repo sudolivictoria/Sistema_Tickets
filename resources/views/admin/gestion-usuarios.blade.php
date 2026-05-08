@@ -49,26 +49,26 @@
             {{-- TABLA --}}
             <table id="userTable" class="w-full text-left border-separate border-spacing-0">
                 <thead>
-                    <tr class="bg-slate-50 text-[14px] uppercase text-green-900 font-black tracking-widest">
-                        <th class="px-4 py-4 border-b border-slate-200">Nombre</th>
-                        <th class="px-4 py-4 border-b border-slate-200">Email</th>
-                        <th class="px-4 py-4 border-b border-slate-200">Teléfono</th>
-                        <th class="px-4 py-4 border-b border-slate-200">Rol</th>
-                        <th class="px-4 py-4 border-b border-slate-200">Unidad</th>
+                    <tr class="bg-slate-50 text-[14px] uppercase text-green-700 font-black tracking-widest">
+                        <th class="px-4 py-4 border-b border-slate-200 font-black">Nombre</th>
+                        <th class="px-4 py-4 border-b border-slate-200 font-black">Rol</th>
+                        <th class="px-4 py-4 border-b border-slate-200 font-black">Email</th>
+                        <th class="px-4 py-4 border-b border-slate-200 font-black">Unidad</th>
                         <th class="px-4 py-4 border-b border-slate-200">Cargo</th>
-                        <th class="px-4 py-4 border-b border-slate-200">Estado</th>
-                        <th class="px-4 py-4 border-b border-slate-200 text-center">Acciones</th>
+                        <th class="px-4 py-4 border-b border-slate-200 font-black">Teléfono</th>
+                        <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
+                        <th class="px-4 py-4 border-b border-slate-200 font-black text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($usuarios as $user)
                         <tr class="text-[13px]">
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->name }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->email }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->telefono ?? 'N/A'}}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->rol->nombre_rol }}</td>
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->email }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->unidad->nombre_unidad }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->cargo }}</td>
+                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->telefono ?? 'N/A'}}</td>
                             <td class="px-4 py-4">
                                 <span
                                     class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">
@@ -90,7 +90,7 @@
 
                                         <button type="submit" @disabled($user->id === auth()->id())
                                             class="p-2 rounded-lg {{ $user->activo ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }} 
-                                                                                                                                                                                                        {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
+                                                                                                                                                                                                                                {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
                                             <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
                                         </button>
                                     </form>

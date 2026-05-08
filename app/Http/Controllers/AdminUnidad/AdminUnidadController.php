@@ -87,7 +87,7 @@ class AdminUnidadController extends Controller
         //----manuales
         $manuales = Manual::latest()->take(3)->get();
 
-        return view('admin_unidad.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'manuales'));
+        return view('gestor.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'manuales'));
     }
 
 
@@ -98,7 +98,7 @@ class AdminUnidadController extends Controller
         $tipos = TipoSolicitud::all();
         $prioridades = Prioridad::all();
 
-        return view('admin_unidad.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
+        return view('gestor.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
     public function store(Request $request)
@@ -174,7 +174,7 @@ class AdminUnidadController extends Controller
 
         $tecnicos = User::where('unidad_id', $miUnidadId)->get();
 
-        return view('admin_unidad.asignar-tickets', compact('tickets', 'tecnicos'));
+        return view('gestor.asignar-tickets', compact('tickets', 'tecnicos'));
     }
 
     //--- Actualizar Prioridad ---
@@ -213,7 +213,7 @@ class AdminUnidadController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('admin_unidad.mis-tickets', compact('misTickets'));
+        return view('gestor.mis-tickets', compact('misTickets'));
     }
 
     public function recursos()
