@@ -12,4 +12,9 @@ class Categoria extends Model
         'nombre_categoria',
         'unidad_id',
     ];
+
+    public function unidad()
+    {
+        return $this->belongsTo(Unidad::class, 'unidad_id');
+    }
 }

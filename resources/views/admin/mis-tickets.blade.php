@@ -1,9 +1,6 @@
 @extends('layouts.admin')
 
 @section('content')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwind.min.css">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="{{ asset('css/tickets.css') }}">
 
     <div class="p-1">
@@ -57,74 +54,8 @@
                             <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-[13px]">
-                        @foreach($misTickets as $ticket)
-                            <tr class="hover:bg-slate-50/80 transition-all">
-
-                                {{-- Categoría --}}
-                                <td class="px-4 py-4 text-slate-900 font-bold uppercase">
-                                    {{ $ticket->categoria->nombre_categoria ?? 'N/A' }}
-                                </td>
-
-                                {{-- Tipo Solicitud --}}
-                                <td class="px-4 py-4 text-slate-900 font-bold">
-                                    {{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}
-                                </td>
-
-                                {{-- Estado --}}
-                                <td class="px-4 py-4">
-                                    @php
-                                        $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
-                                        $claseEstado = match ($estado) {
-                                            'abierto' => 'bg-red-100 text-red-700 border-red-200',
-                                            'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                            'resuelto' => 'bg-green-100 text-green-700 border-green-200',
-                                            default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                        };
-                                    @endphp
-                                    <span
-                                        class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
-                                </td>
-
-                                {{-- Prioridad --}}
-                                <td class="px-4 py-4">
-                                    @php
-                                        $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
-                                        $clasePrio = match ($prio) {
-                                            'Critica' => 'bg-red-100 text-red-700 border-red-200',
-                                            'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
-                                            'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                                            'Baja' => 'bg-green-100 text-green-700 border-green-200',
-                                            default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                        };
-                                    @endphp
-                                    <span class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $clasePrio }}">
-                                        {{ $prio }}
-                                    </span>
-                                </td>
-
-                                {{-- Técnico --}}
-                                <td class="px-4 py-4 text-slate-900 font-bold italic">
-                                    {{ $ticket->tecnico->name ?? 'Pendiente' }}
-                                </td>
-
-                                {{-- Fechas --}}
-                                <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">{{ $ticket->created_at->format('d/m/Y') }}</td>
-                                
-                                <td class="px-4 py-4 font-bold text-slate-900">
-                                    {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
-                                </td>
-
-                                {{-- Botón Detalle (Descripción) --}}
-                                <td class="px-4 py-4 text-center">
-                                    <button type="button"
-                                        onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
-                                        class="p-2 bg-slate-100 text-primary rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
-                                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
+                    <tbody id="tablaBody" data-tipo="mis_tickets" class="divide-y divide-slate-100 text-[13px]">
+                        @include('partials.filas_mis_tickets', ['misTickets' => $misTickets])
                     </tbody>
                 </table>
             </div>
@@ -169,16 +100,5 @@
 
 
 @push('scripts')
-    {{-- Librerías --}}
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
-
     <script src="{{ asset('js/tabla-tickets.js') }}"></script>
-
-    <script>
-        $(document).ready(function () {
-            inicializarTablaTickets('#tablaMisTickets');
-        });
-    </script>
 @endpush

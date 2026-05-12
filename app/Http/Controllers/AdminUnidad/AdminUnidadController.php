@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminUnidad;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NuevaSolicitudUnidadMail;
 use App\Mail\TicketCreadoMail;
 use App\Models\Categoria;
 use App\Models\Manual;
@@ -12,6 +13,7 @@ use App\Models\TipoSolicitud;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -103,6 +105,14 @@ class AdminUnidadController extends Controller
 
     public function store(Request $request)
     {
+        $userId = Auth::id();
+        $checkSum = md5($userId . trim($request->asunto));
+        $cacheKey = 'submit_lock_' . $checkSum;
+        if (!Cache::add($cacheKey, true, 20)) {
+            return redirect()->route('gestor.crear-ticket')
+                ->with('success', '¡Recibido! Tu solicitud ya se está procesando.');
+        }
+
         //-----validacion datos
         $request->validate([
             'asunto' => 'required|string|min:5|max:50',
@@ -131,6 +141,9 @@ class AdminUnidadController extends Controller
         //---cargar relaciones para el correo
         $nuevoTicket->load(['user', 'categoria', 'prioridad', 'tipo_solicitud']);
 
+        //---cargar relaciones para el correo
+        $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
+
         //---envio correo capturandolo del usuario autenticado
         try {
             //---obtenemos el email del usuario autenticado
@@ -149,6 +162,25 @@ class AdminUnidadController extends Controller
             //--guardar ticket aunque no se cree el correo
             Log::error("Fallo al enviar correo de Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
             $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
+        }
+
+
+        //--------notificacion a la unidad correspondiente
+        try {
+            //---identificar unidad por medio de la categoria del ticket
+            $unidadId = $nuevoTicket->categoria->unidad_id;
+
+            //---obtener emails de gestores de la unidad
+            $destinatarios = User::where('unidad_id', $unidadId)
+                ->pluck('email')
+                ->toArray();
+
+            if (!empty($destinatarios)) {
+                //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
+                Mail::bcc($destinatarios)->send(new NuevaSolicitudUnidadMail($nuevoTicket));
+            }
+        } catch (\Exception $e) {
+            Log::error("Error avisando a la unidad: " . $e->getMessage());
         }
 
         //--redireccionar con mensaje de exito o error en el correo
@@ -172,7 +204,9 @@ class AdminUnidadController extends Controller
             ->latest()
             ->get();
 
-        $tecnicos = User::where('unidad_id', $miUnidadId)->get();
+        $tecnicos = User::where('unidad_id', $miUnidadId)
+            ->where('activo', true)
+            ->get();
 
         return view('gestor.asignar-tickets', compact('tickets', 'tecnicos'));
     }
@@ -190,7 +224,20 @@ class AdminUnidadController extends Controller
     //--- Actualizar Técnico ---
     public function actualizarTecnico(Request $request, Ticket $ticket)
     {
-        $request->validate(['tecnico_id' => 'nullable|exists:users,id']);
+        $request->validate([
+            'tecnico_id' => [
+                'nullable',
+                'exists:users,id',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $user = User::find($value);
+                        if ($user && !$user->activo) {
+                            $fail('El técnico seleccionado no está activo.');
+                        }
+                    }
+                },
+            ]
+        ]);
 
         $ticket->update([
             'tecnico_id' => $request->tecnico_id,

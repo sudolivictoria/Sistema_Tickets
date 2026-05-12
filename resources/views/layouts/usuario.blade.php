@@ -6,11 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Help Desk Istu - Cliente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -21,6 +24,7 @@
             },
         }
     </script>
+
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -71,10 +75,10 @@
         </div>
     </div>
     <header
-        class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm">
+        class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
 
-        <div class="flex items-center gap-3 md:gap-4 min-w-0">
-            <button id="menu-toggle" class="md:hidden p-2 rounded-lg text-primary hover:bg-slate-100 relative z-[100]">
+        <div class="flex items-center gap-3 lg:gap-4 min-w-0">
+            <button id="menu-toggle" class="lg:hidden p-2 rounded-lg text-primary hover:bg-slate-100 relative z-[100]">
                 <span id="menu-icon" class="material-symbols-outlined">menu</span>
             </button>
 
@@ -84,25 +88,25 @@
             </div>
 
             <div class="min-w-0">
-                <h2 class="text-base md:text-xl font-bold text-primary tracking-tight truncate">
+                <h2 class="text-base lg:text-xl font-bold text-primary tracking-tight truncate">
                     Help Desk Istu
                 </h2>
 
                 <span
-                    class="hidden sm:inline-block text-green-900 font-bold text-[10px] md:text-xs uppercase tracking-widest px-2 py-0.5 bg-secondary/10 rounded-full truncate">
+                    class="hidden sm:inline-block text-green-900 font-bold text-[10px] lg:text-xs uppercase tracking-widest px-2 py-0.5 bg-secondary/10 rounded-full truncate">
                     {{ auth()->user()->unidad->nombre_unidad ?? 'Cliente' }}
                 </span>
             </div>
         </div>
 
-        <span class="hidden md:block text-xs font-bold text-slate-400 uppercase tracking-widest max-w-[180px]">
+        <span class="hidden lg:block text-xs font-bold text-slate-400 uppercase tracking-widest max-w-[180px]">
             {{ auth()->user()->name ?? 'Cliente' }}
         </span>
     </header>
 
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-primary border-r border-blue-800 flex flex-col pt-32 p-4
-    transform -translate-x-full md:translate-x-0 transition-transform duration-300
-    z-50 md:z-40">
+    transform -translate-x-full lg:translate-x-0 transition-transform duration-300
+    z-50 lg:z-40">
         <nav class="space-y-1 gap-1-5 flex-1">
             <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('usuario.dashboard') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.dashboard') }}">
@@ -139,16 +143,13 @@
         </div>
     </aside>
 
-    <div id="sidebar-overlay" class="fixed inset-0 z-40 hidden md:hidden"></div>
+    <div id="sidebar-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/50 backdrop-blur-sm lg:hidden"></div>
 
-    <main class="md:ml-56 xl:ml-64 pt-20 min-h-screen">
-        <div class="p-4 md:p-8 max-w-[1400px] mx-auto space-y-6 md:space-y-8">
+    <main class="lg:ml-56 xl:ml-64 pt-20 min-h-screen">
+        <div class="p-4 lg:p-8 max-w-[1400px] mx-auto space-y-6 lg:space-y-8">
             @yield('content')
         </div>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @stack('scripts')
 
     <script>
         //-----------preloader 
@@ -164,7 +165,15 @@
     </script>
 
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script src="{{ asset('js/usuario-menu.js') }}?v={{ time() }}" defer></script>
+    @stack('scripts')
+
+    <script src="{{ asset('js/auto-refresco.js') }}"></script>
 </body>
 
 </html>

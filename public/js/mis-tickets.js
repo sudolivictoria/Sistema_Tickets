@@ -1,15 +1,20 @@
-let table;
+var table;
 
 /**
  * Inicializa DataTables
  * @param {string} selectorId
  */
-function inicializarTablaTickets(selectorId) {
+
+window.inicializarTablaTickets = function (selectorId) {
     const tableElement = $(selectorId);
-    if (!tableElement.length) return; //--verificación de existencia del elemento
+    if (!tableElement.length) return;
+
+    if ($.fn.DataTable.isDataTable(selectorId)) {
+        $(selectorId).DataTable().destroy();
+    }
 
     table = tableElement.DataTable({
-        scrollX: true,       
+        scrollX: true,
         scrollCollapse: true,
         language: {
             processing: "Procesando...",
@@ -44,10 +49,12 @@ function inicializarTablaTickets(selectorId) {
     });
 
     //---buscador
-    $("#inputBusqueda").on("keyup", function () {
-        table.search(this.value).draw();
-    });
-}
+    $("#inputBusqueda")
+        .off("keyup")
+        .on("keyup", function () {
+            table.search(this.value).draw();
+        });
+};
 
 /**
  * Filtro por estado
@@ -90,4 +97,8 @@ window.cerrarModal = function () {
     }
 };
 
-mis - tickes.js;
+document.addEventListener("DOMContentLoaded", function () {
+    if (document.querySelector("#tablaMisTickets")) {
+        window.inicializarTablaTickets("#tablaMisTickets");
+    }
+});

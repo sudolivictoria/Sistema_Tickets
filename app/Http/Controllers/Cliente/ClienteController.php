@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NuevaSolicitudUnidadMail;
 use App\Mail\TicketCreadoMail;
 use App\Models\Categoria;
 use App\Models\Manual;
@@ -12,6 +13,7 @@ use App\Models\TipoSolicitud;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -63,6 +65,15 @@ class ClienteController extends Controller
 
     public function store(Request $request)
     {
+
+        $userId = Auth::id();
+        $checkSum = md5($userId . trim($request->asunto));
+        $cacheKey = 'submit_lock_' . $checkSum;
+        if (!Cache::add($cacheKey, true, 20)) {
+            return redirect()->route('usuario.crear-ticket')
+                ->with('success', '¡Recibido! Tu solicitud ya se está procesando.');
+        }
+
         //-----validacion datos
         $request->validate([
             'asunto' => 'required|string|min:5|max:50',
@@ -89,7 +100,7 @@ class ClienteController extends Controller
         ]);
 
         //---cargar relaciones para el correo
-        $nuevoTicket->load(['user', 'categoria', 'prioridad', 'tipo_solicitud']);
+        $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
 
         //---envio correo capturandolo del usuario autenticado
         try {
@@ -111,6 +122,25 @@ class ClienteController extends Controller
             $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
         }
 
+
+        //--------notificacion a la unidad correspondiente
+        try {
+            //---identificar unidad por medio de la categoria del ticket
+            $unidadId = $nuevoTicket->categoria->unidad_id;
+
+            //---obtener emails de gestores de la unidad
+            $destinatarios = User::where('unidad_id', $unidadId)
+                ->pluck('email')
+                ->toArray();
+
+            if (!empty($destinatarios)) {
+                //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
+                Mail::bcc($destinatarios)->send(new NuevaSolicitudUnidadMail($nuevoTicket));
+            }
+        } catch (\Exception $e) {
+            Log::error("Error avisando a la unidad: " . $e->getMessage());
+        }
+
         //--redireccionar con mensaje de exito o error en el correo
         return redirect()->route('usuario.crear-ticket')
             ->with('success', $mensajeFlash);
@@ -119,11 +149,11 @@ class ClienteController extends Controller
     public function misTickets()
     {
         $misTickets = Ticket::where('user_id', Auth::id())
-        ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    return view('usuario.mis-tickets', compact('misTickets'));
+        return view('usuario.mis-tickets', compact('misTickets'));
     }
 
     public function recursos()

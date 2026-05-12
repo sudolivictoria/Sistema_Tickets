@@ -82,26 +82,9 @@
                     </div>
                 </div>
 
-                <div
+                <div id="barras-rendimiento"
                     class="h-56 flex items-end justify-between px-4 gap-3 bg-slate-50/50 rounded-2xl p-6 border border-slate-100">
-                    @foreach($mesesGrafico as $mes)
-                        <div class="flex-1 flex flex-col items-center gap-3 group h-full justify-end">
-                            <div class="w-full max-w-[36px] flex flex-col justify-end gap-1 h-full">
-                                <div class="w-full bg-red-500 rounded-t-md hover:brightness-110 transition-all duration-500 relative shadow-[0_-2px_10px_rgba(132,204,22,0.2)]"
-                                    style="height: {{ $mes['pendientes_pct'] }}%">
-                                    <span
-                                        class="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-black text-red-500 bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity z-10">{{ $mes['pendientes_pct'] }}%</span>
-                                </div>
-                                <div class="w-full bg-primary rounded-t-md hover:brightness-110 transition-all duration-500 relative shadow-[0_-2px_10px_rgba(132,204,22,0.2)]"
-                                    style="height: {{ $mes['resueltos_pct'] }}%">
-                                    <span
-                                        class="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-black text-primary bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity z-10">{{ $mes['resueltos_pct'] }}%</span>
-                                </div>
-                            </div>
-                            <span
-                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ substr($mes['nombre'], 0, 3) }}</span>
-                        </div>
-                    @endforeach
+                    @include('partials.grafico_rendimiento', ['mesesGrafico' => $mesesGrafico])
                 </div>
             </div>
             <!--final rendimiento anual-->
@@ -126,103 +109,24 @@
                 </div>
 
                 {{-- Contenedor con Scroll --}}
-                <div id="refresco-tablaTickets">
-                    <div class="overflow-y-auto" style="max-height: 400px;">
-                        <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
-                            <thead class="sticky top-0 z-10 bg-slate-50 font-black">
-                                <tr
-                                    class="text-[14px] uppercase text-green-700 font-black tracking-widest border-b border-slate-200">
-                                    <th class="px-4 py-4 border-b border-slate-200 font-black">Usuario</th>
-                                    <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
-                                    <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
-                                    <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
-                                    <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
-                                    <th class="px-4 py-4 border-b border-slate-200 font-black">Tecnico</th>
-                                    <th class="px-4 py-4 border-b border-slate-200 font-black">Detalle</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaBody" class="divide-y divide-slate-100 text-[12px]">
-                                @foreach($todosLosTickets as $ticket)
-                                    <tr class="hover:bg-slate-50/80 transition-all ticket-fila"
-                                        data-estado-id="{{ $ticket->estado_id }}">
-                                        <!--DATOS DEL USUARIO-->
-                                        <td class="px-4 py-4">
-                                            <div class="flex flex-col">
-                                                <button type="button" onclick="verUsuario(
-                                                        '{{ $ticket->user->name }}', 
-                                                        '{{ $ticket->user->email }}', 
-                                                        '{{ $ticket->user->unidad->nombre_unidad}}', 
-                                                        '{{ $ticket->user->cargo }}', 
-                                                        '{{ $ticket->user->telefono ?? 'N/A' }}'
-                                                    )"
-                                                    class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-2 group">
-                                                    {{ $ticket->user->name }}
-                                                    <span
-                                                        class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        visibility
-                                                    </span>
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <!-- FINAL DATOS DE USUARIO -->
-
-                                        <td class="px-4 py-4 max-w-[150px] text-slate-900 font-bold">
-                                            {{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}
-                                        </td>
-
-                                        <td class="px-4 py-4">
-                                            @php
-                                                $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
-                                                $clasePrio = match ($prio) {
-                                                    'Critica' => 'bg-red-100 text-red-700 border-red-200',
-                                                    'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
-                                                    'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                                                    'Baja' => 'bg-green-100 text-green-700 border-green-200',
-                                                    default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                                };
-                                            @endphp
-                                            <span
-                                                class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $clasePrio }}">
-                                                {{ $prio }}
-                                            </span>
-                                        </td>
-
-                                        <td class="px-4 py-4">
-                                            @php
-                                                $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
-                                                $claseEstado = match ($estado) {
-                                                    'abierto' => 'bg-red-100 text-red-700 border-red-200',
-                                                    'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                                    'resuelto' => 'bg-green-100 text-green-700 border-green-200',
-                                                    default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                                };
-                                            @endphp
-                                            <span
-                                                class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">
-                                                {{ ucfirst($estado) }}
-                                            </span>
-                                        </td>
-
-                                        <td class="px-4 py-4 font-bold text-slate-900">
-                                            {{ $ticket->created_at->format('d/m/Y') }}
-                                        </td>
-                                        <td class="px-4 py-4 font-bold text-slate-900 italic">
-                                            {{ $ticket->tecnico->name ?? 'Pendiente' }}
-                                        </td>
-
-                                        {{-- BOTON DESCRIPCION DEL TICKET --}}
-                                        <td class="px-4 py-4 text-center">
-                                            <button type="button"
-                                                onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
-                                                class="p-2 bg-slate-100 text-primary rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
-                                                <span class="material-symbols-outlined text-[20px]">visibility</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="overflow-y-auto" style="max-height: 400px;">
+                    <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
+                        <thead class="sticky top-0 z-10 bg-slate-50 font-black">
+                            <tr
+                                class="text-[14px] uppercase text-green-700 font-black tracking-widest border-b border-slate-200">
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Usuario</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Tecnico</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Detalle</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaBody" data-tipo="dashboard" class="divide-y divide-slate-100 text-[12px]">
+                            @include('partials.filas_dashboard', ['todosLosTickets' => $todosLosTickets])
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -363,10 +267,10 @@
 
                         {{-- Unidad --}}
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
-                            <span class="material-symbols-outlined text-secondary text-xl">domain</span>
+                            <span class="material-symbols-outlined text-secondary text-xl">park</span>
                             <div>
-                                <label
-                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad</label>
+                                <label class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad
+                                    / Parque</label>
                                 <p id="userUnidad" class="text-sm text-slate-700 font-bold">---</p>
                             </div>
                         </div>
@@ -407,5 +311,4 @@
 
 @push('scripts')
     <script src="{{ asset('js/admin.js') }}"></script>
-    <script src="{{ asset('js/admin-refresco.js') }}"></script>
 @endpush

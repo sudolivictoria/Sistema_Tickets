@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AdminUnidad\AdminUnidadController;
+use App\Http\Controllers\ApiTableController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
@@ -20,6 +21,10 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
 Route::middleware(['auth'])->group(function () {
+
+
+    //---api para refresco automatico
+    Route::get('/api/refresh-table', [ApiTableController::class, 'refresh'])->name('api.table.refresh');
 
     Route::get('/dashboard', function () {
         $user = Auth::user();

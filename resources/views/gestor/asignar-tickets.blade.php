@@ -1,10 +1,6 @@
 @extends('layouts.gestor')
 
 @section('content')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwind.min.css">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-        
     <link rel="stylesheet" href="{{ asset('css/tickets.css') }}">
 
     <div class="p-1">
@@ -32,105 +28,20 @@
 
                 <table id="tablaAsignarTickets" class="w-full text-left border-separate border-spacing-0">
                     <thead>
-                        <tr class="bg-slate-50 text-[14px] uppercase text-green-700 font-black tracking-widest">
-                            <th class="px-4 py-4 border-b border-slate-200 font-black">Usuario</th>
-                            <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
-                            <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
-                            <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
-                            <th class="px-4 py-4 border-b border-slate-200 font-black">Técnico</th>
-                            <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
-                            <th class="px-4 py-4 border-b border-slate-200 font-black text-center">Detalle</th>
+                        <tr
+                            class="text-[14px] uppercase text-green-700 font-extrabold tracking-widest border-b border-slate-200">
+                            <th class="px-4 py-4 border-b border-slate-200">Usuario</th>
+                            <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
+                            <th class="px-4 py-4 border-b border-slate-200">Estado</th>
+                            <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
+                            <th class="px-4 py-4 border-b border-slate-200">Técnico</th>
+                            <th class="px-4 py-4 border-b border-slate-200">Apertura</th>
+                            <th class="px-4 py-4 border-b border-slate-200 text-center">Detalle</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-[13px]">
-                        @foreach($tickets as $ticket)
-                            <tr class="hover:bg-slate-50/80 transition-all">
-                               
-                                {{-- Usuario --}}
-                                <td class="px-4 py-4">
-                                    <div class="flex flex-col">
-                                        <button type="button" onclick="verUsuario(
-                                                '{{ $ticket->user->name }}', 
-                                                '{{ $ticket->user->email }}', 
-                                                '{{ $ticket->user->unidad->nombre_unidad}}', 
-                                                '{{ $ticket->user->cargo }}', 
-                                                '{{ $ticket->user->telefono ?? 'N/A' }}'
-                                            )"
-                                            class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-2 group">
-                                            {{ $ticket->user->name }}
-                                            <span
-                                                class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                                                visibility
-                                            </span>
-                                        </button>
-                                    </div>
-                                </td>
-                                <!-- FINAL DATOS DE USUARIO -->     
 
-
-                                {{-- Tipo Solicitud --}}
-                                <td class="px-4 py-4 text-slate-900 font-bold">
-                                    {{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}
-                                </td>
-
-                                {{-- Estado --}}
-                                <td class="px-4 py-4">
-                                    @php
-                                        $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
-                                        $claseEstado = match ($estado) {
-                                            'abierto' => 'bg-red-100 text-red-700 border-red-200',
-                                            'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                            'resuelto' => 'bg-green-100 text-green-700 border-green-200',
-                                            default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                        };
-                                    @endphp
-                                    <span
-                                        class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
-                                </td>
-
-                                {{-- Prioridad --}}
-                                <td class="px-4 py-4">
-                                    <form action="{{ route('gestor.actualizar-prioridad', $ticket->id) }}" method="POST">
-                                        @csrf @method('PATCH')
-                                        <select name="prioridad_id" onchange="this.form.submit()"
-                                            class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer">
-                                            <option value="1" {{ $ticket->prioridad_id == 1 ? 'selected' : '' }}>Critica</option>
-                                            <option value="2" {{ $ticket->prioridad_id == 2 ? 'selected' : '' }}>Alta</option>
-                                            <option value="3" {{ $ticket->prioridad_id == 3 ? 'selected' : '' }}>Media</option>
-                                            <option value="4" {{ $ticket->prioridad_id == 4 ? 'selected' : '' }}>Baja</option>
-                                        </select>
-                                    </form>
-                                </td>
-
-                                {{-- Técnico --}}
-                                <td class="px-4 py-4">
-                                    <form action="{{ route('gestor.actualizar-tecnico', $ticket->id) }}" method="POST">
-                                        @csrf @method('PATCH')
-                                        <select name="tecnico_id" onchange="this.form.submit()"
-                                            class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer w-32">
-                                            <option value="">Pendiente</option>
-                                            @foreach($tecnicos as $tecnico)
-                                                <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
-                                                    {{ $tecnico->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </form>
-                                </td>
-
-                                {{-- Fechas --}}
-                                <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">{{ $ticket->created_at->format('d/m/Y') }}</td>
-
-                                {{-- Botón Detalle (Descripción) --}}
-                                <td class="px-4 py-4 text-center">
-                                    <button type="button"
-                                        onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
-                                        class="p-2 bg-slate-100 text-primary rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
-                                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
+                    <tbody id="tablaBody" data-tipo="asignar" class="divide-y divide-slate-100 text-[13px]">
+                        @include('partials.filas_asignar', ['tickets' => $tickets])
                     </tbody>
                 </table>
             </div>
@@ -216,10 +127,10 @@
 
                         {{-- Unidad --}}
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
-                            <span class="material-symbols-outlined text-secondary text-xl">domain</span>
+                            <span class="material-symbols-outlined text-secondary text-xl">park</span>
                             <div>
                                 <label
-                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad</label>
+                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad / Parque</label>
                                 <p id="userUnidad" class="text-sm text-slate-700 font-bold">---</p>
                             </div>
                         </div>
@@ -259,32 +170,20 @@
 
 @endsection
 
-
 @push('scripts')
-    {{-- Librerías --}}
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="{{ asset('js/asignar-tickets.js') }}"></script>
-
-    <script>
-        $(document).ready(function () {
-            inicializarTablaTickets('#tablaAsignarTickets');
-        });
-    </script>
 
     @if(session('sweet_success'))
         <script>
             Swal.fire({
-            title: '¡Actualizado Correctamente!',
-            text: "{{ session('success') }}",
-            icon: 'success',
-            confirmButtonColor: '#1e3a8a',
-            confirmButtonText: 'Entendido',
-            customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
-        });
+                title: '¡Actualizado Correctamente!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                confirmButtonColor: '#1e3a8a',
+                confirmButtonText: 'Entendido',
+                customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
+            });
         </script>
     @endif
 
@@ -300,5 +199,4 @@
             });
         </script>
     @endif
-
 @endpush

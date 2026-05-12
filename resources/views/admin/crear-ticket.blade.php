@@ -115,26 +115,25 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
      <script src="{{ asset('js/ticket-form.js') }}"></script>
     
     <script>
        window.todosLosTipos = @json($tipos ?? []);
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+   
+       document.addEventListener('DOMContentLoaded', function () {
             const oldCategoria = '{{ old("categoria_id") }}';
             if (oldCategoria) {
-                document.querySelector('select[name="categoria_id"]').value = oldCategoria;
-                filtrarTipos(oldCategoria);
-                
-                const oldTipo = '{{ old("tipo_solicitud_id") }}';
-                if (oldTipo) {
+                const catSelect = document.querySelector('select[name="categoria_id"]');
+                if(catSelect) {
+                    catSelect.value = oldCategoria;
+                    window.filtrarTipos(oldCategoria);
+                    
+                    const oldTipo = '{{ old("tipo_solicitud_id") }}';
                     const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
-                    tipoSelect.value = oldTipo;
-                    tipoSelect.dispatchEvent(new Event('change'));
+                    if (oldTipo && tipoSelect) {
+                        tipoSelect.value = oldTipo;
+                        tipoSelect.dispatchEvent(new Event('change'));
+                    }
                 }
             }
         });

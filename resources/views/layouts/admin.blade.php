@@ -6,18 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>@yield('title', 'Help Desk Istu - Admin')</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
-    <script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+   
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+     <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -33,6 +29,8 @@
             },
         }
     </script>
+
+
     <style>
         /* Scrollbar personalizado */
         ::-webkit-scrollbar {
@@ -193,7 +191,14 @@
         });
     </script>
 
+    {{-- LIBRERIAS --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     @stack('scripts')
+    <script src="{{ asset('js/auto-refresco.js') }}"></script>
 </body>
 
 </html>

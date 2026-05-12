@@ -12,17 +12,22 @@ class CheckRole
     /**
      * Maneja una solicitud entrante.
      */
+
     public function handle(Request $request, Closure $next, string $role): Response
     {
         //---verifica si el usuario esta logueado
         if (!Auth::check()) {
-            return redirect('/login');
+            return redirect()->route('login');
         }
 
         //----obtiene el usuario autenticado
         $user = Auth::user();
 
-        $requiredRoleId = $roles[$role] ?? null;
+        $roles = [
+            'Admin'   => 1,
+            'Usuario' => 2,
+            'Gestor'  => 3,
+        ];
 
         //----evitar error si el rol no existe en el diccionario
         if (intval($user->rol_id) === 1) {
@@ -33,6 +38,12 @@ class CheckRole
             return $next($request);
         }
 
-        abort(403, "Acceso denegado.");
+        $requiredRoleId = $roles[$role] ?? null;
+        if ($requiredRoleId && intval($user->rol_id) === $requiredRoleId) {
+            return $next($request);
+        }
+
+        Auth::logout();
+        return redirect()->route('login')->with('error', 'Acceso no autorizado, intentalo de nuevo.');
     }
 }

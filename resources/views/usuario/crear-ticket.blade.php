@@ -111,35 +111,28 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
      <script src="{{ asset('js/ticket-form.js') }}"></script>
     
     <script>
-       window.todosLosTipos = @json($tipos ?? []);
-    </script>
+    window.todosLosTipos = @json($tipos ?? []);
 
-    {{-- categorias y tipos de solicitud --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const oldCategoria = '{{ old("categoria_id") }}';
-            if (oldCategoria) {
-                const catSelect = document.querySelector('select[name="categoria_id"]');
-                if(catSelect) {
-                    catSelect.value = oldCategoria;
-                    if(typeof filtrarTipos === "function") filtrarTipos(oldCategoria);
-                }
+    document.addEventListener('DOMContentLoaded', function () {
+        const oldCategoria = '{{ old("categoria_id") }}';
+        if (oldCategoria) {
+            const catSelect = document.querySelector('select[name="categoria_id"]');
+            if(catSelect) {
+                catSelect.value = oldCategoria;
+                window.filtrarTipos(oldCategoria);
                 
                 const oldTipo = '{{ old("tipo_solicitud_id") }}';
-                if (oldTipo) {
-                    const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
-                    if(tipoSelect) {
-                        tipoSelect.value = oldTipo;
-                        tipoSelect.dispatchEvent(new Event('change'));
-                    }
+                const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
+                if (oldTipo && tipoSelect) {
+                    tipoSelect.value = oldTipo;
+                    tipoSelect.dispatchEvent(new Event('change'));
                 }
             }
-        });
+        }
+    });
     </script>
 
     {{--alertas sweetalert--}}

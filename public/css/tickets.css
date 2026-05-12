@@ -157,3 +157,7 @@
     width: 100% !important;
     -webkit-overflow-scrolling: touch;
 }
+
+table.dataTable thead th {
+    font-weight: 1000 !important;
+}

@@ -29,7 +29,7 @@
                         <select name="categoria_id"
                             class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
-                            <option value="" disabled selected>Seleccione categoría</option>
+                            <option value="" disabled selected>Seleccione</option>
                             @foreach($categorias as $categoria)
                                 <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
                                     {{ $categoria->nombre_categoria }}
@@ -50,8 +50,7 @@
                         <select name="tipo_solicitud_id"
                             class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
-                            <option value="" disabled selected>Seleccione tipo</option>
-                            {{-- Aquí iría tu foreach de tipos --}}
+                            <option value="" disabled selected>Seleccione</option>
                         </select>
                         <span
                             class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -116,29 +115,28 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
      <script src="{{ asset('js/ticket-form.js') }}"></script>
     
     <script>
-       window.todosLosTipos = @json($tipos ?? []);
-    </script>
+    window.todosLosTipos = @json($tipos ?? []);
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const oldCategoria = '{{ old("categoria_id") }}';
-            if (oldCategoria) {
-                document.querySelector('select[name="categoria_id"]').value = oldCategoria;
-                filtrarTipos(oldCategoria);
+    document.addEventListener('DOMContentLoaded', function () {
+        const oldCategoria = '{{ old("categoria_id") }}';
+        if (oldCategoria) {
+            const catSelect = document.querySelector('select[name="categoria_id"]');
+            if(catSelect) {
+                catSelect.value = oldCategoria;
+                window.filtrarTipos(oldCategoria);
                 
                 const oldTipo = '{{ old("tipo_solicitud_id") }}';
-                if (oldTipo) {
-                    const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
+                const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
+                if (oldTipo && tipoSelect) {
                     tipoSelect.value = oldTipo;
                     tipoSelect.dispatchEvent(new Event('change'));
                 }
             }
-        });
+        }
+    });
     </script>
 
     {{--alertas sweetalert--}}

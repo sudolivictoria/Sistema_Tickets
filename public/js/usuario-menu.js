@@ -31,6 +31,12 @@ const initSidebar = () => {
     });
 
     overlay.addEventListener("click", cerrarMenu);
+
+    window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) {
+            cerrarMenu();
+        }
+    });
 };
 
 //----ejecuta solo si el dom esta listo

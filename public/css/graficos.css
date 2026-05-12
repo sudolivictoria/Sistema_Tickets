@@ -1,0 +1,14 @@
+@keyframes growUp {
+    from {
+        height: 0;
+    }
+
+    to {
+        
+    }
+}
+
+#contenedor-grafico .bg-primary,
+#contenedor-grafico .bg-red-500 {
+    animation: growUp 1s ease-out;
+}

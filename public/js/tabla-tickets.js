@@ -1,8 +1,12 @@
-let table;
+var table;
 
-function inicializarTablaTickets(selectorId) {
+window.inicializarTablaTickets = function (selectorId) {
     const tableElement = $(selectorId);
     if (!tableElement.length) return;
+
+    if ($.fn.DataTable.isDataTable(selectorId)) {
+        $(selectorId).DataTable().destroy();
+    }
 
     table = tableElement.DataTable({
         language: {
@@ -38,10 +42,12 @@ function inicializarTablaTickets(selectorId) {
     });
 
     //---buscador
-    $("#inputBusqueda").on("keyup", function () {
-        table.search(this.value).draw();
-    });
-}
+    $("#inputBusqueda")
+        .off("keyup")
+        .on("keyup", function () {
+            table.search(this.value).draw();
+        });
+};
 
 /**
  * Filtro por estado
@@ -83,3 +89,9 @@ window.cerrarModal = function () {
         document.body.style.overflow = "auto";
     }
 };
+
+document.addEventListener("DOMContentLoaded", function () {
+    if (document.querySelector("#tablaMisTickets")) {
+        window.inicializarTablaTickets("#tablaMisTickets");
+    }
+});
