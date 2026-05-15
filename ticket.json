@@ -1,0 +1,7 @@
+{
+    "asunto": "Prueba de carga",
+    "descripcion": "Generando ticket masivo para test de stress",
+    "categoria_id": 1,
+    "tipo_solicitud_id": 1,
+    "prioridad_id": 1
+}

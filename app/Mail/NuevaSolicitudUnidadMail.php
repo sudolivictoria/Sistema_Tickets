@@ -9,20 +9,22 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NuevaSolicitudUnidadMail extends Mailable
+class NuevaSolicitudUnidadMail extends Mailable implements ShouldQueue
 {
-   public $ticket;
+    use Queueable, SerializesModels;
 
-   public function __construct($ticket)
-   {
-       $this->ticket = $ticket;
-   }
+    public $ticket;
+
+    public function __construct($ticket)
+    {
+        $this->ticket = $ticket;
+    }
 
     public function build()
     {
         $id = '#TK' . str_pad($this->ticket->id, 5, '0', STR_PAD_LEFT);
 
         return $this->subject($id . ' - Nueva Solicitud para su Unidad!')
-                ->view('emails.nueva-solicitud-unidad');
+            ->view('emails.nueva-solicitud-unidad');
     }
 }

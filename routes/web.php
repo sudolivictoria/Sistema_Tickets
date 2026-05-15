@@ -12,6 +12,7 @@ use App\Http\Controllers\CategoriaManualController;
 use App\Http\Controllers\Cliente\ClienteController;
 use App\Http\Controllers\ManualController;
 use App\Http\Controllers\TicketController;
+use App\Models\Ticket;
 
 Volt::route('/test-livewire', 'pages.test-livewire')->name('test.livewire');
 
@@ -123,4 +124,29 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/tickets/{id}/resolver', [TicketController::class, 'resolver'])
             ->name('tickets.resolver');
     });
+});
+
+Route::get('/test-performance', function () {
+    //--test
+    return Ticket::with(['user', 'tecnico', 'prioridad', 'estado'])->limit(50)->get();
+});
+
+Route::post('/test-directo', function (Illuminate\Http\Request $request) {
+    // 1. Creamos el ticket manualmente sin pasar por validaciones de Auth
+    $ticket = Ticket::create([
+        'asunto'            => $request->asunto ?? 'Ticket de Stress',
+        'descripcion'       => $request->descripcion ?? 'Prueba de carga',
+        'categoria_id'      => $request->categoria_id ?? 1,
+        'tipo_solicitud_id' => $request->tipo_solicitud_id ?? 1,
+        'user_id'           => 1, // ID de un usuario que ya exista
+        'estado_id'         => 1,
+        'prioridad_id'      => $request->prioridad_id ?? 1,
+    ]);
+
+    // 2. Intentamos enviar el correo AQUÍ para ver cuánto tarda
+    // Si esta línea está activa, el test medirá el tiempo del correo
+    \Illuminate\Support\Facades\Mail::to('test@example.com')
+        ->send(new \App\Mail\NuevaSolicitudUnidadMail($ticket));
+
+    return "Creado exitosamente ID: " . $ticket->id;
 });

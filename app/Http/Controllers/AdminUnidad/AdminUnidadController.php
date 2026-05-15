@@ -12,6 +12,7 @@ use App\Models\Prioridad;
 use App\Models\Ticket;
 use App\Models\TipoSolicitud;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -47,11 +48,17 @@ class AdminUnidadController extends Controller
             })
             ->count();
 
+
+        //---estadisticas mensuales por unidad del admin autenticado
+        $inicioMes = Carbon::now()->startOfMonth();
+        $finMes = Carbon::now()->endOfMonth();
+
         //--tickets recientes por unidad del admin autenticado
         $todosLosTickets = Ticket::with(['user', 'categoria', 'estado'])
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
+            ->whereBetween('created_at', [$inicioMes, $finMes])
             ->latest()
             ->get();
 
@@ -162,7 +169,7 @@ class AdminUnidadController extends Controller
                 Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
                 $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
             } else {
-                Mail::to($destinatario)->send(new TicketCreadoMail($nuevoTicket));
+                Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
                 $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
             }
         } catch (\Exception $e) {
@@ -184,7 +191,7 @@ class AdminUnidadController extends Controller
 
             if (!empty($destinatarios)) {
                 //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
-                Mail::bcc($destinatarios)->send(new NuevaSolicitudUnidadMail($nuevoTicket));
+                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
             }
         } catch (\Exception $e) {
             Log::error("Error avisando a la unidad: " . $e->getMessage());

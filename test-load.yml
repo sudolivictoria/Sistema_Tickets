@@ -1,0 +1,14 @@
+config:
+  target: "http://sistema-tickets.test" # Cambia esto por tu URL de Laragon
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Carga Inicial"
+    - duration: 60
+      arrivalRate: 15
+      name: "Pico de Tráfico"
+
+scenarios:
+  - flow:
+      - get:
+          url: "/test-performance"

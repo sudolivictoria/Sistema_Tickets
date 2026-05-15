@@ -24,7 +24,7 @@ class TicketController extends Controller
 
         //---ENVIAR EL CORREO---
         try {
-            Mail::to($ticket->user->email)->send(new TicketResueltoMail($ticket));
+            Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket));
         } catch (\Exception $e) {
             Log::error("Error enviando correo de ticket resuelto: " . $e->getMessage());
         }

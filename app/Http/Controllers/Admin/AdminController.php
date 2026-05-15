@@ -12,6 +12,7 @@ use App\Models\Prioridad;
 use App\Models\Ticket;
 use App\Models\TipoSolicitud;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -47,18 +48,24 @@ class AdminController extends Controller
             })
             ->count();
 
+
+        //---limitar a solo mostrar los tickets del mes
+        $inicioMes = Carbon::now()->startOfMonth();
+        $finMes = Carbon::now()->endOfMonth();
+
         //--tickets recientes por unidad del admin autenticado
         $todosLosTickets = Ticket::with(['user', 'categoria', 'estado'])
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
+            ->whereBetween('created_at', [$inicioMes, $finMes])
             ->latest()
             ->get();
 
         //--tickets asignados al admin autenticado
         $ticketsAsignados = Ticket::where('tecnico_id', Auth::id())
-        ->where('estado_id', 2)
-        ->count();
+            ->where('estado_id', 2)
+            ->count();
 
         //----Estadísticas mensuales filtradas por Unidad de Categoría----
         $añoActual = date('Y');
@@ -96,7 +103,7 @@ class AdminController extends Controller
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
         $manuales = Manual::with('categoria')->latest()->get();
 
-        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico','categorias', 'manuales', 'ticketsAsignados'));
+        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'categorias', 'manuales', 'ticketsAsignados'));
     }
 
     //-------------------------CLIENTE----------------------------
@@ -140,7 +147,7 @@ class AdminController extends Controller
             'descripcion' => $request->descripcion,
             'categoria_id' => $request->categoria_id,
             'tipo_solicitud_id' => $request->tipo_solicitud_id,
-            'user_id' => Auth::id(), //----asignar el ticket al usuario autenticado
+            'user_id' => Auth::id() ?? 1, //----asignar el ticket al usuario autenticado
             'estado_id' => 1, //---abierto
             'prioridad_id' => $request->prioridad_id,
             'tecnico_id' => null, //---vacio inicial 
@@ -161,7 +168,7 @@ class AdminController extends Controller
                 Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
                 $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
             } else {
-                Mail::to($destinatario)->send(new TicketCreadoMail($nuevoTicket));
+                Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
                 $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
             }
         } catch (\Exception $e) {
@@ -183,7 +190,7 @@ class AdminController extends Controller
 
             if (!empty($destinatarios)) {
                 //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
-                Mail::bcc($destinatarios)->send(new NuevaSolicitudUnidadMail($nuevoTicket));
+                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
             }
         } catch (\Exception $e) {
             Log::error("Error avisando a la unidad: " . $e->getMessage());

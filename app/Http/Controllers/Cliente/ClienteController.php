@@ -115,7 +115,7 @@ class ClienteController extends Controller
                 Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
                 $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
             } else {
-                Mail::to($destinatario)->send(new TicketCreadoMail($nuevoTicket));
+                Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
                 $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
             }
         } catch (\Exception $e) {
@@ -137,7 +137,7 @@ class ClienteController extends Controller
 
             if (!empty($destinatarios)) {
                 //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
-                Mail::bcc($destinatarios)->send(new NuevaSolicitudUnidadMail($nuevoTicket));
+                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
             }
         } catch (\Exception $e) {
             Log::error("Error avisando a la unidad: " . $e->getMessage());

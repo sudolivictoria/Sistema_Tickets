@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => CheckRole::class,
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'test-directo', 
+        ]);
     })
 
     ->withExceptions(function (Exceptions $exceptions) {
@@ -28,3 +32,6 @@ return Application::configure(basePath: dirname(__DIR__))
             return false;
         });
     })->create();
+
+    
+    
