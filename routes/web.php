@@ -77,10 +77,7 @@ Route::middleware(['auth'])->group(function () {
 
         //---gestion de recursos
         Route::resource('manuales', ManualController::class);
-        Route::post('/manuales', [ManualController::class, 'store'])->name('manuales.store');
-        Route::put('/manuales/{id}', [ManualController::class, 'update'])->name('manuales.update');
-        Route::delete('/manuales/{id}', [ManualController::class, 'destroy'])->name('manuales.destroy');
-
+        
         //----gestion de categorias manuales
         Route::post('/categorias-manuales', [CategoriaManualController::class, 'store'])->name('categorias.store');
     });
