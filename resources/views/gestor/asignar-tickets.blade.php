@@ -9,7 +9,6 @@
                 <span class="material-symbols-outlined text-4xl text-primary">confirmation_number</span>
                 Asignar Tickets
             </h2>
-            <p class="text-slate-500 font-medium italic">Asigne tickets a técnicos disponibles</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 
@@ -22,16 +21,16 @@
                             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
                         <input type="text" id="inputBusqueda"
                             class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
-                            placeholder="Buscar por asunto, técnico...">
+                            placeholder="Buscar...">
                     </div>
                 </div>
 
                 <table id="tablaAsignarTickets" class="w-full text-left border-separate border-spacing-0">
                     <thead>
                         <tr
-                            class="text-[14px] uppercase text-green-700 font-extrabold tracking-widest border-b border-slate-200">
+                            class="text-[13px] uppercase text-green-700 font-extrabold tracking-widest border-b border-slate-200">
+                            <th class="px-4 py-4 border-b border-slate-200 font-black">ID</th>
                             <th class="px-4 py-4 border-b border-slate-200">Usuario</th>
-                            <th class="px-4 py-4 border-b border-slate-200">Solicitud</th>
                             <th class="px-4 py-4 border-b border-slate-200">Estado</th>
                             <th class="px-4 py-4 border-b border-slate-200">Prioridad</th>
                             <th class="px-4 py-4 border-b border-slate-200">Técnico</th>
@@ -64,10 +63,20 @@
                     </div>
                     <div class="space-y-4">
                         <div>
+                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Tipo de
+                                Solicitud</label>
+                            <div id="modalTipoSolicitud"
+                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm font-bold leading-relaxed whitespace-pre-line">
+                                ---
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
                             <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la
                                 solicitud</label>
                             <div id="modalDescripcion"
-                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
+                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm font-bold leading-relaxed whitespace-pre-line">
                                 ---
                             </div>
                         </div>
@@ -82,7 +91,7 @@
             </div>
         </div>
     </div>
-
+    
     {{------------------------------------------ MODAL DE USUARIO ------------------------------------------}}
     <div id="modalUsuario" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 py-6">
@@ -129,8 +138,8 @@
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
                             <span class="material-symbols-outlined text-secondary text-xl">park</span>
                             <div>
-                                <label
-                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad / Parque</label>
+                                <label class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad
+                                    / Parque</label>
                                 <p id="userUnidad" class="text-sm text-slate-700 font-bold">---</p>
                             </div>
                         </div>

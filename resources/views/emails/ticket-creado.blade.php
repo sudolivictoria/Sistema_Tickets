@@ -149,6 +149,12 @@
 
                 <div class="info-card">
                     <div class="info-row">
+                        <span class="label">ID del Ticket:</span><br>
+                        <span class="value">
+                            <span>#TK</span>{{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
+                        </span>
+                    </div>
+                    <div class="info-row">
                         <span class="label">Asunto:</span><br>
                         <span class="value">{{ $ticket->asunto }}</span>
                     </div>

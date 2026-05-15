@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Manual;
 use App\Models\Ticket;
 use App\Models\User;
 use Carbon\Carbon;
@@ -32,6 +33,10 @@ class ApiTableController extends Controller
 
             if ($tipo == 'asignar') {
                 $query->where('estado_id', 1);
+            }
+
+            if ($tipo == 'mis_asignados') {
+                $query->where('estado_id', 2)->where('tecnico_id', $user->id);
             }
         }
 
@@ -79,6 +84,10 @@ class ApiTableController extends Controller
             $graficoHtml = view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
         }
 
+        $contadorMisAsignados = Ticket::where('tecnico_id', Auth::id())
+            ->where('estado_id', 2)
+            ->count();
+
         //-----html segun el tipo de tabla que se refresca---
         $html = '';
         switch ($tipo) {
@@ -98,12 +107,24 @@ class ApiTableController extends Controller
             case 'mis_tickets':
                 $html = view('partials.filas_mis_tickets', ['misTickets' => $ticketsResult])->render();
                 break;
+            case 'recursos':
+                $manuales = Manual::with('categoria')->latest()->get();
+                $html = view('partials.filas_recursos', compact('manuales'))->render();
+                break;
+
+            case 'mis_asignados':
+                $tecnicos = User::where('unidad_id', $miUnidadId)->where('activo', true)->get();
+                $html = view('partials.filas_mis_asignados', [
+                    'tickets' => $ticketsResult,
+                    'tecnicos' => $tecnicos
+                ])->render();
         }
         //--retornar JSON con el html
         return response()->json([
             'html' => $html,
             'contadores' => $contadores,
-            'grafico' => $graficoHtml
+            'grafico' => $graficoHtml,
+            'contadorAsignados' => (int)$contadorMisAsignados
         ]);
     }
 }

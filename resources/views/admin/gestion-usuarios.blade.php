@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{{ asset('css/tickets.css') }}">
 
     <div class="space-y-6">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between mb-10 border-b border-slate-200 pb-6">
             <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
                 <span class="material-symbols-outlined text-4xl text-primary">person_add</span>
                 Gestión de Usuarios
@@ -42,7 +42,7 @@
                         class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
                     <input type="text" id="inputBusqueda"
                         class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
-                        placeholder="Buscar por nombre, email...">
+                        placeholder="Buscar...">
                 </div>
             </div>
 
@@ -109,7 +109,7 @@
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
             <div class="bg-primary p-6 text-secondary flex justify-between items-center">
                 <h3 class="font-black uppercase tracking-widest text-lg">Nuevo Usuario</h3>
-                <button onclick="cerrarModal('modalAgregar')" class="material-symbols-outlined">close</button>
+                <button onclick="cerrarModal('modalAgregar')" class="material-symbols-outlined font-bold">close</button>
             </div>
             <form id="formAgregar" action="{{ route('admin.usuarios.store') }}" method="POST" class="p-6 space-y-4">
                 @csrf
@@ -181,7 +181,7 @@
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
             <div class="bg-primary p-6 text-secondary flex justify-between items-center">
                 <h3 class="font-black uppercase tracking-widest text-lg">Editar Usuario</h3>
-                <button onclick="cerrarModal('modalEditar')" class="material-symbols-outlined">close</button>
+                <button onclick="cerrarModal('modalEditar')" class="material-symbols-outlined font-bold">close</button>
             </div>
 
             <form id="formEditar" method="POST" class="p-6 space-y-4">

@@ -6,7 +6,7 @@
         <div class="mb-10 border-b border-slate-200 pb-6">
             <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
                 <span class="material-symbols-outlined text-4xl text-primary">confirmation_number</span>
-                Asignar Tickets
+                Mis Asignados
             </h2>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -24,7 +24,7 @@
                     </div>
                 </div>
 
-                <table id="tablaAsignarTickets" class="w-full text-left border-separate border-spacing-0">
+                <table id="tablaMisAsignados" class="w-full text-left border-separate border-spacing-0">
                     <thead>
                         <tr class="bg-slate-50 text-[13px] uppercase text-green-700 font-black tracking-widest">
                             <th class="px-4 py-4 border-b border-slate-200 font-black">ID</th>
@@ -34,10 +34,11 @@
                             <th class="px-4 py-4 border-b border-slate-200 font-black">Técnico</th>
                             <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
                             <th class="px-4 py-4 border-b border-slate-200 font-black text-center">Detalle</th>
+                            <th class="px-4 py-4 border-b border-slate-200 font-black text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaBody" data-tipo="asignar" class="divide-y divide-slate-100 text-[12px]">
-                        @include('partials.filas_asignar', ['tickets' => $tickets])
+                    <tbody id="tablaBody" data-tipo="mis_asignados" class="divide-y divide-slate-100 text-[12px]">
+                        @include('partials.filas_mis_asignados', ['tickets' => $tickets])
                     </tbody>
                 </table>
             </div>
@@ -88,7 +89,7 @@
             </div>
         </div>
     </div>
-    
+
     {{------------------------------------------ MODAL DE USUARIO ------------------------------------------}}
     <div id="modalUsuario" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 py-6">

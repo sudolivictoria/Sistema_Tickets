@@ -1,6 +1,19 @@
 @foreach($misTickets as $ticket)
     <tr class="hover:bg-slate-50/80 transition-all">
 
+        <td class="px-4 py-4 font-bold text-slate-900 whitespace-nowrap">
+            <div class="flex items-center">
+                {{-- Prefijo con estilo sutil --}}
+                <span class="text-blue-900 font-black text-[12px]">#</span>
+                <span class="text-blue-900 font-black text-[12px] tracking-tighter">TK</span>
+
+                {{-- Número principal destacado --}}
+                <span class="text-blue-900 font-black tracking-tight text-[12px]">
+                    {{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
+                </span>
+            </div>
+        </td>
+
         {{-- Categoría --}}
         <td class="px-4 py-4 text-slate-900 font-bold uppercase">
             {{ $ticket->categoria->nombre_categoria ?? 'N/A' }}
@@ -50,7 +63,8 @@
 
         {{-- Fechas --}}
         <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">
-            {{ $ticket->created_at->format('d/m/Y') }}</td>
+            {{ $ticket->created_at->format('d/m/Y') }}
+        </td>
 
         <td class="px-4 py-4 font-bold text-slate-900">
             {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
@@ -60,7 +74,7 @@
         <td class="px-4 py-4 text-center">
             <button type="button"
                 onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
-                class="p-2 bg-slate-100 text-primary rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
+                class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

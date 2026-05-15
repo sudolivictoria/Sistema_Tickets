@@ -113,14 +113,14 @@
                     <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
-                                class="text-[14px] uppercase text-green-700 font-black tracking-widest border-b border-slate-200">
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Usuario</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Tecnico</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Detalle</th>
+                                class="text-[13px] uppercase text-green-700 font-black tracking-widest border-b border-slate-200">
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">ID</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Usuario</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Apertura</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Detalle</th>
                             </tr>
                         </thead>
                         <tbody id="tablaBody" data-tipo="dashboard" class="divide-y divide-slate-100 text-[12px]">
@@ -134,57 +134,63 @@
 
         <!--recursos-->
         <div class="lg:col-span-1 space-y-6">
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center">
-                    <span class="material-symbols-outlined text-primary/30">folder_open</span>
-                </div>
-                <h4 class="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-4 bg-primary rounded-full"></span>
-                    Recursos
-                </h4>
-                <div class="space-y-3">
-                    @foreach($manuales as $manual)
-                        <a href="{{ $manual->url_archivo }}"
-                            class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group">
-                            <div
-                                class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-primary">
-                                <span class="material-symbols-outlined text-xl">description</span>
-                            </div>
-                            <div class="overflow-hidden">
-                                <div class="text-[11px] font-black text-slate-700 truncate">
-                                    {{ $manual->titulo }}
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary/30">folder_open</span>
+                    </div>
+                    <h4
+                        class="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-primary rounded-full"></span> Recursos
+                    </h4>
+                    {{--contenedor de categorias con scroll--}}
+                    <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
+                        @foreach($categorias as $cat)
+                            <a href="{{ route('admin.recursos', ['categoria' => $cat->id]) }}"
+                                class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-xl">folder</span>
                                 </div>
-                                <div class="text-[9px] text-slate-400 font-bold uppercase">
-                                    {{ $manual->categoria ?? 'General' }}
+                                <div
+                                    class="overflow-hidden text-[11px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
+                                    {{ $cat->nombre_categoria_manual }}
                                 </div>
-                            </div>
-                        </a>
-                    @endforeach
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <a href="{{ route('admin.recursos') }}"
+                        class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white">
+                        Ir al Repositorio
+                    </a>
                 </div>
-                <a href="{{ route('usuario.recursos') }}"
-                    class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center">
-                    Ir al Repositorio
-                </a>
             </div>
             <!--final recursos-->
 
-            <!--protocolo critico-->
+            <!--contador de tickets asignados-->
             <div class="bg-secondary p-8 rounded-3xl text-white shadow-xl relative overflow-hidden group">
                 <div class="relative z-10">
                     <div
                         class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-secondary mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                        <span class="material-symbols-outlined font-black">emergency</span>
+                        <span class="material-symbols-outlined font-black">assignment_ind</span>
                     </div>
-                    <h4 class="text-sm font-black uppercase tracking-wider mb-2">Protocolo</h4>
-                    <p class="text-[14px] text-slate-300 leading-relaxed font-medium">
-                        Tickets con estado <span class="text-primary font-bold italic underline">CRÍTICO</span> requieren
-                        solución inmediata.
+                    <h4 class="text-sm font-black uppercase tracking-wider mb-2">
+                        Tickets Asignados
+                    </h4>
+                    <p id="contador-asignados" class="text-5xl font-black text-primary leading-none">
+                        {{ $ticketsAsignados }}
+                    </p>
+                    <p class="text-sm text-slate-300 mt-3 font-medium">
+                        Tickets asignados actualmente a tu usuario.
                     </p>
                 </div>
                 <span
-                    class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/5 pointer-events-none">warning</span>
+                    class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/5 pointer-events-none">
+                    assignment
+                </span>
             </div>
-            <!--protocolo critico-->
         </div>
     </div>
 
@@ -204,10 +210,20 @@
                     </div>
                     <div class="space-y-4">
                         <div>
+                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Tipo de
+                                Solicitud</label>
+                            <div id="modalTipoSolicitud"
+                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm font-bold leading-relaxed whitespace-pre-line">
+                                ---
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
                             <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la
                                 solicitud</label>
                             <div id="modalDescripcion"
-                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
+                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm font-bold leading-relaxed whitespace-pre-line">
                                 ---
                             </div>
                         </div>
@@ -227,7 +243,6 @@
     <div id="modalUsuario" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 py-6">
             <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModalUsuario()"></div>
-
             <div
                 class="relative bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border-b-8 border-t-8 border-primary">
                 <div class="p-8 text-center">
@@ -235,18 +250,13 @@
                         class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md">
                         <span class="material-symbols-outlined text-4xl text-secondary">account_circle</span>
                     </div>
-
                     <h3 id="userNombre" class="text-xl font-black text-secondary uppercase leading-tight mb-4">---</h3>
-
                     <div class="space-y-3 text-left">
-
                         {{-- Correo --}}
                         <a id="linkCorreo" href="#" target="_blank"
                             class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3 transition-all hover:bg-blue-50 hover:border-blue-200 group cursor-pointer no-underline block">
-
                             <span
                                 class="material-symbols-outlined text-secondary group-hover:text-primary text-xl">email</span>
-
                             <div class="flex-1">
                                 <label
                                     class="text-[10px] font-black text-secondary uppercase tracking-widest block group-hover:text-primary">
@@ -258,13 +268,11 @@
                                     Abrir en Gmail
                                 </span>
                             </div>
-
                             <span
                                 class="material-symbols-outlined text-slate-300 group-hover:text-primary text-sm self-center">
                                 open_in_new
                             </span>
                         </a>
-
                         {{-- Unidad --}}
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
                             <span class="material-symbols-outlined text-secondary text-xl">park</span>
@@ -274,7 +282,6 @@
                                 <p id="userUnidad" class="text-sm text-slate-700 font-bold">---</p>
                             </div>
                         </div>
-
                         {{-- Cargo --}}
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
                             <span class="material-symbols-outlined text-secondary text-xl">work</span>
@@ -284,7 +291,6 @@
                                 <p id="userCargo" class="text-sm text-slate-700 font-bold">---</p>
                             </div>
                         </div>
-
                         {{-- Teléfono --}}
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
                             <span class="material-symbols-outlined text-secondary text-xl">call</span>
@@ -296,7 +302,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="mt-8">
                         <button onclick="cerrarModalUsuario()"
                             class="w-full py-3 bg-slate-100 text-slate-500 font-black rounded-2xl hover:bg-slate-200 transition-all uppercase tracking-widest text-xs">

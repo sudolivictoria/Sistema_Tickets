@@ -1,5 +1,5 @@
-@foreach($tickets as $ticket)
-    <tr class="hover:bg-slate-50/80 transition-all">
+@foreach ($tickets as $ticket)
+    <tr class="hover:bg-slate-50 transition-colors">
         <td class="px-4 py-4 font-bold text-slate-900 whitespace-nowrap">
             <div class="flex items-center">
                 {{-- Prefijo con estilo sutil --}}
@@ -12,16 +12,16 @@
                 </span>
             </div>
         </td>
-        <!--DATOS DEL USUARIO-->
+        {{--Usuario--}}
         <td class="px-4 py-4">
             <div class="flex flex-col">
                 <button type="button" onclick="verUsuario(
-                                                                    '{{ $ticket->user->name }}', 
-                                                                    '{{ $ticket->user->email }}', 
-                                                                    '{{ $ticket->user->unidad->nombre_unidad}}', 
-                                                                    '{{ $ticket->user->cargo }}', 
-                                                                    '{{ $ticket->user->telefono ?? 'N/A' }}'
-                                                                )"
+                                                                                                        '{{ $ticket->user->name }}', 
+                                                                                                        '{{ $ticket->user->email }}', 
+                                                                                                        '{{ $ticket->user->unidad->nombre_unidad}}', 
+                                                                                                        '{{ $ticket->user->cargo }}', 
+                                                                                                        '{{ $ticket->user->telefono ?? 'N/A' }}'
+                                                                                                    )"
                     class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-2 group">
                     {{ $ticket->user->name }}
                     <span
@@ -31,9 +31,8 @@
                 </button>
             </div>
         </td>
-        <!-- FINAL DATOS DE USUARIO -->
 
-        {{-- Estado --}}
+        {{--Estado--}}
         <td class="px-4 py-4">
             @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
@@ -47,8 +46,7 @@
             <span
                 class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
         </td>
-
-        {{-- Prioridad --}}
+        {{--Prioridad--}}
         <td class="px-4 py-4" data-search="{{ $ticket->prioridad->nombre_prioridad }}">
             @php
                 $rutaPrioridad = Auth::user()->rol_id == 1 ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad';
@@ -65,37 +63,70 @@
             </form>
         </td>
 
-        {{-- Técnico --}}
+        {{--Reasignar o Devolver--}}
         <td class="px-4 py-4">
+            {{--ruta segun el rol--}}
             @php
                 $rutaTecnico = Auth::user()->rol_id == 1 ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico';
             @endphp
+
+            {{--actualizar el tecnico--}}
             <form action="{{ route($rutaTecnico, $ticket->id) }}" method="POST">
-                @csrf @method('PATCH')
+                @csrf
+                @method('PATCH')
+
                 <select name="tecnico_id" onchange="this.form.submit()"
-                    class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer w-32">
-                    <option class="font-black" value="">Pendiente</option>
-                    @foreach($tecnicos as $tecnico)
-                        <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
-                            👤 {{ $tecnico->name }}
-                        </option>
-                    @endforeach
+                    class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer w-full">
+
+                    {{--Desasignar tecnico y mandar ticket a pendientes--}}
+                    <option value="" {{ is_null($ticket->tecnico_id) ? 'selected' : '' }} class="text-red-600 font-bold">
+                        ❌ Devolver a Pendientes
+                    </option>
+
+                    {{--Lista de tecnicos--}}
+                    <optgroup label="Reasignar a:">
+                        @foreach($tecnicos as $tecnico)
+                            <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
+                                👤 {{ $tecnico->name }}
+                            </option>
+                        @endforeach
+                    </optgroup>
                 </select>
             </form>
         </td>
 
-        {{-- Fechas --}}
+
+        {{--Fecha de Apertura--}}
         <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">
             {{ $ticket->created_at->format('d/m/Y') }}
         </td>
 
-        {{-- Botón Detalle (Descripción) --}}
+        {{--Detalle--}}
         <td class="px-4 py-4 text-center">
             <button type="button"
                 onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}', '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}')"
                 class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
+        </td>
+
+
+        {{--Acciones--}}
+        <td class="px-4 py-4 text-center">
+            @php
+                $prefix = Auth::user()->rol_id == 1 ? 'admin' : 'gestor';
+                $rutaResolver = $prefix . '.tickets.resolver';
+            @endphp
+            <form action="{{ route($rutaResolver, $ticket->id) }}" method="POST" class="form-resolver">
+                @csrf
+                @method('PATCH')
+
+                <button type="button" onclick="confirmarResolver(this)"
+                    class="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm border border-green-100 flex items-center justify-center mx-auto"
+                    title="Marcar como Resuelto">
+                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                </button>
+            </form>
         </td>
     </tr>
 @endforeach

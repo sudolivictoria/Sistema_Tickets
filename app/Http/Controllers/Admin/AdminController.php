@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\NuevaSolicitudUnidadMail;
 use App\Mail\TicketCreadoMail;
 use App\Models\Categoria;
+use App\Models\CategoriaManual;
 use App\Models\Manual;
 use App\Models\Prioridad;
 use App\Models\Ticket;
@@ -54,6 +55,11 @@ class AdminController extends Controller
             ->latest()
             ->get();
 
+        //--tickets asignados al admin autenticado
+        $ticketsAsignados = Ticket::where('tecnico_id', Auth::id())
+        ->where('estado_id', 2)
+        ->count();
+
         //----Estadísticas mensuales filtradas por Unidad de Categoría----
         $añoActual = date('Y');
         $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
@@ -87,9 +93,10 @@ class AdminController extends Controller
 
 
         //----manuales
-        $manuales = Manual::latest()->take(3)->get();
+        $categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
+        $manuales = Manual::with('categoria')->latest()->get();
 
-        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'manuales'));
+        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico','categorias', 'manuales', 'ticketsAsignados'));
     }
 
     //-------------------------CLIENTE----------------------------
@@ -187,10 +194,7 @@ class AdminController extends Controller
             ->with('success', $mensajeFlash);
     }
 
-
-
     //---metodos para administracion---
-
     public function asignarTickets()
     {
         $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
@@ -239,17 +243,34 @@ class AdminController extends Controller
             ]
         ]);
 
+        //---actualizar datos
         $ticket->update([
             'tecnico_id' => $request->tecnico_id,
-            'estado_id'  => $request->tecnico_id ? 2 : 1 //--cambia de estado 
+            'estado_id'  => $request->tecnico_id ? 2 : 1
         ]);
 
-        return back()->with('sweet_success', 'Técnico asignado correctamente');
+        $mensaje = $request->tecnico_id
+            ? 'Técnico asignado correctamente.'
+            : 'Ticket devuelto a la cola de pendientes.';
+
+        return back()->with('sweet_success', $mensaje);
     }
 
     public function misAsignados()
     {
-        return "Página de Mis Asignados (En construcción)";
+        $user = Auth::user();
+        $tickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tipo_solicitud', 'categoria'])
+            ->where('tecnico_id', $user->id)
+            ->where('estado_id', '!=', 3)
+            ->latest()
+            ->get();
+
+        $prioridades = Prioridad::all();
+        $tecnicos = User::where('unidad_id', $user->unidad_id)
+            ->where('activo', true)
+            ->get();
+
+        return view('admin.mis_asignados', compact('tickets', 'tecnicos', 'prioridades'));
     }
 
     public function gestionUsuarios()
@@ -260,11 +281,12 @@ class AdminController extends Controller
 
     public function gestionRecursos()
     {
-        return "Página de Gestión de Recursos (En construcción)";
+        $categorias = CategoriaManual::all();
+        $manuales = Manual::with('categoria')->latest()->get();
+        return view('admin.gestion-recursos', compact('categorias', 'manuales'));
     }
 
     //---metodos para cliente---
-
     public function misTickets()
     {
         $misTickets = Ticket::where('user_id', Auth::id())
@@ -277,6 +299,8 @@ class AdminController extends Controller
 
     public function recursos()
     {
-        return "Biblioteca de manuales (En construcción)";
+        $categorias = CategoriaManual::all();
+        $manuales = Manual::with('categoria')->latest()->get();
+        return view('admin.recursos', compact('categorias', 'manuales'));
     }
 }

@@ -7,7 +7,6 @@
                 <span class="material-symbols-outlined text-4xl text-primary">confirmation_number</span>
                 Enviar Nueva Solicitud
             </h2>
-            <p class="text-slate-500 font-medium italic">Complete el formulario oficial para la gestión de su solicitud.</p>
         </div>
 
         {{-- Formulario de Creación de Ticket --}}

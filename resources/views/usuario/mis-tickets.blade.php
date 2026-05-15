@@ -9,8 +9,6 @@
                 <span class="material-symbols-outlined text-4xl text-secondary">confirmation_number</span>
                 Mis tickets
             </h2>
-            <p class="text-slate-500 font-medium italic">Se detallan las solicitudes realizadas, su estado, seguimiento y
-                resolución.</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 
@@ -18,7 +16,7 @@
             <div class="p-5">
                 {{-- Cabecera con Filtros y Buscador --}}
                 <div
-                    class="p-4 md:p-6 flex flex-col lg:flex-row gap-6 justify-between items-center bg-white border-b border-slate-100">
+                    class="p-4 md:p-6 flex flex-col lg:flex-row gap-6 justify-between items-center bg-white border-b border-slate-100 whitespace-nowrap">
 
                     <div class="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
                         <h2 class="text-xl font-bold text-primary hidden xl:block">Tickets</h2>
@@ -50,7 +48,7 @@
                             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
                         <input type="text" id="inputBusqueda"
                             class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-400 font-medium"
-                            placeholder="Buscar ticket...">
+                            placeholder="Buscar...">
                     </div>
                 </div>
 
@@ -64,7 +62,8 @@
                 <div class="p-0 w-full overflow-x-auto">
                     <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
                         <thead>
-                            <tr class="bg-slate-50 text-[14px] uppercase text-green-700 font-black tracking-widest">
+                            <tr class="bg-slate-50 text-[13px] uppercase text-green-700 font-black tracking-widest">
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">ID</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Categoría</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>

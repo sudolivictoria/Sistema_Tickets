@@ -30,14 +30,16 @@ document.addEventListener("DOMContentLoaded", function () {
         ejecutarFiltros(estado);
     };
 
-    window.verDetalle = function (asunto, descripcion) {
+    window.verDetalle = function (asunto, descripcion, tipoNombre) {
         const modal = document.getElementById("modalTicket");
         const titulo = document.getElementById("modalTitulo");
         const desc = document.getElementById("modalDescripcion");
+        const tipo = document.getElementById("modalTipoSolicitud");
 
-        if (modal && titulo && desc) {
+        if (modal && titulo && desc && tipo) {
             titulo.innerText = asunto;
             desc.innerText = descripcion;
+            tipo.innerText = tipoNombre;
             modal.classList.remove("hidden");
             document.body.style.overflow = "hidden";
         }
@@ -96,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 });
 
-function ejecutarFiltros(estadoSeleccionado) {
+window.ejecutarFiltros = function (estadoSeleccionado) {
     const estadoFiltro = String(estadoSeleccionado).trim().toLowerCase();
 
     document.querySelectorAll(".ticket-fila").forEach((fila) => {

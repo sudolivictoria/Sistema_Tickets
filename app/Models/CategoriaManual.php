@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CategoriaManual extends Model
 {
-    protected $table = 'categorias_manuales';
+    protected $table = 'categoria_manuales';
     protected $fillable = ['nombre_categoria_manual'];
 }

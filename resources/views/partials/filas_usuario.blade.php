@@ -1,5 +1,14 @@
 @foreach($todosLosTickets as $ticket)
     <tr class="hover:bg-slate-50/50 transition-colors group">
+        <td class="px-2 py-4 font-bold text-slate-900 whitespace-nowrap">
+            <div class="flex items-center">
+                <span class="text-primary font-black text-[12px]">#</span>
+                <span class="text-primary font-black text-[12px] tracking-tighter">TK</span>
+                <span class="text-primary font-black tracking-tight text-[12px]">
+                    {{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
+                </span>
+            </div>
+        </td>
         <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold">{{ $ticket->categoria->nombre_categoria }}</td>
         <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold">{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}
         </td>
@@ -40,7 +49,7 @@
         <td class="px-4 py-4 text-center">
             <button type="button"
                 onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
-                class="p-2 bg-slate-100 text-primary rounded-xl hover:bg-primary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
+                class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

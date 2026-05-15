@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\NuevaSolicitudUnidadMail;
 use App\Mail\TicketCreadoMail;
 use App\Models\Categoria;
+use App\Models\CategoriaManual;
 use App\Models\Manual;
 use App\Models\Prioridad;
 use App\Models\Ticket;
@@ -40,15 +41,16 @@ class ClienteController extends Controller
             ->where('estado_id', 3)
             ->count();
 
-
-        $manuales = Manual::latest()->take(3)->get();
-
         //----tickets del cliente autenticado
         $todosLosTickets = Ticket::where('user_id', Auth::id())
             ->latest()
             ->paginate(5);
 
-        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'manuales', 'todosLosTickets'));
+        //----manuales
+        $categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
+        $manuales = Manual::with('categoria')->latest()->get();
+
+        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'categorias', 'manuales', 'todosLosTickets'));
     }
 
 
@@ -158,6 +160,8 @@ class ClienteController extends Controller
 
     public function recursos()
     {
-        return "Biblioteca de manuales (En construcción)";
+        $categorias = CategoriaManual::all();
+        $manuales = Manual::with('categoria')->latest()->get();
+        return view('usuario.recursos', compact('categorias', 'manuales'));
     }
 }

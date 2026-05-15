@@ -1,0 +1,119 @@
+/**
+ * Manuales y Recursos
+ */
+
+window.filtrar = function (catId, event) {
+    //---filtrar
+    const tarjetas = document.querySelectorAll(".manual-card");
+
+    tarjetas.forEach((tarjeta) => {
+        const tarjetaCat = tarjeta.getAttribute("data-categoria");
+
+        if (catId === "all" || tarjetaCat == catId) {
+            tarjeta.style.display = "block";
+            tarjeta.classList.add("animate-fade-in");
+        } else {
+            tarjeta.style.display = "none";
+        }
+    });
+
+    const botones = document.querySelectorAll(".filter-btn");
+    botones.forEach((btn) => {
+        btn.classList.remove(
+            "bg-blue-900",
+            "text-white",
+            "border-blue-900",
+            "hover:text-white",
+        );
+        btn.classList.add(
+            "bg-white",
+            "text-slate-600",
+            "border-slate-200",
+            "hover:text-blue-900",
+        );
+    });
+   
+    let botonActivo;
+
+    //---Filtrado desde evento o url
+    if (event && event.currentTarget) {
+        botonActivo = event.currentTarget;
+    } else {
+        botonActivo = document.querySelector(`.filter-btn[data-id="${catId}"]`);
+    }
+
+    if (botonActivo) {
+        botonActivo.classList.remove(
+            "bg-white",
+            "text-slate-600",
+            "border-slate-200",
+            "hover:text-blue-900",
+        );
+        botonActivo.classList.add(
+            "bg-blue-900",
+            "text-white",
+            "border-blue-900",
+            "hover:text-white",
+        );
+    }
+};
+
+//---obtener el filtrado desde el
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const catId = params.get('categoria');
+
+    if (catId) {
+        console.log("Filtrado automático desde URL para categoría:", catId);
+        setTimeout(() => {
+            window.filtrar(catId); 
+        }, 100);
+    }
+});
+
+//--Visor de manuales
+window.abrirVisor = function (url, titulo = "Recurso") {
+    const ext = url.split(".").pop().toLowerCase();
+    const visor = document.getElementById("contenedor-visor");
+    const tituloVisor = document.getElementById("visor-titulo");
+    const iconoVisor = document.getElementById("visor-icono");
+
+    tituloVisor.innerText = titulo;
+    visor.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-900"></div>`;
+    //--cargar contenido
+    if (ext === "pdf") {
+        iconoVisor.innerText = "picture_as_pdf";
+        setTimeout(() => {
+            visor.innerHTML = `
+              <iframe src="${url}#view=FitH&toolbar=1"
+                class="w-full h-full border-none opacity-0 transition-opacity duration-500"
+                onload="this.classList.remove('opacity-0')">
+            </iframe>`;
+        }, 400);
+    } else {
+        iconoVisor.innerText = "movie";
+        visor.innerHTML = `
+            <video controls autoplay class="max-w-full max-h-full shadow-2xl">
+                <source src="${url}" type="video/mp4">
+                Tu navegador no soporta videos.
+            </video>`;
+    }
+
+    const modal = document.getElementById("modalVisor");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex"); //--centrar el visor
+    document.body.style.overflow = "hidden"; //---bloquear el scroll de fondo
+};
+
+window.cerrarVisor = function () {
+    const modal = document.getElementById("modalVisor");
+    const contenedor = document.getElementById("contenedor-visor");
+
+    if (modal) {
+        modal.classList.add("hidden");
+        document.body.style.overflow = "auto";
+    }
+    if (contenedor) {
+        contenedor.innerHTML = "";
+    }
+};

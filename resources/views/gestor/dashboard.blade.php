@@ -113,14 +113,14 @@
                     <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
-                                class="text-[14px] uppercase text-green-700 font-black tracking-widest border-b border-slate-200">
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Usuario</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Tecnico</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Detalle</th>
+                                class="text-[13px] uppercase text-green-700 font-black tracking-widest border-b border-slate-200">
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">ID</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Usuario</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Apertura</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Detalle</th>
                             </tr>
                         </thead>
                         <tbody id="tablaBody" data-tipo="dashboard" class="divide-y divide-slate-100 text-[12px]">
@@ -138,35 +138,59 @@
                 <div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center">
                     <span class="material-symbols-outlined text-primary/30">folder_open</span>
                 </div>
+
                 <h4 class="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-4 bg-primary rounded-full"></span>
-                    Recursos
+                    <span class="w-1.5 h-4 bg-primary rounded-full"></span> Recursos
                 </h4>
-                <div class="space-y-3">
-                    @foreach($manuales as $manual)
-                        <a href="{{ $manual->url_archivo }}"
-                            class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group">
+
+                {{--contenedor de categorias con scroll--}}
+                <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
+                    @foreach($categorias as $cat)
+                        <a href="{{ route('gestor.recursos', ['categoria' => $cat->id]) }}"
+                            class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
+
                             <div
-                                class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-primary">
-                                <span class="material-symbols-outlined text-xl">description</span>
+                                class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-xl">folder</span>
                             </div>
-                            <div class="overflow-hidden">
-                                <div class="text-[11px] font-black text-slate-700 truncate">
-                                    {{ $manual->titulo }}
-                                </div>
-                                <div class="text-[9px] text-slate-400 font-bold uppercase">
-                                    {{ $manual->categoria ?? 'General' }}
-                                </div>
+
+                            <div
+                                class="overflow-hidden text-[11px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
+                                {{ $cat->nombre_categoria_manual }}
                             </div>
                         </a>
                     @endforeach
                 </div>
+
                 <a href="{{ route('gestor.recursos') }}"
-                    class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center">
+                    class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white">
                     Ir al Repositorio
                 </a>
             </div>
             {{-- Final Recursos --}}
+
+            <!--contador de tickets asignados-->
+            <div class="bg-secondary p-8 rounded-3xl text-white shadow-xl relative overflow-hidden group">
+                <div class="relative z-10">
+                    <div
+                        class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-secondary mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined font-black">assignment_ind</span>
+                    </div>
+                    <h4 class="text-sm font-black uppercase tracking-wider mb-2">
+                        Tickets Asignados
+                    </h4>
+                    <p id="contador-asignados" class="text-5xl font-black text-primary leading-none">
+                        {{ $ticketsAsignados }}
+                    </p>
+                    <p class="text-sm text-slate-300 mt-3 font-medium">
+                        Tickets asignados actualmente a tu usuario.
+                    </p>
+                </div>
+                <span
+                    class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/5 pointer-events-none">
+                    assignment
+                </span>
+            </div>
 
             {{-- Canales de Atención --}}
             <div class="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
@@ -266,10 +290,20 @@
                     </div>
                     <div class="space-y-4">
                         <div>
+                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Tipo de
+                                Solicitud</label>
+                            <div id="modalTipoSolicitud"
+                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm font-bold leading-relaxed whitespace-pre-line">
+                                ---
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
                             <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la
                                 solicitud</label>
                             <div id="modalDescripcion"
-                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
+                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm font-bold leading-relaxed whitespace-pre-line">
                                 ---
                             </div>
                         </div>

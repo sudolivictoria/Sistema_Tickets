@@ -10,13 +10,9 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TicketCreadoMail extends Mailable
+class TicketResueltoMail extends Mailable
 {
     use Queueable, SerializesModels;
-
-    /**
-     * Create a new message instance.
-     */
 
     public $ticket;
 
@@ -25,15 +21,11 @@ class TicketCreadoMail extends Mailable
         $this->ticket = $ticket;
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function build()
     {
           $id = '#TK' . str_pad($this->ticket->id, 5, '0', STR_PAD_LEFT);
 
-        return $this->subject($id . ' - Confirmación: Su ticket ha sido creado')
-                    ->view('emails.ticket-creado');
-
+        return $this->subject($id . ' - Su ticket ha sido resuelto')
+            ->view('emails.ticket_resuelto');
     }
 }

@@ -139,14 +139,15 @@
                 <div class="logo-container">
                     <img src="{{ $message->embed(public_path('images/logo_istu.png')) }}" alt="Logo ISTU">
                 </div>
-                <h2>Nueva Solicitud Pendiente</h2>
+                <h2>Ticket Resuelto</h2>
             </div>
 
             <div class="content">
-                <p class="welcome-text">Atención Equipo de {{ $ticket->categoria->unidad->nombre_unidad }}</p>
+                <p class="welcome-text">Hola, {{ $ticket->user->name }}</p>
                 <div class="divider-green"></div>
 
-                <p style="color: #1e3a8a; font-weight: 500;">Se ha registrado un nuevo ticket en su unidad.</p>
+                <p style="color: #1e3a8a; font-weight: 500;">Nos complace informarle que el ticket que reportó ha sido
+                    finalizado con éxito.</p>
 
                 <div class="info-card">
                     <div class="info-row">
@@ -156,33 +157,18 @@
                         </span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Usuario:</span><br>
-                        <span class="value">{{ $ticket->user->name }}</span>
-                    </div>
-                    <div class="info-row">
                         <span class="label">Asunto:</span><br>
                         <span class="value">{{ $ticket->asunto }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Tipo Solicitud:</span><br>
-                        <span class="value">{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}</span>
+                        <span class="label">Fecha de Cierre:</span><br>
+                        <span class="value">{{ $ticket->fecha_cierre->format('d/m/Y') }} a las
+                            {{ $ticket->fecha_cierre->format('H:i') }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Fecha Reporte:</span><br>
-                        <span class="value">{{ $ticket->created_at->format('d/m/Y H:i') }}</span>
+                        <span class="label">Técnico Responsable:</span><br>
+                        <span class="value">{{ $ticket->tecnico->name ?? 'N/A' }}</span>
                     </div>
-                </div>
-
-                <p><strong class="label" style="color: #1e3a8a;">Descripción del problema:</strong></p>
-                <div class="description-box">
-                    {{ $ticket->descripcion }}
-                </div>
-
-                <div class="btn-container" style="text-align: center; margin-top: 25px;">
-                    <a href="{{ config('app.url') }}/login" class="btn"
-                        style="background-color: #84cc16; color: white !important; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                        ACCEDER AL SISTEMA
-                    </a>
                 </div>
             </div>
 

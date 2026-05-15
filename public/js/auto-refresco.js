@@ -44,6 +44,16 @@ function autoRefrescoUniversal() {
                 });
             }
 
+            //---actualizar contador de tickets asignados
+            if (data.contadorAsignados !== undefined) {
+                const elContador =
+                    document.getElementById("contador-asignados");
+                if (elContador) {
+                    elContador.innerText = data.contadorAsignados;
+                }
+            }
+
+            //---actualizar grafico si viene en la respuesta
             if (data.grafico) {
                 const contenedorGrafico =
                     document.getElementById("barras-rendimiento");
@@ -52,6 +62,7 @@ function autoRefrescoUniversal() {
                 }
             }
 
+            //---re-ejecutar el filtro activo para mantener la tabla filtrada
             const botonActivo = document.querySelector(
                 ".filtro-btn.bg-secondary",
             );

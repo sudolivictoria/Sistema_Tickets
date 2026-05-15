@@ -20,7 +20,9 @@ class NuevaSolicitudUnidadMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Nueva Solicitud para su Unidad!')
+        $id = '#TK' . str_pad($this->ticket->id, 5, '0', STR_PAD_LEFT);
+
+        return $this->subject($id . ' - Nueva Solicitud para su Unidad!')
                 ->view('emails.nueva-solicitud-unidad');
     }
 }

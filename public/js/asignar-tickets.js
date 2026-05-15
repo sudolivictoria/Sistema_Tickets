@@ -1,10 +1,13 @@
 var table;
 
-window.inicializarTablaTickets = function (selectorId) {
+window.inicializarTablaTickets = function (
+    selectorId,
+    columnaOrden = 0,
+    sentido = "desc",
+) {
     const tableElement = $(selectorId);
     if (!tableElement.length) return;
 
-    // Destruir si ya existe (importante para el auto-refresco)
     if ($.fn.DataTable.isDataTable(selectorId)) {
         $(selectorId).DataTable().destroy();
     }
@@ -38,7 +41,7 @@ window.inicializarTablaTickets = function (selectorId) {
         responsive: false,
         autoWidth: false,
         pageLength: 5,
-        order: [[6, "desc"]],
+        order: [[columnaOrden, sentido]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
@@ -54,14 +57,16 @@ window.inicializarTablaTickets = function (selectorId) {
 /**
  * Gestión de Modal de detalles
  */
-window.verDetalle = function (asunto, descripcion) {
+window.verDetalle = function (asunto, descripcion, tipoNombre) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
+    const tipo = document.getElementById("modalTipoSolicitud");
 
-    if (modal && titulo && desc) {
+    if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
+        tipo.innerText = tipoNombre;
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
@@ -78,6 +83,7 @@ window.cerrarModal = function () {
     }
 };
 
+//------------------DETALLES USUARIOS-----------------
 window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const modal = document.getElementById("modalUsuario");
     const nombre = document.getElementById("userNombre");
@@ -110,6 +116,7 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
     }
 };
 
+//------------------CERRAR MODAL USUARIO-----------------
 window.cerrarModalUsuario = function () {
     const modal = document.getElementById("modalUsuario");
     if (modal) {
@@ -118,8 +125,69 @@ window.cerrarModalUsuario = function () {
     }
 };
 
+//------------------AUTO REFRESCO-----------------
 document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaAsignarTickets")) {
-        window.inicializarTablaTickets("#tablaAsignarTickets");
+        window.inicializarTablaTickets("#tablaAsignarTickets", 5, "asc");
+    }
+
+    if (document.querySelector("#tablaMisAsignados")) {
+        window.inicializarTablaTickets("#tablaMisAsignados", 6, "desc");
     }
 });
+
+//------------------CONFIRMAR RESOLVER TICKET-----------------
+function confirmarResolver(btn) {
+    const form = btn.closest("form");
+    const url = form.action;
+
+    Swal.fire({
+        title: "¿Marcar como Resuelto?",
+        text: "Esta acción registrará la hora de cierre del ticket.",
+        icon: "question",
+        iconColor: "#1e3a8a",
+        showCancelButton: true,
+        confirmButtonColor: "#84cc16",
+        confirmButtonText: "Sí, resolver",
+        cancelButtonText: "Cancelar",
+        cancelButtonColor: "#ef4444",
+        customClass: { popup: "rounded-3xl" },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ).content,
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(new FormData(form)),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        autoRefrescoUniversal();
+                        Swal.fire({
+                            title: "¡Ticket Resuelto!",
+                            text: data.message,
+                            icon: "success",
+                            iconColor: "#84cc16",
+                            timer: 3000,
+                            showConfirmButton: false,
+                            customClass: { popup: "rounded-3xl" },
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    Swal.fire(
+                        "Error",
+                        "No se pudo procesar la solicitud",
+                        "error",
+                    );
+                });
+        }
+    });
+}
