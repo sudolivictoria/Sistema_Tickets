@@ -179,7 +179,7 @@
                 </div>
 
                 <div class="btn-container" style="text-align: center; margin-top: 25px;">
-                    <a href="{{ config('app.url') }}/login" class="btn"
+                    <a href="{{ url('/login') }}" class="btn"
                         style="background-color: #84cc16; color: white !important; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                         ACCEDER AL SISTEMA
                     </a>

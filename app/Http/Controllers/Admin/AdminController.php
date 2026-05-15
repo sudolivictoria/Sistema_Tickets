@@ -190,7 +190,7 @@ class AdminController extends Controller
 
             if (!empty($destinatarios)) {
                 //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
-                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
+                Mail::bcc($destinatarios)->send(new NuevaSolicitudUnidadMail($nuevoTicket));
             }
         } catch (\Exception $e) {
             Log::error("Error avisando a la unidad: " . $e->getMessage());
