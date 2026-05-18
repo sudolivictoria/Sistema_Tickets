@@ -29,10 +29,10 @@
                 </div>
                 <h1>Help Desk Istu</h1>
 
-                @if ($errors->has('session_expired'))
+                @if (request()->get('session_expired'))
                     <div class="error"
                         style="background-color: #fff3cd; color: #856404; border-left: 4px solid #eab308; padding: 12px; margin-bottom: 15px; border-radius: 6px;">
-                        <p style="margin: 0; font-weight: 500;">{{ $errors->first('session_expired') }}</p>
+                        <p style="margin: 0; font-weight: 500;">Tu sesión expiró por inactividad. Por favor, inicia sesión nuevamente.</p>
                     </div>
                 @endif
 
