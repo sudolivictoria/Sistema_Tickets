@@ -1,4 +1,4 @@
-let table;
+var table;
 
 $(document).ready(function () {
     //---inicializacion datatable

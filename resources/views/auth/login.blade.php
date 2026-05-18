@@ -29,6 +29,13 @@
                 </div>
                 <h1>Help Desk Istu</h1>
 
+                @if (session('flash_message'))
+                    <div class="error"
+                        style="background-color: #fff3cd; color: #856404; border-left: 4px solid #eab308; padding: 12px; margin-bottom: 15px; border-radius: 6px;">
+                        <p style="margin: 0; font-weight: 500;">{{ session('flash_message') }}</p>
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="error">
                         <ul style="margin:0; padding-left: 18px;">
