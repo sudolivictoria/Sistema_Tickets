@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (document.querySelector("#tablaMisAsignados")) {
-        window.inicializarTablaTickets("#tablaMisAsignados", 6, "desc");
+        window.inicializarTablaTickets("#tablaMisAsignados", 5, "desc");
     }
 });
 

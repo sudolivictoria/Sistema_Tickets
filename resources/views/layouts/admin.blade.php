@@ -11,9 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-   
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-     <script>
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -24,7 +24,9 @@
                         "background-light": "#f8fafc",
                         "background-dark": "#0f172a",
                     },
-                    fontFamily: { "display": ["Inter", "sans-serif"] },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
                 },
             },
         }
@@ -87,9 +89,9 @@
                 </h2>
             </div>
 
-            <div class="flex items-center gap-4">
-                <span
-                    class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ auth()->user()->name ?? 'Administrador' }}</span>
+            <div class="hidden md:flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
+                <span class="material-symbols-outlined text-slate-400 text-[18px] animate-pulse">schedule</span>
+                <span id="relojSistema" class="text-xs font-black text-slate-600 tracking-wider">00:00:00 PM</span>
             </div>
         </header>
 
@@ -179,18 +181,6 @@
         </div>
     </div>
 
-    <script>
-        window.addEventListener('load', function () {
-            const preloader = document.getElementById('preloader');
-            preloader.classList.add('opacity-0');
-            document.body.classList.remove('overflow-hidden');
-            document.body.style.overflow = 'auto';
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 1000);
-        });
-    </script>
-
     {{-- LIBRERIAS --}}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -199,6 +189,40 @@
 
     @stack('scripts')
     <script src="{{ asset('js/auto-refresco.js') }}"></script>
-</body>
 
+    <script>
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('preloader');
+            preloader.classList.add('opacity-0');
+            document.body.classList.remove('overflow-hidden');
+            document.body.style.overflow = 'auto';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 1000);
+        });
+
+        //-----reloj 
+        window.iniciarReloj = function() {
+            const contenedorReloj = document.getElementById('relojSistema');
+
+            if (!contenedorReloj) return;
+
+            setInterval(() => {
+                const ahora = new Date();
+                let horaFormateada = ahora.toLocaleTimeString('es-SV', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+
+                contenedorReloj.innerText = horaFormateada;
+            }, 1000);
+        }
+
+        $(document).ready(function() {
+            iniciarReloj();
+        });
+    </script>
+</body>
 </html>

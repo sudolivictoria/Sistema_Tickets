@@ -18,8 +18,13 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { "primary": "#1e3a8a", "secondary": "#84cc16" },
-                    fontFamily: { "display": ["Inter", "sans-serif"] },
+                    colors: {
+                        "primary": "#1e3a8a",
+                        "secondary": "#84cc16"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
                 },
             },
         }
@@ -99,12 +104,15 @@
             </div>
         </div>
 
-        <span class="hidden lg:block text-xs font-bold text-slate-400 uppercase tracking-widest max-w-[180px]">
-            {{ auth()->user()->name ?? 'Cliente' }}
-        </span>
+        <div
+            class="hidden md:flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
+            <span class="material-symbols-outlined text-slate-400 text-[18px] animate-pulse">schedule</span>
+            <span id="relojSistema" class="text-xs font-black text-slate-600 tracking-wider">00:00:00 PM</span>
+        </div>
     </header>
 
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-primary border-r border-blue-800 flex flex-col pt-32 p-4
+    <aside id="sidebar"
+        class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-primary border-r border-blue-800 flex flex-col pt-32 p-4
     transform -translate-x-full lg:translate-x-0 transition-transform duration-300
     z-50 lg:z-40">
         <nav class="space-y-1 gap-1-5 flex-1">
@@ -151,20 +159,6 @@
         </div>
     </main>
 
-    <script>
-        //-----------preloader 
-        window.addEventListener('load', function () {
-            const preloader = document.getElementById('preloader');
-            preloader.classList.add('opacity-0');
-            document.body.classList.remove('overflow-hidden');
-            document.body.style.overflow = 'auto';
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 1000);
-        });
-    </script>
-
-
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
@@ -174,6 +168,43 @@
     @stack('scripts')
 
     <script src="{{ asset('js/auto-refresco.js') }}"></script>
+
+    <script>
+        //-----------preloader 
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('preloader');
+            preloader.classList.add('opacity-0');
+            document.body.classList.remove('overflow-hidden');
+            document.body.style.overflow = 'auto';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 1000);
+        });
+
+        //-----reloj 
+        window.iniciarReloj = function() {
+            const contenedorReloj = document.getElementById('relojSistema');
+
+            if (!contenedorReloj) return;
+
+            setInterval(() => {
+                const ahora = new Date();
+                let horaFormateada = ahora.toLocaleTimeString('es-SV', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+
+                contenedorReloj.innerText = horaFormateada;
+            }, 1000);
+        }
+
+        $(document).ready(function() {
+            iniciarReloj();
+        });
+    </script>
+
 </body>
 
 </html>

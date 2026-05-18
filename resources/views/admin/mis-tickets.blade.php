@@ -20,7 +20,7 @@
                         <h2 class="text-xl font-bold text-secondary">Tickets</h2>
                         <div class="flex gap-2" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)"
-                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
+                                class="filtro-btn px-4 py-1.5 bg-primary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
                             <button type="button" onclick="filtrarEstado('abierto', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
                             <button type="button" onclick="filtrarEstado('procesando', this)"
@@ -99,5 +99,5 @@
 
 
 @push('scripts')
-    <script src="{{ asset('js/tabla-tickets.js') }}"></script>
+    <script src="{{ asset('js/mis-tickets.js') }}"></script>
 @endpush

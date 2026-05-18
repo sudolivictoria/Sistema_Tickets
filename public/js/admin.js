@@ -110,3 +110,4 @@ window.ejecutarFiltros = function (estadoSeleccionado) {
         fila.classList.toggle("hidden", ocultar);
     });
 }
+
