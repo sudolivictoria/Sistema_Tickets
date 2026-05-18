@@ -91,7 +91,7 @@
 
             <div class="hidden md:flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
                 <span class="material-symbols-outlined text-slate-400 text-[18px] animate-pulse">schedule</span>
-                <span id="relojSistema" class="text-xs font-black text-slate-600 tracking-wider">00:00:00 PM</span>
+                <span id="relojSistema" class="text-xs font-black text-slate-600 tracking-wider">00:00:00</span>
             </div>
         </header>
 
