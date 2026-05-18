@@ -4,9 +4,12 @@ $(document).ready(function () {
     //---inicializacion datatable
     table = $("#userTable").DataTable({
         language: {
-            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
+            processing: "Procesando...",
             zeroRecords: "No se encontraron resultados",
             emptyTable: "No hay datos disponibles en la tabla",
+            info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+            infoFiltered: "(filtrado de un total de _MAX_ registros)",
+            infoEmpty: "Mostrando 0 registros",
             paginate: {
                 next: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_right</span>',
                 previous:
