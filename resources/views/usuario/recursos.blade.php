@@ -15,7 +15,7 @@
         <div class="flex flex-wrap gap-3 mb-10">
 
             <button onclick="filtrar('all', event)"
-                class="filter-btn active bg-blue-900 text-white px-6 py-2 rounded-full border-2 border-blue-900 font-semibold uppercase text-xs tracking-wider hover:border-blue-900 hover:text-blue-900 transition">
+                class="filter-btn active bg-white text-blue-900 px-6 py-2 rounded-full border-2 border-blue-900 font-semibold uppercase text-xs tracking-wider hover:border-blue-900 hover:text-blue-900 transition">
                 Todos
             </button>
 
