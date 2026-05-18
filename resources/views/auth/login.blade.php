@@ -36,7 +36,7 @@
                     </div>
                 @endif
 
-                @if ($errors->any())
+                @if ($errors->any() && !$errors->has('session_expired'))
                     <div class="error">
                         <ul style="margin:0; padding-left: 18px;">
                             @foreach ($errors->all() as $error)
