@@ -25,10 +25,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
 
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
-            return redirect()->route('login')
-                ->with('flash_message', 'Tu sesión expiró por inactividad. Por favor, inicia sesión nuevamente.');
-        });
+    $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+        return redirect()->route('login')
+            ->withErrors(['session_expired' => 'Tu sesión expiró por inactividad. Por favor, inicia sesión nuevamente.']);
+    });
 
         $exceptions->shouldRenderJsonWhen(function (Request $request, \Throwable $e) {
             if ($request->is('api/*') || $request->expectsJson()) {
