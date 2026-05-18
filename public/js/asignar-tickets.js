@@ -16,8 +16,16 @@ window.inicializarTablaTickets = function (
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",
-            zeroRecords: "No se encontraron resultados",
-            emptyTable: "No hay datos disponibles",
+            zeroRecords: `
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">search_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No se encontraron resultados</p>
+                    </div>`,
+            emptyTable: `
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No hay datos disponibles</p>
+                    </div>`,
             info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
             infoFiltered: "(filtrado de un total de _MAX_ registros)",
             infoEmpty: "Mostrando 0 registros",
