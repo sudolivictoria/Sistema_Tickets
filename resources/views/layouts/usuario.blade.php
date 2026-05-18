@@ -93,14 +93,9 @@
             </div>
 
             <div class="min-w-0">
-                <h2 class="text-base lg:text-xl font-bold text-primary tracking-tight truncate">
-                    Help Desk Istu
+                <h2 class="text-xl font-bold text-primary tracking-tight">Help Desk Istu <span
+                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-secondary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Usuario' }}</span>
                 </h2>
-
-                <span
-                    class="hidden sm:inline-block text-green-900 font-bold text-[10px] lg:text-xs uppercase tracking-widest px-2 py-0.5 bg-secondary/10 rounded-full truncate">
-                    {{ auth()->user()->unidad->nombre_unidad ?? 'Cliente' }}
-                </span>
             </div>
         </div>
 
