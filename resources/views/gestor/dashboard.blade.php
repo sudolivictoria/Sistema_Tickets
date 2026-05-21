@@ -49,7 +49,7 @@
                 <span class="material-symbols-outlined text-primary text-3xl">verified</span>
             </div>
             <div>
-                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Resueltos</p>
+                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Cerrados</p>
                 <h3 id="cont-resueltos" class="text-3xl font-black text-slate-800 leading-none">{{ $resueltos ?? 0 }}</h3>
             </div>
         </div>
@@ -73,7 +73,7 @@
                     <div class="flex gap-6">
                         <div class="flex items-center gap-2"><span
                                 class="size-3 rounded-full bg-primary shadow-sm"></span><span
-                                class="text-[10px] font-black text-primary uppercase">Resueltos</span>
+                                class="text-[10px] font-black text-primary uppercase">Cerrados</span>
                         </div>
                         <div class="flex items-center gap-2"><span
                                 class="size-3 rounded-full bg-red-200 shadow-sm"></span><span
@@ -104,6 +104,11 @@
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
                             <button type="button" onclick="filtrarEstado('3', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
+                            <button type="button" onclick="filtrarEstado('4', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-orange-100 hover:text-orange-600 transition-all">Equivocado</button>
+                            <button type="button" onclick="filtrarEstado('5', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-yellow-100 hover:text-yellow-600 transition-all">No
+                                Corresponde</button>
                         </div>
                     </div>
                 </div>

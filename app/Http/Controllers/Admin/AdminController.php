@@ -24,10 +24,11 @@ class AdminController extends Controller
     public function index()
     {
         $miUnidadId = Auth::user()->unidad_id;
+         $estadosCerrados = [3, 4, 5];
 
         //--tickets asignados por unidad del admin autenticado
         $noAsignados = Ticket::whereNull('tecnico_id')
-            ->where('estado_id', '!=', 3)
+            ->whereNotIn('estado_id', $estadosCerrados)
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
@@ -35,18 +36,19 @@ class AdminController extends Controller
 
         //--tickets pendientes por unidad del admin autenticado
         $pendientes = Ticket::whereNotNull('tecnico_id')
-            ->where('estado_id', '=', 2)
+            ->whereNotIn('estado_id', $estadosCerrados)
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
             ->count();
 
         //--tickets resueltos por unidad del admin autenticado
-        $resueltos = Ticket::where('estado_id', '=', 3)
+        $resueltos = Ticket::whereIn('estado_id', $estadosCerrados)
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
             ->count();
+
 
 
         //---limitar a solo mostrar los tickets del mes
@@ -83,10 +85,10 @@ class AdminController extends Controller
 
         for ($i = 1; $i <= 12; $i++) {
             //---tickets resueltos
-            $res = $statsMensuales->where('mes', $i)->where('estado_id', 3)->sum('total');
+            $res = $statsMensuales->where('mes', $i)->whereIn('estado_id', $estadosCerrados)->sum('total');
 
             //--sumamos los pendientes   
-            $pen = $statsMensuales->where('mes', $i)->where('estado_id', '!=', 3)->sum('total');
+            $pen = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', $estadosCerrados)->sum('total');
 
             $total = $res + $pen;
 
@@ -266,9 +268,10 @@ class AdminController extends Controller
     public function misAsignados()
     {
         $user = Auth::user();
+        $estadosCerrados = [3, 4, 5];
         $tickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tipo_solicitud', 'categoria'])
             ->where('tecnico_id', $user->id)
-            ->where('estado_id', '!=', 3)
+            ->whereNotIn('estado_id', $estadosCerrados)
             ->latest()
             ->get();
 

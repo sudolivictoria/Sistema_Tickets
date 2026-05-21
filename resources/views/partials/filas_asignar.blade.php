@@ -16,12 +16,12 @@
         <td class="px-4 py-4">
             <div class="flex flex-col">
                 <button type="button" onclick="verUsuario(
-                                                                    '{{ $ticket->user->name }}', 
-                                                                    '{{ $ticket->user->email }}', 
-                                                                    '{{ $ticket->user->unidad->nombre_unidad}}', 
-                                                                    '{{ $ticket->user->cargo }}', 
-                                                                    '{{ $ticket->user->telefono ?? 'N/A' }}'
-                                                                )"
+                        '{{ $ticket->user->name }}', 
+                        '{{ $ticket->user->email }}', 
+                        '{{ $ticket->user->unidad->nombre_unidad}}', 
+                        '{{ $ticket->user->cargo }}', 
+                        '{{ $ticket->user->telefono ?? 'N/A' }}'
+                    )"
                     class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-2 group">
                     {{ $ticket->user->name }}
                     <span
@@ -41,6 +41,8 @@
                     'abierto' => 'bg-red-100 text-red-700 border-red-200',
                     'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
                     'resuelto' => 'bg-green-100 text-green-700 border-green-200',
+                    'equivocado' => 'bg-orange-100 text-orange-700 border-orange-200',
+                    'no corresponde' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp

@@ -51,7 +51,7 @@
                             class="material-symbols-outlined text-2xl font-bold">check_circle</span></div>
                     <div>
                         <div id="cont-resueltos" class="text-2xl font-black text-primary">{{ $resueltos ?? 0 }}</div>
-                        <div class="text-[14px] font-black uppercase text-slate-400">Resueltos</div>
+                        <div class="text-[14px] font-black uppercase text-slate-400">Cerrados</div>
                     </div>
                 </div>
             </div>

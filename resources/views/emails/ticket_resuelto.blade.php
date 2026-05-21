@@ -147,7 +147,7 @@
                 <div class="divider-green"></div>
 
                 <p style="color: #1e3a8a; font-weight: 500;">Nos complace informarle que el ticket que reportó ha sido
-                    finalizado con éxito.</p>
+                    cerrado.</p>
 
                 <div class="info-card">
                     <div class="info-row">

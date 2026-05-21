@@ -24,10 +24,11 @@ class AdminUnidadController extends Controller
     public function index()
     {
         $miUnidadId = Auth::user()->unidad_id;
+        $estadosCerrados = [3, 4, 5];
 
         //--tickets asignados por unidad del admin autenticado
         $noAsignados = Ticket::whereNull('tecnico_id')
-            ->where('estado_id', '!=', 3)
+            ->whereNotIn('estado_id', $estadosCerrados)
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
@@ -35,19 +36,18 @@ class AdminUnidadController extends Controller
 
         //--tickets pendientes por unidad del admin autenticado
         $pendientes = Ticket::whereNotNull('tecnico_id')
-            ->where('estado_id', '!=', 3)
+            ->whereNotIn('estado_id', $estadosCerrados)
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
             ->count();
 
         //--tickets resueltos por unidad del admin autenticado
-        $resueltos = Ticket::where('estado_id', '=', 3)
+        $resueltos = Ticket::whereIn('estado_id', $estadosCerrados)
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
             ->count();
-
 
         //---estadisticas mensuales por unidad del admin autenticado
         $inicioMes = Carbon::now()->startOfMonth();
@@ -83,10 +83,10 @@ class AdminUnidadController extends Controller
 
         for ($i = 1; $i <= 12; $i++) {
             //---tickets resueltos
-            $res = $statsMensuales->where('mes', $i)->where('estado_id', 3)->sum('total');
+            $res = $statsMensuales->where('mes', $i)->whereIn('estado_id', $estadosCerrados)->sum('total');
 
             //--sumamos los pendientes   
-            $pen = $statsMensuales->where('mes', $i)->where('estado_id', '!=', 3)->sum('total');
+            $pen = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', $estadosCerrados)->sum('total');
 
             $total = $res + $pen;
 
@@ -98,14 +98,12 @@ class AdminUnidadController extends Controller
             ];
         }
 
-
         //----manuales
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
         $manuales = Manual::with('categoria')->latest()->get();
 
         return view('gestor.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'categorias', 'manuales', 'ticketsAsignados'));
     }
-
 
     //-------------------------CLIENTE----------------------------
     public function create()
@@ -178,12 +176,10 @@ class AdminUnidadController extends Controller
             $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
         }
 
-
         //--------notificacion a la unidad correspondiente
         try {
             //---identificar unidad por medio de la categoria del ticket
             $unidadId = $nuevoTicket->categoria->unidad_id;
-
             //---obtener emails de gestores de la unidad
             $destinatarios = User::where('unidad_id', $unidadId)
                 ->pluck('email')
@@ -201,8 +197,6 @@ class AdminUnidadController extends Controller
         return redirect()->route('gestor.crear-ticket')
             ->with('success', $mensajeFlash);
     }
-
-
 
     //---metodos del lado del administrador---
     public function asignarTickets()
@@ -269,15 +263,14 @@ class AdminUnidadController extends Controller
     public function misAsignados()
     {
         $user = Auth::user();
-
+        $estadosCerrados = [3, 4, 5];
         $tickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tipo_solicitud', 'categoria'])
             ->where('tecnico_id', $user->id)
-            ->where('estado_id', '!=', 3)
+            ->whereNotIn('estado_id', $estadosCerrados)
             ->latest()
             ->get();
 
         $prioridades = Prioridad::all();
-
         $tecnicos = User::where('unidad_id', $user->unidad_id)
             ->where('activo', true)
             ->get();

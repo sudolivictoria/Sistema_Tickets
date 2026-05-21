@@ -75,6 +75,14 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/tickets/{id}/resolver', [TicketController::class, 'resolver'])
             ->name('tickets.resolver');
 
+        //---equivocacion ticket
+        Route::patch('/tickets/{id}/equivocacion', [TicketController::class, 'equivocacion'])
+            ->name('tickets.equivocacion');
+
+        //---no corresponde
+        Route::patch('/tickets/{id}/no-corresponde', [TicketController::class, 'noCorresponde'])
+            ->name('tickets.no-corresponde');
+
         //---gestion de recursos
         Route::resource('manuales', ManualController::class);
         
@@ -120,6 +128,14 @@ Route::middleware(['auth'])->group(function () {
         //---resolver ticket
         Route::patch('/tickets/{id}/resolver', [TicketController::class, 'resolver'])
             ->name('tickets.resolver');
+
+        //---equivocacion ticket
+        Route::patch('/tickets/{id}/equivocacion', [TicketController::class, 'equivocacion'])
+            ->name('tickets.equivocacion');
+
+        //---no corresponde
+        Route::patch('/tickets/{id}/no-corresponde', [TicketController::class, 'noCorresponde'])
+            ->name('tickets.no-corresponde');
     });
 });
 

@@ -24,21 +24,18 @@
                         {{-- Filtros de Estados --}}
                         <div class="flex flex-wrap gap-2 justify-center md:justify-start w-full" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)"
-                                class="filtro-btn flex-1 sm:flex-none px-4 py-2 bg-primary text-white rounded-xl text-[11px] font-black uppercase shadow-md transition-all whitespace-nowrap">
-                                Todos
-                            </button>
-                            <button type="button" onclick="filtrarEstado('abierto', this)"
-                                class="filtro-btn flex-1 sm:flex-none px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:text-red-600 hover:bg-red-100 transition-all whitespace-nowrap">
-                                Abierto
-                            </button>
-                            <button type="button" onclick="filtrarEstado('procesando', this)"
-                                class="filtro-btn flex-1 sm:flex-none px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:text-blue-600 hover:bg-blue-100 transition-all whitespace-nowrap">
-                                Procesando
-                            </button>
-                            <button type="button" onclick="filtrarEstado('resuelto', this)"
-                                class="filtro-btn flex-1 sm:flex-none px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:text-green-600 hover:bg-green-100 transition-all whitespace-nowrap">
-                                Resuelto
-                            </button>
+                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
+                            <button type="button" onclick="filtrarEstado('1', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
+                            <button type="button" onclick="filtrarEstado('2', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
+                            <button type="button" onclick="filtrarEstado('3', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
+                            <button type="button" onclick="filtrarEstado('4', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-orange-100 hover:text-orange-600 transition-all">Equivocado</button>
+                            <button type="button" onclick="filtrarEstado('5', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-yellow-100 hover:text-yellow-600 transition-all">No
+                                Corresponde</button>
                         </div>
                     </div>
 

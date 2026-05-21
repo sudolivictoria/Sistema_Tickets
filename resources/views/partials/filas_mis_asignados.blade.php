@@ -16,12 +16,12 @@
         <td class="px-4 py-4">
             <div class="flex flex-col">
                 <button type="button" onclick="verUsuario(
-                                                                                                        '{{ $ticket->user->name }}', 
-                                                                                                        '{{ $ticket->user->email }}', 
-                                                                                                        '{{ $ticket->user->unidad->nombre_unidad}}', 
-                                                                                                        '{{ $ticket->user->cargo }}', 
-                                                                                                        '{{ $ticket->user->telefono ?? 'N/A' }}'
-                                                                                                    )"
+                                                                                                                    '{{ $ticket->user->name }}', 
+                                                                                                                    '{{ $ticket->user->email }}', 
+                                                                                                                    '{{ $ticket->user->unidad->nombre_unidad}}', 
+                                                                                                                    '{{ $ticket->user->cargo }}', 
+                                                                                                                    '{{ $ticket->user->telefono ?? 'N/A' }}'
+                                                                                                                )"
                     class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-2 group">
                     {{ $ticket->user->name }}
                     <span
@@ -40,6 +40,8 @@
                     'abierto' => 'bg-red-100 text-red-700 border-red-200',
                     'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
                     'resuelto' => 'bg-green-100 text-green-700 border-green-200',
+                    'equivocado' => 'bg-orange-100 text-orange-700 border-orange-200',
+                    'no corresponde' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp
@@ -106,27 +108,53 @@
             <button type="button"
                 onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}', '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}')"
                 class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
-                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                <span class="material-symbols-outlined text-[16px]">visibility</span>
             </button>
         </td>
 
 
         {{--Acciones--}}
-        <td class="px-4 py-4 text-center">
+        <td class="px-4 py-4">
             @php
                 $prefix = Auth::user()->rol_id == 1 ? 'admin' : 'gestor';
                 $rutaResolver = $prefix . '.tickets.resolver';
+                $rutaEquivocacion = $prefix . '.tickets.equivocacion';
+                $rutaNoCorresponde = $prefix . '.tickets.no-corresponde';
             @endphp
-            <form action="{{ route($rutaResolver, $ticket->id) }}" method="POST" class="form-resolver">
-                @csrf
-                @method('PATCH')
 
-                <button type="button" onclick="confirmarResolver(this)"
-                    class="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm border border-green-100 flex items-center justify-center mx-auto"
-                    title="Marcar como Resuelto">
-                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
-                </button>
-            </form>
+            <div class="flex items-center justify-center gap-2">
+
+                <form action="{{ route($rutaResolver, $ticket->id) }}" method="POST" class="form-resolver m-0">
+                    @csrf
+                    @method('PATCH')
+                    <button type="button" onclick="confirmarResolver(this)"
+                        class="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm border border-green-100 flex items-center justify-center"
+                        title="Marcar como Resuelto">
+                        <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    </button>
+                </form>
+
+                <form action="{{ route($rutaEquivocacion, $ticket->id) }}" method="POST" class="form-equivocacion m-0">
+                    @csrf
+                    @method('PATCH')
+                    <button type="button" onclick="confirmarEquivocado(this)"
+                        class="p-2 bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white rounded-xl transition-all shadow-sm border border-orange-100 flex items-center justify-center"
+                        title="Marcar como Equivocado">
+                        <span class="material-symbols-outlined text-[16px]">do_not_touch</span>
+                    </button>
+                </form>
+
+                <form action="{{ route($rutaNoCorresponde, $ticket->id) }}" method="POST" class="form-no-corresponde m-0">
+                    @csrf
+                    @method('PATCH')
+                    <button type="button" onclick="confirmarNoCorresponde(this)"
+                        class="p-2 bg-yellow-50 text-yellow-600 hover:bg-yellow-600 hover:text-white rounded-xl transition-all shadow-sm border border-yellow-100 flex items-center justify-center"
+                        title="Marcar como No Corresponde">
+                        <span class="material-symbols-outlined text-[16px]">thumb_down</span>
+                    </button>
+                </form>
+
+            </div>
         </td>
     </tr>
 @endforeach

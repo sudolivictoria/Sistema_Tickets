@@ -44,4 +44,73 @@ class TicketController extends Controller
 
         return redirect()->back()->with('sweet_success', $mensaje);
     }
+
+    public function equivocacion(Request $request, $id)
+    {
+        $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
+
+        $ticket->update([
+            'estado_id' => 4,
+            'fecha_cierre' => Carbon::now()
+        ]);
+
+        $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
+
+        //---ENVIAR EL CORREO---
+        try {
+            Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket));
+        } catch (\Exception $e) {
+            Log::error("Error enviando correo de ticket cerrado: " . $e->getMessage());
+        }
+
+        $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => $mensaje]);
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje
+            ]);
+        }
+
+        return redirect()->back()->with('sweet_success', $mensaje);
+    }
+
+
+      public function nocorresponde(Request $request, $id)
+    {
+        $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
+
+        $ticket->update([
+            'estado_id' => 5,
+            'fecha_cierre' => Carbon::now()
+        ]);
+
+        $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
+
+        //---ENVIAR EL CORREO---
+        try {
+            Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket));
+        } catch (\Exception $e) {
+            Log::error("Error enviando correo de ticket cerrado: " . $e->getMessage());
+        }
+
+        $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => $mensaje]);
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje
+            ]);
+        }
+
+        return redirect()->back()->with('sweet_success', $mensaje);
+    }
 }

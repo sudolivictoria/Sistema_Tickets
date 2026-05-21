@@ -25,7 +25,7 @@ class TicketResueltoMail extends Mailable
     {
           $id = '#TK' . str_pad($this->ticket->id, 5, '0', STR_PAD_LEFT);
 
-        return $this->subject($id . ' - Su ticket ha sido resuelto')
+        return $this->subject($id . ' - Su ticket ha sido cerrado')
             ->view('emails.ticket_resuelto');
     }
 }

@@ -1,5 +1,4 @@
 var table;
-
 window.inicializarTablaTickets = function (
     selectorId,
     columnaOrden = 0,
@@ -62,7 +61,6 @@ window.verDetalle = function (asunto, descripcion, tipoNombre) {
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
-
     if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
@@ -94,7 +92,6 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
 
     //----------------envio de correos directo----------------
     const elLinkCorreo = document.getElementById("linkCorreo");
-
     if (nombre && correo && departamento && puesto && contacto && modal) {
         nombre.innerText = name;
         correo.innerText = email;
@@ -130,7 +127,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaAsignarTickets")) {
         window.inicializarTablaTickets("#tablaAsignarTickets", 5, "asc");
     }
-
     if (document.querySelector("#tablaMisAsignados")) {
         window.inicializarTablaTickets("#tablaMisAsignados", 5, "desc");
     }
@@ -140,7 +136,6 @@ document.addEventListener("DOMContentLoaded", function () {
 function confirmarResolver(btn) {
     const form = btn.closest("form");
     const url = form.action;
-
     Swal.fire({
         title: "¿Marcar como Resuelto?",
         text: "Esta acción registrará la hora de cierre del ticket.",
@@ -171,6 +166,116 @@ function confirmarResolver(btn) {
                         autoRefrescoUniversal();
                         Swal.fire({
                             title: "¡Ticket Resuelto!",
+                            text: data.message,
+                            icon: "success",
+                            iconColor: "#84cc16",
+                            timer: 3000,
+                            showConfirmButton: false,
+                            customClass: { popup: "rounded-3xl" },
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    Swal.fire(
+                        "Error",
+                        "No se pudo procesar la solicitud",
+                        "error",
+                    );
+                });
+        }
+    });
+}
+
+//---------------CONFIRMAR TICKET EQUIVOCADO-----------------
+function confirmarEquivocado(btn) {
+    const form = btn.closest("form");
+    const url = form.action;
+    Swal.fire({
+        title: "¿Marcar como Equivocado?",
+        text: "Esta acción registrará la hora de cierre del ticket.",
+        icon: "question",
+        iconColor: "#1e3a8a",
+        showCancelButton: true,
+        confirmButtonColor: "#84cc16",
+        confirmButtonText: "Sí, marcar",
+        cancelButtonText: "Cancelar",
+        cancelButtonColor: "#ef4444",
+        customClass: { popup: "rounded-3xl" },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ).content,
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(new FormData(form)),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        autoRefrescoUniversal();
+                        Swal.fire({
+                            title: "¡Ticket Marcado como Equivocado!",
+                            text: data.message,
+                            icon: "success",
+                            iconColor: "#84cc16",
+                            timer: 3000,
+                            showConfirmButton: false,
+                            customClass: { popup: "rounded-3xl" },
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    Swal.fire(
+                        "Error",
+                        "No se pudo procesar la solicitud",
+                        "error",
+                    );
+                });
+        }
+    });
+}
+
+//---------------CONFIRMAR TICKET NO CORRESPONDE-----------------
+function confirmarNoCorresponde(btn) {
+    const form = btn.closest("form");
+    const url = form.action;
+    Swal.fire({
+        title: "¿Marcar No Corresponde?",
+        text: "Esta acción registrará la hora de cierre del ticket.",
+        icon: "question",
+        iconColor: "#1e3a8a",
+        showCancelButton: true,
+        confirmButtonColor: "#84cc16",
+        confirmButtonText: "Sí, marcar",
+        cancelButtonText: "Cancelar",
+        cancelButtonColor: "#ef4444",
+        customClass: { popup: "rounded-3xl" },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ).content,
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(new FormData(form)),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        autoRefrescoUniversal();
+                        Swal.fire({
+                            title: "¡Ticket Marcado como No Corresponde!",
                             text: data.message,
                             icon: "success",
                             iconColor: "#84cc16",

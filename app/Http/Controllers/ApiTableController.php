@@ -19,6 +19,7 @@ class ApiTableController extends Controller
 
         $query = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tecnico', 'tipo_solicitud', 'categoria']);
         $statsQuery = Ticket::whereYear('created_at', date('Y'));
+        $estadosCerrados = [3, 4, 5];
 
         if ($tipo == 'mis_tickets' || $user->rol_id == 2) {
             $query->where('user_id', $user->id);
@@ -49,34 +50,37 @@ class ApiTableController extends Controller
         $allTicketsForStats = $statsQuery->get();
 
         $contadores = [
-            'abiertos'  => $allTicketsForStats->whereNull('tecnico_id')->where('estado_id', '!=', 3)->count(),
+            'abiertos'  => $allTicketsForStats->whereNull('tecnico_id')->whereNotIn('estado_id', $estadosCerrados)->count(),
             'proceso'   => $allTicketsForStats->whereNotNull('tecnico_id')->where('estado_id', 2)->count(),
-            'resueltos' => $allTicketsForStats->where('estado_id', 3)->count(),
+            'resueltos' => $allTicketsForStats->whereIn('estado_id', $estadosCerrados)->count(),
         ];
 
         $graficoHtml = null;
 
         if ($user->rol_id != 2) {
 
-
+            $añoActual = date('Y');
             $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
             $mesesGrafico = [];
 
-            $ticketsPorMes = $allTicketsForStats->groupBy(function ($ticket) {
-                return Carbon::parse($ticket->created_at)->month;
-            });
+            //---agrupa tickets por mes y estado
+            $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
+                ->whereYear('created_at', $añoActual)
+                ->whereHas('categoria', function ($q) use ($miUnidadId) {
+                    $q->where('unidad_id', $miUnidadId);
+                })
+                ->groupBy('mes', 'estado_id')
+                ->get();
 
             for ($i = 1; $i <= 12; $i++) {
-                $ticketsDelMes = $ticketsPorMes->get($i, collect());
-                $total = $ticketsDelMes->count();
-
-                $resueltos = $ticketsDelMes->where('estado_id', 3)->count();
-                $pendientes = $total - $resueltos;
+                $res = $statsMensuales->where('mes', $i)->whereIn('estado_id', $estadosCerrados)->sum('total');
+                $pen = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', $estadosCerrados)->sum('total');
+                $total = $res + $pen;
 
                 $mesesGrafico[] = [
-                    'nombre' => $nombresMeses[$i - 1], // Usamos ENE, FEB, etc.
-                    'resueltos_pct' => $total > 0 ? round(($resueltos / $total) * 100) : 0,
-                    'pendientes_pct' => $total > 0 ? round(($pendientes / $total) * 100) : 0,
+                    'nombre' => $nombresMeses[$i - 1],
+                    'resueltos_pct' => $total > 0 ? round(($res / $total) * 100) : 0,
+                    'pendientes_pct' => $total > 0 ? round(($pen / $total) * 100) : 0,
                     'total' => $total
                 ];
             }

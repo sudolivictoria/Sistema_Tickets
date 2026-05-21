@@ -82,6 +82,15 @@ class DatabaseSeeder extends Seeder
             'nombre_estado' => 'resuelto'
         ]);
 
+        Estado::create([
+            'nombre_estado' => 'equivocado'
+        ]);
+
+        Estado::create([
+            'nombre_estado' => 'no-corresponde'
+        ]);
+
+
         //----prioridades
 
         Prioridad::create([
