@@ -89,10 +89,10 @@
             </div>
             <!--final rendimiento anual-->
 
-            <!--tickets registrados-->
+            <!--TABLA TICKETS REGISTRADOS POR MES-->
             <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                {{-- Cabecera con Filtros y Buscador --}}
                 <div class="p-5 border-b border-slate-100 flex flex-wrap gap-4 justify-between items-center bg-white">
+                    {{--Filtros por estado--}}
                     <div class="flex items-center gap-4">
                         <div class="flex gap-2" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)"
@@ -101,24 +101,58 @@
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
                             <button type="button" onclick="filtrarEstado('2', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
-                            <button type="button" onclick="filtrarEstado('3', this)"
+                            <button type="button" onclick="filtrarEstado('3, 4, 5', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
                         </div>
                     </div>
+
+                    {{--CONTADORES--}}
+                    <div class="flex items-center gap-3 text-[11px] font-black uppercase tracking-wider">
+                        {{--ABIERTOS--}}
+                        <div
+                            class="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg">
+                            <span>Abiertos:</span>
+                            <span id="count-abiertos"
+                                class="bg-red-600 text-white font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center">
+                                {{ $todosLosTickets->whereNull('tecnico_id')->whereNotIn('estado_id', [3, 4, 5])->count() }}
+                            </span>
+                        </div>
+
+                        {{--PROCESANDO--}}
+                        <div
+                            class="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg">
+                            <span>En Proceso:</span>
+                            <span id="count-proceso"
+                                class="bg-blue-600 text-white font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center">
+                                {{ $todosLosTickets->whereNotNull('tecnico_id')->where('estado_id', 2)->count() }}
+                            </span>
+                        </div>
+
+                        {{--RESUELTOS--}}
+                        <div
+                            class="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg">
+                            <span>Resueltos:</span>
+                            <span id="count-resueltos"
+                                class="bg-emerald-600 text-white font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center">
+                                {{ $todosLosTickets->whereIn('estado_id', [3, 4, 5])->count() }}
+                            </span>
+                        </div>
+                    </div>
+
                 </div>
 
-                {{-- Contenedor con Scroll --}}
+                {{--ENCABEZADOS Y PARTIAL--}}
                 <div class="overflow-y-auto" style="max-height: 400px;">
                     <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
                                 class="text-[13px] uppercase text-[#008F7E] font-black tracking-widest border-b border-slate-200">
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">ID</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Usuario</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Detalle</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">ID</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Usuario</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Tecnico</th>
+                                <th class="px-4 py-4 border-b border-slate-200 font-black">Detalle</th>
                             </tr>
                         </thead>
                         <tbody id="tablaBody" data-tipo="dashboard" class="divide-y divide-slate-100 text-[12px]">

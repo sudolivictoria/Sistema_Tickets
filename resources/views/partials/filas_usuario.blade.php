@@ -9,8 +9,7 @@
                 </span>
             </div>
         </td>
-        <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold">{{ $ticket->categoria->nombre_categoria }}</td>
-        <td class="px-6 py-4 max-w-[150px] text-slate-600 font-bold">{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}
+        <td class="px-6 py-4 max-w-[150px] font-black text-[13px]">{{ $ticket->categoria->nombre_categoria }}</td>
         </td>
         <td class="px-6 py-4">
             @php
@@ -24,7 +23,7 @@
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp
-            <span class="px-2 py-1 rounded-md border font-black uppercase text-[12px] {{ $claseEstado }}">
+            <span class="px-2 py-1 rounded-md border font-black uppercase text-[11px] {{ $claseEstado }}">
                 {{ ucfirst($estado) }}
             </span>
         </td>
@@ -40,17 +39,17 @@
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp
-            <span class="px-2 py-1 rounded-md border font-black text-[12px] uppercase {{ $clasePrio }}">
+            <span class="px-2 py-1 rounded-md border font-black text-[11px] uppercase {{ $clasePrio }}">
                 {{ $prio }}
             </span>
         </td>
 
-        <td class="px-6 py-4 text-slate-600 font-bold">{{ $ticket->created_at->format('d/m/Y') }}</td>
+        <td class="px-6 py-4 font-black text-[13px]">{{ $ticket->created_at->format('d/m/Y') }}</td>
 
         {{-- Botón Detalle (Descripción) --}}
         <td class="px-4 py-4 text-center">
             <button type="button"
-                onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
+                onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}',  '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}')"
                 class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>

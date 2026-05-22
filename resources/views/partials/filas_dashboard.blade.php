@@ -22,7 +22,7 @@
                         '{{ $ticket->user->cargo }}', 
                         '{{ $ticket->user->telefono ?? 'N/A' }}'
                     )"
-                    class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-1 group">
+                    class="font-black hover:text-primary transition-all text-left flex items-center gap-1 group">
                     {{ $ticket->user->name }}
                     <span
                         class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
@@ -66,8 +66,8 @@
             </span>
         </td>
         
-        <td class="px-2 py-4 font-bold text-slate-900">
-            {{ $ticket->tecnico->name ?? 'Pendiente' }}
+        <td class="px-2 py-4 font-black">
+            {{ $ticket->tecnico->name ?? 'Pendiente de Asignación' }}
         </td>
 
         {{-- BOTON DESCRIPCION DEL TICKET --}}

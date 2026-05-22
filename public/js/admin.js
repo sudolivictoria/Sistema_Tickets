@@ -12,6 +12,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    window.ejecutarFiltros = function (estadoSeleccionado) {
+    const estadoFiltro = String(estadoSeleccionado).trim().toLowerCase();
+    const listaEstados = estadoFiltro.split(',');
+
+    document.querySelectorAll(".ticket-fila").forEach((fila) => {
+        const estadoIdFila = String(fila.dataset.estadoId || "").trim().toLowerCase();
+        const coincide = estadoFiltro === "todos" || listaEstados.includes(estadoIdFila);
+        fila.classList.toggle("hidden", !coincide);
+    });
+}
+
     //--filtros por estado
     window.filtrarEstado = function (estado, btn) {
         //--resetear estilos
@@ -100,16 +111,5 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 });
 
-window.ejecutarFiltros = function (estadoSeleccionado) {
-    const estadoFiltro = String(estadoSeleccionado).trim().toLowerCase();
 
-    document.querySelectorAll(".ticket-fila").forEach((fila) => {
-        const estadoIdFila = String(fila.dataset.estadoId || "")
-            .trim()
-            .toLowerCase();
-        const ocultar =
-            estadoFiltro !== "todos" && estadoIdFila !== estadoFiltro;
-        fila.classList.toggle("hidden", ocultar);
-    });
-}
 

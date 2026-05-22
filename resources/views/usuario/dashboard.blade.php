@@ -73,7 +73,6 @@
                             <tr>
                                 <th class="px-6 py-4 font-black">ID</th>
                                 <th class="px-6 py-4 font-black">Categoría</th>
-                                <th class="px-6 py-4 font-black">Solicitud</th>
                                 <th class="px-6 py-4 font-black">Estado</th>
                                 <th class="px-6 py-4 font-black">Prioridad</th>
                                 <th class="px-6 py-4 font-black">Apertura</th>
@@ -227,19 +226,33 @@
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
-                    <div class="space-y-4">
+                    <div class="space-y-5">
                         <div>
-                            <label class="text-[11px] font-black text-primary uppercase tracking-widest">Descripción de la
-                                solicitud</label>
+                            <div class="flex items-center gap-1.5 mb-2 text-primary">
+                                <span class="material-symbols-outlined text-[16px] text-secondary">category</span>
+                                <label class="text-[11px] font-black uppercase tracking-widest">Tipo de Solicitud</label>
+                            </div>
+                            <div id="modalTipoSolicitud"
+                                class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line">
+                                ---
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center gap-1.5 mb-2 text-primary">
+                                <span class="material-symbols-outlined text-[16px] text-secondary">description</span>
+                                <label class="text-[11px] font-black uppercase tracking-widest">Descripción de la
+                                    solicitud</label>
+                            </div>
                             <div id="modalDescripcion"
-                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
+                                class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line max-h-[200px] overflow-y-auto custom-scrollbar">
                                 ---
                             </div>
                         </div>
                     </div>
                     <div class="mt-8">
                         <button onclick="cerrarModal()"
-                            class="w-full py-4 bg-secondary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-secondary/20">
+                            class="w-full py-4 bg-secondary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-primary/20">
                             Cerrar Detalle
                         </button>
                     </div>
@@ -247,6 +260,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 @push('scripts')

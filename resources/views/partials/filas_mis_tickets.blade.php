@@ -15,13 +15,8 @@
         </td>
 
         {{-- Categoría --}}
-        <td class="px-4 py-4 text-slate-900 font-bold uppercase">
+        <td class="px-4 py-4 font-black uppercase">
             {{ $ticket->categoria->nombre_categoria ?? 'N/A' }}
-        </td>
-
-        {{-- Tipo Solicitud --}}
-        <td class="px-4 py-4 text-slate-900 font-bold">
-            {{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}
         </td>
 
         {{-- Estado --}}
@@ -59,23 +54,23 @@
         </td>
 
         {{-- Técnico --}}
-        <td class="px-4 py-4 text-slate-900 font-bold italic">
-            {{ $ticket->tecnico->name ?? 'Pendiente' }}
+        <td class="px-4 py-4 font-black">
+            {{ $ticket->tecnico->name ?? 'Pendiente de Asignación' }}
         </td>
 
         {{-- Fechas --}}
-        <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">
+        <td class="px-4 py-4 font-black data-order="{{ $ticket->created_at->timestamp }}">
             {{ $ticket->created_at->format('d/m/Y') }}
         </td>
 
-        <td class="px-4 py-4 font-bold text-slate-900">
+        <td class="px-4 py-4 font-black">
             {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
         </td>
 
         {{-- Botón Detalle (Descripción) --}}
         <td class="px-4 py-4 text-center">
             <button type="button"
-                onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}')"
+                onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}', '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}')"
                 class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>

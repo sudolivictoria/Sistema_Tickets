@@ -108,23 +108,25 @@
 
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-primary border-r border-blue-800 flex flex-col pt-32 p-4
     transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-50 lg:z-40">
-        <nav class="space-y-1 gap-1-5 flex-1">
+        <nav class="space-y-3 flex-1">
             <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.dashboard') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.dashboard') }}">
-                <span class="material-symbols-outlined">dashboard</span>
+                <span class="material-symbols-outlined text-xl">dashboard</span>
                 <span class="text-sm">Dashboard</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('usuario.crear-ticket') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+            <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-1 px-4 font-black">
+                Servicios</p>
+            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.crear-ticket') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.crear-ticket') }}">
                 <span class="material-symbols-outlined text-xl">add_circle</span>
                 <span class="text-sm">Crear Ticket</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('usuario.mis-tickets') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.mis-tickets') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.mis-tickets') }}">
                 <span class="material-symbols-outlined text-xl">history</span>
                 <span class="text-sm">Mis Tickets</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('usuario.recursos') ? 'bg-primary text-secondary' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold transition-all"
+            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.recursos') ? 'bg-secondary text-primary' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold transition-all"
                 href="{{ route('usuario.recursos') }}">
                 <span class="material-symbols-outlined text-xl">library_books</span>
                 <span class="text-sm">Recursos</span>

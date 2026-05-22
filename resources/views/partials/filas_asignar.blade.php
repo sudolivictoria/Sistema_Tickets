@@ -1,6 +1,6 @@
 @foreach($tickets as $ticket)
     <tr class="hover:bg-slate-50/80 transition-all">
-        <td class="px-4 py-4 font-bold text-slate-900 whitespace-nowrap">
+        <td class="px-4 py-4 font-black whitespace-nowrap">
             <div class="flex items-center">
                 {{-- Prefijo con estilo sutil --}}
                 <span class="text-secondary font-black text-[12px]">#</span>
@@ -22,7 +22,7 @@
                         '{{ $ticket->user->cargo }}', 
                         '{{ $ticket->user->telefono ?? 'N/A' }}'
                     )"
-                    class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-2 group">
+                    class="font-black hover:text-primary transition-all text-left flex items-center gap-2 group">
                     {{ $ticket->user->name }}
                     <span
                         class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
@@ -87,7 +87,7 @@
         </td>
 
         {{-- Fechas --}}
-        <td class="px-4 py-4 font-bold text-slate-900" data-order="{{ $ticket->created_at->timestamp }}">
+        <td class="px-4 py-4 font-black data-order="{{ $ticket->created_at->timestamp }}">
             {{ $ticket->created_at->format('d/m/Y') }}
         </td>
 

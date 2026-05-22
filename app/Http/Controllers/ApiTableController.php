@@ -16,7 +16,6 @@ class ApiTableController extends Controller
         $tipo = $request->query('tipo');
         $user = Auth::user();
         $miUnidadId = $user->unidad_id;
-
         $query = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tecnico', 'tipo_solicitud', 'categoria']);
         $statsQuery = Ticket::whereYear('created_at', date('Y'));
         $estadosCerrados = [3, 4, 5];
@@ -43,6 +42,12 @@ class ApiTableController extends Controller
 
         if ($tipo == 'usuario') {
             $query->limit(5);
+        }
+
+        if($tipo == 'dashboard'){
+            $inicioMes = Carbon::now()->startOfMonth();
+            $finMes = Carbon::now()->endOfMonth();
+            $query->whereBetween('created_at', [$inicioMes, $finMes]);
         }
 
         $ticketsResult = $query->latest()->get();

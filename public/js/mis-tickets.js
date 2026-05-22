@@ -62,20 +62,22 @@ window.filtrarEstado = function (estado, btn) {
 
     //---filtros de estado
     const valorBusqueda = estado === "todos" ? "" : `^${estado}$`;
-    table.column(3).search(valorBusqueda, true, false, true).draw();
+    table.column(2).search(valorBusqueda, true, false, true).draw();
 };
 
 /**
  * Gestión de Modal de detalles
  */
-window.verDetalle = function (asunto, descripcion) {
+window.verDetalle = function (asunto, descripcion, tipoSolicitud) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
+    const tipo = document.getElementById("modalTipoSolicitud");
 
-    if (modal && titulo && desc) {
+    if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
+        tipo.innerText = tipoSolicitud;
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }

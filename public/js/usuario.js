@@ -19,14 +19,16 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 //---funciones para ver detalles de los tickets
-window.verDetalle = function (asunto, descripcion) {
+window.verDetalle = function (asunto, descripcion, solicitud) {
     const modal = document.getElementById("modalTicket");
     const modalTitulo = document.getElementById("modalTitulo");
     const modalDescripcion = document.getElementById("modalDescripcion");
+    const modalTipoSolicitud = document.getElementById("modalTipoSolicitud");
 
-    if (modal && modalTitulo && modalDescripcion) {
+    if (modal && modalTitulo && modalDescripcion && modalTipoSolicitud) {
         modalTitulo.innerText = asunto;
         modalDescripcion.innerText = descripcion;
+        modalTipoSolicitud.innerText = solicitud;
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }

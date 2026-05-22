@@ -1,6 +1,6 @@
 @foreach ($tickets as $ticket)
     <tr class="hover:bg-slate-50 transition-colors">
-        <td class="px-4 py-4 font-bold text-slate-900 whitespace-nowrap">
+        <td class="px-4 py-4 whitespace-nowrap">
             <div class="flex items-center">
                 {{-- Prefijo con estilo sutil --}}
                 <span class="text-secondary font-black text-[12px]">#</span>
@@ -15,14 +15,14 @@
         {{--Usuario--}}
         <td class="px-4 py-4">
             <div class="flex flex-col">
-                <button type="button" onclick="verUsuario(
-                                                                                                                    '{{ $ticket->user->name }}', 
-                                                                                                                    '{{ $ticket->user->email }}', 
-                                                                                                                    '{{ $ticket->user->unidad->nombre_unidad}}', 
-                                                                                                                    '{{ $ticket->user->cargo }}', 
-                                                                                                                    '{{ $ticket->user->telefono ?? 'N/A' }}'
-                                                                                                                )"
-                    class="text-slate-900 font-bold hover:text-primary transition-all text-left flex items-center gap-2 group">
+            <button type="button" onclick="verUsuario(
+                        '{{ $ticket->user->name }}', 
+                        '{{ $ticket->user->email }}', 
+                        '{{ $ticket->user->unidad->nombre_unidad}}', 
+                        '{{ $ticket->user->cargo }}', 
+                        '{{ $ticket->user->telefono ?? 'N/A' }}'
+                    )"
+                    class="font-black hover:text-primary transition-all text-left flex items-center gap-2 group">
                     {{ $ticket->user->name }}
                     <span
                         class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
@@ -122,7 +122,7 @@
                     @csrf
                     @method('PATCH')
                     <button type="button" onclick="confirmarResolver(this)"
-                        class="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm border border-green-100 flex items-center justify-center"
+                        class="p-2 bg-green-50 text-green-600 font-black hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm border border-green-100 flex items-center justify-center"
                         title="Marcar como Resuelto">
                         <span class="material-symbols-outlined text-[16px]">check_circle</span>
                     </button>
@@ -132,7 +132,7 @@
                     @csrf
                     @method('PATCH')
                     <button type="button" onclick="confirmarEquivocado(this)"
-                        class="p-2 bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white rounded-xl transition-all shadow-sm border border-orange-100 flex items-center justify-center"
+                        class="p-2 bg-orange-50 text-orange-600 font-black hover:bg-orange-600 hover:text-white rounded-xl transition-all shadow-sm border border-orange-100 flex items-center justify-center"
                         title="Marcar como Equivocado">
                         <span class="material-symbols-outlined text-[16px]">do_not_touch</span>
                     </button>
@@ -142,7 +142,7 @@
                     @csrf
                     @method('PATCH')
                     <button type="button" onclick="confirmarNoCorresponde(this)"
-                        class="p-2 bg-yellow-50 text-yellow-600 hover:bg-yellow-600 hover:text-white rounded-xl transition-all shadow-sm border border-yellow-100 flex items-center justify-center"
+                        class="p-2 bg-yellow-50 text-yellow-600 font-black hover:bg-yellow-600 hover:text-white rounded-xl transition-all shadow-sm border border-yellow-100 flex items-center justify-center"
                         title="Marcar como No Corresponde">
                         <span class="material-symbols-outlined text-[16px]">thumb_down</span>
                     </button>

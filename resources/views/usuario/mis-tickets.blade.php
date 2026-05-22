@@ -55,7 +55,6 @@
                             <tr class="bg-slate-50 text-[13px] uppercase text-[#008F7E] font-black tracking-widest">
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">ID</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Categoría</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Técnico</th>
@@ -87,15 +86,28 @@
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
-                    <div>
-                        <div class="flex items-center gap-1.5 mb-2 text-secondary">
-                            <span class="material-symbols-outlined text-[16px] text-primary">description</span>
-                            <label class="text-[11px] font-black uppercase tracking-widest">Descripción de la
-                                solicitud</label>
+                    <div class="space-y-5">
+                        <div>
+                            <div class="flex items-center gap-1.5 mb-2 text-primary">
+                                <span class="material-symbols-outlined text-[16px] text-secondary">category</span>
+                                <label class="text-[11px] font-black uppercase tracking-widest">Tipo de Solicitud</label>
+                            </div>
+                            <div id="modalTipoSolicitud"
+                                class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line">
+                                ---
+                            </div>
                         </div>
-                        <div id="modalDescripcion"
-                            class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line max-h-[200px] overflow-y-auto custom-scrollbar">
-                            ---
+
+                        <div>
+                            <div class="flex items-center gap-1.5 mb-2 text-primary">
+                                <span class="material-symbols-outlined text-[16px] text-secondary">description</span>
+                                <label class="text-[11px] font-black uppercase tracking-widest">Descripción de la
+                                    solicitud</label>
+                            </div>
+                            <div id="modalDescripcion"
+                                class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line max-h-[200px] overflow-y-auto custom-scrollbar">
+                                ---
+                            </div>
                         </div>
                     </div>
                     <div class="mt-8">
@@ -108,6 +120,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 {{-- SCRIPTS --}}

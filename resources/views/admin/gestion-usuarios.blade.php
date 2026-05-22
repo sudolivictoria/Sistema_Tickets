@@ -49,7 +49,7 @@
             {{-- TABLA --}}
             <table id="userTable" class="w-full text-left border-separate border-spacing-0">
                 <thead>
-                    <tr class="bg-slate-50 text-[14px] uppercase text-[#008F7E] font-black tracking-widest">
+                    <tr class="bg-slate-50 text-[12px] uppercase text-[#008F7E] font-black tracking-widest">
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Nombre</th>
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Rol</th>
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Email</th>
@@ -57,18 +57,18 @@
                         <th class="px-4 py-4 border-b border-slate-200">Cargo</th>
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Teléfono</th>
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
-                        <th class="px-4 py-4 border-b border-slate-200 font-black text-center">Acciones</th>
+                        <th class="px-4 py-4 border-b border-slate-200 font-black text-center">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($usuarios as $user)
-                        <tr class="text-[12px]">
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->name }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->rol->nombre_rol }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->email }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->unidad->nombre_unidad }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->cargo }}</td>
-                            <td class="px-4 py-4 font-bold text-slate-900">{{ $user->telefono ?? 'N/A'}}</td>
+                        <tr class="text-[11.5px]">
+                            <td class="px-4 py-4 font-black">{{ $user->name }}</td>
+                            <td class="px-4 py-4 font-black">{{ $user->rol->nombre_rol }}</td>
+                            <td class="px-4 py-4 font-black">{{ $user->email }}</td>
+                            <td class="px-4 py-4 font-black">{{ $user->unidad->nombre_unidad }}</td>
+                            <td class="px-4 py-4 font-black">{{ $user->cargo }}</td>
+                            <td class="px-4 py-4 font-black">{{ $user->telefono ?? 'N/A'}}</td>
                             <td class="px-4 py-4">
                                 <span
                                     class="px-2 py-1 rounded-md border font-black text-[9px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-[#008F7E] border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">

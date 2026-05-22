@@ -27,13 +27,13 @@
     <!--------------------------FILTROS------------------------------>
     <div class="flex gap-3 mb-10 overflow-x-auto pb-2">
         <button onclick="filtrar('all', event)"
-            class="filter-btn active bg-white text-[#04003B] px-6 py-2 rounded-full border-2 border-[#04003B] font-semibold uppercase text-xs tracking-wider hover:border-[#04003B] hover:text-[#04003B] transition">
+            class="filter-btn active bg-white text-[#04003B] px-6 py-2 rounded-full border-2 border-[#04003B] font-black uppercase text-xs tracking-wider hover:border-[#04003B] hover:text-[#04003B] transition">
             Todos
         </button>
 
         @foreach ($categorias as $cat)
             <button type="button"
-                class="filter-btn bg-white text-slate-600 border-2 border-slate-200 px-6 py-2 rounded-full font-semibold uppercase text-xs tracking-wider hover:border-[#04003B] hover:text-[#04003B] transition"
+                class="filter-btn bg-white text-secondary  font-black  border-2 border-slate-200 px-6 py-2 rounded-full uppercase text-xs tracking-wider hover:border-[#04003B] hover:text-[#04003B] transition"
                 data-id="{{ $cat->id }}" onclick="filtrar({{ $cat->id }}, event)">
                 {{ $cat->nombre_categoria_manual }}
             </button>
@@ -233,6 +233,8 @@
             </div>
         </div>
 
+        @endsection
+        
         @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -260,4 +262,3 @@
 
         <script src="{{ asset('js/gestion-recursos.js') }}"></script>
         @endpush
-        @endsection
