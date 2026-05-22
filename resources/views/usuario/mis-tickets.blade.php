@@ -19,23 +19,16 @@
                     class="p-4 md:p-6 flex flex-col lg:flex-row gap-6 justify-between items-center bg-white border-b border-slate-100 whitespace-nowrap">
 
                     <div class="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
-                        <h2 class="text-xl font-bold text-primary hidden xl:block">Tickets</h2>
-
                         {{-- Filtros de Estados --}}
                         <div class="flex flex-wrap gap-2 justify-center md:justify-start w-full" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)"
                                 class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
-                            <button type="button" onclick="filtrarEstado('1', this)"
+                            <button type="button" onclick="filtrarEstado('abierto', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
-                            <button type="button" onclick="filtrarEstado('2', this)"
+                            <button type="button" onclick="filtrarEstado('procesando', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
-                            <button type="button" onclick="filtrarEstado('3', this)"
+                            <button type="button" onclick="filtrarEstado('resuelto', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
-                            <button type="button" onclick="filtrarEstado('4', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-orange-100 hover:text-orange-600 transition-all">Equivocado</button>
-                            <button type="button" onclick="filtrarEstado('5', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-yellow-100 hover:text-yellow-600 transition-all">No
-                                Corresponde</button>
                         </div>
                     </div>
 
@@ -59,7 +52,7 @@
                 <div class="p-0 w-full overflow-x-auto">
                     <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
                         <thead>
-                            <tr class="bg-slate-50 text-[13px] uppercase text-green-700 font-black tracking-widest">
+                            <tr class="bg-slate-50 text-[13px] uppercase text-[#008F7E] font-black tracking-widest">
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">ID</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Categoría</th>
                                 <th class="px-4 py-4 border-b border-slate-200 font-black">Solicitud</th>
@@ -94,14 +87,15 @@
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-[11px] font-black text-primary uppercase tracking-widest">Descripción de la
+                    <div>
+                        <div class="flex items-center gap-1.5 mb-2 text-secondary">
+                            <span class="material-symbols-outlined text-[16px] text-primary">description</span>
+                            <label class="text-[11px] font-black uppercase tracking-widest">Descripción de la
                                 solicitud</label>
-                            <div id="modalDescripcion"
-                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm leading-relaxed whitespace-pre-line italic">
-                                ---
-                            </div>
+                        </div>
+                        <div id="modalDescripcion"
+                            class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line max-h-[200px] overflow-y-auto custom-scrollbar">
+                            ---
                         </div>
                     </div>
                     <div class="mt-8">

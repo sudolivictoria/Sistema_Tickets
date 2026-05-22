@@ -4,11 +4,11 @@
         <td class="px-4 py-4 font-bold text-slate-900 whitespace-nowrap">
             <div class="flex items-center">
                 {{-- Prefijo con estilo sutil --}}
-                <span class="text-blue-900 font-black text-[12px]">#</span>
-                <span class="text-blue-900 font-black text-[12px] tracking-tighter">TK</span>
+                <span class="text-[#04003B] font-black text-[12px]">#</span>
+                <span class="text-[#04003B] font-black text-[12px] tracking-tighter">TK</span>
 
                 {{-- Número principal destacado --}}
-                <span class="text-blue-900 font-black tracking-tight text-[12px]">
+                <span class="text-[#04003B] font-black tracking-tight text-[12px]">
                     {{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
                 </span>
             </div>
@@ -29,10 +29,10 @@
             @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
                 $claseEstado = match ($estado) {
-                    'abierto' => 'bg-red-100 text-red-700 border-red-200',
+                    'abierto' => 'bg-orange-100 text-orange-700 border-orange-200',
                     'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
-                    'resuelto' => 'bg-green-100 text-green-700 border-green-200',
-                    'equivocado' => 'bg-orange-100 text-orange-700 border-orange-200',
+                    'resuelto' => 'bg-green-100 text-[#008F7E] border-green-200',
+                    'equivocado' => 'bg-red-100 text-red-700 border-red-200',
                     'no corresponde' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
@@ -49,7 +49,7 @@
                     'Critica' => 'bg-red-100 text-red-700 border-red-200',
                     'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
                     'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                    'Baja' => 'bg-green-100 text-green-700 border-green-200',
+                    'Baja' => 'bg-green-100 text-[#008F7E] border-green-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp

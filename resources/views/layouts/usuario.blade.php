@@ -19,7 +19,7 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#1e3a8a",
+                        "primary": "#04003B",
                         "secondary": "#84cc16"
                     },
                     fontFamily: {
@@ -57,7 +57,7 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #1e3a8a;
+            background: #04003B;
             border-radius: 10px;
             border: 2px solid #f1f5f9;
         }
@@ -106,12 +106,10 @@
         </div>
     </header>
 
-    <aside id="sidebar"
-        class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-primary border-r border-blue-800 flex flex-col pt-32 p-4
-    transform -translate-x-full lg:translate-x-0 transition-transform duration-300
-    z-50 lg:z-40">
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-primary border-r border-blue-800 flex flex-col pt-32 p-4
+    transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-50 lg:z-40">
         <nav class="space-y-1 gap-1-5 flex-1">
-            <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('usuario.dashboard') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.dashboard') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.dashboard') }}">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="text-sm">Dashboard</span>
@@ -133,11 +131,11 @@
             </a>
         </nav>
 
-        <div class="mt-auto pt-6 border-t border-white/10">
+        <div class="mt-auto pt-2 border-t border-white/10">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
-                    class="w-full flex items-center gap-3 px-4 py-3 text-blue-300 hover:text-blue-900 hover:bg-blue-300 rounded-xl transition-all font-bold group">
+                    class="w-full flex items-center gap-3 px-4 py-3 text-blue-300 hover:text-[#04003B] hover:bg-blue-300 rounded-xl transition-all font-bold group">
                     <span
                         class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
                     <span class="text-sm">Cerrar Sesión</span>
@@ -166,7 +164,7 @@
 
     <script>
         //-----------preloader 
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -177,7 +175,7 @@
         });
 
         //-----reloj 
-        window.iniciarReloj = function() {
+        window.iniciarReloj = function () {
             const contenedorReloj = document.getElementById('relojSistema');
 
             if (!contenedorReloj) return;
@@ -195,7 +193,7 @@
             }, 1000);
         }
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             iniciarReloj();
         });
     </script>

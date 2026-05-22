@@ -56,11 +56,27 @@ window.inicializarTablaTickets = function (
 /**
  * Gestión de Modal de detalles
  */
-window.verDetalle = function (asunto, descripcion, tipoNombre) {
+window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
+    const fecha = document.getElementById("modalFechaApertura");
+    if (modal && titulo && desc && tipo && fecha) {
+        titulo.innerText = asunto;
+        desc.innerText = descripcion;
+        tipo.innerText = tipoNombre;
+        fecha.innerText = fechaApertura;
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    }
+};
+
+window.verDetalleAsignar = function (asunto, descripcion, tipoNombre) {
+    const modal = document.getElementById("modalTicketAsignar");
+    const titulo = document.getElementById("modalTituloAsignar");
+    const desc = document.getElementById("modalDescripcionAsignar");
+    const tipo = document.getElementById("modalTipoSolicitudAsignar");
     if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
@@ -70,10 +86,19 @@ window.verDetalle = function (asunto, descripcion, tipoNombre) {
     }
 };
 
+
 /**
  * Cerrar modal
  */
-window.cerrarModal = function () {
+window.cerrarModalAsignar = function () {
+    const modal = document.getElementById("modalTicketAsignar");
+    if (modal) {
+        modal.classList.add("hidden");
+        document.body.style.overflow = "auto";
+    }
+};
+
+window.cerrarModalMisAsignados = function () {
     const modal = document.getElementById("modalTicket");
     if (modal) {
         modal.classList.add("hidden");
@@ -140,7 +165,7 @@ function confirmarResolver(btn) {
         title: "¿Marcar como Resuelto?",
         text: "Esta acción registrará la hora de cierre del ticket.",
         icon: "question",
-        iconColor: "#1e3a8a",
+        iconColor: "#04003B",
         showCancelButton: true,
         confirmButtonColor: "#84cc16",
         confirmButtonText: "Sí, resolver",
@@ -195,7 +220,7 @@ function confirmarEquivocado(btn) {
         title: "¿Marcar como Equivocado?",
         text: "Esta acción registrará la hora de cierre del ticket.",
         icon: "question",
-        iconColor: "#1e3a8a",
+        iconColor: "#04003B",
         showCancelButton: true,
         confirmButtonColor: "#84cc16",
         confirmButtonText: "Sí, marcar",
@@ -250,7 +275,7 @@ function confirmarNoCorresponde(btn) {
         title: "¿Marcar No Corresponde?",
         text: "Esta acción registrará la hora de cierre del ticket.",
         icon: "question",
-        iconColor: "#1e3a8a",
+        iconColor: "#04003B",
         showCancelButton: true,
         confirmButtonColor: "#84cc16",
         confirmButtonText: "Sí, marcar",

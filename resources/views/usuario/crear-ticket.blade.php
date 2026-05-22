@@ -141,7 +141,7 @@
                 title: '¡Excelente!',
                 text: "{{ session('success') }}",
                 icon: 'success',
-                confirmButtonColor: '#1e3a8a',
+                confirmButtonColor: '#04003B',
                 confirmButtonText: 'Entendido',
                 customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
             }).then(() => {

@@ -30,7 +30,7 @@
         }
 
         .header {
-            background-color: #1e3a8a;
+            background-color: #04003B;
             color: #ffffff;
             padding: 15px 20px;
             text-align: center;
@@ -62,7 +62,7 @@
         .welcome-text {
             font-size: 18px;
             font-weight: bold;
-            color: #1e3a8a;
+            color: #04003B;
             margin-bottom: 5px;
         }
 
@@ -95,7 +95,7 @@
 
         .label {
             font-weight: bold;
-            color: #1e3a8a;
+            color: #04003B;
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -127,7 +127,7 @@
         }
 
         .footer strong {
-            color: #1e3a8a;
+            color: #04003B;
         }
     </style>
 </head>
@@ -146,7 +146,7 @@
                 <p class="welcome-text">Atención Equipo de {{ $ticket->categoria->unidad->nombre_unidad }}</p>
                 <div class="divider-green"></div>
 
-                <p style="color: #1e3a8a; font-weight: 500;">Se ha registrado un nuevo ticket en su unidad.</p>
+                <p style="color: #04003B; font-weight: 500;">Se ha registrado un nuevo ticket en su unidad.</p>
 
                 <div class="info-card">
                     <div class="info-row">
@@ -173,7 +173,7 @@
                     </div>
                 </div>
 
-                <p><strong class="label" style="color: #1e3a8a;">Descripción del problema:</strong></p>
+                <p><strong class="label" style="color: #04003B;">Descripción del problema:</strong></p>
                 <div class="description-box">
                     {{ $ticket->descripcion }}
                 </div>

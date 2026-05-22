@@ -30,7 +30,7 @@
         }
 
         .header {
-            background-color: #1e3a8a;
+            background-color: #04003B;
             color: #ffffff;
             padding: 15px 20px;
             text-align: center;
@@ -62,7 +62,7 @@
         .welcome-text {
             font-size: 18px;
             font-weight: bold;
-            color: #1e3a8a;
+            color: #04003B;
             margin-bottom: 5px;
         }
 
@@ -95,7 +95,7 @@
 
         .label {
             font-weight: bold;
-            color: #1e3a8a;
+            color: #04003B;
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -127,7 +127,7 @@
         }
 
         .footer strong {
-            color: #1e3a8a;
+            color: #04003B;
         }
     </style>
 </head>
@@ -146,7 +146,7 @@
                 <p class="welcome-text">Hola, {{ $ticket->user->name }}</p>
                 <div class="divider-green"></div>
 
-                <p style="color: #1e3a8a; font-weight: 500;">Nos complace informarle que el ticket que reportó ha sido
+                <p style="color: #04003B; font-weight: 500;">Nos complace informarle que el ticket que reportó ha sido
                     cerrado.</p>
 
                 <div class="info-card">

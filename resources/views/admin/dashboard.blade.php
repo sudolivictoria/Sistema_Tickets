@@ -22,9 +22,9 @@
     <!--estadisticas generales-->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div
-            class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-red-500 flex items-center gap-5 hover:translate-y-[-4px] transition-all duration-300">
-            <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-red-600 text-3xl">notification_important</span>
+            class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500 flex items-center gap-5 hover:translate-y-[-4px] transition-all duration-300">
+            <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-orange-600 text-3xl">notification_important</span>
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Abiertos</p>
@@ -96,17 +96,13 @@
                     <div class="flex items-center gap-4">
                         <div class="flex gap-2" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)"
-                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
+                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[11px] font-black uppercase shadow-md transition-all">Todos</button>
                             <button type="button" onclick="filtrarEstado('1', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
                             <button type="button" onclick="filtrarEstado('2', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
                             <button type="button" onclick="filtrarEstado('3', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
-                            <button type="button" onclick="filtrarEstado('4', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-orange-100 hover:text-orange-600 transition-all">Equivocado</button>
-                            <button type="button" onclick="filtrarEstado('5', this)"    
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-yellow-100 hover:text-yellow-600 transition-all">No Corresponde</button>
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
                         </div>
                     </div>
                 </div>
@@ -116,12 +112,11 @@
                     <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
-                                class="text-[13px] uppercase text-green-700 font-black tracking-widest border-b border-slate-200">
+                                class="text-[13px] uppercase text-[#008F7E] font-black tracking-widest border-b border-slate-200">
                                 <th class="px-2 py-4 border-b border-slate-200 font-black">ID</th>
                                 <th class="px-2 py-4 border-b border-slate-200 font-black">Usuario</th>
                                 <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
                                 <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Apertura</th>
                                 <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
                                 <th class="px-2 py-4 border-b border-slate-200 font-black">Detalle</th>
                             </tr>
@@ -151,10 +146,10 @@
                     <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
                         @foreach($categorias as $cat)
                             <a href="{{ route('admin.recursos', ['categoria' => $cat->id]) }}"
-                                class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
+                                class="flex items-center gap-2 p-3 rounded-lg bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
                                 <div
                                     class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-xl">folder</span>
+                                    <span class="material-symbols-outlined text-lg">folder</span>
                                 </div>
                                 <div
                                     class="overflow-hidden text-[11px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
@@ -200,40 +195,62 @@
     {{------------------------------------------------MODAL DE DETALLE-----------------------------------------}}
     <div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModal()"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 py-8">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="cerrarModal()"></div>
+
             <div
-                class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-primary">
-                <div class="p-8">
-                    <div class="flex justify-between items-start mb-6">
-                        <h3 id="modalTitulo" class="text-xl font-black text-secondary uppercase">---</h3>
-                        <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
-                            <span class="material-symbols-outlined">close</span>
+                class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-primary z-10 animate-fade-in">
+                <div class="p-6 sm:p-8">
+
+                    <div class="flex justify-between items-start gap-4 pb-4 border-b border-slate-100 mb-6">
+                        <div class="space-y-1.5">
+                            <h3 id="modalTitulo"
+                                class="text-lg sm:text-xl font-black text-secondary uppercase tracking-tight leading-snug">
+                                ---</h3>
+
+                            <div class="flex items-center gap-1.5 pt-3 text-slate-500 font-semibold text-[13px]">
+                                <span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+                                <label class="text-[11px] font-black uppercase tracking-widest text-secondary">Fecha de
+                                    Apertura:</label>
+                                <span id="modalFechaApertura"
+                                    class="font-bold bg-slate-100 px-2 py-0.5 rounded-md text-slate-700">---</span>
+                            </div>
+                        </div>
+
+                        <button onclick="cerrarModal()"
+                            class="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all shrink-0">
+                            <span class="material-symbols-outlined text-[22px]">close</span>
                         </button>
                     </div>
-                    <div class="space-y-4">
+
+                    <div class="space-y-5">
                         <div>
-                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Tipo de
-                                Solicitud</label>
+                            <div class="flex items-center gap-1.5 mb-2 text-secondary">
+                                <span class="material-symbols-outlined text-[16px] text-primary">category</span>
+                                <label class="text-[11px] font-black uppercase tracking-widest">Tipo de Solicitud</label>
+                            </div>
                             <div id="modalTipoSolicitud"
-                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm font-bold leading-relaxed whitespace-pre-line">
+                                class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line">
                                 ---
                             </div>
                         </div>
-                    </div>
-                    <div class="space-y-4">
+
                         <div>
-                            <label class="text-[11px] font-black text-secondary uppercase tracking-widest">Descripción de la
-                                solicitud</label>
+                            <div class="flex items-center gap-1.5 mb-2 text-secondary">
+                                <span class="material-symbols-outlined text-[16px] text-primary">description</span>
+                                <label class="text-[11px] font-black uppercase tracking-widest">Descripción de la
+                                    solicitud</label>
+                            </div>
                             <div id="modalDescripcion"
-                                class="mt-2 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-sm font-bold leading-relaxed whitespace-pre-line">
+                                class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line max-h-[200px] overflow-y-auto custom-scrollbar">
                                 ---
                             </div>
                         </div>
                     </div>
-                    <div class="mt-8">
+
+                    <div class="mt-6 pt-4 border-t border-slate-100">
                         <button onclick="cerrarModal()"
-                            class="w-full py-4 bg-primary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-primary/20">
+                            class="w-full py-3.5 bg-primary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30">
                             Cerrar Detalle
                         </button>
                     </div>
@@ -259,7 +276,7 @@
                         <a id="linkCorreo" href="#" target="_blank"
                             class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3 transition-all hover:bg-blue-50 hover:border-blue-200 group cursor-pointer no-underline block">
                             <span
-                                class="material-symbols-outlined text-secondary group-hover:text-primary text-xl">email</span>
+                                class="material-symbols-outlined text-primary group-hover:text-primary text-xl">email</span>
                             <div class="flex-1">
                                 <label
                                     class="text-[10px] font-black text-secondary uppercase tracking-widest block group-hover:text-primary">
@@ -278,7 +295,7 @@
                         </a>
                         {{-- Unidad --}}
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
-                            <span class="material-symbols-outlined text-secondary text-xl">park</span>
+                            <span class="material-symbols-outlined text-primary text-xl">park</span>
                             <div>
                                 <label class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad
                                     / Parque</label>
@@ -287,7 +304,7 @@
                         </div>
                         {{-- Cargo --}}
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
-                            <span class="material-symbols-outlined text-secondary text-xl">work</span>
+                            <span class="material-symbols-outlined text-primary text-xl">work</span>
                             <div>
                                 <label
                                     class="text-[10px] font-black text-secondary uppercase tracking-widest block">Cargo</label>
@@ -296,7 +313,7 @@
                         </div>
                         {{-- Teléfono --}}
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3">
-                            <span class="material-symbols-outlined text-secondary text-xl">call</span>
+                            <span class="material-symbols-outlined text-primary text-xl">call</span>
                             <div>
                                 <label
                                     class="text-[10px] font-black text-secondary uppercase tracking-widest block">Teléfono /

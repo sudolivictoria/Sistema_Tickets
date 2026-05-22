@@ -30,16 +30,18 @@ document.addEventListener("DOMContentLoaded", function () {
         ejecutarFiltros(estado);
     };
 
-    window.verDetalle = function (asunto, descripcion, tipoNombre) {
+    window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
         const modal = document.getElementById("modalTicket");
         const titulo = document.getElementById("modalTitulo");
         const desc = document.getElementById("modalDescripcion");
         const tipo = document.getElementById("modalTipoSolicitud");
+        const fecha = document.getElementById("modalFechaApertura");
 
-        if (modal && titulo && desc && tipo) {
+        if (modal && titulo && desc && tipo && fecha) {
             titulo.innerText = asunto;
             desc.innerText = descripcion;
             tipo.innerText = tipoNombre;
+            fecha.innerText = fechaApertura;
             modal.classList.remove("hidden");
             document.body.style.overflow = "hidden";
         }

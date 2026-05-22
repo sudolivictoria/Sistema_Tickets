@@ -40,7 +40,7 @@
                 $claseEstado = match ($estado) {
                     'abierto' => 'bg-red-100 text-red-700 border-red-200',
                     'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
-                    'resuelto' => 'bg-green-100 text-green-700 border-green-200',
+                    'resuelto' => 'bg-green-100 text-[#008F7E] border-green-200',
                     'equivocado' => 'bg-orange-100 text-orange-700 border-orange-200',
                     'no corresponde' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
@@ -94,7 +94,7 @@
         {{-- Botón Detalle (Descripción) --}}
         <td class="px-4 py-4 text-center">
             <button type="button"
-                onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}', '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}')"
+                onclick="verDetalleAsignar('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}', '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}')"
                 class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>

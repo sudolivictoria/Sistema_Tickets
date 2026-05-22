@@ -22,7 +22,7 @@
                 extend: {
                     colors: {
                         "primary": "#84cc16",
-                        "secondary": "#1e3a8a",
+                        "secondary": "#04003B",
                         "background-light": "#f8fafc",
                         "background-dark": "#0f172a",
                     },
@@ -47,7 +47,7 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #1e3a8a;
+            background: #04003B;
             border-radius: 10px;
             border: 2px solid #f1f5f9;
         }
@@ -99,15 +99,15 @@
         <div class="flex flex-1 overflow-hidden">
 
             <aside class="w-64 bg-secondary flex flex-col shrink-0 z-10 shadow-2xl overflow-y-auto">
-                <div class="p-6 flex flex-col h-full">
+                <div class="p-4 flex flex-col h-full">
                     <nav class="flex flex-col gap-1.5 flex-1">
-                        <a class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('gestor.dashboard') ? 'bg-primary text-secondary shadow-lg' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold mb-4 transition-all"
+                        <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('gestor.dashboard') ? 'bg-primary text-secondary shadow-lg' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold mb-4 transition-all"
                             href="{{ route('gestor.dashboard') }}">
                             <span class="material-symbols-outlined">dashboard</span>
                             <span class="text-sm">Dashboard</span>
                         </a>
 
-                        <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-4 px-4 font-black">
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-2 px-4 font-black">
                             Administración</p>
 
                         <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.asignar-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
@@ -122,7 +122,7 @@
                             <span class="text-sm">Mis Asignados</span>
                         </a>
 
-                        <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-6 px-4 font-black">Servicios
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-2 px-4 font-black">Servicios
                         </p>
 
                         <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.crear-ticket') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
@@ -144,11 +144,11 @@
                         </a>
                     </nav>
 
-                    <div class="mt-auto pt-6 border-t border-white/10">
+                    <div class="mt-auto pt-2 border-t border-white/10">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"
-                                class="w-full flex items-center gap-3 px-4 py-3 text-blue-300 hover:text-blue-900 hover:bg-blue-300 rounded-xl transition-all font-bold group">
+                                class="w-full flex items-center gap-3 px-4 py-3 text-blue-300 hover:text-[#04003B] hover:bg-blue-300 rounded-xl transition-all font-bold group">
                                 <span
                                     class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">logout</span>
                                 <span class="text-sm">Cerrar Sesión</span>
@@ -176,7 +176,6 @@
     @stack('scripts')
     <script src="{{ asset('js/auto-refresco.js') }}"></script>
 
-
     <script>
         window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
@@ -187,7 +186,6 @@
                 preloader.style.display = 'none';
             }, 1000);
         });
-
 
         //-----reloj 
         window.iniciarReloj = function() {
@@ -207,7 +205,6 @@
                 contenedorReloj.innerText = horaFormateada;
             }, 1000);
         }
-
         $(document).ready(function() {
             iniciarReloj();
         });

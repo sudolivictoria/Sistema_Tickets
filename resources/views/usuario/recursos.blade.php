@@ -15,13 +15,13 @@
         <div class="flex flex-wrap gap-3 mb-10">
 
             <button onclick="filtrar('all', event)"
-                class="filter-btn active bg-white text-blue-900 px-6 py-2 rounded-full border-2 border-blue-900 font-semibold uppercase text-xs tracking-wider hover:border-blue-900 hover:text-blue-900 transition">
+                class="filter-btn active bg-white text-[#04003B] px-6 py-2 rounded-full border-2 border-[#04003B] font-semibold uppercase text-xs tracking-wider hover:border-[#04003B] hover:text-[#04003B] transition">
                 Todos
             </button>
 
             @foreach ($categorias as $cat)
                 <button type="button"
-                    class="filter-btn bg-white text-slate-600 border-2 border-slate-200 px-6 py-2 rounded-full font-semibold uppercase text-xs tracking-wider hover:border-blue-900 hover:text-blue-900 transition"
+                    class="filter-btn bg-white text-slate-600 border-2 border-slate-200 px-6 py-2 rounded-full font-semibold uppercase text-xs tracking-wider hover:border-[#04003B] hover:text-[#04003B] transition"
                     data-id="{{ $cat->id }}" onclick="filtrar({{ $cat->id }}, event)">
 
                     {{ $cat->nombre_categoria_manual }}
@@ -37,7 +37,7 @@
 
     <!----------------------------------------VISOR DE MANUALES--------------------------------------------->
     <div id="modalVisor"
-        class="hidden fixed inset-0 bg-blue-900/90 backdrop-blur-md flex items-center justify-center z-[10000] p-4">
+        class="hidden fixed inset-0 bg-[#04003B]/90 backdrop-blur-md flex items-center justify-center z-[10000] p-4">
         <div class="bg-white w-full h-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
             <div class="bg-slate-50 px-8 py-4 flex justify-between items-center border-b border-slate-200">
                 <div class="flex items-center gap-4">
@@ -46,7 +46,7 @@
                     </div>
                     <div>
                         <h3 id="visor-titulo"
-                            class="font-black text-blue-900 uppercase tracking-tight text-lg leading-tight">Vista Previa del
+                            class="font-black text-[#04003B] uppercase tracking-tight text-lg leading-tight">Vista Previa del
                             Recurso</h3>
                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Sistema de Gestión de
                             Manuales</p>

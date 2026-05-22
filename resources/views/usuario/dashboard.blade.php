@@ -69,7 +69,7 @@
 
                 <div class="overflow-x-auto text-[13px] md:text-[14px]">
                     <table class="w-full min-w-[760px] text-left">
-                        <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-green-700">
+                        <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-[#008F7E]">
                             <tr>
                                 <th class="px-6 py-4 font-black">ID</th>
                                 <th class="px-6 py-4 font-black">Categoría</th>
@@ -102,14 +102,12 @@
                 {{--contenedor de categorias con scroll--}}
                 <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
                     @foreach($categorias as $cat)
-                        <a href="{{ route('usuario.recursos', ['categoria' => $cat->id]) }}"
-                            class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
-
+                        <a href="{{ route('admin.recursos', ['categoria' => $cat->id]) }}"
+                            class="flex items-center gap-2 p-3 rounded-lg bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
                             <div
                                 class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
-                                <span class="material-symbols-outlined text-xl">folder</span>
+                                <span class="material-symbols-outlined text-lg">folder</span>
                             </div>
-
                             <div
                                 class="overflow-hidden text-[11px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
                                 {{ $cat->nombre_categoria_manual }}

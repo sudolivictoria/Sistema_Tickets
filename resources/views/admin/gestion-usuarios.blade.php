@@ -49,7 +49,7 @@
             {{-- TABLA --}}
             <table id="userTable" class="w-full text-left border-separate border-spacing-0">
                 <thead>
-                    <tr class="bg-slate-50 text-[14px] uppercase text-green-700 font-black tracking-widest">
+                    <tr class="bg-slate-50 text-[14px] uppercase text-[#008F7E] font-black tracking-widest">
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Nombre</th>
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Rol</th>
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Email</th>
@@ -62,7 +62,7 @@
                 </thead>
                 <tbody>
                     @foreach($usuarios as $user)
-                        <tr class="text-[13px]">
+                        <tr class="text-[12px]">
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->name }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->rol->nombre_rol }}</td>
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->email }}</td>
@@ -71,7 +71,7 @@
                             <td class="px-4 py-4 font-bold text-slate-900">{{ $user->telefono ?? 'N/A'}}</td>
                             <td class="px-4 py-4">
                                 <span
-                                    class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">
+                                    class="px-2 py-1 rounded-md border font-black text-[9px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-[#008F7E] border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">
                                     {{ $user->activo == 1 ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </td>
@@ -80,8 +80,8 @@
                                     {{-- BOTÓN EDITAR --}}
                                     <button type="button" onclick="abrirModal('editar', {{ json_encode($user) }})"
                                         @disabled($user->id === auth()->id())
-                                        class="p-2 rounded-lg {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-105 transition-transform' }}">
-                                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                                        class="p-1 rounded-md {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-105 transition-transform' }}">
+                                        <span class="material-symbols-outlined text-[10px]">edit</span>
                                     </button>
 
                                     {{-- BOTÓN ESTADO ACTIVO / DESACTIVADO --}}
@@ -89,9 +89,9 @@
                                         @csrf @method('PATCH')
 
                                         <button type="submit" @disabled($user->id === auth()->id())
-                                            class="p-2 rounded-lg {{ $user->activo ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }} 
-                                                                                                                                                                                                                                {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
-                                            <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
+                                            class="p-1 rounded-md {{ $user->activo ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }} 
+                                            {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
+                                            <span class="material-symbols-outlined text-[10px]">power_settings_new</span>
                                         </button>
                                     </form>
                                 </div>
@@ -105,7 +105,7 @@
 
     <!----------------MODAL AGREGAR USUARIO------------>
     <div id="modalAgregar"
-        class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-blue-900/40 backdrop-blur-sm">
+        class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-[#04003B]/40 backdrop-blur-sm">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
             <div class="bg-primary p-6 text-secondary flex justify-between items-center">
                 <h3 class="font-black uppercase tracking-widest text-lg">Nuevo Usuario</h3>
@@ -177,7 +177,7 @@
 
     <!----------------MODAL EDITAR USUARIO------------>
     <div id="modalEditar"
-        class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-blue-900/40 backdrop-blur-sm">
+        class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-[#04003B]/40 backdrop-blur-sm">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
             <div class="bg-primary p-6 text-secondary flex justify-between items-center">
                 <h3 class="font-black uppercase tracking-widest text-lg">Editar Usuario</h3>
@@ -266,7 +266,7 @@
                 icon: 'success',
                 title: '¡Éxito!',
                 text: "{{ session('success') }}",
-                confirmButtonColor: '#1e3a8a',
+                confirmButtonColor: '#04003B',
             });
         </script>
     @endif

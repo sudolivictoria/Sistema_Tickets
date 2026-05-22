@@ -20,16 +20,16 @@ window.filtrar = function (catId, event) {
     const botones = document.querySelectorAll(".filter-btn");
     botones.forEach((btn) => {
         btn.classList.remove(
-            "bg-blue-900",
+            "bg-[#04003B]",
             "text-white",
-            "border-blue-900",
+            "border-[#04003B]",
             "hover:text-white",
         );
         btn.classList.add(
             "bg-white",
             "text-slate-600",
             "border-slate-200",
-            "hover:text-blue-900",
+            "hover:text-[#04003B]",
         );
     });
    
@@ -47,12 +47,12 @@ window.filtrar = function (catId, event) {
             "bg-white",
             "text-slate-600",
             "border-slate-200",
-            "hover:text-blue-900",
+            "hover:text-[#04003B]",
         );
         botonActivo.classList.add(
-            "bg-blue-900",
+            "bg-[#04003B]",
             "text-white",
-            "border-blue-900",
+            "border-[#04003B]",
             "hover:text-white",
         );
     }
@@ -79,7 +79,7 @@ window.abrirVisor = function (url, titulo = "Recurso") {
     const iconoVisor = document.getElementById("visor-icono");
 
     tituloVisor.innerText = titulo;
-    visor.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-900"></div>`;
+    visor.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#04003B]"></div>`;
     //--cargar contenido
     if (ext === "pdf") {
         iconoVisor.innerText = "picture_as_pdf";

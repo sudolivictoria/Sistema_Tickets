@@ -16,10 +16,10 @@
             @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
                 $claseEstado = match ($estado) {
-                    'abierto' => 'bg-red-100 text-red-700 border-red-200',
+                    'abierto' => 'bg-orange-100 text-orange-700 border-orange-200',
                     'procesando' => 'bg-blue-100 text-blue-700 border-blue-200',
-                    'resuelto' => 'bg-green-100 text-green-700 border-green-200',
-                    'equivocado' => 'bg-orange-100 text-orange-700 border-orange-200',
+                    'resuelto' => 'bg-green-100 text-[#008F7E] border-green-200',
+                    'equivocado' => 'bg-red-100 text-red-700 border-red-200',
                     'no corresponde' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
@@ -36,7 +36,7 @@
                     'Critica' => 'bg-red-100 text-red-700 border-red-200',
                     'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
                     'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                    'Baja' => 'bg-green-100 text-green-700 border-green-200',
+                    'Baja' => 'bg-green-100 text-[#008F7E] border-green-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp
