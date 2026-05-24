@@ -36,7 +36,7 @@ window.inicializarTablaTickets = function (selectorId) {
         responsive: true,
         autoWidth: false,
         pageLength: 5,
-        order: [[6, "desc"]],
+        order: [[0, "desc"]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
