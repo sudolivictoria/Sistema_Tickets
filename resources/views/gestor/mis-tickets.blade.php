@@ -12,7 +12,7 @@
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 
-            {{--Tabla--}}
+            {{-- Tabla --}}
             <div class="p-5">
                 {{-- Cabecera con Filtros y Buscador --}}
                 <div class="p-5 flex flex-wrap gap-4 justify-between items-center bg-white">
@@ -24,8 +24,8 @@
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
                             <button type="button" onclick="filtrarEstado('procesando', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
-                            <button type="button" onclick="filtrarEstado('resuelto', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
+                            <button type="button" onclick="filtrarEstado('resuelto,equivocado,no corresponde', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Cerrado</button>
                         </div>
                     </div>
 
@@ -60,7 +60,7 @@
         </div>
     </div>
 
-    {{------------------------------------------------MODAL DE DETALLE-----------------------------------------}}
+    {{-- ----------------------------------------------MODAL DE DETALLE--------------------------------------- --}}
     <div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4">

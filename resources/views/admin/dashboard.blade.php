@@ -1,12 +1,11 @@
 @extends('layouts.admin')
 
 @section('content')
-
     <div class="flex justify-between items-center mb-8">
         <div>
             <div class="flex items-center gap-4">
                 <span class="text-4xl font-medium text-slate-600">
-                    Hola, <span class="text-secondary font-bold">{{ auth()->user()->name ?? 'Administrador'}}</span>
+                    Hola, <span class="text-secondary font-bold">{{ auth()->user()->name ?? 'Administrador' }}</span>
                 </span>
             </div>
             <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y resolución eficiente de
@@ -89,10 +88,10 @@
             </div>
             <!--final rendimiento anual-->
 
-            <!--TABLA TICKETS REGISTRADOS POR MES-->
+            {{-- Tickets Registrados --}}
             <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                {{-- Cabecera con Filtros y Buscador --}}
                 <div class="p-5 border-b border-slate-100 flex flex-wrap gap-4 justify-between items-center bg-white">
-                    {{--Filtros por estado--}}
                     <div class="flex items-center gap-4">
                         <div class="flex gap-2" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)"
@@ -101,58 +100,24 @@
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
                             <button type="button" onclick="filtrarEstado('2', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
-                            <button type="button" onclick="filtrarEstado('3, 4, 5', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Resuelto</button>
+                            <button type="button" onclick="filtrarEstado('3,4,5', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Cerrado</button>
                         </div>
                     </div>
-
-                    {{--CONTADORES--}}
-                    <div class="flex items-center gap-3 text-[11px] font-black uppercase tracking-wider">
-                        {{--ABIERTOS--}}
-                        <div
-                            class="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg">
-                            <span>Abiertos:</span>
-                            <span id="count-abiertos"
-                                class="bg-red-600 text-white font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center">
-                                {{ $todosLosTickets->whereNull('tecnico_id')->whereNotIn('estado_id', [3, 4, 5])->count() }}
-                            </span>
-                        </div>
-
-                        {{--PROCESANDO--}}
-                        <div
-                            class="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg">
-                            <span>En Proceso:</span>
-                            <span id="count-proceso"
-                                class="bg-blue-600 text-white font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center">
-                                {{ $todosLosTickets->whereNotNull('tecnico_id')->where('estado_id', 2)->count() }}
-                            </span>
-                        </div>
-
-                        {{--RESUELTOS--}}
-                        <div
-                            class="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg">
-                            <span>Resueltos:</span>
-                            <span id="count-resueltos"
-                                class="bg-emerald-600 text-white font-black px-1.5 py-0.5 rounded-md min-w-[20px] text-center">
-                                {{ $todosLosTickets->whereIn('estado_id', [3, 4, 5])->count() }}
-                            </span>
-                        </div>
-                    </div>
-
                 </div>
 
-                {{--ENCABEZADOS Y PARTIAL--}}
+                {{-- Contenedor con Scroll --}}
                 <div class="overflow-y-auto" style="max-height: 400px;">
                     <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
                                 class="text-[13px] uppercase text-[#008F7E] font-black tracking-widest border-b border-slate-200">
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">ID</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Usuario</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Tecnico</th>
-                                <th class="px-4 py-4 border-b border-slate-200 font-black">Detalle</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">ID</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Usuario</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
+                                <th class="px-2 py-4 border-b border-slate-200 font-black">Detalle</th>
                             </tr>
                         </thead>
                         <tbody id="tablaBody" data-tipo="dashboard" class="divide-y divide-slate-100 text-[12px]">
@@ -162,7 +127,7 @@
                 </div>
             </div>
         </div>
-        <!--final tickets-->
+        {{-- Final Tickets Registrados --}}
 
         <!--recursos-->
         <div class="lg:col-span-1 space-y-6">
@@ -176,9 +141,9 @@
                         class="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-primary rounded-full"></span> Recursos
                     </h4>
-                    {{--contenedor de categorias con scroll--}}
+                    {{-- contenedor de categorias con scroll --}}
                     <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
-                        @foreach($categorias as $cat)
+                        @foreach ($categorias as $cat)
                             <a href="{{ route('admin.recursos', ['categoria' => $cat->id]) }}"
                                 class="flex items-center gap-2 p-3 rounded-lg bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
                                 <div
@@ -226,7 +191,7 @@
         </div>
     </div>
 
-    {{------------------------------------------------MODAL DE DETALLE-----------------------------------------}}
+    {{-- ----------------------------------------------MODAL DE DETALLE--------------------------------------- --}}
     <div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
@@ -293,7 +258,7 @@
         </div>
     </div>
 
-    {{------------------------------------------ MODAL DE USUARIO ------------------------------------------}}
+    {{-- ---------------------------------------- MODAL DE USUARIO ---------------------------------------- --}}
     <div id="modalUsuario" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 py-6">
             <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModalUsuario()"></div>
@@ -350,7 +315,8 @@
                             <span class="material-symbols-outlined text-primary text-xl">call</span>
                             <div>
                                 <label
-                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Teléfono /
+                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Teléfono
+                                    /
                                     Ext.</label>
                                 <p id="userTelefono" class="text-sm text-slate-700 font-bold">---</p>
                             </div>

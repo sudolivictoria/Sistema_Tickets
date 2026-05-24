@@ -60,8 +60,15 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-primary text-white shadow-md");
 
+    let valorBusqueda = "";
+    if (estado !== "todos") {
+        const estados = String(estado)
+            .split(",")
+            .map((e) => e.trim());
+
+        valorBusqueda = `(${estados.join("|")})`;
+    }
     //---filtros de estado
-    const valorBusqueda = estado === "todos" ? "" : `^${estado}$`;
     table.column(2).search(valorBusqueda, true, false, true).draw();
 };
 

@@ -9,7 +9,7 @@
             <div class="w-full bg-primary rounded-t-md hover:brightness-110 transition-all duration-500 relative shadow-[0_-2px_10px_rgba(132,204,22,0.2)]"
                 style="height: {{ $mes['resueltos_pct'] }}%">
                 <span
-                    class="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-black text-primary bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity z-10">{{ $mes['resueltos_pct'] }}%</span>
+                    class="absolute -top-12 left-1/2 -translate-x-1/2 text-[10px] font-black text-primary bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity z-10">{{ $mes['resueltos_pct'] }}%</span>
             </div>
         </div>
         <span

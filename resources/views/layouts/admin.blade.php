@@ -99,8 +99,8 @@
 
             <aside class="w-64 bg-secondary flex flex-col shrink-0 z-10 shadow-2xl overflow-y-auto">
                 <div class="p-4 flex flex-col h-full">
-                    <nav class="flex flex-col gap-1.5 flex-1">
-                        <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('admin.dashboard') ? 'bg-primary text-secondary shadow-lg' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold mb-4 transition-all"
+                    <nav class="flex flex-col gap-1 flex-1">
+                        <a class="flex items-center gap-3 px-4 py-3 mt-1 {{ request()->routeIs('admin.dashboard') ? 'bg-primary text-secondary shadow-lg' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold mb-4 transition-all"
                             href="{{ route('admin.dashboard') }}">
                             <span class="material-symbols-outlined">dashboard</span>
                             <span class="text-sm">Dashboard</span>
@@ -134,6 +134,18 @@
                             <span class="text-sm">Gestión Recursos</span>
                         </a>
 
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('admin.gestion-recursos') }}">
+                            <span class="material-symbols-outlined text-xl">folder_shared</span>
+                            <span class="text-sm">Historial</span>
+                        </a>
+
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('admin.gestion-recursos') }}">
+                            <span class="material-symbols-outlined text-xl">folder_shared</span>
+                            <span class="text-sm">Reportes</span>
+                        </a>
+
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-2 px-4 font-black">Servicios
                         </p>
 
@@ -158,7 +170,7 @@
 
                     </nav>
 
-                    <div class="mt-auto pt-2 border-t border-white/10">
+                    <div class="mt-auto pt-1 border-t border-white/10">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"
