@@ -33,7 +33,7 @@
                 };
             @endphp
             <span
-                class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
+                class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase whitespace-nowrap {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
         </td>
 
         {{-- Prioridad --}}

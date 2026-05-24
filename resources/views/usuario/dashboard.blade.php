@@ -101,7 +101,7 @@
                 {{--contenedor de categorias con scroll--}}
                 <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
                     @foreach($categorias as $cat)
-                        <a href="{{ route('admin.recursos', ['categoria' => $cat->id]) }}"
+                        <a href="{{ route('usuario.recursos', ['categoria' => $cat->id]) }}"
                             class="flex items-center gap-2 p-3 rounded-lg bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
                             <div
                                 class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">

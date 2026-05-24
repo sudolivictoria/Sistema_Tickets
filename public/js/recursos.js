@@ -32,7 +32,7 @@ window.filtrar = function (catId, event) {
             "hover:text-[#04003B]",
         );
     });
-   
+
     let botonActivo;
 
     //---Filtrado desde evento o url
@@ -59,14 +59,14 @@ window.filtrar = function (catId, event) {
 };
 
 //---obtener el filtrado desde el
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
     const params = new URLSearchParams(window.location.search);
-    const catId = params.get('categoria');
+    const catId = params.get("categoria");
 
     if (catId) {
         console.log("Filtrado automático desde URL para categoría:", catId);
         setTimeout(() => {
-            window.filtrar(catId); 
+            window.filtrar(catId);
         }, 100);
     }
 });
@@ -78,18 +78,33 @@ window.abrirVisor = function (url, titulo = "Recurso") {
     const tituloVisor = document.getElementById("visor-titulo");
     const iconoVisor = document.getElementById("visor-icono");
 
+    //--detectar tipo de dispositivo
+    const esMovil =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+        );
+
     tituloVisor.innerText = titulo;
     visor.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#04003B]"></div>`;
+
     //--cargar contenido
     if (ext === "pdf") {
         iconoVisor.innerText = "picture_as_pdf";
-        setTimeout(() => {
-            visor.innerHTML = `
-              <iframe src="${url}#view=FitH&toolbar=1"
-                class="w-full h-full border-none opacity-0 transition-opacity duration-500"
-                onload="this.classList.remove('opacity-0')">
-            </iframe>`;
-        }, 400);
+
+        //--si es movil
+        if (esMovil) {
+            window.open(url, "_blank");
+            cerrarVisor();
+            return;
+        } else {
+            setTimeout(() => {
+                visor.innerHTML = `
+                <iframe src="${url}#view=FitH&toolbar=1"
+                    class="w-full h-full border-none opacity-0 transition-opacity duration-500"
+                    onload="this.classList.remove('opacity-0')">
+                </iframe>`;
+            }, 400);
+        }
     } else {
         iconoVisor.innerText = "movie";
         visor.innerHTML = `

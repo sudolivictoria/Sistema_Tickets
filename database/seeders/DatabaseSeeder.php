@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Estado::create([
-            'nombre_estado' => 'no-corresponde'
+            'nombre_estado' => 'no corresponde'
         ]);
 
 
@@ -119,7 +119,7 @@ class DatabaseSeeder extends Seeder
 
         TipoSolicitud::create([
             'nombre_tipo_solicitud' => 'REQUERIMIENTO DE PERSONAL',
-            'descripcion_solicitud' => null,
+            'descripcion_solicitud' => 'Solicitud de nuevo personal, cambio de personal, eliminación de personal o cualquier requerimiento relacionado con el personal',
             'categoria_id' => $categoriaRRHH->id,
         ]);
     }

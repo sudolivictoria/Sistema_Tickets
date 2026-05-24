@@ -198,7 +198,7 @@ class AdminUnidadController extends Controller
             ->with('success', $mensajeFlash);
     }
 
-      //--metodos lado del cliente
+    //--metodos lado del cliente
     public function misTickets()
     {
         $misTickets = Ticket::where('user_id', Auth::id())
@@ -213,7 +213,7 @@ class AdminUnidadController extends Controller
     {
         $categorias = CategoriaManual::all();
         $manuales = Manual::with('categoria')->latest()->get();
-        return view('admin.recursos', compact('categorias', 'manuales'));
+        return view('gestor.recursos', compact('categorias', 'manuales'));
     }
 
     //------------------------------metodos del lado del administrador---------------------------------------------
@@ -296,5 +296,8 @@ class AdminUnidadController extends Controller
         return view('gestor.mis_asignados', compact('tickets', 'tecnicos', 'prioridades'));
     }
 
-  
+    public function historial()
+    {
+        return view('gestor.historial');
+    }
 }
