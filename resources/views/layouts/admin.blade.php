@@ -65,6 +65,7 @@
     class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display overflow-hidden">
 
 
+    <!--Preloader-->
     <div id="preloader"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-1000">
         <div class="flex flex-col items-center">
@@ -99,7 +100,7 @@
 
             <aside class="w-64 bg-secondary flex flex-col shrink-0 z-10 shadow-2xl overflow-y-auto">
                 <div class="p-4 flex flex-col h-full">
-                    <nav class="flex flex-col gap-1 flex-1">
+                    <nav class="flex flex-col space-y-1 flex-1">
                         <a class="flex items-center gap-3 px-4 py-3 mt-1 {{ request()->routeIs('admin.dashboard') ? 'bg-primary text-secondary shadow-lg' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold mb-4 transition-all"
                             href="{{ route('admin.dashboard') }}">
                             <span class="material-symbols-outlined">dashboard</span>
@@ -134,15 +135,15 @@
                             <span class="text-sm">Gestión Recursos</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('admin.gestion-recursos') }}">
-                            <span class="material-symbols-outlined text-xl">folder_shared</span>
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.historial') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('admin.historial') }}">
+                            <span class="material-symbols-outlined text-xl">contract</span>
                             <span class="text-sm">Historial</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('admin.gestion-recursos') }}">
-                            <span class="material-symbols-outlined text-xl">folder_shared</span>
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.reportes') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('admin.reportes') }}">
+                            <span class="material-symbols-outlined text-xl">analytics</span>
                             <span class="text-sm">Reportes</span>
                         </a>
 
@@ -203,6 +204,7 @@
     <script src="{{ asset('js/auto-refresco.js') }}"></script>
 
     <script>
+        //-----------preloader
         window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');

@@ -1,12 +1,11 @@
 @extends('layouts.gestor')
 
 @section('content')
-
     <div class="flex justify-between items-center mb-8">
         <div>
             <div class="flex items-center gap-4">
                 <span class="text-4xl font-medium text-slate-600">
-                    Hola, <span class="text-secondary font-bold">{{ auth()->user()->name ?? 'Administrador'}}</span>
+                    Hola, <span class="text-secondary font-bold">{{ auth()->user()->name ?? 'Administrador' }}</span>
                 </span>
             </div>
             <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y resolución eficiente de
@@ -19,7 +18,7 @@
         </div>
     </div>
 
-    {{--Estadísticas Generales--}}
+    {{-- Estadísticas Generales --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div
             class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500 flex items-center gap-5 hover:translate-y-[-4px] transition-all duration-300">
@@ -59,7 +58,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div class="lg:col-span-3 space-y-8">
 
-            {{--Rendimiento Anual--}}
+            {{-- Rendimiento Anual --}}
             <div id="contenedor-grafico" class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
                 <div class="mb-10 flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -141,9 +140,9 @@
                     <span class="w-1.5 h-4 bg-primary rounded-full"></span> Recursos
                 </h4>
 
-                {{--contenedor de categorias con scroll--}}
+                {{-- contenedor de categorias con scroll --}}
                 <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
-                    @foreach($categorias as $cat)
+                    @foreach ($categorias as $cat)
                         <a href="{{ route('admin.recursos', ['categoria' => $cat->id]) }}"
                             class="flex items-center gap-2 p-3 rounded-lg bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
                             <div
@@ -270,7 +269,7 @@
         </div>
     </div>
 
-    {{------------------------------------------------MODAL DE DETALLE-----------------------------------------}}
+    {{-- ----------------------------------------------MODAL DE DETALLE--------------------------------------- --}}
     <div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
@@ -291,7 +290,7 @@
                                 <label class="text-[11px] font-black uppercase tracking-widest text-secondary">Fecha de
                                     Apertura:</label>
                                 <span id="modalFechaApertura"
-                                    class="font-bold bg-slate-100 px-2 py-0.5 rounded-md text-slate-700">---</span>
+                                    class="font-black text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md">---</span>
                             </div>
                         </div>
 
@@ -336,8 +335,8 @@
             </div>
         </div>
     </div>
-    
-    {{------------------------------------------ MODAL DE USUARIO ------------------------------------------}}
+
+    {{-- ---------------------------------------- MODAL DE USUARIO ---------------------------------------- --}}
     <div id="modalUsuario" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 py-6">
             <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModalUsuario()"></div>
@@ -404,7 +403,8 @@
                             <span class="material-symbols-outlined text-primary text-xl">call</span>
                             <div>
                                 <label
-                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Teléfono /
+                                    class="text-[10px] font-black text-secondary uppercase tracking-widest block">Teléfono
+                                    /
                                     Ext.</label>
                                 <p id="userTelefono" class="text-sm text-slate-700 font-bold">---</p>
                             </div>

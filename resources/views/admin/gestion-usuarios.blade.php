@@ -1,13 +1,6 @@
 @extends('layouts.admin')
 
 @section('content')
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwind.min.css">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <link rel="stylesheet" href="{{ asset('css/tickets.css') }}">
 
     <div class="space-y-6">
@@ -49,7 +42,7 @@
             {{-- TABLA --}}
             <table id="userTable" class="w-full text-left border-separate border-spacing-0">
                 <thead>
-                    <tr class="bg-slate-50 text-[14px] uppercase text-[#008F7E] font-black tracking-widest">
+                    <tr class="bg-slate-50 text-[13px] uppercase text-[#008F7E] font-black tracking-widest">
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Nombre</th>
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Rol</th>
                         <th class="px-4 py-4 border-b border-slate-200 font-black">Email</th>
@@ -77,21 +70,21 @@
                             </td>
                             <td class="px-4 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
-                                    {{-- BOTÓN EDITAR --}}
+                                    {{--BOTÓN EDITAR--}}
                                     <button type="button" onclick="abrirModal('editar', {{ json_encode($user) }})"
                                         @disabled($user->id === auth()->id())
-                                        class="p-1 rounded-md {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-105 transition-transform' }}">
-                                        <span class="material-symbols-outlined text-[10px]">edit</span>
+                                        class="p-2 rounded-lg {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-200 hover:scale-105 transition-transform' }}">
+                                        <span class="material-symbols-outlined text-[16px]">edit</span>
                                     </button>
 
-                                    {{-- BOTÓN ESTADO ACTIVO / DESACTIVADO --}}
+                                    {{--BOTÓN ESTADO ACTIVO / DESACTIVADO--}}
                                     <form action="{{ route('admin.usuarios.toggle', $user->id) }}" method="POST" class="m-0">
                                         @csrf @method('PATCH')
 
                                         <button type="submit" @disabled($user->id === auth()->id())
-                                            class="p-1 rounded-md {{ $user->activo ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600' }} 
+                                            class="p-2 rounded-lg {{ $user->activo ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-200' }} 
                                             {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
-                                            <span class="material-symbols-outlined text-[10px]">power_settings_new</span>
+                                            <span class="material-symbols-outlined text-[16px]">power_settings_new</span>
                                         </button>
                                     </form>
                                 </div>

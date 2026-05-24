@@ -122,6 +122,12 @@
                             <span class="text-sm">Mis Asignados</span>
                         </a>
 
+                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.historial') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                            href="{{ route('gestor.historial') }}">
+                            <span class="material-symbols-outlined text-xl">contract</span>
+                            <span class="text-sm">Historial</span>
+                        </a>
+
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-2 px-4 font-black">Servicios
                         </p>
 
@@ -210,4 +216,5 @@
         });
     </script>
 </body>
+
 </html>

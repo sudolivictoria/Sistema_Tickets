@@ -198,7 +198,25 @@ class AdminUnidadController extends Controller
             ->with('success', $mensajeFlash);
     }
 
-    //---metodos del lado del administrador---
+      //--metodos lado del cliente
+    public function misTickets()
+    {
+        $misTickets = Ticket::where('user_id', Auth::id())
+            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('gestor.mis-tickets', compact('misTickets'));
+    }
+
+    public function recursos()
+    {
+        $categorias = CategoriaManual::all();
+        $manuales = Manual::with('categoria')->latest()->get();
+        return view('admin.recursos', compact('categorias', 'manuales'));
+    }
+
+    //------------------------------metodos del lado del administrador---------------------------------------------
     public function asignarTickets()
     {
         $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
@@ -278,21 +296,5 @@ class AdminUnidadController extends Controller
         return view('gestor.mis_asignados', compact('tickets', 'tecnicos', 'prioridades'));
     }
 
-    //--metodos lado del cliente
-    public function misTickets()
-    {
-        $misTickets = Ticket::where('user_id', Auth::id())
-            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('gestor.mis-tickets', compact('misTickets'));
-    }
-
-    public function recursos()
-    {
-        $categorias = CategoriaManual::all();
-        $manuales = Manual::with('categoria')->latest()->get();
-        return view('admin.recursos', compact('categorias', 'manuales'));
-    }
+  
 }

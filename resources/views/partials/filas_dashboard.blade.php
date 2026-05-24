@@ -2,17 +2,17 @@
     <tr class="hover:bg-slate-50/80 transition-all ticket-fila" data-estado-id="{{ $ticket->estado_id }}">
         <td class="px-2 py-4 font-bold text-slate-900 whitespace-nowrap">
             <div class="flex items-center">
-                {{-- Prefijo con estilo sutil --}}
+                {{--prefijo ticket--}}
                 <span class="text-secondary font-black text-[12px]">#</span>
                 <span class="text-secondary font-black text-[12px] tracking-tighter">TK</span>
 
-                {{-- Número principal destacado --}}
+                {{--numero principal--}}
                 <span class="text-secondary font-black tracking-tight text-[12px]">
                     {{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
                 </span>
             </div>
         </td>
-        <!--DATOS DEL USUARIO-->
+        <!--datos del usuario-->
         <td class="px-2 py-4">
             <div class="flex flex-col">
                 <button type="button" onclick="verUsuario(
@@ -31,7 +31,7 @@
                 </button>
             </div>
         </td>
-        <!-- FINAL DATOS DE USUARIO -->
+        <!--final datos del usuario-->
 
         <td class="px-2 py-4">
             @php
@@ -70,7 +70,7 @@
             {{ $ticket->tecnico->name ?? 'Pendiente de Asignación' }}
         </td>
 
-        {{-- BOTON DESCRIPCION DEL TICKET --}}
+        {{--descripcion del ticket--}}
         <td class="px-2 py-4 text-center">
             <button type="button"
                 onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}', '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}', '{{ addslashes($ticket->created_at->format('d/m/Y')) }}')"

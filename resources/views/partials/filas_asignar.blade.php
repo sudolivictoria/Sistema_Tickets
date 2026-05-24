@@ -2,11 +2,11 @@
     <tr class="hover:bg-slate-50/80 transition-all">
         <td class="px-4 py-4 font-black whitespace-nowrap">
             <div class="flex items-center">
-                {{-- Prefijo con estilo sutil --}}
+                {{--prefijo ticket--}}
                 <span class="text-secondary font-black text-[12px]">#</span>
                 <span class="text-secondary font-black text-[12px] tracking-tighter">TK</span>
 
-                {{-- Número principal destacado --}}
+                {{--numero principal--}}
                 <span class="text-secondary font-black tracking-tight text-[12px]">
                     {{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
                 </span>
@@ -31,9 +31,9 @@
                 </button>
             </div>
         </td>
-        <!-- FINAL DATOS DE USUARIO -->
+        <!--FINAL DATOS DE USUARIO-->
 
-        {{-- Estado --}}
+        {{--Estado--}}
         <td class="px-4 py-4">
             @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
@@ -50,7 +50,7 @@
                 class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
         </td>
 
-        {{-- Prioridad --}}
+        {{--Prioridad--}}
         <td class="px-4 py-4" data-search="{{ $ticket->prioridad->nombre_prioridad }}">
             @php
                 $rutaPrioridad = Auth::user()->rol_id == 1 ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad';
@@ -67,7 +67,7 @@
             </form>
         </td>
 
-        {{-- Técnico --}}
+        {{--Técnico--}}
         <td class="px-4 py-4">
             @php
                 $rutaTecnico = Auth::user()->rol_id == 1 ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico';
@@ -86,12 +86,12 @@
             </form>
         </td>
 
-        {{-- Fechas --}}
+        {{--Fechas--}}
         <td class="px-4 py-4 font-black data-order="{{ $ticket->created_at->timestamp }}">
             {{ $ticket->created_at->format('d/m/Y') }}
         </td>
 
-        {{-- Botón Detalle (Descripción) --}}
+        {{--Botón Detalle (Descripción)--}}
         <td class="px-4 py-4 text-center">
             <button type="button"
                 onclick="verDetalleAsignar('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}', '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}')"

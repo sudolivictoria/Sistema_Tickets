@@ -24,7 +24,7 @@ class AdminController extends Controller
     public function index()
     {
         $miUnidadId = Auth::user()->unidad_id;
-         $estadosCerrados = [3, 4, 5];
+        $estadosCerrados = [3, 4, 5];
 
         //--tickets asignados por unidad del admin autenticado
         $noAsignados = Ticket::whereNull('tecnico_id')
@@ -203,7 +203,25 @@ class AdminController extends Controller
             ->with('success', $mensajeFlash);
     }
 
-    //---metodos para administracion---
+    //---metodos para cliente---
+    public function misTickets()
+    {
+        $misTickets = Ticket::where('user_id', Auth::id())
+            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin.mis-tickets', compact('misTickets'));
+    }
+
+    public function recursos()
+    {
+        $categorias = CategoriaManual::all();
+        $manuales = Manual::with('categoria')->latest()->get();
+        return view('admin.recursos', compact('categorias', 'manuales'));
+    }
+
+    //------------------------------metodos para administracion---------------------------------------------
     public function asignarTickets()
     {
         $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
@@ -296,21 +314,13 @@ class AdminController extends Controller
         return view('admin.gestion-recursos', compact('categorias', 'manuales'));
     }
 
-    //---metodos para cliente---
-    public function misTickets()
+    public function historial()
     {
-        $misTickets = Ticket::where('user_id', Auth::id())
-            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('admin.mis-tickets', compact('misTickets'));
+        return view('admin.historial');
     }
 
-    public function recursos()
+    public function reportes()
     {
-        $categorias = CategoriaManual::all();
-        $manuales = Manual::with('categoria')->latest()->get();
-        return view('admin.recursos', compact('categorias', 'manuales'));
+        return view('admin.reportes');
     }
 }

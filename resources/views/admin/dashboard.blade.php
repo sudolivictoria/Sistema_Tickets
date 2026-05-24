@@ -212,7 +212,7 @@
                                 <label class="text-[11px] font-black uppercase tracking-widest text-secondary">Fecha de
                                     Apertura:</label>
                                 <span id="modalFechaApertura"
-                                    class="font-bold bg-slate-100 px-2 py-0.5 rounded-md text-slate-700">---</span>
+                                    class="font-black text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md">---</span>
                             </div>
                         </div>
 
