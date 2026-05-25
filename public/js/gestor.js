@@ -49,6 +49,23 @@ document.addEventListener("DOMContentLoaded", function () {
         ejecutarFiltros(estado);
     };
 
+    $(".btn-ver-detalle").on("click", function () {
+        const asunto = $(this).data("asunto");
+        const descripcion = $(this).data("descripcion");
+        const tipo = $(this).data("tipo");
+        const fecha = $(this).data("fecha");
+        verDetalle(asunto, descripcion, tipo, fecha);
+    });
+
+    $(".btn-ver-usuario").on("click", function () {
+        const nombre = $(this).data("nombre");
+        const email = $(this).data("email");
+        const unidad = $(this).data("unidad");
+        const cargo = $(this).data("cargo");
+        const telefono = $(this).data("telefono");
+        verUsuario(nombre, email, unidad, cargo, telefono);
+    });
+
     /**
      * Gestión de Modal de detalles
      */

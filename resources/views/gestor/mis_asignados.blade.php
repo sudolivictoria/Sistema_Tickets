@@ -5,7 +5,7 @@
     <div class="p-1">
         <div class="mb-10 border-b border-slate-200 pb-6">
             <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
-                <span class="material-symbols-outlined text-4xl text-primary">confirmation_number</span>
+                <span class="material-symbols-outlined text-4xl text-primary">assignment_ind</span>
                 Mis Asignados
             </h2>
         </div>
@@ -15,6 +15,18 @@
             <div class="p-5">
                 {{-- Cabecera con Filtros y Buscador --}}
                 <div class="p-5 flex flex-wrap gap-4 justify-between items-center bg-white">
+                    <div class="flex items-center gap-4">
+                        <div class="flex gap-2" id="filtrosEstado">
+                            <button type="button" onclick="filtrarEstado('todos', this)"
+                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
+                            <button type="button" onclick="filtrarEstado('procesando', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
+                            <button type="button" onclick="filtrarEstado('resuelto,equivocado,no corresponde', this)"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Cerrado</button>
+                        </div>
+                    </div>
+
+                    <!---buscador-->
                     <div class="relative w-full md:w-72">
                         <span
                             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
@@ -66,7 +78,7 @@
                                 <label class="text-[11px] font-black uppercase tracking-widest text-secondary">Fecha de
                                     Apertura:</label>
                                 <span id="modalFechaApertura"
-                                    class="font-bold bg-slate-100 px-2 py-0.5 rounded-md text-slate-700">---</span>
+                                    class="font-black bg-slate-100 px-2 py-0.5 rounded-md text-slate-700">---</span>
                             </div>
                         </div>
 
@@ -201,7 +213,7 @@
 
 
 @push('scripts')
-    <script src="{{ asset('js/asignar-tickets.js') }}"></script>
+    <script src="{{ asset('js/mis-asignados.js') }}"></script>
 
     @if (session('sweet_success'))
         <script>

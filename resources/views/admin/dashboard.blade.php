@@ -21,7 +21,7 @@
     <!--estadisticas generales-->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div
-            class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500 flex items-center gap-5 hover:translate-y-[-4px] transition-all duration-300">
+            class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500 flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-orange-600 text-3xl">notification_important</span>
             </div>
@@ -32,9 +32,9 @@
         </div>
 
         <div
-            class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-blue-500 flex items-center gap-5 hover:translate-y-[-4px] transition-all duration-300">
+            class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-secondary flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-blue-600 text-3xl">pending_actions</span>
+                <span class="material-symbols-outlined text-secondary text-3xl">pending_actions</span>
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">En Proceso</p>
@@ -43,7 +43,7 @@
         </div>
 
         <div
-            class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-primary flex items-center gap-5 hover:translate-y-[-4px] transition-all duration-300">
+            class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-primary flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-primary text-3xl">verified</span>
             </div>

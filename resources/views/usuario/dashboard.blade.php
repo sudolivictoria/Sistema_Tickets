@@ -7,7 +7,7 @@
         <div class="relative z-10 flex flex-col xl:flex-row justify-between xl:items-end gap-6">
             <div>
                 <p class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-2">Sistema de Solicitudes</p>
-                <h2 class="text-2xl md:text-4xl font-black text-white tracking-tighter leading-tight">Hola,
+                <h2 class="text-2xl md:text-4xl sm:text-xl font-black text-white tracking-tighter leading-tight">Hola,
                     {{ auth()->user()->name ?? 'Usuario' }}
                 </h2>
                 <p class="text-white/90 mt-3 max-w-200 text-sm font-medium italic">

@@ -49,7 +49,7 @@
     <div id="modalTicketAsignar" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 py-8">
-            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="cerrarModalAsignar()"></div>
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="cerrarModal()"></div>
 
             <div
                 class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-primary z-10 animate-fade-in">
@@ -62,7 +62,7 @@
                                 ---</h3>
                         </div>
 
-                        <button onclick="cerrarModalAsignar()"
+                        <button onclick="cerrarModal()"
                             class="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all shrink-0">
                             <span class="material-symbols-outlined text-[22px]">close</span>
                         </button>
@@ -94,7 +94,7 @@
                     </div>
 
                     <div class="mt-6 pt-4 border-t border-slate-100">
-                        <button onclick="cerrarModalAsignar()"
+                        <button onclick="cerrarModal()"
                             class="w-full py-3.5 bg-primary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30">
                             Cerrar Detalle
                         </button>

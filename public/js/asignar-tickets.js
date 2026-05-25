@@ -40,7 +40,7 @@ window.inicializarTablaTickets = function (
         responsive: false,
         autoWidth: false,
         pageLength: 5,
-        order: [[columnaOrden, sentido]],
+        order: [0, "asc"],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
@@ -49,30 +49,50 @@ window.inicializarTablaTickets = function (
         .on("keyup", function () {
             table.search(this.value).draw();
         });
+
+    $("#tablaAsignarTickets").on("click", ".btn-ver-detalle", function () {
+        const asunto = $(this).data("asunto");
+        const descripcion = $(this).data("descripcion");
+        const tipo = $(this).data("tipo");
+        verDetalle(asunto, descripcion, tipo);
+    });
+
+    $("#tablaAsignarTickets").on("click", ".btn-ver-usuario", function () {
+        const nombre = $(this).data("nombre");
+        const email = $(this).data("email");
+        const unidad = $(this).data("unidad");
+        const cargo = $(this).data("cargo");
+        const telefono = $(this).data("telefono");
+        verUsuario(nombre, email, unidad, cargo, telefono);
+    });
 };
 
 /****************** FILTROS ******************/
+window.filtrarEstado = function (estado, btn) {
+    //--actualizar estilos de botones
+    $(".filtro-btn")
+        .removeClass("bg-secondary text-white shadow-md")
+        .addClass("bg-slate-100 text-slate-500");
+    $(btn)
+        .removeClass("bg-slate-100 text-slate-500")
+        .addClass("bg-secondary text-white shadow-md");
+
+    let valorBusqueda = "";
+    if (estado !== "todos") {
+        const estados = String(estado)
+            .split(",")
+            .map((e) => e.trim());
+
+        valorBusqueda = `(${estados.join("|")})`;
+    }
+    //---filtros de estado
+    table.column(2).search(valorBusqueda, true, false, true).draw();
+};
 
 /**
  * Gestión de Modal de detalles
  */
-window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
-    const modal = document.getElementById("modalTicket");
-    const titulo = document.getElementById("modalTitulo");
-    const desc = document.getElementById("modalDescripcion");
-    const tipo = document.getElementById("modalTipoSolicitud");
-    const fecha = document.getElementById("modalFechaApertura");
-    if (modal && titulo && desc && tipo && fecha) {
-        titulo.innerText = asunto;
-        desc.innerText = descripcion;
-        tipo.innerText = tipoNombre;
-        fecha.innerText = fechaApertura;
-        modal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-    }
-};
-
-window.verDetalleAsignar = function (asunto, descripcion, tipoNombre) {
+window.verDetalle = function (asunto, descripcion, tipoNombre) {
     const modal = document.getElementById("modalTicketAsignar");
     const titulo = document.getElementById("modalTituloAsignar");
     const desc = document.getElementById("modalDescripcionAsignar");
@@ -86,20 +106,11 @@ window.verDetalleAsignar = function (asunto, descripcion, tipoNombre) {
     }
 };
 
-
 /**
  * Cerrar modal
  */
-window.cerrarModalAsignar = function () {
+window.cerrarModal = function () {
     const modal = document.getElementById("modalTicketAsignar");
-    if (modal) {
-        modal.classList.add("hidden");
-        document.body.style.overflow = "auto";
-    }
-};
-
-window.cerrarModalMisAsignados = function () {
-    const modal = document.getElementById("modalTicket");
     if (modal) {
         modal.classList.add("hidden");
         document.body.style.overflow = "auto";
@@ -150,174 +161,6 @@ window.cerrarModalUsuario = function () {
 //------------------AUTO REFRESCO-----------------
 document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaAsignarTickets")) {
-        window.inicializarTablaTickets("#tablaAsignarTickets", 5, "asc");
-    }
-    if (document.querySelector("#tablaMisAsignados")) {
-        window.inicializarTablaTickets("#tablaMisAsignados", 5, "desc");
+        window.inicializarTablaTickets("#tablaAsignarTickets");
     }
 });
-
-//------------------CONFIRMAR RESOLVER TICKET-----------------
-function confirmarResolver(btn) {
-    const form = btn.closest("form");
-    const url = form.action;
-    Swal.fire({
-        title: "¿Marcar como Resuelto?",
-        text: "Esta acción registrará la hora de cierre del ticket.",
-        icon: "question",
-        iconColor: "#04003B",
-        showCancelButton: true,
-        confirmButtonColor: "#84cc16",
-        confirmButtonText: "Sí, resolver",
-        cancelButtonText: "Cancelar",
-        cancelButtonColor: "#ef4444",
-        customClass: { popup: "rounded-3xl" },
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]',
-                    ).content,
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams(new FormData(form)),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        autoRefrescoUniversal();
-                        Swal.fire({
-                            title: "¡Ticket Resuelto!",
-                            text: data.message,
-                            icon: "success",
-                            iconColor: "#84cc16",
-                            timer: 3000,
-                            showConfirmButton: false,
-                            customClass: { popup: "rounded-3xl" },
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    Swal.fire(
-                        "Error",
-                        "No se pudo procesar la solicitud",
-                        "error",
-                    );
-                });
-        }
-    });
-}
-
-//---------------CONFIRMAR TICKET EQUIVOCADO-----------------
-function confirmarEquivocado(btn) {
-    const form = btn.closest("form");
-    const url = form.action;
-    Swal.fire({
-        title: "¿Marcar como Equivocado?",
-        text: "Esta acción registrará la hora de cierre del ticket.",
-        icon: "question",
-        iconColor: "#04003B",
-        showCancelButton: true,
-        confirmButtonColor: "#84cc16",
-        confirmButtonText: "Sí, marcar",
-        cancelButtonText: "Cancelar",
-        cancelButtonColor: "#ef4444",
-        customClass: { popup: "rounded-3xl" },
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]',
-                    ).content,
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams(new FormData(form)),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        autoRefrescoUniversal();
-                        Swal.fire({
-                            title: "¡Ticket Marcado como Equivocado!",
-                            text: data.message,
-                            icon: "success",
-                            iconColor: "#84cc16",
-                            timer: 3000,
-                            showConfirmButton: false,
-                            customClass: { popup: "rounded-3xl" },
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    Swal.fire(
-                        "Error",
-                        "No se pudo procesar la solicitud",
-                        "error",
-                    );
-                });
-        }
-    });
-}
-
-//---------------CONFIRMAR TICKET NO CORRESPONDE-----------------
-function confirmarNoCorresponde(btn) {
-    const form = btn.closest("form");
-    const url = form.action;
-    Swal.fire({
-        title: "¿Marcar No Corresponde?",
-        text: "Esta acción registrará la hora de cierre del ticket.",
-        icon: "question",
-        iconColor: "#04003B",
-        showCancelButton: true,
-        confirmButtonColor: "#84cc16",
-        confirmButtonText: "Sí, marcar",
-        cancelButtonText: "Cancelar",
-        cancelButtonColor: "#ef4444",
-        customClass: { popup: "rounded-3xl" },
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]',
-                    ).content,
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams(new FormData(form)),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        autoRefrescoUniversal();
-                        Swal.fire({
-                            title: "¡Ticket Marcado como No Corresponde!",
-                            text: data.message,
-                            icon: "success",
-                            iconColor: "#84cc16",
-                            timer: 3000,
-                            showConfirmButton: false,
-                            customClass: { popup: "rounded-3xl" },
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    Swal.fire(
-                        "Error",
-                        "No se pudo procesar la solicitud",
-                        "error",
-                    );
-                });
-        }
-    });
-}

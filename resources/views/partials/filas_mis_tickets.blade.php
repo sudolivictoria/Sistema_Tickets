@@ -33,7 +33,7 @@
                 };
             @endphp
             <span
-                class="status-label px-2 py-1 rounded-md border font-black text-[10px] uppercase whitespace-nowrap {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
+                class="status-label px-2 py-1 rounded-full border font-black text-[10px] uppercase whitespace-nowrap {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
         </td>
 
         {{-- Prioridad --}}
@@ -48,7 +48,7 @@
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp
-            <span class="px-2 py-1 rounded-md border font-black text-[10px] uppercase {{ $clasePrio }}">
+            <span class="px-2 py-1 rounded-full border font-black text-[10px] uppercase {{ $clasePrio }}">
                 {{ $prio }}
             </span>
         </td>
@@ -59,7 +59,7 @@
         </td>
 
         {{-- Fechas --}}
-        <td class="px-4 py-4 font-black data-order="{{ $ticket->created_at->timestamp }}">
+        <td class="px-4 py-4 font-black data-order=" {{ $ticket->created_at->timestamp }}">
             {{ $ticket->created_at->format('d/m/Y') }}
         </td>
 
@@ -70,8 +70,9 @@
         {{-- Botón Detalle (Descripción) --}}
         <td class="px-4 py-4 text-center">
             <button type="button"
-                onclick="verDetalle('{{ addslashes($ticket->asunto) }}', '{{ addslashes($ticket->descripcion) }}', '{{ addslashes($ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A') }}')"
-                class="p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto">
+                class="btn-ver-detalle p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
+                data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
+                data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

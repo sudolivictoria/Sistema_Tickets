@@ -16,6 +16,13 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    $(document).on("click", ".btn-ver-detalle", function () {
+        const asunto = $(this).data("asunto");
+        const descripcion = $(this).data("descripcion");
+        const tipo = $(this).data("tipo");
+        verDetalle(asunto, descripcion, tipo);
+    });
 });
 
 //---funciones para ver detalles de los tickets

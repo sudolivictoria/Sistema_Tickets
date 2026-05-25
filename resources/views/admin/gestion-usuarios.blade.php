@@ -64,7 +64,7 @@
                             <td class="px-4 py-4 font-black">{{ $user->telefono ?? 'N/A'}}</td>
                             <td class="px-4 py-4">
                                 <span
-                                    class="px-2 py-1 rounded-md border font-black text-[9px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-[#008F7E] border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">
+                                    class="px-2 py-1 rounded-full border font-black text-[9px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-[#008F7E] border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">
                                     {{ $user->activo == 1 ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </td>
@@ -73,8 +73,8 @@
                                     {{--BOTÓN EDITAR--}}
                                     <button type="button" onclick="abrirModal('editar', {{ json_encode($user) }})"
                                         @disabled($user->id === auth()->id())
-                                        class="p-2 rounded-lg {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-200 hover:scale-105 transition-transform' }}">
-                                        <span class="material-symbols-outlined text-[16px]">edit</span>
+                                        class="p-2 rounded-xl {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-105 transition-transform' }}">
+                                        <span class="material-symbols-outlined text-[18px]">edit</span>
                                     </button>
 
                                     {{--BOTÓN ESTADO ACTIVO / DESACTIVADO--}}
@@ -82,9 +82,9 @@
                                         @csrf @method('PATCH')
 
                                         <button type="submit" @disabled($user->id === auth()->id())
-                                            class="p-2 rounded-lg {{ $user->activo ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-200' }} 
+                                            class="p-2 rounded-xl {{ $user->activo ? 'bg-red-50 text-red-600 hover:bg-red-100 hover:scale-105 transition-transform' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-200 hover:scale-105 transition-transform' }} 
                                             {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
-                                            <span class="material-symbols-outlined text-[16px]">power_settings_new</span>
+                                            <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
                                         </button>
                                     </form>
                                 </div>

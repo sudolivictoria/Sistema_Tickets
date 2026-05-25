@@ -7,6 +7,7 @@ use App\Mail\NuevaSolicitudUnidadMail;
 use App\Mail\TicketCreadoMail;
 use App\Models\Categoria;
 use App\Models\CategoriaManual;
+use App\Models\Estado;
 use App\Models\Manual;
 use App\Models\Prioridad;
 use App\Models\Ticket;
@@ -281,10 +282,8 @@ class AdminUnidadController extends Controller
     public function misAsignados()
     {
         $user = Auth::user();
-        $estadosCerrados = [3, 4, 5];
         $tickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tipo_solicitud', 'categoria'])
             ->where('tecnico_id', $user->id)
-            ->whereNotIn('estado_id', $estadosCerrados)
             ->latest()
             ->get();
 
@@ -298,6 +297,40 @@ class AdminUnidadController extends Controller
 
     public function historial()
     {
-        return view('gestor.historial');
+        $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
+
+        //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
+        $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
+            ->whereHas('categoria', function ($q) use ($miUnidadId) {
+                $q->where('unidad_id', $miUnidadId);
+            })
+            ->latest()
+            ->get();
+
+
+        //----metricas
+        $cargaTrabajo = $tickets->filter(function ($ticket) {
+            return Carbon::parse($ticket->created_at)->isToday();
+        })->count();
+
+        $resueltos24h = $tickets->whereIn('estado_id', [3, 4, 5])
+            ->filter(function ($ticket) {
+                return $ticket->fecha_cierre && Carbon::parse($ticket->fecha_cierre)->gte(now()->subDay());
+            })
+            ->count();
+
+        //-----tasa cierre mensual
+        $ticketsDelMes = $tickets->filter(function ($ticket) {
+            return Carbon::parse($ticket->created_at)->isCurrentMonth();
+        });
+
+        $totalTickets = $ticketsDelMes->count();
+        $cerradosTickets = $ticketsDelMes->whereIn('estado_id', [3, 4, 5])->count();
+        $tasaCierre = $totalTickets > 0 ? round(($cerradosTickets / $totalTickets) * 100) : 0;
+
+        $estados = Estado::all();
+
+
+        return view('admin.historial', compact('tickets', 'cargaTrabajo', 'resueltos24h', 'tasaCierre', 'estados'));
     }
 }

@@ -46,6 +46,13 @@ window.inicializarTablaTickets = function (selectorId) {
         .on("keyup", function () {
             table.search(this.value).draw();
         });
+
+    $("#tablaMisTickets").on("click", ".btn-ver-detalle", function () {
+        const asunto = $(this).data("asunto");
+        const descripcion = $(this).data("descripcion");
+        const tipo = $(this).data("tipo");
+        verDetalle(asunto, descripcion, tipo);
+    });
 };
 
 /**

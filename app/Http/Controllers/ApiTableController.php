@@ -36,7 +36,7 @@ class ApiTableController extends Controller
             }
 
             if ($tipo == 'mis_asignados') {
-                $query->where('estado_id', 2)->where('tecnico_id', $user->id);
+                $query->where('tecnico_id', $user->id);
             }
         }
 
