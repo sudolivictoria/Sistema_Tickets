@@ -20,7 +20,6 @@ function autoRefrescoUniversal() {
             const tablaElement = tablaBody.closest("table");
 
             if ($.fn.DataTable.isDataTable(tablaElement)) {
-                //=== SOLUCIÓN PROFESIONAL PARA DATATABLES ===
                 const selectorId = "#" + tablaElement.id;
                 $(selectorId).DataTable().destroy();
                 tablaBody.innerHTML = data.html;
