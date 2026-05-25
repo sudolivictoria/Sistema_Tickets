@@ -171,7 +171,7 @@
                 <div class="relative z-10">
                     <div
                         class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-secondary mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                        <span class="material-symbols-outlined font-black">assignment_ind</span>
+                        <span class="material-symbols-outlined font-black">approval_delegation</span>
                     </div>
                     <h4 class="text-sm font-black uppercase tracking-wider mb-2">
                         Tickets Asignados
