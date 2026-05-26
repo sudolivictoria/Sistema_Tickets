@@ -12,7 +12,7 @@
                 </span>
             </div>
         </td>
-        {{--Usuario--}}
+        {{-- Usuario --}}
         <td class="px-4 py-4">
             <div class="flex flex-col">
                 <button type="button"
@@ -31,7 +31,7 @@
             </div>
         </td>
 
-        {{--Estado--}}
+        {{-- Estado --}}
         <td class="px-4 py-4">
             @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
@@ -47,10 +47,11 @@
             <span
                 class="status-label px-2 py-1 rounded-full border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
         </td>
-        {{--Prioridad--}}
+        {{-- Prioridad --}}
         <td class="px-4 py-4" data-search="{{ $ticket->prioridad->nombre_prioridad }}">
             @php
-                $rutaPrioridad = Auth::user()->rol_id == 1 ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad';
+                $rutaPrioridad =
+                    Auth::user()->rol_id == 1 ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad';
             @endphp
             <form action="{{ route($rutaPrioridad, $ticket->id) }}" method="POST">
                 @csrf @method('PATCH')
@@ -64,14 +65,14 @@
             </form>
         </td>
 
-        {{--Reasignar o Devolver--}}
+        {{-- Reasignar o Devolver --}}
         <td class="px-4 py-4">
-            {{--ruta segun el rol--}}
+            {{-- ruta segun el rol --}}
             @php
                 $rutaTecnico = Auth::user()->rol_id == 1 ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico';
             @endphp
 
-            {{--actualizar el tecnico--}}
+            {{-- actualizar el tecnico --}}
             <form action="{{ route($rutaTecnico, $ticket->id) }}" method="POST">
                 @csrf
                 @method('PATCH')
@@ -79,15 +80,17 @@
                 <select name="tecnico_id" onchange="this.form.submit()"
                     class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer w-full">
 
-                    {{--Desasignar tecnico y mandar ticket a pendientes--}}
-                    <option value="" {{ is_null($ticket->tecnico_id) ? 'selected' : '' }} class="text-red-600 font-bold">
+                    {{-- Desasignar tecnico y mandar ticket a pendientes --}}
+                    <option value="" {{ is_null($ticket->tecnico_id) ? 'selected' : '' }}
+                        class="text-red-600 font-bold">
                         ❌ Devolver a Pendientes
                     </option>
 
-                    {{--Lista de tecnicos--}}
+                    {{-- Lista de tecnicos --}}
                     <optgroup label="Reasignar a:">
-                        @foreach($tecnicos as $tecnico)
-                            <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
+                        @foreach ($tecnicos as $tecnico)
+                            <option value="{{ $tecnico->id }}"
+                                {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
                                 👤 {{ $tecnico->name }}
                             </option>
                         @endforeach
@@ -96,53 +99,63 @@
             </form>
         </td>
 
-        {{--Detalle--}}
+        {{-- Detalle --}}
         <td class="px-4 py-4 text-center">
             <button type="button"
                 class="btn-ver-detalle p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
-                data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}" data-fecha="{{ $ticket->created_at->format('d/m/Y') }}">
+                data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}"
+                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>
 
 
-        {{--Acciones--}}
+        {{-- Acciones --}}
         <td class="px-4 py-4">
             @php
                 $prefix = Auth::user()->rol_id == 1 ? 'admin' : 'gestor';
                 $rutaResolver = $prefix . '.tickets.resolver';
                 $rutaEquivocacion = $prefix . '.tickets.equivocacion';
                 $rutaNoCorresponde = $prefix . '.tickets.no-corresponde';
+                $estaCerrado = in_array($ticket->estado_id, [3, 4, 5]);
             @endphp
 
             <div class="flex items-center justify-center gap-2">
 
+                {{-- Botón Resolver --}}
                 <form action="{{ route($rutaResolver, $ticket->id) }}" method="POST" class="form-resolver m-0">
                     @csrf
                     @method('PATCH')
-                    <button type="button" onclick="confirmarResolver(this)"
-                        class="p-2 bg-green-50 text-green-600 font-black hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm border border-green-100 flex items-center justify-center"
+                    <button type="button" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarResolver(this)' }}
+                        class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
+                {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed' : 'bg-green-50 text-green-600 border-green-100 hover:bg-green-600 hover:text-white' }}"
                         title="Marcar como Resuelto">
                         <span class="material-symbols-outlined text-[16px]">check_circle</span>
                     </button>
                 </form>
 
-                <form action="{{ route($rutaEquivocacion, $ticket->id) }}" method="POST" class="form-equivocacion m-0">
+                {{-- Botón Equivocado --}}
+                <form action="{{ route($rutaEquivocacion, $ticket->id) }}" method="POST"
+                    class="form-equivocacion m-0">
                     @csrf
                     @method('PATCH')
-                    <button type="button" onclick="confirmarEquivocado(this)"
-                        class="p-2 bg-orange-50 text-orange-600 font-black hover:bg-orange-600 hover:text-white rounded-xl transition-all shadow-sm border border-orange-100 flex items-center justify-center"
+                    <button type="button" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarEquivocado(this)' }}
+                        class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
+                {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed' : 'bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-600 hover:text-white' }}"
                         title="Marcar como Equivocado">
                         <span class="material-symbols-outlined text-[16px]">do_not_touch</span>
                     </button>
                 </form>
 
-                <form action="{{ route($rutaNoCorresponde, $ticket->id) }}" method="POST" class="form-no-corresponde m-0">
+                {{-- Botón No Corresponde --}}
+                <form action="{{ route($rutaNoCorresponde, $ticket->id) }}" method="POST"
+                    class="form-no-corresponde m-0">
                     @csrf
                     @method('PATCH')
-                    <button type="button" onclick="confirmarNoCorresponde(this)"
-                        class="p-2 bg-yellow-50 text-yellow-600 font-black hover:bg-yellow-600 hover:text-white rounded-xl transition-all shadow-sm border border-yellow-100 flex items-center justify-center"
+                    <button type="button" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarNoCorresponde(this)' }}
+                        class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
+                {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed' : 'bg-yellow-50 text-yellow-600 border-yellow-100 hover:bg-yellow-600 hover:text-white' }}"
                         title="Marcar como No Corresponde">
                         <span class="material-symbols-outlined text-[16px]">thumb_down</span>
                     </button>
@@ -150,5 +163,6 @@
 
             </div>
         </td>
+
     </tr>
 @endforeach

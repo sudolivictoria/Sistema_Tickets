@@ -109,24 +109,10 @@ window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     }
 };
 
-window.verDetalleAsignar = function (asunto, descripcion, tipoNombre) {
-    const modal = document.getElementById("modalTicketAsignar");
-    const titulo = document.getElementById("modalTituloAsignar");
-    const desc = document.getElementById("modalDescripcionAsignar");
-    const tipo = document.getElementById("modalTipoSolicitudAsignar");
-    if (modal && titulo && desc && tipo) {
-        titulo.innerText = asunto;
-        desc.innerText = descripcion;
-        tipo.innerText = tipoNombre;
-        modal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-    }
-};
-
 /**
  * Cerrar modal
  */
-window.cerrarModalMisAsignados = function () {
+window.cerrarModal = function () {
     const modal = document.getElementById("modalTicket");
     if (modal) {
         modal.classList.add("hidden");

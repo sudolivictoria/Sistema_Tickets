@@ -108,6 +108,11 @@
             </div>
         </div>
     </div>
+
+    {{-- detalle ticket --}}
+    @include('partials.detalle_ticket')
+
+    
 @endsection
 
 {{-- SCRIPTS --}}

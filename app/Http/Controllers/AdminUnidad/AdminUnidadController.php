@@ -329,8 +329,10 @@ class AdminUnidadController extends Controller
         $tasaCierre = $totalTickets > 0 ? round(($cerradosTickets / $totalTickets) * 100) : 0;
 
         $estados = Estado::all();
+        $categorias = Categoria::all();
 
 
-        return view('admin.historial', compact('tickets', 'cargaTrabajo', 'resueltos24h', 'tasaCierre', 'estados'));
+
+        return view('gestor.historial', compact('tickets', 'cargaTrabajo', 'resueltos24h', 'tasaCierre', 'estados', 'categorias'));
     }
 }
