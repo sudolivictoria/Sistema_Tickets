@@ -180,7 +180,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('scripts')
-    <script src="{{ asset('js/auto-refresco.js') }}"></script>
+    <script src="{{ asset('js/api.js') }}"></script>
 
     <script>
         window.addEventListener('load', function() {

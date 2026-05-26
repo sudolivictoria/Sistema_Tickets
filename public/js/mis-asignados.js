@@ -47,7 +47,7 @@ window.inicializarTablaTickets = function (
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
-            table.search(this.value).draw();
+            table.search(this.value).draw(false);
         });
 
     $("#tablaMisAsignados").on("click", ".btn-ver-detalle", function () {
@@ -199,7 +199,7 @@ function confirmarResolver(btn) {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        autoRefrescoUniversal();
+                        enrutadorRefresco();
                         Swal.fire({
                             title: "¡Ticket Resuelto!",
                             text: data.message,
@@ -254,7 +254,7 @@ function confirmarEquivocado(btn) {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        autoRefrescoUniversal();
+                        enrutadorRefresco();
                         Swal.fire({
                             title: "¡Ticket Marcado como Equivocado!",
                             text: data.message,
@@ -309,7 +309,7 @@ function confirmarNoCorresponde(btn) {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        autoRefrescoUniversal();
+                        enrutadorRefresco();
                         Swal.fire({
                             title: "¡Ticket Marcado como No Corresponde!",
                             text: data.message,

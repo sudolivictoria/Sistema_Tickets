@@ -20,7 +20,7 @@
                             <button type="button" onclick="filtrarEstado('todos', this)"
                                 class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
                             <button type="button" onclick="filtrarEstado('procesando', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Pendientes</button>
                             <button type="button" onclick="filtrarEstado('resuelto,equivocado,no corresponde', this)"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Cerrado</button>
                         </div>
@@ -67,22 +67,6 @@
 @push('scripts')
     <script src="{{ asset('js/mis-asignados.js') }}"></script>
 
-    @if (session('sweet_success'))
-        <script>
-            Swal.fire({
-                title: '¡Actualizado Correctamente!',
-                text: "{{ session('sweet_success') }}",
-                icon: 'success',
-                confirmButtonColor: '#04003B',
-                confirmButtonText: 'Entendido',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
-                }
-            });
-        </script>
-    @endif
-
     @if ($errors->any())
         <script>
             Swal.fire({
@@ -94,6 +78,38 @@
                 customClass: {
                     popup: 'rounded-3xl',
                     confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
+                }
+            });
+        </script>
+    @endif
+
+    @if (session('sweet_error'))
+        <script>
+            Swal.fire({
+                title: 'Operación denegada',
+                text: "{{ session('sweet_error') }}",
+                icon: 'error',
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Entendido',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
+                }
+            });
+        </script>
+    @endif
+
+    @if (session('sweet_success'))
+        <script>
+            Swal.fire({
+                title: '¡Acción Exitosa!',
+                text: "{{ session('sweet_success') }}",
+                icon: 'success',
+                iconColor: '#84cc16',
+                timer: 3000,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'rounded-3xl'
                 }
             });
         </script>

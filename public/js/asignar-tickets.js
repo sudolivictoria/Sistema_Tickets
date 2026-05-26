@@ -47,7 +47,7 @@ window.inicializarTablaTickets = function (
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
-            table.search(this.value).draw();
+            table.search(this.value).draw(false);
         });
 
     $("#tablaAsignarTickets").on("click", ".btn-ver-detalle", function () {

@@ -27,7 +27,7 @@
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Abiertos</p>
-                <h3 id="cont-abiertos" class="text-3xl font-black text-slate-800 leading-none">{{ $noAsignados ?? 0 }}</h3>
+                <h3 id="contador-abiertos" class="text-3xl font-black text-slate-800 leading-none">{{ $noAsignados ?? 0 }}</h3>
             </div>
         </div>
 
@@ -38,7 +38,7 @@
             </div>
             <div>
                 <p class="text-xs font-black text-secondary uppercase tracking-widest">En Proceso</p>
-                <h3 id="cont-proceso" class="text-3xl font-black text-slate-800 leading-none">{{ $pendientes ?? 0 }}</h3>
+                <h3 id="contador-proceso" class="text-3xl font-black text-slate-800 leading-none">{{ $pendientes ?? 0 }}</h3>
             </div>
         </div>
 
@@ -49,7 +49,7 @@
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Cerrados</p>
-                <h3 id="cont-resueltos" class="text-3xl font-black text-slate-800 leading-none">{{ $resueltos ?? 0 }}</h3>
+                <h3 id="contador-resueltos" class="text-3xl font-black text-slate-800 leading-none">{{ $resueltos ?? 0 }}</h3>
             </div>
         </div>
     </div>

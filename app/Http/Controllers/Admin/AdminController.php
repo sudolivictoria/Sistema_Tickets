@@ -248,6 +248,10 @@ class AdminController extends Controller
     {
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
 
+        if (in_array($ticket->estado_id, [3, 4, 5])) {
+            return back()->with('sweet_error', 'No se puede modificar la prioridad este ticket ha sido resuelto o cerrado.');
+        }
+
         $ticket->update(['prioridad_id' => $request->prioridad_id]);
 
         return back()->with('sweet_success', 'Prioridad actualizada correctamente');
@@ -270,6 +274,21 @@ class AdminController extends Controller
                 },
             ]
         ]);
+
+        if (in_array($ticket->estado_id, [3, 4, 5])) {
+            return back()->with('sweet_error', '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.');
+        }
+
+        if ($request->filled('tecnico_id')) {
+            if ($ticket->tecnico_id !== null && $ticket->tecnico_id != $request->tecnico_id) {
+                return back()->with('sweet_error', '¡Demasiado tarde! Otro gestor ya asignó este ticket a un técnico diferente.');
+            }
+        } else {
+            if ($ticket->tecnico_id === null) {
+                return back()->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
+            }
+        }
+
 
         //---actualizar datos
         $ticket->update([

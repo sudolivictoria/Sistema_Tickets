@@ -162,7 +162,7 @@
     <script src="{{ asset('js/usuario-menu.js') }}?v={{ time() }}" defer></script>
     @stack('scripts')
 
-    <script src="{{ asset('js/auto-refresco.js') }}"></script>
+    <script src="{{ asset('js/api.js') }}"></script>
 
     <script>
         //-----------preloader 

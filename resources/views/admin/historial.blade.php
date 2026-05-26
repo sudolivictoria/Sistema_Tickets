@@ -9,7 +9,6 @@
                     Historial
                 </h2>
             </div>
-            <p class="text-slate-500 text-sm font-medium italic py-4">Registro y Consulta de tickets.</p>
         </div>
         <div class="min-w-[180px] px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-end">
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Fecha de
@@ -25,7 +24,6 @@
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Abiertos (Últimas 24h)</p>
                 <h3 class="text-3xl font-black text-orange-500" id="metric-carga-trabajo">{{ $cargaTrabajo ?? 0 }}
-                    <span class="text-sm font-bold text-slate-400">Tkts</span>
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
@@ -47,9 +45,8 @@
         <div
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-secondary flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div>
-                <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Tasa de Cierre Mensual</p>
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Tasa de Cierre Mensual %</p>
                 <h3 class="text-3xl font-black text-secondary" id="metric-tasa-cierre">{{ $tasaCierre ?? 0 }}
-                    <span class="text-sm font-bold text-secondary">%</span>
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-blue-50 text-secondary flex items-center justify-center">
@@ -145,7 +142,7 @@
                         <th class="hidden">Categoria</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-[12px]">
+                <tbody id="tablaBody" data-tipo="historial" class="divide-y divide-slate-100 text-[12px]">
                     @include('partials.filas_historial', ['tickets' => $tickets])
                 </tbody>
             </table>
