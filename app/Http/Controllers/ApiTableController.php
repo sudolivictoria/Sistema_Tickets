@@ -44,7 +44,7 @@ class ApiTableController extends Controller
             $query->limit(5);
         }
 
-        if($tipo == 'dashboard'){
+        if ($tipo == 'dashboard') {
             $inicioMes = Carbon::now()->startOfMonth();
             $finMes = Carbon::now()->endOfMonth();
             $query->whereBetween('created_at', [$inicioMes, $finMes]);
@@ -97,6 +97,37 @@ class ApiTableController extends Controller
             ->where('estado_id', 2)
             ->count();
 
+
+        //----metricas
+
+        $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
+            ->whereYear('created_at', date('Y'))
+            ->whereHas('categoria', function ($q) use ($miUnidadId) {
+                $q->where('unidad_id', $miUnidadId);
+            })
+            ->latest()
+            ->get();
+
+
+        $cargaTrabajo = $tickets->filter(function ($ticket) {
+            return Carbon::parse($ticket->created_at)->isToday();
+        })->count();
+
+        $resueltos24h = $tickets->whereIn('estado_id', [3, 4, 5])
+            ->filter(function ($ticket) {
+                return $ticket->fecha_cierre && Carbon::parse($ticket->fecha_cierre)->gte(now()->subDay());
+            })
+            ->count();
+
+        //-----tasa cierre mensual
+        $ticketsDelMes = $tickets->filter(function ($ticket) {
+            return Carbon::parse($ticket->created_at)->isCurrentMonth();
+        });
+
+        $totalTickets = $ticketsDelMes->count();
+        $cerradosTickets = $ticketsDelMes->whereIn('estado_id', [3, 4, 5])->count();
+        $tasaCierre = $totalTickets > 0 ? round(($cerradosTickets / $totalTickets) * 100) : 0;
+
         //-----html segun el tipo de tabla que se refresca---
         $html = '';
         switch ($tipo) {
@@ -133,7 +164,10 @@ class ApiTableController extends Controller
             'html' => $html,
             'contadores' => $contadores,
             'grafico' => $graficoHtml,
-            'contadorAsignados' => (int)$contadorMisAsignados
+            'contadorAsignados' => (int)$contadorMisAsignados,
+            'cargaTrabajo' => $cargaTrabajo,
+            'resueltos24h' => $resueltos24h,
+            'tasaCierre' => $tasaCierre
         ]);
     }
 }

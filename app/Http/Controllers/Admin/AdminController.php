@@ -319,9 +319,7 @@ class AdminController extends Controller
 
         //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
         $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
-            ->whereHas('categoria', function ($q) use ($miUnidadId) {
-                $q->where('unidad_id', $miUnidadId);
-            })
+            ->whereYear('created_at', date('Y'))
             ->latest()
             ->get();
 

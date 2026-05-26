@@ -13,16 +13,23 @@ function autoRefrescoUniversal() {
 
     const tipoTabla = tablaBody.getAttribute("data-tipo") || "dashboard";
 
-    //----api para obtener el html
+
     fetch(`/api/refresh-table?tipo=${tipoTabla}`)
         .then((response) => response.json())
         .then((data) => {
             const tablaElement = tablaBody.closest("table");
 
-            if ($.fn.DataTable.isDataTable(tablaElement)) {
+            //----actualizar la tabla de datos
+            if (tablaElement && $.fn.DataTable.isDataTable(tablaElement)) {
                 const selectorId = "#" + tablaElement.id;
+
+                //---destruir instancia de datatable
                 $(selectorId).DataTable().destroy();
+
+                //---inyectar html
                 tablaBody.innerHTML = data.html;
+
+                //--reinicializar tabla
                 if (typeof window.inicializarTablaTickets === "function") {
                     window.inicializarTablaTickets(selectorId);
                 }
@@ -30,38 +37,86 @@ function autoRefrescoUniversal() {
                 tablaBody.innerHTML = data.html;
             }
 
-            //--actualizar contadores si existen en los tickets asignados
+            //---contadores generales
+            if (data.contadores) {
+                const elAbiertos = document.getElementById("contador-abiertos");
+                const elProceso = document.getElementById("contador-proceso");
+                const elResueltos =
+                    document.getElementById("contador-resueltos");
+
+                if (elAbiertos)
+                    elAbiertos.textContent = data.contadores.abiertos;
+                if (elProceso) elProceso.textContent = data.contadores.proceso;
+                if (elResueltos)
+                    elResueltos.textContent = data.contadores.resueltos;
+            }
+
+            //---actualizar contadores asignados
             if (data.contadorAsignados !== undefined) {
-                const elContador = document.getElementById("contador-asignados");
+                const elContador =
+                    document.getElementById("contador-asignados");
                 if (elContador) {
-                    elContador.innerText = data.contadorAsignados;
+                    elContador.textContent = data.contadorAsignados;
                 }
             }
 
-            //---actualizar grafico si viene en la respuesta
+            //---actualizar nuevas metricas
+            if (data.cargaTrabajo !== undefined) {
+                const elCarga = document.getElementById("metric-carga-trabajo");
+                if (elCarga) elCarga.textContent = data.cargaTrabajo;
+            }
+
+            if (data.resueltos24h !== undefined) {
+                const elResueltos24 = document.getElementById(
+                    "metric-resueltos-24h",
+                );
+                if (elResueltos24)
+                    elResueltos24.textContent = data.resueltos24h;
+            }
+
+            if (data.tasaCierre !== undefined) {
+                const elTasa = document.getElementById("metric-tasa-cierre");
+                if (elTasa) elTasa.textContent = data.tasaCierre;
+            }
+
+            //-----actualizar grafico de rendimiento
             if (data.grafico) {
-                const contenedorGrafico = document.getElementById("barras-rendimiento");
+                const contenedorGrafico =
+                    document.getElementById("barras-rendimiento");
                 if (contenedorGrafico) {
                     contenedorGrafico.innerHTML = data.grafico;
                 }
             }
 
-            //---re-ejecutar el filtro activo para mantener la tabla filtrada en vistas estáticas
-            const botonActivo = document.querySelector(".filtro-btn.bg-secondary");
-
+            //-----re-ejecutar filtros
+            const botonActivo = document.querySelector(
+                ".filtro-btn.bg-secondary",
+            );
             if (botonActivo && typeof ejecutarFiltros === "function") {
                 const onclickAttr = botonActivo.getAttribute("onclick");
                 if (onclickAttr) {
-                    const estadoId = onclickAttr.match(/'([^']+)'/)?.[1] || "todos";
-                    //---ejecuta los filtros visuales de CSS
+                    const estadoId =
+                        onclickAttr.match(/'([^']+)'/)?.[1] || "todos";
                     ejecutarFiltros(estadoId);
                 }
             }
         })
-        .catch((err) => console.error("Error en refresco:", err));
+        .catch((err) => console.error("Error en refresco dinámico:", err));
 }
 
-//---ejecutar cada 30 segundos
-if (document.getElementById("tablaBody")) {
-    setInterval(autoRefrescoUniversal, 30000);
+function iniciarAutoRefresco() {
+    if (document.getElementById("tablaBody")) {
+        //--ejecutar funcion de refresco
+        autoRefrescoUniversal();
+
+        //---progrmar ciclo para 30 se segundos
+        setTimeout(iniciarAutoRefresco, 30000);
+    }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.getElementById("tablaBody")) {
+        //--espera para iniciar el bucle automatico
+        setTimeout(iniciarAutoRefresco, 30000);
+    }
+});

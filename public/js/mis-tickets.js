@@ -53,6 +53,7 @@ window.inicializarTablaTickets = function (selectorId) {
         const tipo = $(this).data("tipo");
         verDetalle(asunto, descripcion, tipo);
     });
+    
 };
 
 /**

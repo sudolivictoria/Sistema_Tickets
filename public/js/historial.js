@@ -1,7 +1,58 @@
 var tableHistorial;
+//----no cargar datos al inicio
+var filtrosAplicados = false;
 
 document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaHistorial")) {
+        //----filtros
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            if (settings.nTable.id !== "tablaHistorial") return true;
+            //---no mostrar nada hasta ver los filtros
+            if (!filtrosAplicados) {
+                return false;
+            }
+            //---obtener el elemento de filtrado
+            const filaTr = settings.aoData[dataIndex].nTr;
+            const fechaFilaRaw = filaTr.getAttribute("data-fecha");
+            const estadoFilaId = filaTr.getAttribute("data-estado-id");
+            const categoriaFilaId = filaTr.getAttribute("data-categoria-id");
+
+            //---filtro del estado
+            const estadoSel = document.getElementById("filtroEstado").value;
+            if (estadoSel !== "todos" && estadoFilaId !== estadoSel) {
+                return false;
+            }
+            //----categoria
+            const elCategoria = document.getElementById("filtroCategoria");
+            if (elCategoria) {
+                const categoriaSel = elCategoria.value;
+                if (
+                    categoriaSel !== "todos" &&
+                    categoriaFilaId !== categoriaSel
+                ) {
+                    return false;
+                }
+            }
+            //---fechas
+            const fInicioRaw =
+                document.getElementById("filtroFechaInicio").value;
+            const fFinRaw = document.getElementById("filtroFechaFin").value;
+
+            if (fechaFilaRaw) {
+                const fechaFila = new Date(fechaFilaRaw + "T00:00:00");
+
+                if (fInicioRaw) {
+                    const fechaInicio = new Date(fInicioRaw + "T00:00:00");
+                    if (fechaFila < fechaInicio) return false;
+                }
+                if (fFinRaw) {
+                    const fechaFin = new Date(fFinRaw + "T00:00:00");
+                    if (fechaFila > fechaFin) return false;
+                }
+            }
+            return true;
+        });
+        //----config datatable
         tableHistorial = $("#tablaHistorial").DataTable({
             language: {
                 processing: "Procesando...",
@@ -13,8 +64,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>`,
                 emptyTable: `
                         <div class="flex flex-col items-center justify-center py-10">
-                            <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_off</span>
-                            <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No hay datos disponibles</p>
+                            <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">pageview</span>
+                            <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Por favor seleccione los filtros y presione "Filtrar" para cargar el historial</p>
                         </div>`,
                 info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
                 infoFiltered: "(filtrado de un total de _MAX_ registros)",
@@ -34,16 +85,9 @@ document.addEventListener("DOMContentLoaded", function () {
             order: [[0, "desc"]],
             dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
         });
-
-        $("#inputBusqueda")
-            .off("keyup")
-            .on("keyup", function () {
-                if (tableHistorial) {
-                    tableHistorial.search(this.value).draw();
-                }
-            });
+        tableHistorial.draw();
     }
-
+    //---modal detalle
     $("#tablaHistorial").on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");
@@ -51,40 +95,39 @@ document.addEventListener("DOMContentLoaded", function () {
         const fecha = $(this).data("fecha");
         verDetalle(asunto, descripcion, tipo, fecha);
     });
-
-    $("#filtroEstado").on("change", function () {
-        if (!tableHistorial) return;
-
-        const valorSelect = this.value; //"todos", "1", "2" o "3,4,5"
-
-        if (valorSelect === "todos") {
-            tableHistorial.column(3).search("").draw();
-        } else {
-            const estados = valorSelect.split(",").map((e) => e.trim());
-            const valorBusqueda = `(${estados.join("|")})`;
-            tableHistorial
-                .column(3)
-                .search(valorBusqueda, true, false, true)
-                .draw();
-        }
-    });
-
-    $("#filtroCategoria").on("change", function () {
-        if (!tableHistorial) return;
-
-        const categoriaSeleccionada = this.value;
-
-        if (categoriaSeleccionada === "todas") {
-            tableHistorial.column(6).search("").draw();
-        } else {
-            tableHistorial
-                .column(6)
-                .search("^" + categoriaSeleccionada + "$", true, false)
-                .draw();
-        }
+    $("#tablaHistorial").on("click", ".btn-ver-usuario", function () {
+        const nombre = $(this).data("nombre");
+        const email = $(this).data("email");
+        const unidad = $(this).data("unidad");
+        const cargo = $(this).data("cargo");
+        const telefono = $(this).data("telefono");
+        verUsuario(nombre, email, unidad, cargo, telefono);
     });
 });
+//--------filtrado
+window.aplicarFiltrosHistorial = function () {
+    if (!tableHistorial) return;
+    filtrosAplicados = true;
+    //---filtrado buscador
+    const textoBuscar = document.getElementById("filtroBuscar").value;
+    tableHistorial.search(textoBuscar);
+    //---redibujar la tabla
+    tableHistorial.draw();
+};
+//---limpar filtros
+window.limpiarFiltrosHistorial = function () {
+    if (!tableHistorial) return;
+    filtrosAplicados = false;
+    //---resetear inputs
+    document.getElementById("filtroBuscar").value = "";
+    document.getElementById("filtroFechaInicio").value = "";
+    document.getElementById("filtroFechaFin").value = "";
+    document.getElementById("filtroEstado").value = "todos";
+    document.getElementById("filtroCategoria").value = "todos";
+    tableHistorial.search("").draw(); //--vista vacia
+};
 
+//----DETALLE TICKET Y USUARIO---
 window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
@@ -117,8 +160,6 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const departamento = document.getElementById("userUnidad");
     const puesto = document.getElementById("userCargo");
     const contacto = document.getElementById("userTelefono");
-
-    //----------------envio de correos directo----------------
     const elLinkCorreo = document.getElementById("linkCorreo");
 
     if (nombre && correo && departamento && puesto && contacto && modal) {
@@ -128,9 +169,7 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
         puesto.innerText = cargo;
         contacto.innerText = telefono;
 
-        //-----------------GMAIL--------------
         if (email && email !== "---") {
-            //----abre gmail directamente para su redaccion
             elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=Consulta sobre su Ticket&body=Hola ${name},`;
             elLinkCorreo.classList.remove("opacity-50", "pointer-events-none");
         } else {
