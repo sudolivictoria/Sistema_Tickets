@@ -44,16 +44,32 @@ function refrescoTablasEstandar() {
                     window.inicializarTablaTickets(id);
                 }
 
-                //---mantener la pagina en el caso que refresca
+                // --- 1. Sincronizar texto en memoria (🔒 Quitamos el .draw() de aquí) ---
                 if (textoAntes) {
                     if (document.getElementById("inputBusqueda")) {
-                        document.getElementById("inputBusqueda").value =
-                            textoAntes;
+                        document.getElementById("inputBusqueda").value = textoAntes;
                     }
-                    $(id).DataTable().search(textoAntes).draw(false);
+                    $(id).DataTable().search(textoAntes);
+                }
+
+                // --- 2. 🔒 CONTROL DE FLUJO: Reaplicar botón O dibujar por defecto ---
+                if (botonActivo) {
+                    const onclickAttr = botonActivo.getAttribute("onclick");
+                    if (onclickAttr) {
+                        const match = onclickAttr.match(/'([^']+)'/);
+                        const estadoId = match ? match[1] : "todos";
+
+                        if (typeof window.ejecutarFiltros === "function") {
+                            window.ejecutarFiltros(estadoId);
+                        } else if (typeof window.filtrarEstado === "function") {
+                            window.filtrarEstado(estadoId, botonActivo);
+                        }
+                    }
                 } else {
+                    // Solo si no hay un botón de estado activo, dibujamos la tabla de forma limpia
                     $(id).DataTable().draw(false);
                 }
+
             } else {
                 tablaBody.innerHTML = data.html;
             }
@@ -87,101 +103,6 @@ function refrescoTablasEstandar() {
                     contenedorGrafico.innerHTML = data.grafico;
                 }
             }
-
-            //---reaplicar estilos
-            if (botonActivo) {
-                const onclickAttr = botonActivo.getAttribute("onclick");
-                if (onclickAttr) {
-                    const match = onclickAttr.match(/'([^']+)'/);
-                    const estadoId = match ? match[1] : "todos";
-
-                    if (typeof window.ejecutarFiltros === "function") {
-                        window.ejecutarFiltros(estadoId);
-                    } else if (typeof window.filtrarEstado === "function") {
-                        window.filtrarEstado(estadoId, botonActivo);
-                    }
-                }
-            }
         })
         .catch((err) => console.error("Error en refresco estándar:", err));
 }
-
-// ========================================================
-// REFRESCO EXCLUSIVO PARA LA PÁGINA DE ASIGNAR TICKETS
-// ========================================================
-function refrescoAsignar() {
-    const tablaBody = document.getElementById("tablaBody");
-    if (!tablaBody) return;
-
-    const modalAbierto = document.querySelector(
-        ".modal:not(.hidden), #modalUsuario:not(.hidden)",
-    );
-    const buscador = document.querySelector('input[type="search"]');
-    if (modalAbierto || (buscador && buscador === document.activeElement))
-        return;
-
-    const tablaElement = tablaBody.closest("table");
-    let textoAntes =
-        tablaElement && $.fn.DataTable.isDataTable(tablaElement)
-            ? $(tablaElement).DataTable().search()
-            : "";
-
-    fetch(`/api/refresh-table?tipo=asignar`)
-        .then((res) => res.json())
-        .then((data) => {
-            if (tablaElement && $.fn.DataTable.isDataTable(tablaElement)) {
-                const id = "#" + tablaElement.id;
-
-                $(id).DataTable().destroy();
-                tablaBody.innerHTML = data.html;
-
-                if (typeof window.inicializarTablaTickets === "function") {
-                    window.inicializarTablaTickets(id);
-                }
-                if (textoAntes) {
-                    $(id).DataTable().search(textoAntes).draw(false);
-                } else {
-                    $(id).DataTable().draw(false);
-                }
-            } else {
-                tablaBody.innerHTML = data.html;
-            }
-        })
-        .catch((err) => console.error("Error en refresco Asignar:", err));
-}
-
-// =========================
-// ORQUESTADOR CENTRAL
-// =========================
-function enrutadorRefresco() {
-    const tablaBody = document.getElementById("tablaBody");
-    if (!tablaBody) return;
-
-    const tipoTabla = tablaBody.getAttribute("data-tipo") || "dashboard";
-
-    if (tipoTabla === "historial") {
-        if (typeof window.refrescoHistorial === "function") {
-            window.refrescoHistorial();
-        }
-    } else if (tipoTabla === "asignar") {
-        refrescoAsignar();
-    } else {
-        refrescoTablasEstandar();
-    }
-}
-function iniciarAutoRefresco() {
-    if (document.getElementById("tablaBody")) {
-        enrutadorRefresco();
-        setTimeout(iniciarAutoRefresco, 30000);
-    }
-}
-document.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById("tablaBody")) {
-        setTimeout(iniciarAutoRefresco, 30000);
-    }
-});
-window.autoRefrescoUniversal = function () {
-    if (typeof enrutadorRefresco === "function") {
-        enrutadorRefresco();
-    }
-};
