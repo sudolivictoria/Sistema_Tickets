@@ -138,6 +138,8 @@
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
+                        <th class="px-2 py-4 border-b border-slate-200 font-black">Apertura</th>
+                        <th class="px-2 py-4 border-b border-slate-200 font-black">Cierre</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Detalle</th>
                         <th class="hidden">Categoria</th>
                     </tr>
@@ -150,7 +152,7 @@
     </div>
 
     {{-- detalle ticket --}}
-    @include('partials.detalle_ticket_completo')
+    @include('partials.detalle_ticket')
 
     {{-- detalle usuario --}}
     @include('partials.detalle_usuario')

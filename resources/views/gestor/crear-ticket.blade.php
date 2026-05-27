@@ -29,8 +29,9 @@
                             class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
                             <option value="" disabled selected>Seleccione</option>
-                            @foreach($categorias as $categoria)
-                                <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
+                            @foreach ($categorias as $categoria)
+                                <option value="{{ $categoria->id }}"
+                                    {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
                                     {{ $categoria->nombre_categoria }}
                                 </option>
                             @endforeach
@@ -73,7 +74,8 @@
 
             <!---descripcion detallada-->
             <div class="flex flex-col gap-2.5">
-                <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Descripción Detallada</label>
+                <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Descripción
+                    Detallada</label>
                 <textarea name="descripcion"
                     class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all resize-none font-medium text-slate-700"
                     rows="5" placeholder="Explique brevemente el problema..." required>{{ old('descripcion') }}</textarea>
@@ -82,10 +84,12 @@
             <div class="flex flex-col gap-2.5">
                 <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Nivel de Urgencia</label>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    @foreach($prioridades as $prio)
+                    @foreach ($prioridades as $prio)
                         <label class="cursor-pointer">
-                            <input class="hidden peer" name="prioridad_id" type="radio" value="{{ $prio->id }}" {{ $prio->nombre_prioridad == 'Media' ? 'checked' : '' }} />
-                            <div class="py-3 px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center transition-all 
+                            <input class="hidden peer" name="prioridad_id" type="radio" value="{{ $prio->id }}"
+                                {{ $prio->nombre_prioridad == 'Media' ? 'checked' : '' }} />
+                            <div
+                                class="py-3 px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center transition-all 
                                         peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary peer-checked:shadow-sm
                                         hover:border-slate-200">
                                 {{ $prio->nombre_prioridad }}
@@ -114,55 +118,65 @@
 @endsection
 
 @push('scripts')
-     <script src="{{ asset('js/ticket-form.js') }}"></script>
-    
-    <script>
-    window.todosLosTipos = @json($tipos ?? []);
+    <script src="{{ asset('js/ticket-form.js') }}"></script>
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const oldCategoria = '{{ old("categoria_id") }}';
-        if (oldCategoria) {
-            const catSelect = document.querySelector('select[name="categoria_id"]');
-            if(catSelect) {
-                catSelect.value = oldCategoria;
-                window.filtrarTipos(oldCategoria);
-                
-                const oldTipo = '{{ old("tipo_solicitud_id") }}';
-                const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
-                if (oldTipo && tipoSelect) {
-                    tipoSelect.value = oldTipo;
-                    tipoSelect.dispatchEvent(new Event('change'));
+    <script>
+        window.todosLosTipos = @json($tipos ?? []);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const oldCategoria = '{{ old('categoria_id') }}';
+            if (oldCategoria) {
+                const catSelect = document.querySelector('select[name="categoria_id"]');
+                if (catSelect) {
+                    catSelect.value = oldCategoria;
+                    window.filtrarTipos(oldCategoria);
+
+                    const oldTipo = '{{ old('tipo_solicitud_id') }}';
+                    const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
+                    if (oldTipo && tipoSelect) {
+                        tipoSelect.value = oldTipo;
+                        tipoSelect.dispatchEvent(new Event('change'));
+                    }
                 }
             }
-        }
-    });
+        });
     </script>
 
-    {{--alertas sweetalert--}}
-    @if(session('success'))
+    {{-- alertas sweetalert --}}
+    @if (session('success'))
         <script>
-            Swal.fire({
-                title: '¡Excelente!',
-                text: "{{ session('success') }}",
-                icon: 'success',
-                confirmButtonColor: '#04003B',
-                confirmButtonText: 'Entendido',
-                customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
-            }).then(() => {
-                window.location.href = "{{ route('gestor.dashboard') }}";
+            document.addEventListener("DOMContentLoaded", () => {
+                Swal.fire({
+                    title: '¡Excelente!',
+                    text: "{{ session('success') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#04003B',
+                    confirmButtonText: 'Entendido',
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
+                    }
+                }).then(() => {
+                    window.location.href = "{{ route('admin.dashboard') }}";
+                });
             });
         </script>
     @endif
 
     @if ($errors->any())
         <script>
-            Swal.fire({
-                title: 'No se pudo enviar',
-                html: '{!! implode("<br>", $errors->all()) !!}',
-                icon: 'error',
-                confirmButtonColor: '#dc2626',
-                confirmButtonText: 'Corregir',
-                customClass: { popup: 'rounded-3xl', confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs' }
+            document.addEventListener("DOMContentLoaded", () => {
+                Swal.fire({
+                    title: 'No se pudo enviar',
+                    html: '{!! implode('<br>', $errors->all()) !!}',
+                    icon: 'error',
+                    confirmButtonColor: '#dc2626',
+                    confirmButtonText: 'Corregir',
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
+                    }
+                });
             });
         </script>
     @endif

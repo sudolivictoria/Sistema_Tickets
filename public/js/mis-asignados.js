@@ -40,7 +40,7 @@ window.inicializarTablaTickets = function (
         responsive: false,
         autoWidth: false,
         pageLength: 5,
-        order: [0, "desc"],
+        order: [[0, "desc"]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
@@ -54,8 +54,7 @@ window.inicializarTablaTickets = function (
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");
         const tipo = $(this).data("tipo");
-        const fecha = $(this).data("fecha");
-        verDetalle(asunto, descripcion, tipo, fecha);
+        verDetalle(asunto, descripcion, tipo);
     });
 
     $("#tablaMisAsignados").on("click", ".btn-ver-usuario", function () {
@@ -93,17 +92,15 @@ window.filtrarEstado = function (estado, btn) {
 /**
  * Gestión de Modal de detalles
  */
-window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
+window.verDetalle = function (asunto, descripcion, tipoNombre) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
-    const fecha = document.getElementById("modalFechaApertura");
-    if (modal && titulo && desc && tipo && fecha) {
+    if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
         tipo.innerText = tipoNombre;
-        fecha.innerText = fechaApertura;
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
@@ -199,7 +196,7 @@ function confirmarResolver(btn) {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        enrutadorRefresco();
+                        autoRefrescoUniversal();
                         Swal.fire({
                             title: "¡Ticket Resuelto!",
                             text: data.message,
@@ -254,7 +251,7 @@ function confirmarEquivocado(btn) {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        enrutadorRefresco();
+                        autoRefrescoUniversal();
                         Swal.fire({
                             title: "¡Ticket Marcado como Equivocado!",
                             text: data.message,
@@ -309,7 +306,7 @@ function confirmarNoCorresponde(btn) {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        enrutadorRefresco();
+                        autoRefrescoUniversal();
                         Swal.fire({
                             title: "¡Ticket Marcado como No Corresponde!",
                             text: data.message,

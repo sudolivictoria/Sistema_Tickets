@@ -136,17 +136,15 @@ window.limpiarFiltrosHistorial = function () {
     tableHistorial.search("").draw(); //--vista vacia
 };
 //----DETALLE TICKET Y USUARIO---
-window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
+window.verDetalle = function (asunto, descripcion, tipoNombre) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
-    const fecha = document.getElementById("modalFechaApertura");
-    if (modal && titulo && desc && tipo && fecha) {
+    if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
         tipo.innerText = tipoNombre;
-        fecha.innerText = fechaApertura;
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
@@ -190,60 +188,4 @@ window.cerrarModalUsuario = function () {
         modal.classList.add("hidden");
         document.body.style.overflow = "auto";
     }
-};
-//-------------REFRESCO HISTORIAL------------------
-window.refrescoHistorial = function () {
-    const tablaBody = document.getElementById("tablaBody");
-    if (!tablaBody) return;
-    const modalAbierto = document.querySelector(
-        ".modal:not(.hidden), #modalTicket:not(.hidden), #modalUsuario:not(.hidden)",
-    );
-    const buscador = document.getElementById("filtroBuscar");
-    if (modalAbierto || (buscador && buscador === document.activeElement))
-        return;
-    const tablaElement = tablaBody.closest("table");
-    let textoAntes = buscador ? buscador.value : "";
-    fetch(`/api/refresh-table?tipo=historial`)
-        .then((res) => res.json())
-        .then((data) => {
-            if (tablaElement && $.fn.DataTable.isDataTable(tablaElement)) {
-                $("#tablaHistorial").DataTable().destroy();
-                tablaBody.innerHTML = data.html;
-                if (
-                    typeof window.inicializarHistorialDataTable === "function"
-                ) {
-                    window.inicializarHistorialDataTable();
-                }
-                //----si el usuario ya estaba filtrando mantner texto
-                if (textoAntes && buscador) {
-                    buscador.value = textoAntes;
-                    if (typeof filtrosAplicados !== "undefined")
-                        filtrosAplicados = true;
-                    $("#tablaHistorial").DataTable().search(textoAntes).draw();
-                }
-            }
-            //----actualizar metricas
-            if (
-                data.cargaTrabajo !== undefined &&
-                document.getElementById("metric-carga-trabajo")
-            ) {
-                document.getElementById("metric-carga-trabajo").textContent =
-                    data.cargaTrabajo;
-            }
-            if (
-                data.resueltos24h !== undefined &&
-                document.getElementById("metric-resueltos-24h")
-            ) {
-                document.getElementById("metric-resueltos-24h").textContent =
-                    data.resueltos24h;
-            }
-            if (
-                data.tasaCierre !== undefined &&
-                document.getElementById("metric-tasa-cierre")
-            ) {
-                document.getElementById("metric-tasa-cierre").textContent =
-                    data.tasaCierre;
-            }
-        })
-        .catch((err) => console.error("Error al refrescar historial:", err));
 };

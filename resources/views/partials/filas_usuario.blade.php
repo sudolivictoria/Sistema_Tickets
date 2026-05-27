@@ -23,7 +23,7 @@
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp
-            <span class="px-2 py-1 rounded-full border font-black uppercase text-[11px] {{ $claseEstado }}">
+            <span class="px-2 py-1 rounded-full border font-black uppercase text-[11px] whitespace-nowrap {{ $claseEstado }}">
                 {{ ucfirst($estado) }}
             </span>
         </td>

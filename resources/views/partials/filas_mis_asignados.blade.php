@@ -50,12 +50,14 @@
         {{-- Prioridad --}}
         <td class="px-4 py-4" data-search="{{ $ticket->prioridad->nombre_prioridad }}">
             @php
-                $rutaPrioridad = Auth::user()->rol_id == 1 ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad';
+                $rutaPrioridad =
+                    Auth::user()->rol_id == 1 ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad';
                 $estaCerrado = in_array($ticket->estado_id, [3, 4, 5]);
             @endphp
             <form action="{{ route($rutaPrioridad, $ticket->id) }}" method="POST">
                 @csrf @method('PATCH')
-                <select name="prioridad_id" onchange="this.form.submit()" {{ $estaCerrado ? 'disabled' : '' }} class="bg-transparent font-black text-[12px] border-none focus:ring-0 
+                <select name="prioridad_id" onchange="this.form.submit()" {{ $estaCerrado ? 'disabled' : '' }}
+                    class="bg-transparent font-black text-[12px] border-none focus:ring-0 
                         {{ $estaCerrado ? 'text-slate-400' : 'text-secondary cursor-pointer' }}">
                     <option value="1" {{ $ticket->prioridad_id == 1 ? 'selected' : '' }}>Critica</option>
                     <option value="2" {{ $ticket->prioridad_id == 2 ? 'selected' : '' }}>Alta</option>
@@ -73,21 +75,29 @@
 
             <form action="{{ route($rutaTecnico, $ticket->id) }}" method="POST">
                 @csrf @method('PATCH')
-                <select name="tecnico_id" onchange="this.form.submit()" {{ $estaCerrado ? 'disabled' : '' }} class="bg-transparent font-black text-[12px] border-none focus:ring-0 w-full
+                <select name="tecnico_id" onchange="this.form.submit()" {{ $estaCerrado ? 'disabled' : '' }}
+                    class="bg-transparent font-black text-[12px] border-none focus:ring-0 w-full
                         {{ $estaCerrado ? 'text-slate-400' : 'text-secondary cursor-pointer' }}">
-                    <option value="" {{ is_null($ticket->tecnico_id) ? 'selected' : '' }} class="text-red-600 font-bold">
+                    <option value="" {{ is_null($ticket->tecnico_id) ? 'selected' : '' }}
+                        class="text-red-600 font-bold">
                         ❌ Devolver a Pendientes
                     </option>
 
                     <optgroup label="Reasignar a:">
                         @foreach ($tecnicos as $tecnico)
-                            <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
+                            <option value="{{ $tecnico->id }}"
+                                {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
                                 👤 {{ $tecnico->name }}
                             </option>
                         @endforeach
                     </optgroup>
                 </select>
             </form>
+        </td>
+
+        {{-- Fechas --}}
+        <td class="px-4 py-4 font-black" data-order="{{ $ticket->created_at->timestamp }}">
+            {{ $ticket->created_at->format('d/m/Y') }}
         </td>
 
         {{-- Detalle --}}
@@ -126,7 +136,8 @@
                 </form>
 
                 {{-- Botón Equivocado --}}
-                <form action="{{ route($rutaEquivocacion, $ticket->id) }}" method="POST" class="form-equivocacion m-0">
+                <form action="{{ route($rutaEquivocacion, $ticket->id) }}" method="POST"
+                    class="form-equivocacion m-0">
                     @csrf
                     @method('PATCH')
                     <button type="button" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarEquivocado(this)' }}
@@ -138,7 +149,8 @@
                 </form>
 
                 {{-- Botón No Corresponde --}}
-                <form action="{{ route($rutaNoCorresponde, $ticket->id) }}" method="POST" class="form-no-corresponde m-0">
+                <form action="{{ route($rutaNoCorresponde, $ticket->id) }}" method="POST"
+                    class="form-no-corresponde m-0">
                     @csrf
                     @method('PATCH')
                     <button type="button" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarNoCorresponde(this)' }}

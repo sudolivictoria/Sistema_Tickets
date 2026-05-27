@@ -40,7 +40,7 @@ window.inicializarTablaTickets = function (
         responsive: false,
         autoWidth: false,
         pageLength: 5,
-        order: [0, "asc"],
+        order: [[0, "asc"]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
@@ -93,10 +93,10 @@ window.filtrarEstado = function (estado, btn) {
  * Gestión de Modal de detalles
  */
 window.verDetalle = function (asunto, descripcion, tipoNombre) {
-    const modal = document.getElementById("modalTicketAsignar");
-    const titulo = document.getElementById("modalTituloAsignar");
-    const desc = document.getElementById("modalDescripcionAsignar");
-    const tipo = document.getElementById("modalTipoSolicitudAsignar");
+    const modal = document.getElementById("modalTicket");
+    const titulo = document.getElementById("modalTitulo");
+    const desc = document.getElementById("modalDescripcion");
+    const tipo = document.getElementById("modalTipoSolicitud");
     if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
@@ -110,7 +110,7 @@ window.verDetalle = function (asunto, descripcion, tipoNombre) {
  * Cerrar modal
  */
 window.cerrarModal = function () {
-    const modal = document.getElementById("modalTicketAsignar");
+    const modal = document.getElementById("modalTicket");
     if (modal) {
         modal.classList.add("hidden");
         document.body.style.overflow = "auto";

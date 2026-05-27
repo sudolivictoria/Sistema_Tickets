@@ -33,7 +33,7 @@
                     <div class="p-3 bg-red-50 text-red-500 rounded-2xl"><span
                             class="material-symbols-outlined text-2xl font-bold">priority_high</span></div>
                     <div>
-                        <div id="cont-abiertos" class="text-2xl font-black text-primary">{{ $abiertos ?? 0 }}</div>
+                        <div id="contador-abiertos" class="text-2xl font-black text-primary">{{ $abiertos ?? 0 }}</div>
                         <div class="text-[14px] font-black uppercase text-slate-400">Abiertos</div>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                     <div class="p-3 bg-blue-700 text-secondary rounded-2xl"><span
                             class="material-symbols-outlined text-2xl">engineering</span></div>
                     <div>
-                        <div id="cont-proceso" class="text-2xl font-black">{{ $enProceso ?? 0 }}</div>
+                        <div id="contador-proceso" class="text-2xl font-black">{{ $enProceso ?? 0 }}</div>
                         <div class="text-[14px] font-black uppercase text-blue-200">En Proceso</div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                     <div class="p-3 bg-lime-50 text-secondary rounded-2xl"><span
                             class="material-symbols-outlined text-2xl font-bold">check_circle</span></div>
                     <div>
-                        <div id="cont-resueltos" class="text-2xl font-black text-primary">{{ $resueltos ?? 0 }}</div>
+                        <div id="contador-resueltos" class="text-2xl font-black text-primary">{{ $resueltos ?? 0 }}</div>
                         <div class="text-[14px] font-black uppercase text-slate-400">Cerrados</div>
                     </div>
                 </div>

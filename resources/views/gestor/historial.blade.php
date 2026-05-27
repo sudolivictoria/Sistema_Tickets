@@ -18,7 +18,7 @@
     </div>
     <!--estadisticas generales-->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {{--carga activa de trabajo--}}
+        {{-- carga activa de trabajo --}}
         <div
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-orange-500 flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div>
@@ -31,7 +31,7 @@
                 <span class="material-symbols-outlined text-2xl">pending_actions</span>
             </div>
         </div>
-        {{--Resueltos hoy--}}
+        {{-- Resueltos hoy --}}
         <div
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-primary flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div>
@@ -42,7 +42,7 @@
                 <span class="material-symbols-outlined text-2xl">bolt</span>
             </div>
         </div>
-        {{--Eficiencia Mensual--}}
+        {{-- Eficiencia Mensual --}}
         <div
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-secondary flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div>
@@ -58,10 +58,10 @@
     </div>
     <!--final estadisticas generales-->
     <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        {{--BARRA DE FILTROS--}}
+        {{-- BARRA DE FILTROS --}}
         <div
             class="p-5 border-b border-slate-200 bg-slate-50/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
-            {{--Búsqueda por ID o Nombre--}}
+            {{-- Búsqueda por ID o Nombre --}}
             <div class="space-y-1.5">
                 <label class="text-[10px] font-black uppercase text-slate-500 tracking-wider">Identificación</label>
                 <div class="relative">
@@ -72,26 +72,26 @@
                         placeholder="ID, Usuario o Técnico...">
                 </div>
             </div>
-            {{--Fecha Inicio--}}
+            {{-- Fecha Inicio --}}
             <div class="space-y-1.5">
                 <label class="text-[10px] font-black uppercase text-slate-500 tracking-wider">Fecha Inicio</label>
                 <input type="date" id="filtroFechaInicio"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-primary transition-all font-semibold text-slate-600">
             </div>
-            {{--Fecha Fin--}}
+            {{-- Fecha Fin --}}
             <div class="space-y-1.5">
                 <label class="text-[10px] font-black uppercase text-slate-500 tracking-wider">Fecha Fin</label>
                 <input type="date" id="filtroFechaFin"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-primary transition-all font-semibold text-slate-600">
             </div>
-            {{--Filtrar por Estado--}}
+            {{-- Filtrar por Estado --}}
             <div class="space-y-1.5">
                 <label class="text-[10px] font-black uppercase text-slate-500 tracking-wider">Estado Operacional</label>
                 <select id="filtroEstado"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-primary transition-all font-black uppercase tracking-wider text-slate-600 cursor-pointer">
                     <option value="todos" class="font-black">ESTADOS</option>
-                    @foreach($estados as $est)
-                        @if($est->id == 1)
+                    @foreach ($estados as $est)
+                        @if ($est->id == 1)
                             <option value="1" class="text-orange-500 font-black">{{ $est->nombre_estado }}</option>
                         @elseif($est->id == 2)
                             <option value="2" class="text-blue-500 font-black">{{ $est->nombre_estado }}</option>
@@ -105,7 +105,7 @@
                     @endforeach
                 </select>
             </div>
-            {{--Botones de Ejecución--}}
+            {{-- Botones de Ejecución --}}
             <div class="flex gap-2 w-full">
                 <button type="button" onclick="aplicarFiltrosHistorial()"
                     class="flex-1 h-[38px] bg-secondary text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-md hover:bg-opacity-95 transition-all flex items-center justify-center gap-1.5">
@@ -118,7 +118,7 @@
                 </button>
             </div>
         </div>
-        {{--TABLA DE HISTORIA--}}
+        {{-- TABLA DE HISTORIA --}}
         <div class="overflow-x-auto px-6 pb-6">
             <table id="tablaHistorial" class="w-full text-left border-separate border-spacing-0">
                 <thead>
@@ -129,6 +129,8 @@
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
+                        <th class="px-2 py-4 border-b border-slate-200 font-black">Apertura</th>
+                        <th class="px-2 py-4 border-b border-slate-200 font-black">Cierre</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Detalle</th>
                         <th class="hidden">Categoria</th>
                     </tr>
@@ -141,11 +143,10 @@
     </div>
 
     {{-- detalle ticket --}}
-    @include('partials.detalle_ticket_completo')
+    @include('partials.detalle_ticket')
 
     {{-- detalle usuario --}}
     @include('partials.detalle_usuario')
-
 @endsection
 @push('scripts')
     <script src="{{ asset('js/historial.js') }}"></script>

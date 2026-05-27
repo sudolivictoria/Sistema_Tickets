@@ -86,7 +86,7 @@
         </td>
 
         {{--Fechas--}}
-        <td class="px-4 py-4 font-black data-order=" {{ $ticket->created_at->timestamp }}">
+        <td class="px-4 py-4 font-black" data-order="{{ $ticket->created_at->timestamp }}">
             {{ $ticket->created_at->format('d/m/Y') }}
         </td>
 

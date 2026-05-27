@@ -1,108 +1,98 @@
-// =======================================================
-// REFRESCO PARA DASHBOARD, MIS TICKETS Y MIS ASIGNADOS
-// =======================================================
-function refrescoTablasEstandar() {
+function ejecutarRefrescoInteligente() {
     const tablaBody = document.getElementById("tablaBody");
     if (!tablaBody) return;
 
-    //---evitar refresco si hay modals abiertos
+    //--verificar si hay una accion en curso
     const modalAbierto = document.querySelector(
-        ".modal:not(.hidden), #modalTicket:not(.hidden), #modalUsuario:not(.hidden)",
+        ".modal:not(.hidden), #modalTicket:not(.hidden), #modalUsuario:not(.hidden), .swal2-container:not(.hidden)",
     );
-
-    //---capturar buscador
     const buscador =
         document.getElementById("inputBusqueda") ||
         document.querySelector('input[type="search"]');
     const buscadorEnFoco = buscador === document.activeElement;
 
-    if (modalAbierto || buscadorEnFoco) return;
+    if (modalAbierto || buscadorEnFoco) return; //--pausar refresco
 
+    //--identificar tipo de tabla
     const tipoTabla = tablaBody.getAttribute("data-tipo") || "dashboard";
     const tablaElement = tablaBody.closest("table");
 
-    let textoAntes =
-        tablaElement && $.fn.DataTable.isDataTable(tablaElement)
-            ? $(tablaElement).DataTable().search()
-            : "";
-
-    //----respaldar el boton activo
-    const botonActivo = document.querySelector(
-        ".filtro-btn.bg-primary, .filtro-btn.bg-secondary, .filtro-btn.active",
-    );
-
+    //--hacer peticion a la api
     fetch(`/api/refresh-table?tipo=${tipoTabla}`)
         .then((res) => res.json())
         .then((data) => {
             if (tablaElement && $.fn.DataTable.isDataTable(tablaElement)) {
-                const id = "#" + tablaElement.id;
-
-                $(id).DataTable().destroy();
-                tablaBody.innerHTML = data.html;
-
-                if (typeof window.inicializarTablaTickets === "function") {
-                    window.inicializarTablaTickets(id);
+                const dt = $(tablaElement).DataTable();
+                dt.clear();
+                if (data.html && data.html.trim() !== "") {
+                    dt.rows.add($(data.html).filter('tr'));
                 }
 
-                // --- 1. Sincronizar texto en memoria (🔒 Quitamos el .draw() de aquí) ---
-                if (textoAntes) {
-                    if (document.getElementById("inputBusqueda")) {
-                        document.getElementById("inputBusqueda").value = textoAntes;
-                    }
-                    $(id).DataTable().search(textoAntes);
-                }
-
-                // --- 2. 🔒 CONTROL DE FLUJO: Reaplicar botón O dibujar por defecto ---
-                if (botonActivo) {
-                    const onclickAttr = botonActivo.getAttribute("onclick");
-                    if (onclickAttr) {
-                        const match = onclickAttr.match(/'([^']+)'/);
-                        const estadoId = match ? match[1] : "todos";
-
-                        if (typeof window.ejecutarFiltros === "function") {
-                            window.ejecutarFiltros(estadoId);
-                        } else if (typeof window.filtrarEstado === "function") {
-                            window.filtrarEstado(estadoId, botonActivo);
-                        }
-                    }
-                } else {
-                    // Solo si no hay un botón de estado activo, dibujamos la tabla de forma limpia
-                    $(id).DataTable().draw(false);
-                }
-
+                //---no redibujar toda la tabla, solo actualizar datos
+                dt.draw(false);
             } else {
                 tablaBody.innerHTML = data.html;
             }
 
-            //--sincronizar contadores
+            //--actualizar contadores y métricas
             if (data.contadores) {
-                if (document.getElementById("contador-abiertos"))
-                    document.getElementById("contador-abiertos").textContent =
-                        data.contadores.abiertos;
-                if (document.getElementById("contador-proceso"))
-                    document.getElementById("contador-proceso").textContent =
-                        data.contadores.proceso;
-                if (document.getElementById("contador-resueltos"))
-                    document.getElementById("contador-resueltos").textContent =
-                        data.contadores.resueltos;
-            }
-            //--sincronizar mis asignados
-            if (
-                data.contadorAsignados !== undefined &&
-                document.getElementById("contador-asignados")
-            ) {
-                document.getElementById("contador-asignados").textContent =
-                    data.contadorAsignados;
+                actualizarElemento(
+                    "contador-abiertos",
+                    data.contadores.abiertos,
+                );
+                actualizarElemento("contador-proceso", data.contadores.proceso);
+                actualizarElemento(
+                    "contador-resueltos",
+                    data.contadores.resueltos,
+                );
             }
 
-            //---sincronizar el grafico
-            if (data.grafico) {
-                const contenedorGrafico =
-                    document.getElementById("barras-rendimiento");
-                if (contenedorGrafico) {
-                    contenedorGrafico.innerHTML = data.grafico;
-                }
+            if (data.contadorAsignados !== undefined) {
+                actualizarElemento(
+                    "contador-asignados",
+                    data.contadorAsignados,
+                );
             }
+
+            if (data.grafico) {
+                actualizarElemento("barras-rendimiento", data.grafico, true);
+            }
+
+            if (data.cargaTrabajo !== undefined)
+                actualizarElemento("metric-carga-trabajo", data.cargaTrabajo);
+            if (data.resueltos24h !== undefined)
+                actualizarElemento("metric-resueltos-24h", data.resueltos24h);
+            if (data.tasaCierre !== undefined)
+                actualizarElemento("metric-tasa-cierre", data.tasaCierre);
         })
-        .catch((err) => console.error("Error en refresco estándar:", err));
+        .catch((err) => console.error("Error en auto-refresco:", err));
 }
+
+//--funcion para actualizar texto o html
+function actualizarElemento(id, valor, esHTML = false) {
+    const el = document.getElementById(id);
+    if (el) {
+        if (esHTML) el.innerHTML = valor;
+        else el.textContent = valor;
+    }
+}
+
+// ===================================
+// INICIALIZACIÓN DE LA ACTUALIZACION
+// ==================================
+function iniciarAutoRefresco() {
+    if (document.getElementById("tablaBody")) {
+        ejecutarRefrescoInteligente();
+        setTimeout(iniciarAutoRefresco, 30000); 
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.getElementById("tablaBody")) {
+        setTimeout(iniciarAutoRefresco, 30000);
+    }
+});
+
+window.autoRefrescoUniversal = function () {
+    ejecutarRefrescoInteligente();
+};

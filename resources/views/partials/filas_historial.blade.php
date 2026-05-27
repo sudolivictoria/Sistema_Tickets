@@ -10,13 +10,15 @@
         <!--datos del usuario-->
         <td class="px-2 py-4">
             <div class="flex flex-col">
-                <button type="button" onclick="verUsuario(
+                <button type="button"
+                    onclick="verUsuario(
                             '{{ $ticket->user->name }}', 
                             '{{ $ticket->user->email }}', 
                             '{{ $ticket->user->unidad->nombre_unidad }}', 
                             '{{ $ticket->user->cargo }}', 
                             '{{ $ticket->user->telefono ?? 'N/A' }}'
-                        )" class="font-black hover:text-primary transition-all text-left flex items-center gap-1 group">
+                        )"
+                    class="font-black hover:text-primary transition-all text-left flex items-center gap-1 group">
                     {{ $ticket->user->name }}
                     <span
                         class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
@@ -37,7 +39,7 @@
                     'Baja' => 'bg-green-100 text-[#008F7E] border-green-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
-             @endphp
+            @endphp
             <span class="px-2 py-1 rounded-full border font-black text-[10px] uppercase {{ $clasePrio }}">
                 {{ $prio }}
             </span>
@@ -56,7 +58,7 @@
                     'no corresponde' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
-             @endphp
+            @endphp
             <span
                 class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $claseEstado }}">
                 {{ $nombreEstado }}
@@ -65,6 +67,14 @@
         {{-- Técnico --}}
         <td class="px-5 py-4 font-black">
             {{ optional($ticket->tecnico)->name ?? 'Pendiente de asignación' }}
+        </td>
+        {{-- Fechas --}}
+        <td class="px-4 py-4 font-black data-order=" {{ $ticket->created_at->timestamp }}">
+            {{ $ticket->created_at->format('d/m/Y') }}
+        </td>
+
+        <td class="px-4 py-4 font-black">
+            {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
         </td>
         {{-- Acciones --}}
         <td class="px-5 py-4 text-center">
@@ -76,12 +86,6 @@
                     data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}"
                     data-fecha="{{ $ticket->created_at->format('d/m/Y') }}">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
-                </button>
-                {{-- Comentarios --}}
-                <button type="button" onclick="abrirComentariosTicket({{ $ticket->id }})"
-                    class="w-7 h-7 flex items-center justify-center bg-slate-100 text-slate-600 hover:bg-primary hover:text-white rounded-lg transition-all"
-                    title="Ver Comentarios">
-                    <span class="material-symbols-outlined text-[17px]">chat_bubble</span>
                 </button>
             </div>
         </td>

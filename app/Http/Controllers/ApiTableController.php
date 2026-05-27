@@ -27,7 +27,7 @@ class ApiTableController extends Controller
             $query->where('tecnico_id', $user->id);
             $statsQuery->where('tecnico_id', $user->id);
         } else {
-            //---datos del historial
+            //---Datos del historial
             if ($tipo == 'historial') {
                 if ($user->rol_id != 1) {
                     $query->whereHas('categoria', function ($q) use ($miUnidadId) {
@@ -49,16 +49,22 @@ class ApiTableController extends Controller
                 $query->where('estado_id', 1);
             }
         }
+
         if ($tipo == 'usuario') {
             $query->limit(5);
         }
+
         if ($tipo == 'dashboard') {
             $inicioMes = Carbon::now()->startOfMonth();
             $finMes = Carbon::now()->endOfMonth();
             $query->whereBetween('created_at', [$inicioMes, $finMes]);
         }
+
+        //---Consulta y datos para estadisticas
         $ticketsResult = $query->latest()->get();
         $allTicketsForStats = $statsQuery->get();
+
+        //---contadores para los dashboard y tarjetas superiores
         $contadores = [
             'abiertos'  => $allTicketsForStats->whereNull('tecnico_id')->whereNotIn('estado_id', $estadosCerrados)->count(),
             'proceso'   => $allTicketsForStats->whereNotNull('tecnico_id')->where('estado_id', 2)->count(),
@@ -67,13 +73,13 @@ class ApiTableController extends Controller
 
         $graficoHtml = null;
 
+        //--grafico de rendimiento mensual por año
         if ($user->rol_id != 2) {
-
             $añoActual = date('Y');
             $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
             $mesesGrafico = [];
 
-            //---agrupa tickets por mes y estado (mantiene tu comportamiento original para el gráfico)
+            //---tickets por mes
             $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
                 ->whereYear('created_at', $añoActual)
                 ->whereHas('categoria', function ($q) use ($miUnidadId) {
@@ -98,12 +104,12 @@ class ApiTableController extends Controller
             $graficoHtml = view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
         }
 
+        //--contador mis asignados
         $contadorMisAsignados = Ticket::where('tecnico_id', Auth::id())
             ->where('estado_id', 2)
             ->count();
 
-
-        //--metricas tarjetas superiores
+        //--metricas
         $cargaTrabajo = 0;
         $resueltos24h = 0;
         $tasaCierre = 0;
@@ -112,38 +118,38 @@ class ApiTableController extends Controller
             $metricsQuery = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
                 ->whereYear('created_at', date('Y'));
 
-            //--gestor calcula por unidad
+            //---El gestor calcula estadísticas respecto a su unidad, el administrador de forma general
             if ($user->rol_id != 1) {
                 $metricsQuery->whereHas('categoria', function ($q) use ($miUnidadId) {
                     $q->where('unidad_id', $miUnidadId);
                 });
             }
-            //---el admin lo hace de manera global
 
             $tickets = $metricsQuery->latest()->get();
 
+            //---Carga de trabajo: Creados el día de hoy
             $cargaTrabajo = $tickets->filter(function ($ticket) {
                 return Carbon::parse($ticket->created_at)->isToday();
             })->count();
 
-            $resueltos24h = $tickets->whereIn('estado_id', [3, 4, 5])
+            //---Resueltos en las últimas 24 horas continuas
+            $resueltos24h = $tickets->whereIn('estado_id', $estadosCerrados)
                 ->filter(function ($ticket) {
                     return $ticket->fecha_cierre && Carbon::parse($ticket->fecha_cierre)->gte(now()->subDay());
                 })
                 ->count();
 
-            //-----tasa cierre mensual
+            //---Tasa de cierre respecto al mes actual transcurrido
             $ticketsDelMes = $tickets->filter(function ($ticket) {
                 return Carbon::parse($ticket->created_at)->isCurrentMonth();
             });
 
             $totalTickets = $ticketsDelMes->count();
-            $cerradosTickets = $ticketsDelMes->whereIn('estado_id', [3, 4, 5])->count();
+            $cerradosTickets = $ticketsDelMes->whereIn('estado_id', $estadosCerrados)->count();
             $tasaCierre = $totalTickets > 0 ? round(($cerradosTickets / $totalTickets) * 100) : 0;
         }
 
-
-        //-----html segun el tipo de tabla que se refresca---
+        //---Segmentación e Inyección del HTML según la vista solicitada por la petición
         $html = '';
         switch ($tipo) {
             case 'dashboard':
@@ -169,6 +175,7 @@ class ApiTableController extends Controller
                 break;
 
             case 'mis_asignados':
+                //---Trae los técnicos activos que pertenezcan a la unidad asignada para reasignaciones mutuas si es requerido
                 $tecnicos = User::where('unidad_id', $miUnidadId)->where('activo', true)->get();
                 $html = view('partials.filas_mis_asignados', [
                     'tickets' => $ticketsResult,
@@ -181,7 +188,7 @@ class ApiTableController extends Controller
                 break;
         }
 
-        //--retornar JSON con todas las variables necesarias
+        //---Retorno unificado del JSON estructurado para el mapeo AJAX de JavaScript
         return response()->json([
             'html' => $html,
             'contadores' => $contadores,
