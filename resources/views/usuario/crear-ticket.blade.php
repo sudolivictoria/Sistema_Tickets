@@ -153,7 +153,7 @@
                         confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
                     }
                 }).then(() => {
-                    window.location.href = "{{ route('admin.dashboard') }}";
+                    window.location.href = "{{ route('usuario.dashboard') }}";
                 });
             });
         </script>

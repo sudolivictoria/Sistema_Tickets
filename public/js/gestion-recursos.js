@@ -121,7 +121,7 @@ window.eliminarManual = function (id) {
             form.submit();
         }
     });
-}
+};
 
 //---helpers para abrir y cerrar modales
 window.abrirModal = function (id) {

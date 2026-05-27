@@ -12,55 +12,55 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    window.ejecutarFiltros = function (estadoSeleccionado) {
-        const estadoFiltro = String(estadoSeleccionado).trim().toLowerCase();
-        const listaEstados = estadoFiltro.split(",");
+    $(document).on("click", ".btn-ver-detalle", function () {
+        const asunto = $(this).data("asunto");
+        const descripcion = $(this).data("descripcion");
+        const tipo = $(this).data("tipo");
+        const fecha = $(this).data("fecha");
+        verDetalle(asunto, descripcion, tipo, fecha);
+    });
 
-        document.querySelectorAll(".ticket-fila").forEach((fila) => {
-            const estadoIdFila = String(fila.dataset.estadoId || "")
-                .trim()
-                .toLowerCase();
-            const coincide =
-                estadoFiltro === "todos" || listaEstados.includes(estadoIdFila);
-            fila.classList.toggle("hidden", !coincide);
-        });
-    };
-
-    //--filtros por estado
-    window.filtrarEstado = function (estado, btn) {
-        //--resetear estilos
-        document.querySelectorAll(".filtro-btn").forEach((b) => {
-            b.classList.remove("bg-secondary", "text-white", "shadow-md");
-            b.classList.add("bg-slate-100", "text-slate-500");
-        });
-
-        //--destacar botón seleccionado
-        if (btn) {
-            btn.classList.remove("bg-slate-100", "text-slate-500");
-            btn.classList.add("bg-secondary", "text-white", "shadow-md");
-        }
-
-        //--ejecutar filtrado
-        ejecutarFiltros(estado);
-    };
+    $(document).on("click", ".btn-ver-usuario", function () {
+        const nombre = $(this).data("nombre");
+        const email = $(this).data("email");
+        const unidad = $(this).data("unidad");
+        const cargo = $(this).data("cargo");
+        const telefono = $(this).data("telefono");
+        verUsuario(nombre, email, unidad, cargo, telefono);
+    });
 });
 
-$(document).on("click", ".btn-ver-detalle", function () {
-    const asunto = $(this).data("asunto");
-    const descripcion = $(this).data("descripcion");
-    const tipo = $(this).data("tipo");
-    const fecha = $(this).data("fecha");
-    verDetalle(asunto, descripcion, tipo, fecha);
-});
+window.ejecutarFiltros = function (estadoSeleccionado) {
+    const estadoFiltro = String(estadoSeleccionado).trim().toLowerCase();
+    const listaEstados = estadoFiltro.split(",");
 
-$(document).on("click", ".btn-ver-usuario", function () {
-    const nombre = $(this).data("nombre");
-    const email = $(this).data("email");
-    const unidad = $(this).data("unidad");
-    const cargo = $(this).data("cargo");
-    const telefono = $(this).data("telefono");
-    verUsuario(nombre, email, unidad, cargo, telefono);
-});
+    document.querySelectorAll(".ticket-fila").forEach((fila) => {
+        const estadoIdFila = String(fila.dataset.estadoId || "")
+            .trim()
+            .toLowerCase();
+        const coincide =
+            estadoFiltro === "todos" || listaEstados.includes(estadoIdFila);
+        fila.classList.toggle("hidden", !coincide);
+    });
+};
+
+//--filtros por estado
+window.filtrarEstado = function (estado, btn) {
+    //--resetear estilos
+    document.querySelectorAll(".filtro-btn").forEach((b) => {
+        b.classList.remove("bg-secondary", "text-white", "shadow-md");
+        b.classList.add("bg-slate-100", "text-slate-500");
+    });
+
+    //--destacar botón seleccionado
+    if (btn) {
+        btn.classList.remove("bg-slate-100", "text-slate-500");
+        btn.classList.add("bg-secondary", "text-white", "shadow-md");
+    }
+
+    //--ejecutar filtrado
+    ejecutarFiltros(estado);
+};
 
 window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const modal = document.getElementById("modalTicket");

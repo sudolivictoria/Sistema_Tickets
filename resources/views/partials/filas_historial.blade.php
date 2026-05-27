@@ -16,7 +16,7 @@
                             '{{ $ticket->user->email }}', 
                             '{{ $ticket->user->unidad->nombre_unidad }}', 
                             '{{ $ticket->user->cargo }}', 
-                            '{{ $ticket->user->telefono ?? 'N/A' }}'
+                            '{{ $ticket->user->telefono ?? '----' }}'
                         )"
                     class="font-black hover:text-primary transition-all text-left flex items-center gap-1 group">
                     {{ $ticket->user->name }}

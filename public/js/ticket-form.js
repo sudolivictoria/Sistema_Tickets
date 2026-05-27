@@ -1,11 +1,11 @@
-//--Inmediately Invoked Function Expression 1
+//--Inmediately Invoked Function Expression 
 (function () {
     window.filtrarTipos = function (categoriaId) {
         const selectTipo = document.querySelector(
             'select[name="tipo_solicitud_id"]',
         );
         if (!selectTipo) return;
-        //--reiniicar opciones
+        //--reiniciar opciones
         selectTipo.innerHTML =
             '<option value="" disabled selected>Seleccione</option>';
 

@@ -1,12 +1,10 @@
 var tableHistorial;
 //----no cargar datos al inicio
 var filtrosAplicados = false;
-
 window.inicializarHistorialDataTable = function () {
     if ($.fn.DataTable.isDataTable("#tablaHistorial")) {
         $("#tablaHistorial").DataTable().destroy();
     }
-
     //---data table configuracion exaxta
     tableHistorial = $("#tablaHistorial").DataTable({
         language: {
@@ -41,61 +39,6 @@ window.inicializarHistorialDataTable = function () {
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
-    tableHistorial.draw();
-};
-
-document.addEventListener("DOMContentLoaded", function () {
-    if (document.querySelector("#tablaHistorial")) {
-        //----filtros
-        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-            if (settings.nTable.id !== "tablaHistorial") return true;
-            //---no mostrar nada hasta ver los filtros
-            if (!filtrosAplicados) {
-                return false;
-            }
-            //---obtener el elemento de filtrado
-            const filaTr = settings.aoData[dataIndex].nTr;
-            const fechaFilaRaw = filaTr.getAttribute("data-fecha");
-            const estadoFilaId = filaTr.getAttribute("data-estado-id");
-            const categoriaFilaId = filaTr.getAttribute("data-categoria-id");
-            //---filtro del estado
-            const estadoSel = document.getElementById("filtroEstado").value;
-            if (estadoSel !== "todos" && estadoFilaId !== estadoSel) {
-                return false;
-            }
-            //----categoria
-            const elCategoria = document.getElementById("filtroCategoria");
-            if (elCategoria) {
-                const categoriaSel = elCategoria.value;
-                if (
-                    categoriaSel !== "todos" &&
-                    categoriaFilaId !== categoriaSel
-                ) {
-                    return false;
-                }
-            }
-            //---fechas
-            const fInicioRaw =
-                document.getElementById("filtroFechaInicio").value;
-            const fFinRaw = document.getElementById("filtroFechaFin").value;
-
-            if (fechaFilaRaw) {
-                const fechaFila = new Date(fechaFilaRaw + "T00:00:00");
-
-                if (fInicioRaw) {
-                    const fechaInicio = new Date(fInicioRaw + "T00:00:00");
-                    if (fechaFila < fechaInicio) return false;
-                }
-                if (fFinRaw) {
-                    const fechaFin = new Date(fFinRaw + "T00:00:00");
-                    if (fechaFila > fechaFin) return false;
-                }
-            }
-            return true;
-        });
-        //--inicializacion
-        window.inicializarHistorialDataTable();
-    }
     //---modal detalle delegación eventos
     $("#tablaHistorial").on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
@@ -112,7 +55,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const telefono = $(this).data("telefono");
         verUsuario(nombre, email, unidad, cargo, telefono);
     });
-});
+    tableHistorial.draw();
+};
 //--------filtrado
 window.aplicarFiltrosHistorial = function () {
     if (!tableHistorial) return;
@@ -189,3 +133,56 @@ window.cerrarModalUsuario = function () {
         document.body.style.overflow = "auto";
     }
 };
+document.addEventListener("DOMContentLoaded", function () {
+    if (document.querySelector("#tablaHistorial")) {
+        //----filtros
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            if (settings.nTable.id !== "tablaHistorial") return true;
+            //---no mostrar nada hasta ver los filtros
+            if (!filtrosAplicados) {
+                return false;
+            }
+            //---obtener el elemento de filtrado
+            const filaTr = settings.aoData[dataIndex].nTr;
+            const fechaFilaRaw = filaTr.getAttribute("data-fecha");
+            const estadoFilaId = filaTr.getAttribute("data-estado-id");
+            const categoriaFilaId = filaTr.getAttribute("data-categoria-id");
+            //---filtro del estado
+            const estadoSel = document.getElementById("filtroEstado").value;
+            if (estadoSel !== "todos" && estadoFilaId !== estadoSel) {
+                return false;
+            }
+            //----categoria
+            const elCategoria = document.getElementById("filtroCategoria");
+            if (elCategoria) {
+                const categoriaSel = elCategoria.value;
+                if (
+                    categoriaSel !== "todos" &&
+                    categoriaFilaId !== categoriaSel
+                ) {
+                    return false;
+                }
+            }
+            //---fechas
+            const fInicioRaw =
+                document.getElementById("filtroFechaInicio").value;
+            const fFinRaw = document.getElementById("filtroFechaFin").value;
+
+            if (fechaFilaRaw) {
+                const fechaFila = new Date(fechaFilaRaw + "T00:00:00");
+
+                if (fInicioRaw) {
+                    const fechaInicio = new Date(fInicioRaw + "T00:00:00");
+                    if (fechaFila < fechaInicio) return false;
+                }
+                if (fFinRaw) {
+                    const fechaFin = new Date(fFinRaw + "T00:00:00");
+                    if (fechaFila > fechaFin) return false;
+                }
+            }
+            return true;
+        });
+        //--inicializacion
+        window.inicializarHistorialDataTable();
+    }
+});

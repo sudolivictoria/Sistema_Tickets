@@ -19,7 +19,7 @@
                     class="btn-ver-usuario font-black hover:text-primary transition-all text-left flex items-center gap-2 group"
                     data-nombre="{{ $ticket->user->name }}" data-email="{{ $ticket->user->email }}"
                     data-unidad="{{ $ticket->user->unidad->nombre_unidad }}" data-cargo="{{ $ticket->user->cargo }}"
-                    data-telefono="{{ $ticket->user->telefono ?? 'Sin Asignar' }}">
+                    data-telefono="{{ $ticket->user->telefono ?? '----' }}">
 
                     {{ $ticket->user->name }}
 
