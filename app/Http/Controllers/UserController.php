@@ -20,7 +20,7 @@ class UserController extends Controller
 
         //--guarda el cambio en la base de datos
         $user->save();
-        return back()->with('success', 'El estado del usuario ha sido actualizado.');
+        return redirect()->route('admin.gestion-usuarios')->with('success', 'El estado del usuario ha sido actualizado.');
     }
 
     public function index()
@@ -48,8 +48,7 @@ class UserController extends Controller
 
         User::create($validated);
 
-        // En lugar de response()->json, hacemos esto:
-        return back()->with('success', 'Usuario creado exitosamente.');
+        return redirect()->route('admin.gestion-usuarios')->with('success', 'Usuario creado exitosamente.');
     }
 
 
@@ -75,6 +74,6 @@ class UserController extends Controller
         }
 
         $user->update($validated);
-        return back()->with('success', 'Usuario actualizado.');
+        return redirect()->route('admin.gestion-usuarios')->with('success', 'Usuario actualizado.');
     }
 }
