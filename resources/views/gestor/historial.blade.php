@@ -89,7 +89,7 @@
                 <label class="text-[10px] font-black uppercase text-slate-500 tracking-wider">Estado Operacional</label>
                 <select id="filtroEstado"
                     class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-primary transition-all font-black uppercase tracking-wider text-slate-600 cursor-pointer">
-                    <option value="todos" class="font-black">ESTADOS</option>
+                    <option value="todos" class="font-black">TODOS</option>
                     @foreach ($estados as $est)
                         @if ($est->id == 1)
                             <option value="1" class="text-orange-500 font-black">{{ $est->nombre_estado }}</option>

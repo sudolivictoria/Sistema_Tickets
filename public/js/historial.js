@@ -71,12 +71,22 @@ window.aplicarFiltrosHistorial = function () {
 window.limpiarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     filtrosAplicados = false;
-    //---resetear inputs
-    document.getElementById("filtroBuscar").value = "";
-    document.getElementById("filtroFechaInicio").value = "";
-    document.getElementById("filtroFechaFin").value = "";
-    document.getElementById("filtroEstado").value = "todos";
-    document.getElementById("filtroCategoria").value = "todos";
+    //---resetear inputs verificando que existan primero para evitar errores
+    const elBuscar = document.getElementById("filtroBuscar");
+    if (elBuscar) elBuscar.value = "";
+
+    const elFechaInicio = document.getElementById("filtroFechaInicio");
+    if (elFechaInicio) elFechaInicio.value = "";
+
+    const elFechaFin = document.getElementById("filtroFechaFin");
+    if (elFechaFin) elFechaFin.value = "";
+
+    const elEstado = document.getElementById("filtroEstado");
+    if (elEstado) elEstado.value = "todos";
+
+    const elCategoria = document.getElementById("filtroCategoria");
+    if (elCategoria) elCategoria.value = "todos";
+    
     tableHistorial.search("").draw(); //--vista vacia
 };
 //----DETALLE TICKET Y USUARIO---
