@@ -51,14 +51,14 @@ window.inicializarTablaTickets = function (
             table.search(this.value).draw(false);
         });
 
-    $("#tablaMisAsignados").on("click", ".btn-ver-detalle", function () {
+    $(document).on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");
         const tipo = $(this).data("tipo");
         verDetalle(asunto, descripcion, tipo);
     });
 
-    $("#tablaMisAsignados").on("click", ".btn-ver-usuario", function () {
+    $(document).on("click", ".btn-ver-usuario", function () {
         const nombre = $(this).data("nombre");
         const email = $(this).data("email");
         const unidad = $(this).data("unidad");

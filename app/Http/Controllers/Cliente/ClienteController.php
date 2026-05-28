@@ -28,17 +28,20 @@ class ClienteController extends Controller
         $estadosCerrados = [3, 4, 5];
 
         //----estadisticas tickets del cliente autenticado
-        $abiertos = Ticket::where('user_id', $userId)
+        $abiertos = Ticket::whereYear('created_at', date('Y'))
+            ->where('user_id', $userId)
             ->whereNull('tecnico_id')
             ->whereNotIn('estado_id', $estadosCerrados)
             ->count();
 
-        $enProceso = Ticket::where('user_id', $userId)
+        $enProceso = Ticket::whereYear('created_at', date('Y'))
+            ->where('user_id', $userId)
             ->whereNotNull('tecnico_id')
             ->whereNotIn('estado_id', $estadosCerrados)
             ->count();
 
-        $resueltos = Ticket::where('user_id', $userId)
+        $resueltos = Ticket::whereYear('created_at', date('Y'))
+            ->where('user_id', $userId)
             ->whereIn('estado_id', $estadosCerrados)
             ->count();
 

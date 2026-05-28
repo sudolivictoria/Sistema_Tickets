@@ -74,7 +74,7 @@
             <button type="button"
                 class="btn-ver-detalle p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
-                data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}" data-fecha="{{ $ticket->created_at->format('d/m/Y') }}">
+                data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}" data-fecha="{{ $ticket->created_at->format('d/m/Y') }}">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

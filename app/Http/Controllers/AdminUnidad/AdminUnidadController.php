@@ -28,26 +28,23 @@ class AdminUnidadController extends Controller
         $estadosCerrados = [3, 4, 5];
 
         //--tickets asignados por unidad del admin autenticado
-        $noAsignados = Ticket::whereNull('tecnico_id')
+        $noAsignados = Ticket::whereYear('created_at', date('Y'))
+            ->whereNull('tecnico_id')
             ->whereNotIn('estado_id', $estadosCerrados)
-            ->whereHas('categoria', function ($q) use ($miUnidadId) {
-                $q->where('unidad_id', $miUnidadId);
-            })
+            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
             ->count();
 
         //--tickets pendientes por unidad del admin autenticado
-        $pendientes = Ticket::whereNotNull('tecnico_id')
+        $pendientes = Ticket::whereYear('created_at', date('Y'))
+            ->whereNotNull('tecnico_id')
             ->whereNotIn('estado_id', $estadosCerrados)
-            ->whereHas('categoria', function ($q) use ($miUnidadId) {
-                $q->where('unidad_id', $miUnidadId);
-            })
+            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
             ->count();
 
         //--tickets resueltos por unidad del admin autenticado
-        $resueltos = Ticket::whereIn('estado_id', $estadosCerrados)
-            ->whereHas('categoria', function ($q) use ($miUnidadId) {
-                $q->where('unidad_id', $miUnidadId);
-            })
+        $resueltos = Ticket::whereYear('created_at', date('Y'))
+            ->whereIn('estado_id', $estadosCerrados)
+            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
             ->count();
 
         //---estadisticas mensuales por unidad del admin autenticado
