@@ -115,8 +115,7 @@
         </form>
     </div>
 @endsection
-
-@push('scripts')
+@push('page-scripts')
     <script src="{{ asset('js/ticket-form.js') }}"></script>
 
     <script>

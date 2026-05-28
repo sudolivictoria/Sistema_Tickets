@@ -51,10 +51,7 @@
     @include('partials.detalle_usuario')
 @endsection
 
-
-@push('scripts')
-    <script src="{{ asset('js/asignar-tickets.js') }}"></script>
-
+@push('page-scripts')
     @if ($errors->any())
         <script>
             document.addEventListener("DOMContentLoaded", () => {
@@ -108,4 +105,13 @@
             });
         </script>
     @endif
+@endpush
+
+
+@push('page-scripts')
+    <script src="{{ asset('js/asignar-tickets.js') }}"></script> 
+@endpush
+
+@push('sse-scripts')
+    <script src="{{ asset('js/api.js') }}"></script>
 @endpush

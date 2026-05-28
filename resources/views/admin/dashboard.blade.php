@@ -27,7 +27,8 @@
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Abiertos</p>
-                <h3 id="contador-abiertos" class="text-3xl font-black text-slate-800 leading-none">{{ $noAsignados ?? 0 }}</h3>
+                <h3 id="contador-abiertos" class="text-3xl font-black text-slate-800 leading-none">{{ $noAsignados ?? 0 }}
+                </h3>
             </div>
         </div>
 
@@ -38,7 +39,8 @@
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">En Proceso</p>
-                <h3 id="contador-proceso" class="text-3xl font-black text-slate-800 leading-none">{{ $pendientes ?? 0 }}</h3>
+                <h3 id="contador-proceso" class="text-3xl font-black text-slate-800 leading-none">{{ $pendientes ?? 0 }}
+                </h3>
             </div>
         </div>
 
@@ -49,7 +51,8 @@
             </div>
             <div>
                 <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Cerrados</p>
-                <h3 id="contador-resueltos" class="text-3xl font-black text-slate-800 leading-none">{{ $resueltos ?? 0 }}</h3>
+                <h3 id="contador-resueltos" class="text-3xl font-black text-slate-800 leading-none">{{ $resueltos ?? 0 }}
+                </h3>
             </div>
         </div>
     </div>
@@ -94,18 +97,20 @@
                 <div class="p-5 border-b border-slate-100 flex flex-wrap gap-4 justify-between items-center bg-white">
                     <div class="flex items-center gap-4">
                         <div class="flex gap-2" id="filtrosEstado">
-                            <button type="button" onclick="filtrarEstado('todos', this)"
+                            <button type="button" onclick="filtrarEstado('todos', this)" data-estado="todos"
                                 class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[11px] font-black uppercase shadow-md transition-all">Todos</button>
-                            <button type="button" onclick="filtrarEstado('1', this)"
+
+                            <button type="button" onclick="filtrarEstado('1', this)" data-estado="1"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
-                            <button type="button" onclick="filtrarEstado('2', this)"
+
+                            <button type="button" onclick="filtrarEstado('2', this)" data-estado="2"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
-                            <button type="button" onclick="filtrarEstado('3,4,5', this)"
+
+                            <button type="button" onclick="filtrarEstado('3,4,5', this)" data-estado="3,4,5"
                                 class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Cerrado</button>
                         </div>
                     </div>
                 </div>
-
                 {{-- Contenedor con Scroll --}}
                 <div class="overflow-y-auto" style="max-height: 400px;">
                     <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
@@ -198,6 +203,10 @@
     @include('partials.detalle_usuario')
 @endsection
 
-@push('scripts')
+@push('page-scripts')
     <script src="{{ asset('js/admin.js') }}"></script>
+@endpush
+
+@push('sse-scripts')
+    <script src="{{ asset('js/api.js') }}"></script>
 @endpush

@@ -17,12 +17,21 @@
                 <div class="p-5 flex flex-wrap gap-4 justify-between items-center bg-white">
                     <div class="flex items-center gap-4">
                         <div class="flex gap-2" id="filtrosEstado">
-                            <button type="button" onclick="filtrarEstado('todos', this)"
-                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">Todos</button>
-                            <button type="button" onclick="filtrarEstado('procesando', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Pendientes</button>
+                            <button type="button" onclick="filtrarEstado('todos', this)" data-estado="todos"
+                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">
+                                Todos
+                            </button>
+
+                            <button type="button" onclick="filtrarEstado('procesando', this)" data-estado="procesando"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">
+                                Pendientes
+                            </button>
+
                             <button type="button" onclick="filtrarEstado('resuelto,equivocado,no corresponde', this)"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Cerrado</button>
+                                data-estado="resuelto,equivocado,no corresponde"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">
+                                Cerrado
+                            </button>
                         </div>
                     </div>
 
@@ -64,10 +73,7 @@
     @include('partials.detalle_usuario')
 @endsection
 
-
-@push('scripts')
-    <script src="{{ asset('js/mis-asignados.js') }}"></script>
-
+@push('page-scripts')
     @if ($errors->any())
         <script>
             document.addEventListener("DOMContentLoaded", () => {
@@ -121,4 +127,13 @@
             });
         </script>
     @endif
+@endpush
+
+
+@push('page-scripts')
+    <script src="{{ asset('js/mis-asignados.js') }}"></script>
+@endpush
+
+@push('sse-scripts')
+    <script src="{{ asset('js/api.js') }}"></script>
 @endpush

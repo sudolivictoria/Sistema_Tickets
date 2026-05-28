@@ -83,7 +83,7 @@
 
                                         <button type="submit" @disabled($user->id === auth()->id())
                                             class="p-2 rounded-xl {{ $user->activo ? 'bg-red-50 text-red-600 hover:bg-red-100 hover:scale-105 transition-transform' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-200 hover:scale-105 transition-transform' }} 
-                                            {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
+                                                    {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
                                             <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
                                         </button>
                                     </form>
@@ -273,6 +273,7 @@
         </script>
     @endif
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="{{ asset('js/gestion-usuarios.js') }}"></script>
 
 @endpush

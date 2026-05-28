@@ -11,6 +11,7 @@ window.inicializarTablaTickets = function (
         $(selectorId).DataTable().destroy();
     }
 
+    $.fn.dataTable.ext.pager.numbers_length = 5;
     table = tableElement.DataTable({
         stateSave: true,
         language: {
@@ -187,7 +188,9 @@ function procesarAccionTicket(btn, config) {
             fetch(url, {
                 method: "POST",
                 headers: {
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    "X-CSRF-TOKEN": document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ).content,
                     "X-Requested-With": "XMLHttpRequest",
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
@@ -196,7 +199,7 @@ function procesarAccionTicket(btn, config) {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        autoRefrescoUniversal();
+                        AutoRefrescoSSE.forzarRefresco();
                         Swal.fire({
                             title: config.tituloExito,
                             text: data.message,
@@ -210,7 +213,11 @@ function procesarAccionTicket(btn, config) {
                 })
                 .catch((error) => {
                     console.error("Error:", error);
-                    Swal.fire("Error", "No se pudo procesar la solicitud", "error");
+                    Swal.fire(
+                        "Error",
+                        "No se pudo procesar la solicitud",
+                        "error",
+                    );
                 });
         }
     });
@@ -224,7 +231,7 @@ window.confirmarResolver = function (btn) {
     procesarAccionTicket(btn, {
         tituloConfirmacion: "¿Marcar como Resuelto?",
         textoBoton: "Sí, resolver",
-        tituloExito: "¡Ticket Resuelto!"
+        tituloExito: "¡Ticket Resuelto!",
     });
 };
 
@@ -232,7 +239,7 @@ window.confirmarEquivocado = function (btn) {
     procesarAccionTicket(btn, {
         tituloConfirmacion: "¿Marcar como Equivocado?",
         textoBoton: "Sí, marcar",
-        tituloExito: "¡Ticket Marcado como Equivocado!"
+        tituloExito: "¡Ticket Marcado como Equivocado!",
     });
 };
 
@@ -240,6 +247,6 @@ window.confirmarNoCorresponde = function (btn) {
     procesarAccionTicket(btn, {
         tituloConfirmacion: "¿Marcar No Corresponde?",
         textoBoton: "Sí, marcar",
-        tituloExito: "¡Ticket Marcado como No Corresponde!"
+        tituloExito: "¡Ticket Marcado como No Corresponde!",
     });
 };

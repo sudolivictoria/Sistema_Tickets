@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
 
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -66,6 +66,8 @@
             background: #84cc16;
         }
     </style>
+
+    <link rel="stylesheet" href="{{ asset('css/tickets.css') }}?v={{ time() }}">
 </head>
 
 <body class="bg-slate-50 font-display text-slate-900 antialiased">
@@ -154,15 +156,11 @@
         </div>
     </main>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="{{ asset('js/usuario-menu.js') }}?v={{ time() }}" defer></script>
+
     @stack('scripts')
 
-    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/usuario-menu.js') }}?v={{ time() }}" defer></script>
 
     <script>
         //-----------preloader 
@@ -195,10 +193,13 @@
             }, 1000);
         }
 
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', function () {
             iniciarReloj();
         });
     </script>
+
+    @stack('page-scripts')
+    @stack('sse-scripts')
 
 </body>
 

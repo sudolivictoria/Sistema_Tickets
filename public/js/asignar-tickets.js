@@ -11,6 +11,7 @@ window.inicializarTablaTickets = function (
         $(selectorId).DataTable().destroy();
     }
 
+    $.fn.dataTable.ext.pager.numbers_length = 5;
     table = tableElement.DataTable({
         stateSave: true,
         language: {

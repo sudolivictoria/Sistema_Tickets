@@ -234,10 +234,8 @@
         </div>
 
         @endsection
-        
-        @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+        @push('scripts')
         @if (session('success'))
         <script>
             Swal.fire({

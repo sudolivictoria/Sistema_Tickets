@@ -67,7 +67,12 @@
 
 @endsection
 
-@push('scripts')
-<script src="{{ asset('js/recursos.js') }}"></script>
+{{-- SCRIPTS --}}
+@push('page-scripts')
+    <script src="{{ asset('js/recursos.js') }}"></script>
+@endpush
+
+@push('sse-scripts')
+    <script src="{{ asset('js/api.js') }}"></script>
 @endpush
 

@@ -68,7 +68,7 @@
                 </div>
 
                 <div class="overflow-x-auto text-[13px] md:text-[14px]">
-                    <table class="w-full min-w-[760px] text-left">
+                    <table class="w-full min-w-[760px] text-left" id="tablaTicketsUsuario">
                         <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-[#008F7E]">
                             <tr>
                                 <th class="px-6 py-4 font-black">ID</th>
@@ -214,6 +214,12 @@
     @include('partials.detalle_ticket_usuario')
 @endsection
 
-@push('scripts')
+{{-- SCRIPTS --}}
+@push('page-scripts')
     <script src="{{ asset('js/usuario.js') }}"></script>
 @endpush
+
+@push('sse-scripts')
+    <script src="{{ asset('js/api.js') }}"></script>
+@endpush
+

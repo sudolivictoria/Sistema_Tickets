@@ -4,7 +4,6 @@ var table;
  * Inicializa DataTables
  * @param {string} selectorId
  */
-
 window.inicializarTablaTickets = function (selectorId) {
     const tableElement = $(selectorId);
     if (!tableElement.length) return;
@@ -13,14 +12,22 @@ window.inicializarTablaTickets = function (selectorId) {
         $(selectorId).DataTable().destroy();
     }
 
+    $.fn.dataTable.ext.pager.numbers_length = 5;
     table = tableElement.DataTable({
-        scrollX: true,
-        scrollCollapse: true,
+        stateSave: true,
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",
-            zeroRecords: "No se encontraron resultados",
-            emptyTable: "No hay datos disponibles",
+            zeroRecords: `
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">search_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No se encontraron resultados</p>
+                    </div>`,
+            emptyTable: `
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No hay datos disponibles</p>
+                    </div>`,
             info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
             infoFiltered: "(filtrado de un total de _MAX_ registros)",
             infoEmpty: "Mostrando 0 registros",
@@ -53,20 +60,19 @@ window.inicializarTablaTickets = function (selectorId) {
         const tipo = $(this).data("tipo");
         verDetalle(asunto, descripcion, tipo);
     });
-    
 };
 
 /**
- * Filtro por estado
+ * Filtro por estado - CONECTADO A SSE (CORREGIDO)
  */
 window.filtrarEstado = function (estado, btn) {
     //--actualizar estilos de botones
     $(".filtro-btn")
-        .removeClass("bg-primary text-white shadow-md")
+        .removeClass("bg-secondary text-white shadow-md")
         .addClass("bg-slate-100 text-slate-500");
     $(btn)
         .removeClass("bg-slate-100 text-slate-500")
-        .addClass("bg-primary text-white shadow-md");
+        .addClass("bg-secondary text-white shadow-md");
 
     let valorBusqueda = "";
     if (estado !== "todos") {
@@ -79,7 +85,6 @@ window.filtrarEstado = function (estado, btn) {
     //---filtros de estado
     table.column(2).search(valorBusqueda, true, false, true).draw();
 };
-
 /**
  * Gestión de Modal de detalles
  */

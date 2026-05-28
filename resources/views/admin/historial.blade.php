@@ -158,6 +158,11 @@
     @include('partials.detalle_usuario')
 
 @endsection
-@push('scripts')
+
+@push('page-scripts')
     <script src="{{ asset('js/historial.js') }}"></script>
+@endpush
+
+@push('sse-scripts')
+    <script src="{{ asset('js/api.js') }}"></script>
 @endpush

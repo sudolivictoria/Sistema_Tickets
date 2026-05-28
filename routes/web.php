@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
 
     //---api para refresco automatico
     Route::get('/api/refresh-table', [ApiTableController::class, 'refresh'])->name('api.table.refresh');
+    Route::get('/api/tickets-stream', [ApiTableController::class, 'sseStream'])->name('tickets.stream');
 
     Route::get('/dashboard', function () {
         $user = Auth::user();

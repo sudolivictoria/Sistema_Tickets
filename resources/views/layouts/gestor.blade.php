@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
 
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
@@ -173,17 +173,9 @@
         </div>
     </div>
 
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.tailwind.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     @stack('scripts')
-    <script src="{{ asset('js/api.js') }}"></script>
-
     <script>
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -194,7 +186,7 @@
         });
 
         //-----reloj 
-        window.iniciarReloj = function() {
+        window.iniciarReloj = function () {
             const contenedorReloj = document.getElementById('relojSistema');
 
             if (!contenedorReloj) return;
@@ -211,10 +203,14 @@
                 contenedorReloj.innerText = horaFormateada;
             }, 1000);
         }
-        $(document).ready(function() {
+
+        document.addEventListener('DOMContentLoaded', function () {
             iniciarReloj();
         });
     </script>
+
+    @stack('page-scripts')
+    @stack('sse-scripts')
 </body>
 
 </html>
