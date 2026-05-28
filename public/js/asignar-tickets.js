@@ -12,6 +12,7 @@ window.inicializarTablaTickets = function (
     }
 
     table = tableElement.DataTable({
+        stateSave: true,
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",

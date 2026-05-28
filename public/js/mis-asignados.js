@@ -12,6 +12,7 @@ window.inicializarTablaTickets = function (
     }
 
     table = tableElement.DataTable({
+        stateSave: true,
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",
@@ -165,18 +166,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-//------------------CONFIRMAR RESOLVER TICKET-----------------
-function confirmarResolver(btn) {
+//-------funcion dry---------------
+function procesarAccionTicket(btn, config) {
     const form = btn.closest("form");
     const url = form.action;
+
     Swal.fire({
-        title: "¿Marcar como Resuelto?",
+        title: config.tituloConfirmacion,
         text: "Esta acción registrará la hora de cierre del ticket.",
         icon: "question",
         iconColor: "#04003B",
         showCancelButton: true,
         confirmButtonColor: "#84cc16",
-        confirmButtonText: "Sí, resolver",
+        confirmButtonText: config.textoBoton,
         cancelButtonText: "Cancelar",
         cancelButtonColor: "#ef4444",
         customClass: { popup: "rounded-3xl" },
@@ -185,9 +187,7 @@ function confirmarResolver(btn) {
             fetch(url, {
                 method: "POST",
                 headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]',
-                    ).content,
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
                     "X-Requested-With": "XMLHttpRequest",
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
@@ -198,7 +198,7 @@ function confirmarResolver(btn) {
                     if (data.success) {
                         autoRefrescoUniversal();
                         Swal.fire({
-                            title: "¡Ticket Resuelto!",
+                            title: config.tituloExito,
                             text: data.message,
                             icon: "success",
                             iconColor: "#84cc16",
@@ -210,122 +210,36 @@ function confirmarResolver(btn) {
                 })
                 .catch((error) => {
                     console.error("Error:", error);
-                    Swal.fire(
-                        "Error",
-                        "No se pudo procesar la solicitud",
-                        "error",
-                    );
+                    Swal.fire("Error", "No se pudo procesar la solicitud", "error");
                 });
         }
     });
 }
 
-//---------------CONFIRMAR TICKET EQUIVOCADO-----------------
-function confirmarEquivocado(btn) {
-    const form = btn.closest("form");
-    const url = form.action;
-    Swal.fire({
-        title: "¿Marcar como Equivocado?",
-        text: "Esta acción registrará la hora de cierre del ticket.",
-        icon: "question",
-        iconColor: "#04003B",
-        showCancelButton: true,
-        confirmButtonColor: "#84cc16",
-        confirmButtonText: "Sí, marcar",
-        cancelButtonText: "Cancelar",
-        cancelButtonColor: "#ef4444",
-        customClass: { popup: "rounded-3xl" },
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]',
-                    ).content,
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams(new FormData(form)),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        autoRefrescoUniversal();
-                        Swal.fire({
-                            title: "¡Ticket Marcado como Equivocado!",
-                            text: data.message,
-                            icon: "success",
-                            iconColor: "#84cc16",
-                            timer: 3000,
-                            showConfirmButton: false,
-                            customClass: { popup: "rounded-3xl" },
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    Swal.fire(
-                        "Error",
-                        "No se pudo procesar la solicitud",
-                        "error",
-                    );
-                });
-        }
-    });
-}
+// =====================================================================
+// BOTONES HTML (RESOLVER, MARCAR COMO EQUÍVOCADO, MARCAR COMO NO CORRESPONDE)
+// =====================================================================
 
-//---------------CONFIRMAR TICKET NO CORRESPONDE-----------------
-function confirmarNoCorresponde(btn) {
-    const form = btn.closest("form");
-    const url = form.action;
-    Swal.fire({
-        title: "¿Marcar No Corresponde?",
-        text: "Esta acción registrará la hora de cierre del ticket.",
-        icon: "question",
-        iconColor: "#04003B",
-        showCancelButton: true,
-        confirmButtonColor: "#84cc16",
-        confirmButtonText: "Sí, marcar",
-        cancelButtonText: "Cancelar",
-        cancelButtonColor: "#ef4444",
-        customClass: { popup: "rounded-3xl" },
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]',
-                    ).content,
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams(new FormData(form)),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        autoRefrescoUniversal();
-                        Swal.fire({
-                            title: "¡Ticket Marcado como No Corresponde!",
-                            text: data.message,
-                            icon: "success",
-                            iconColor: "#84cc16",
-                            timer: 3000,
-                            showConfirmButton: false,
-                            customClass: { popup: "rounded-3xl" },
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    Swal.fire(
-                        "Error",
-                        "No se pudo procesar la solicitud",
-                        "error",
-                    );
-                });
-        }
+window.confirmarResolver = function (btn) {
+    procesarAccionTicket(btn, {
+        tituloConfirmacion: "¿Marcar como Resuelto?",
+        textoBoton: "Sí, resolver",
+        tituloExito: "¡Ticket Resuelto!"
     });
-}
+};
+
+window.confirmarEquivocado = function (btn) {
+    procesarAccionTicket(btn, {
+        tituloConfirmacion: "¿Marcar como Equivocado?",
+        textoBoton: "Sí, marcar",
+        tituloExito: "¡Ticket Marcado como Equivocado!"
+    });
+};
+
+window.confirmarNoCorresponde = function (btn) {
+    procesarAccionTicket(btn, {
+        tituloConfirmacion: "¿Marcar No Corresponde?",
+        textoBoton: "Sí, marcar",
+        tituloExito: "¡Ticket Marcado como No Corresponde!"
+    });
+};
