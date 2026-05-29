@@ -3,8 +3,6 @@
     @push('css')
         @vite(['resources/css/tickets.css'])
     @endpush
-    @vite(['resources/css/tickets.css'])
-@endpush
 <div class="flex justify-between items-center mb-8">
     <div>
         <div class="flex items-center gap-4">

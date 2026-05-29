@@ -1,5 +1,5 @@
 // =============================================================
-// AUTO-REFRESCO UNIVERSAL POR EVENTOS DEL SERVIDOR (SSE)
+// AUTO-REFRESCO UNIVERSAL POR EVENTOS DEL SERVIDOR (SSE) - BLINDADO
 // =============================================================
 
 const AutoRefrescoSSE = (() => {
@@ -47,6 +47,13 @@ const AutoRefrescoSSE = (() => {
         }
 
         const tablaId = tablaElement.id;
+
+        // 🌟 REGLA DE ORO 1: Si es la tabla de Historial, la API SSE jamás la toca ni le altera el HTML
+        if (tablaId === "tablaHistorial") {
+            isRefreshing = false;
+            return; 
+        }
+
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) {
             isRefreshing = false;
@@ -121,6 +128,9 @@ const AutoRefrescoSSE = (() => {
     function aplicarEstilosPaginacion() {
         const wrappers = document.querySelectorAll(".dataTables_wrapper");
         wrappers.forEach((wrap) => {
+            // 🌟 REGLA DE ORO 2: No aplicar estilos automáticos al contenedor del historial
+            if (wrap.id === "tablaHistorial_wrapper") return;
+
             const lengthSelect = wrap.querySelector(
                 ".dataTables_length select",
             );
@@ -184,6 +194,13 @@ const AutoRefrescoSSE = (() => {
             '.dataTable, table[id*="tabla"], table[id*="Table"]',
         );
         if (!tablaElement) return;
+
+        // 🌟 REGLA DE ORO 3: Evita que el flujo automático cargue datos en el Historial al entrar
+        if (tablaElement.id === "tablaHistorial") {
+            console.log("[SSE] Pantalla de Historial detectada: Auto-refresco en segundo plano desactivado.");
+            return; 
+        }
+
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) return;
         const tipoTabla = tablaBody.getAttribute("data-tipo") || "dashboard";
@@ -198,7 +215,8 @@ const AutoRefrescoSSE = (() => {
             filtroEstado = window.filtroSseActual || "todos";
         }
 
-        if (filtroEstado.includes(",")) {
+        // 🌟 REGLA DE ORO 4: Mantener estable el filtro múltiple (comas) en Asignados y Dashboard.
+        if (filtroEstado.includes(",") && tipoTabla !== "asignados" && tipoTabla !== "dashboard") {
             filtroEstado = "cerrado";
         }
 
@@ -292,7 +310,9 @@ const AutoRefrescoSSE = (() => {
 // =============================================================
 document.addEventListener("DOMContentLoaded", function () {
     if (window.$ && $.fn.DataTable) {
-        $(document).on("draw.dt", function () {
+        $(document).on("draw.dt", function (e, settings) {
+            // 🌟 REGLA DE ORO 5: Detener eventos cruzados si provienen del historial
+            if (settings && settings.nTable && settings.nTable.id === "tablaHistorial") return;
             AutoRefrescoSSE.aplicarEstilosPaginacion();
         });
     }
