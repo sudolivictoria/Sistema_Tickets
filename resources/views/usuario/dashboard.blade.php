@@ -47,7 +47,7 @@
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border-b-4 border-secondary shadow-sm flex items-center gap-4">
-                    <div class="p-3 bg-lime-50 text-secondary rounded-2xl"><span
+                    <div class="p-3 bg-lime-50 text-primary rounded-2xl"><span
                             class="material-symbols-outlined text-2xl font-bold">check_circle</span></div>
                     <div>
                         <div id="contador-resueltos" class="text-2xl font-black text-secondary">{{ $resueltos ?? 0 }}</div>

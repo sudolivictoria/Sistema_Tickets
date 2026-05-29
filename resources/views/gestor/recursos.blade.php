@@ -72,5 +72,5 @@
 @endpush
 
 @push('sse-scripts')
-    @vite(['resources/js/api.js'])
+    @vite(['resources/js/recursos-api.js'])
 @endpush

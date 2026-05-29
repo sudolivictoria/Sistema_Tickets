@@ -1,8 +1,8 @@
-@import 'datatables.net-dt/css/dataTables.dataTables.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@import 'datatables.net-dt/css/dataTables.dataTables.css';
 @import "./tickets.css";
 @import "./login.css";
 @import "./graficos.css";

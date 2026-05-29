@@ -52,24 +52,40 @@ window.inicializarTablaTickets = function (
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
-
-    //--eventos para modales de detalles de ticket y usuario
-    $(document).on("click", ".btn-ver-detalle", function () {
-        const asunto = $(this).data("asunto");
-        const descripcion = $(this).data("descripcion");
-        const tipo = $(this).data("tipo");
-        verDetalle(asunto, descripcion, tipo);
-    });
-
-    $(document).on("click", ".btn-ver-usuario", function () {
-        const nombre = $(this).data("nombre");
-        const email = $(this).data("email");
-        const unidad = $(this).data("unidad");
-        const cargo = $(this).data("cargo");
-        const telefono = $(this).data("telefono");
-        verUsuario(nombre, email, unidad, cargo, telefono);
-    });
 };
+
+// =====================================================================
+//                         DETALLES E INICIALIZACION
+// =====================================================================
+$(document).ready(function () {
+    $(document)
+        .off("click", ".btn-ver-detalle")
+        .on("click", ".btn-ver-detalle", function () {
+            const asunto = $(this).data("asunto");
+            const descripcion = $(this).data("descripcion");
+            const tipo = $(this).data("tipo");
+
+            window.verDetalle(asunto, descripcion, tipo);
+        });
+
+    $(document)
+        .off("click", ".btn-ver-usuario")
+        .on("click", ".btn-ver-usuario", function () {
+            const nombre = $(this).data("nombre");
+            const email = $(this).data("email");
+            const unidad = $(this).data("unidad");
+            const cargo = $(this).data("cargo");
+            const telefono = $(this).data("telefono");
+
+            window.verUsuario(nombre, email, unidad, cargo, telefono);
+        });
+
+    //------------------AUTO REFRESCO-----------------
+    const selectorTabla = "#tablaAsignarTickets";
+    if ($(selectorTabla).length) {
+        window.inicializarTablaTickets(selectorTabla);
+    }
+});
 
 /****************** FILTROS ******************/
 window.filtrarEstado = function (estado, btn) {
@@ -161,11 +177,3 @@ window.cerrarModalUsuario = function () {
         document.body.style.overflow = "auto";
     }
 };
-
-//------------------AUTO REFRESCO-----------------
-$(document).ready(function () {
-    const selectorTabla = "#tablaAsignarTickets";
-    if ($(selectorTabla).length) {
-        window.inicializarTablaTickets(selectorTabla);
-    }
-});

@@ -114,7 +114,7 @@
 
                 {{-- Contenedor con Scroll --}}
                 <div class="overflow-y-auto" style="max-height: 400px;">
-                    <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
+                    <table class="w-full text-left border-separate border-spacing-0" id="tablaGestor">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
                                 class="text-[13px] uppercase text-[#008F7E] font-black tracking-widest border-b border-slate-200">

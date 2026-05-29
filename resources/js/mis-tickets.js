@@ -53,15 +53,28 @@ window.inicializarTablaTickets = function (selectorId) {
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
-
-    //--eventos para modales de detalles de ticket y usuario
-    $(document).on("click", ".btn-ver-detalle", function () {
-        const asunto = $(this).data("asunto");
-        const descripcion = $(this).data("descripcion");
-        const tipo = $(this).data("tipo");
-        verDetalle(asunto, descripcion, tipo);
-    });
 };
+
+// =====================================================================
+//                         DETALLES E INICIALIZACION
+// =====================================================================
+$(document).ready(function () {
+    $(document)
+        .off("click", ".btn-ver-detalle")
+        .on("click", ".btn-ver-detalle", function () {
+            const asunto = $(this).data("asunto");
+            const descripcion = $(this).data("descripcion");
+            const tipo = $(this).data("tipo");
+
+            window.verDetalle(asunto, descripcion, tipo);
+        });
+
+    //------------------AUTO REFRESCO-----------------
+    const selectorTabla = "#tablaMisTickets";
+    if ($(selectorTabla).length) {
+        window.inicializarTablaTickets(selectorTabla);
+    }
+});
 
 /**
  * Filtro por estado - CONECTADO A SSE (CORREGIDO)
@@ -111,10 +124,3 @@ window.cerrarModal = function () {
         document.body.style.overflow = "auto";
     }
 };
-
-$(document).ready(function () {
-    const selectorTabla = "#tablaMisTickets";
-    if ($(selectorTabla).length) {
-        window.inicializarTablaTickets(selectorTabla);
-    }
-});

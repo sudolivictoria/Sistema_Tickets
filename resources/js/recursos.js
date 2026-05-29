@@ -1,9 +1,11 @@
 /**
- * Manuales y Recursos
+ * Manuales y Recursos (Vista de Usuario con SSE)
  */
 
+window.categoriaActivaActual = "all"; // Guarda de forma global qué filtro tiene el usuario
+
 window.filtrar = function (catId, event) {
-    //---filtrar
+    window.categoriaActivaActual = catId; // Actualiza la categoría activa
     const tarjetas = document.querySelectorAll(".manual-card");
 
     //---filtrar tarjetas
@@ -60,13 +62,12 @@ window.filtrar = function (catId, event) {
     }
 };
 
-//---obtener el filtrado desde el
+//---obtener el filtrado desde la URL al cargar
 document.addEventListener("DOMContentLoaded", function () {
     const params = new URLSearchParams(window.location.search);
     const catId = params.get("categoria");
 
     if (catId) {
-        console.log("Filtrado automático desde URL para categoría:", catId);
         setTimeout(() => {
             window.filtrar(catId);
         }, 100);
@@ -81,22 +82,21 @@ window.abrirVisor = function (url, titulo = "Recurso") {
     const iconoVisor = document.getElementById("visor-icono");
 
     //--detectar tipo de dispositivo
-    const esMovil =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent,
-        );
+    const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    tituloVisor.innerText = titulo;
+    if (tituloVisor) tituloVisor.innerText = titulo;
+    if (!visor) return;
+
     visor.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#04003B]"></div>`;
 
     //--cargar contenido
     if (ext === "pdf") {
-        iconoVisor.innerText = "picture_as_pdf";
+        if (iconoVisor) iconoVisor.innerText = "picture_as_pdf";
 
-        //--si es movil
+        //--si es movil abre en pestaña nueva para evitar bloqueos
         if (esMovil) {
             window.open(url, "_blank");
-            cerrarVisor();
+            window.cerrarVisor();
             return;
         } else {
             setTimeout(() => {
@@ -108,7 +108,7 @@ window.abrirVisor = function (url, titulo = "Recurso") {
             }, 400);
         }
     } else {
-        iconoVisor.innerText = "movie";
+        if (iconoVisor) iconoVisor.innerText = "movie";
         visor.innerHTML = `
             <video controls autoplay class="max-w-full max-h-full shadow-2xl">
                 <source src="${url}" type="video/mp4">
@@ -117,9 +117,11 @@ window.abrirVisor = function (url, titulo = "Recurso") {
     }
 
     const modal = document.getElementById("modalVisor");
-    modal.classList.remove("hidden");
-    modal.classList.add("flex"); //--centrar el visor
-    document.body.style.overflow = "hidden"; //---bloquear el scroll de fondo
+    if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex"); //--centrar el visor
+        document.body.style.overflow = "hidden"; //---bloquear el scroll de fondo
+    }
 };
 
 window.cerrarVisor = function () {

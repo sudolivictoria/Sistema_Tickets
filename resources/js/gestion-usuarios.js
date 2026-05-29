@@ -55,11 +55,17 @@ $(document).ready(function () {
         const eyeOpen = btn.find(".eye-open");
         const eyeClosed = btn.find(".eye-closed");
 
-        const isPassword = input.attr("type") === "password";
-        input.attr("type", isPassword ? "text" : "password");
+        const esPassword = input.attr("type") === "password";
 
-        eyeOpen.toggleClass("hidden", isPassword);
-        eyeClosed.toggleClass("hidden", !isPassword);
+        if (esPassword) {
+            input.attr("type", "text");
+            eyeOpen.addClass("hidden");
+            eyeClosed.removeClass("hidden");
+        } else {
+            input.attr("type", "password");
+            eyeOpen.removeClass("hidden");
+            eyeClosed.addClass("hidden");
+        }
     });
 });
 

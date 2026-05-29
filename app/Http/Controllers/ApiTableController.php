@@ -15,13 +15,15 @@ use Throwable;
 
 class ApiTableController extends Controller
 {
-    //--variables par a controlar la frecuencia de actualización y evitar solapamientos en el procesamiento de respuestas
+    //--variables para controlar la frecuencia de actualización y evitar solapamientos en el procesamiento de respuestas
     private const TIPOS_VALIDOS = ['dashboard', 'usuario', 'asignar', 'mis_tickets', 'mis_asignados', 'historial'];
     private const TIPOS_SOLO_CONTENIDO = ['recursos'];
     private const TIPOS_SOLO_STAFF = ['asignar', 'historial', 'mis_asignados'];
     private const ESTADOS_CERRADOS = [3, 4, 5];
+
     /**
-     * ENDPOINT DE FLUJO DE EVENTOS DE SERVIDOR SSE (tiempo real sin recargar) para actualizar tablas y estadísticas en dashboard, historial, mis tickets, mis asignados y asignar tickets
+     * ENDPOINT DE FLUJO DE EVENTOS DE SERVIDOR SSE (tiempo real sin recargar) 
+     * para actualizar tablas y estadísticas en dashboard, historial, mis tickets, mis asignados y asignar tickets
      */
     public function sseStream(Request $request): StreamedResponse
     {
@@ -34,7 +36,7 @@ class ApiTableController extends Controller
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        //--Validar tipo de vista solicitada    
+
         return response()->stream(function () use ($request, $user, $miUnidadId, $userId, $userRolId) {
             if (function_exists('ob_end_clean')) {
                 @ob_end_clean();
@@ -72,7 +74,6 @@ class ApiTableController extends Controller
                         return $q;
                     };
 
-                    //--Contadores de estadísticas superiores
                     $contadores = [
                         'abiertos'  => $statsBase()->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
                         'proceso'   => $statsBase()->whereNotNull('tecnico_id')->where('estado_id', 2)->count(),
@@ -116,34 +117,80 @@ class ApiTableController extends Controller
     }
 
     /**
+     * ENDPOINT SSE PARA MANUALES Y RECURSOS (Tiempo real exclusivo para tarjetas .manual-card)
+     */
+    public function streamRecursos(Request $request): StreamedResponse
+    {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
+        return response()->stream(function () use ($request) {
+            if (function_exists('ob_end_clean')) {
+                @ob_end_clean();
+            }
+
+            $user = Auth::user();
+            if (!$user) {
+                echo "data: " . json_encode(['error' => 'No autenticado']) . "\n\n";
+                if (ob_get_level() > 0) ob_flush();
+                flush();
+                return;
+            }
+
+            try {
+                //--- Obtener los recursos de la base de datos ordenados por los últimos subidos
+                $manuales = Manual::with('categoria')->latest()->get();
+                //--- Renderizar el archivo blade parcial que contiene la estructura HTML de las tarjetas
+                $htmlCards = view('partials.filas_recursos', compact('manuales'))->render();
+
+                //--- Transmitir la estructura HTML limpia a tu script recursos-api.js
+                echo "data: " . json_encode([
+                    'html' => $htmlCards
+                ]) . "\n\n";
+            } catch (Throwable $e) {
+                Log::error('ApiTableController streamRecursos Error: ' . $e->getMessage());
+                echo "data: " . json_encode(['error' => 'Error interno de procesamiento']) . "\n\n";
+            }
+
+            if (ob_get_level() > 0) ob_flush();
+            flush();
+        }, 200, [
+            'Content-Type'      => 'text/event-stream',
+            'Cache-Control'     => 'no-cache',
+            'Connection'        => 'keep-alive',
+            'X-Accel-Buffering' => 'no'
+        ]);
+    }
+
+    /**
      * Endpoint HTTP Clásico de consulta / fallback manual
      */
     public function refresh(Request $request): JsonResponse
     {
-        //--Este endpoint puede ser utilizado para consultas manuales o como fallback en caso de que el stream SSE falle 
         $user = Auth::user();
-        //--Validar autenticación y permisos básicos antes de procesar la solicitud
         if (!$user) {
             return response()->json(['error' => 'No autenticado.'], 401);
         }
-        //--Validar tipo de vista solicitada
+
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_write_close();
         }
-        //--Validar tipo de vista solicitada
+
         $tipo = (string) $request->query('tipo', 'dashboard');
         if (!in_array($tipo, self::TIPOS_VALIDOS, true) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
             return response()->json(['error' => 'Tipo no válido.'], 422);
         }
-        //--Si el tipo de vista es solo de contenido estático (como recursos), no es necesario hacer consultas complejas, solo renderizar la vista correspondiente
+
+        //-- Si el tipo de vista es de contenido manual/tarjetas, renderizar directamente pasándole los parámetros correctos
         if (in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
-            return response()->json(['html' => $this->renderizarVista($tipo, collect(), 0)]);
+            return response()->json(['html' => $this->renderizarVista($tipo, collect(), (int)$user->unidad_id)]);
         }
-        //--Restringir acceso a tipos específicos para usuarios con rol de cliente
+
         if ($user->rol_id == 2 && in_array($tipo, self::TIPOS_SOLO_STAFF, true)) {
             return response()->json(['error' => 'Acceso denegado.'], 403);
         }
-        //--Procesar la solicitud aplicando los mismos filtros y lógica que en el stream SSE para mantener consistencia en los datos mostrados
+
         try {
             $miUnidadId = (int) $user->unidad_id;
             $añoActual  = (int) date('Y');
@@ -153,35 +200,30 @@ class ApiTableController extends Controller
             $this->aplicarFiltrosBase($queryTickets, $user, $tipo, $miUnidadId);
             $this->inyectarFiltroEstado($queryTickets, $estadoFiltro, $tipo);
 
-            //--Limitar resultados para la vista de usuario, que solo muestra los 5 tickets más recientes, mientras que las demás vistas muestran todos los tickets correspondientes a los filtros aplicados
             $limit = ($tipo === 'usuario') ? 5 : null;
             $ticketsResult = $limit
                 ? $queryTickets->latest()->limit($limit)->get()
                 : $queryTickets->latest()->get();
 
-            //---Contadores de estadísticas superiores
             $statsBase = function () use ($añoActual, $user, $tipo, $miUnidadId) {
                 $q = Ticket::whereYear('created_at', $añoActual);
                 $this->aplicarFiltrosStats($q, $user, $tipo, $miUnidadId);
                 return $q;
             };
 
-            //---Contadores de estadísticas superiores
             $contadores = [
                 'abiertos'  => $statsBase()->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
                 'proceso'   => $statsBase()->whereNotNull('tecnico_id')->where('estado_id', 2)->count(),
                 'resueltos' => $statsBase()->whereIn('estado_id', self::ESTADOS_CERRADOS)->count(),
             ];
 
-            //--Generar gráfico de rendimiento mensual solo para roles administrativos
             $graficoHtml = ($user->rol_id != 2) ? $this->generarGrafico($miUnidadId, $añoActual) : null;
-            //---Contador específico de "Mis Asignados" para mostrar alerta si hay tickets en proceso asignados al técnico
             $contadorMisAsignados = Ticket::where('tecnico_id', $user->id)->where('estado_id', 2)->count();
-            //---Calcular métricas adicionales solo para la vista de historial, que muestra datos del año completo
+
             [$cargaTrabajo, $resueltos24h, $tasaCierre] = ($tipo === 'historial')
                 ? $this->calcularMetricas($user, $miUnidadId, $añoActual)
                 : [0, 0, 0];
-            //---Renderizar la vista parcial correspondiente al tipo de tabla solicitada
+
             return response()->json([
                 'html'              => $this->renderizarVista($tipo, $ticketsResult, $miUnidadId),
                 'contadores'        => $contadores,
@@ -196,18 +238,16 @@ class ApiTableController extends Controller
             return response()->json(['error' => 'Error interno.'], 500);
         }
     }
+
     /**
      * Mapeo estricto del estado solicitado para inyección SQL limpia
      */
     private function inyectarFiltroEstado($queryTickets, string $estadoFiltro, string $tipo): void
     {
-        /**Si el filtro es "todos" o no se especifica, no se aplica ningún filtro adicional por estado, 
-        *mostrando todos los tickets correspondientes a los demás filtros aplicados*/
         if ($estadoFiltro === 'todos' || $estadoFiltro === '') {
             return;
         }
 
-        //--Mapeo estricto de los estados para evitar inyección SQL y asegurar que solo se apliquen filtros válidos
         switch ($estadoFiltro) {
             case '1':
             case 'abierto':
@@ -220,9 +260,7 @@ class ApiTableController extends Controller
                 }
                 break;
 
-            case '2':
             case 'procesando':
-            case 'proceso':
                 if ($tipo === 'dashboard') {
                     $queryTickets->whereNotNull('tecnico_id')->where('estado_id', 2);
                 } else {
@@ -230,10 +268,6 @@ class ApiTableController extends Controller
                 }
                 break;
 
-            case '3':
-            case '4':
-            case '5':
-            case '3,4,5':
             case 'resuelto':
             case 'equivocado':
             case 'no corresponde':
@@ -247,7 +281,10 @@ class ApiTableController extends Controller
                 break;
         }
     }
-    //--Filtros base comunes para todas las vistas, aplicados tanto en el stream SSE como en el endpoint de refresh para mantener consistencia en los datos mostrados
+
+    /**
+     * Filtros base comunes para todas las vistas
+     */
     private function aplicarFiltrosBase($query, $user, string $tipo, int $miUnidadId): void
     {
         if ($tipo === 'mis_tickets' || $user->rol_id == 2) {
@@ -276,7 +313,9 @@ class ApiTableController extends Controller
         }
     }
 
-    //--Filtros específicos para estadísticas, que deben aplicarse tanto en el stream SSE como en el endpoint de refresh para mantener consistencia en los datos mostrados
+    /**
+     * Filtros específicos para estadísticas
+     */
     private function aplicarFiltrosStats($query, $user, string $tipo, int $miUnidadId): void
     {
         if ($tipo === 'mis_tickets' || $user->rol_id == 2) {
@@ -295,7 +334,6 @@ class ApiTableController extends Controller
 
     private function generarGrafico(int $miUnidadId, int $año): ?string
     {
-        //--Generar gráfico de rendimiento mensual solo para roles administrativos
         $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
         $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
             ->whereYear('created_at', $año)
@@ -303,7 +341,6 @@ class ApiTableController extends Controller
             ->groupBy('mes', 'estado_id')
             ->get();
 
-            //--Calcular los porcentajes de tickets resueltos y pendientes para cada mes, asegurando que la suma sea 100% o 0% si no hay tickets
         $mesesGrafico = [];
         for ($i = 1; $i <= 12; $i++) {
             $res   = $statsMensuales->where('mes', $i)->whereIn('estado_id', self::ESTADOS_CERRADOS)->sum('total');
@@ -320,17 +357,17 @@ class ApiTableController extends Controller
         return view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
     }
 
-    //--Calcular métricas adicionales para la vista de historial, que muestra datos del año completo
+    /**
+     * Calcular métricas adicionales para la vista de historial
+     */
     private function calcularMetricas($user, int $miUnidadId, int $año): array
     {
         $query = Ticket::whereYear('created_at', $año);
         if ($user->rol_id != 1) {
             $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
         }
-        //--Obtener solo los campos necesarios para calcular las métricas sin cargar relaciones completas
         $tickets = $query->get(['id', 'estado_id', 'created_at', 'fecha_cierre']);
 
-        //--metricas panel historial
         $cargaTrabajo = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isToday())->count();
         $resueltos24h = $tickets->whereIn('estado_id', self::ESTADOS_CERRADOS)
             ->filter(fn($t) => $t->fecha_cierre && Carbon::parse($t->fecha_cierre)->gte(now()->subDay()))
@@ -342,7 +379,9 @@ class ApiTableController extends Controller
         return [$cargaTrabajo, $resueltos24h, $tasaCierre];
     }
 
-    //--Renderizado centralizado de vistas parciales para mantener consistencia y facilitar mantenimiento
+    /**
+     * Renderizado centralizado de vistas parciales
+     */
     private function renderizarVista(string $tipo, $ticketsResult, int $miUnidadId): string
     {
         return match ($tipo) {

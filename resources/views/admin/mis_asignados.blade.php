@@ -55,7 +55,6 @@
                             <th class="px-4 py-4 border-b border-slate-200 font-black">Estado</th>
                             <th class="px-4 py-4 border-b border-slate-200 font-black">Prioridad</th>
                             <th class="px-4 py-4 border-b border-slate-200 font-black">Técnico</th>
-                            <th class="px-4 py-4 border-b border-slate-200 font-black">Apertura</th>
                             <th class="px-4 py-4 border-b border-slate-200 font-black text-center">Detalle</th>
                             <th class="px-4 py-4 border-b border-slate-200 font-black text-center">Acciones</th>
                         </tr>
@@ -69,7 +68,7 @@
     </div>
 
     {{-- detalle ticket --}}
-    @include('partials.detalle_ticket')
+    @include('partials.detalle_ticket_completo')
 
     {{-- detalle usuario --}}
     @include('partials.detalle_usuario')

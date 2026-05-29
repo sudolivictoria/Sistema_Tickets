@@ -96,24 +96,30 @@
                 {{-- Cabecera con Filtros y Buscador --}}
                 <div class="p-5 border-b border-slate-100 flex flex-wrap gap-4 justify-between items-center bg-white">
                     <div class="flex items-center gap-4">
-                        <div class="flex gap-2" id="filtrosEstado">
+                          <div class="flex gap-2" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)" data-estado="todos"
-                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[11px] font-black uppercase shadow-md transition-all">Todos</button>
-
-                            <button type="button" onclick="filtrarEstado('1', this)" data-estado="1"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
-
-                            <button type="button" onclick="filtrarEstado('2', this)" data-estado="2"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
-
-                            <button type="button" onclick="filtrarEstado('3,4,5', this)" data-estado="3,4,5"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Cerrado</button>
+                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">
+                                Todos
+                            </button>
+                            <button type="button" onclick="filtrarEstado('abierto', this)" data-estado="abierto"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">
+                                Abierto
+                            </button>
+                            <button type="button" onclick="filtrarEstado('procesando', this)" data-estado="procesando"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">
+                                Pendientes
+                            </button>
+                            <button type="button" onclick="filtrarEstado('resuelto,equivocado,no corresponde', this)"
+                                data-estado="resuelto,equivocado,no corresponde"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">
+                                Cerrado
+                            </button>
                         </div>
                     </div>
                 </div>
                 {{-- Contenedor con Scroll --}}
-                <div class="overflow-y-auto" style="max-height: 400px;">
-                    <table class="w-full text-left border-separate border-spacing-0" id="tablaTickets">
+                <div class="overflow-y-auto" style="max-height: 300px;">
+                    <table class="w-full text-left border-separate border-spacing-0" id="tablaAdmin">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
                                 class="text-[13px] uppercase text-[#008F7E] font-black tracking-widest border-b border-slate-200">

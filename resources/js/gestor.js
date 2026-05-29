@@ -1,3 +1,43 @@
+//----variable global para almacenar la instancia de la tabla
+var table;
+window.currentStreamFilter = "todos";
+
+/**
+ * Inicializa DataTables de forma avanzada con estilos Tailwind
+ * @param {string} selectorId
+ */
+window.inicializarTablaTickets = function (selectorId) {
+    const tableElement = $(selectorId);
+    if (!tableElement.length) return;
+
+    if ($.fn.DataTable.isDataTable(selectorId)) {
+        $(selectorId).DataTable().destroy();
+    }
+    table = tableElement.DataTable({
+        paging: false,
+        searching: true,
+        info: false,
+        responsive: true,
+        dom: "rt",
+        language: {
+            zeroRecords: `
+                <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
+                    <span class="material-symbols-outlined text-primary text-4xl mb-3 animate-spin" style="animation-duration: 2s;">sync</span>
+                    <h5 class="text-xs font-black uppercase text-slate-500 tracking-widest animate-pulse">Buscando coincidencias...</h5>
+                    <p class="text-[11px] text-slate-400 font-medium mt-1">Sincronizando el estado de los tickets en tiempo real.</p>
+                </div>
+            `,
+            emptyTable: `
+                <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
+                    <span class="material-symbols-outlined text-slate-300 text-4xl mb-2 select-none">folder_off</span>
+                    <h5 class="text-xs font-black uppercase text-slate-400 tracking-widest">Bandeja Vacía</h5>
+                    <p class="text-[11px] text-slate-400 font-medium mt-1">No existen tickets disponibles bajo este estado.</p>
+                </div>
+            `
+        },
+    });
+};
+
 //----desplegable de canales directos
 document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.getElementById("toggle-canales");
@@ -15,24 +55,35 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-    //-------eventos para modales de detalles de ticket y usuario
-    $(document).on("click", ".btn-ver-detalle", function () {
-        const asunto = $(this).data("asunto");
-        const descripcion = $(this).data("descripcion");
-        const tipo = $(this).data("tipo");
-        const fecha = $(this).data("fecha");
-        verDetalle(asunto, descripcion, tipo, fecha);
-    });
+});
 
-    // 3. Clics seguros para ver usuario (Delegación de eventos)
-    $(document).on("click", ".btn-ver-usuario", function () {
-        const nombre = $(this).data("nombre");
-        const email = $(this).data("email");
-        const unidad = $(this).data("unidad");
-        const cargo = $(this).data("cargo");
-        const telefono = $(this).data("telefono");
-        verUsuario(nombre, email, unidad, cargo, telefono);
-    });
+// =====================================================================
+//                         DETALLES E INICIALIZACION
+// =====================================================================
+$(document).ready(function () {
+    window.inicializarTablaTickets("#tablaGestor");
+    $(document)
+        .off("click", ".btn-ver-detalle")
+        .on("click", ".btn-ver-detalle", function () {
+            const asunto = $(this).data("asunto");
+            const descripcion = $(this).data("descripcion");
+            const tipo = $(this).data("tipo");
+            const fecha = $(this).data("fecha");
+
+            window.verDetalle(asunto, descripcion, tipo, fecha);
+        });
+
+    $(document)
+        .off("click", ".btn-ver-usuario")
+        .on("click", ".btn-ver-usuario", function () {
+            const nombre = $(this).data("nombre");
+            const email = $(this).data("email");
+            const unidad = $(this).data("unidad");
+            const cargo = $(this).data("cargo");
+            const telefono = $(this).data("telefono");
+
+            window.verUsuario(nombre, email, unidad, cargo, telefono);
+        });
 });
 
 //----ejecutar filtros

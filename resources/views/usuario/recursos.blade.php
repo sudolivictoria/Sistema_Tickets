@@ -4,8 +4,8 @@
     <div class="p-8 bg-slate-50 min-h-screen">
         <div class="flex justify-between items-center mb-10 border-b border-slate-200 pb-6">
             <div>
-                <h2 class="text-3xl font-black text-primary mb-2 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-4xl text-secondary">library_books</span>
+                <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-4xl text-primary">library_books</span>
                     Recursos
                 </h2>
             </div>
@@ -72,5 +72,5 @@
 @endpush
 
 @push('sse-scripts')
-    @vite(['resources/js/api.js'])
+    @vite(['resources/js/recursos-api.js'])
 @endpush

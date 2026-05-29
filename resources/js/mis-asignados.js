@@ -52,24 +52,36 @@ window.inicializarTablaTickets = function (
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
+};
 
-    //--eventos para modales de detalles de ticket y usuario
-    $(document).on("click", ".btn-ver-detalle", function () {
+// =====================================================================
+//                         DETALLES E INICIALIZACION
+// =====================================================================
+$(document).ready(function () {
+    $(document).off("click", ".btn-ver-detalle").on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");
         const tipo = $(this).data("tipo");
-        verDetalle(asunto, descripcion, tipo);
+        const fecha = $(this).data("fecha");
+        
+        window.verDetalle(asunto, descripcion, tipo, fecha);
     });
 
-    $(document).on("click", ".btn-ver-usuario", function () {
+    $(document).off("click", ".btn-ver-usuario").on("click", ".btn-ver-usuario", function () {
         const nombre = $(this).data("nombre");
         const email = $(this).data("email");
         const unidad = $(this).data("unidad");
         const cargo = $(this).data("cargo");
         const telefono = $(this).data("telefono");
-        verUsuario(nombre, email, unidad, cargo, telefono);
+        
+        window.verUsuario(nombre, email, unidad, cargo, telefono);
     });
-};
+
+    const selectorTabla = "#tablaMisAsignados";
+    if ($(selectorTabla).length) {
+        window.inicializarTablaTickets(selectorTabla);
+    }
+});
 
 /****************** FILTROS ******************/
 window.filtrarEstado = function (estado, btn) {
@@ -96,15 +108,17 @@ window.filtrarEstado = function (estado, btn) {
 /**
  * Gestión de Modal de detalles
  */
-window.verDetalle = function (asunto, descripcion, tipoNombre) {
+window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
-    if (modal && titulo && desc && tipo) {
+    const fecha = document.getElementById("modalFechaApertura");
+    if (modal && titulo && desc && tipo && fecha) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
         tipo.innerText = tipoNombre;
+        fecha.innerText = fechaApertura;
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
@@ -161,14 +175,6 @@ window.cerrarModalUsuario = function () {
         document.body.style.overflow = "auto";
     }
 };
-
-//------------------AUTO REFRESCO-----------------
-$(document).ready(function () {
-    const selectorTabla = "#tablaMisAsignados";
-    if ($(selectorTabla).length) {
-        window.inicializarTablaTickets(selectorTabla);
-    }
-});
 
 //-------funcion dry---------------
 function procesarAccionTicket(btn, config) {

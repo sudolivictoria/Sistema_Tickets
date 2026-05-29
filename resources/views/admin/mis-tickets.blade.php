@@ -1,7 +1,10 @@
 @extends('layouts.admin')
 
 @section('content')
-    <link rel="stylesheet" href="{{ asset('css/tickets.css') }}">
+    @push('css')
+        @vite(['resources/css/tickets.css'])
+    @endpush
+    >
 
     <div class="p-1">
         <div class="mb-10 border-b border-slate-200 pb-6">
@@ -38,7 +41,8 @@
                     </div>
 
                     <div class="relative w-full md:w-72">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
                         <input type="text" id="inputBusqueda"
                             class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all"
                             placeholder="Buscar...">
@@ -72,13 +76,13 @@
 
     {{-- Detalle ticket --}}
     @include('partials.detalle_ticket')
-@endsection 
+@endsection
 
 @push('page-scripts')
     @vite(['resources/js/mis-tickets.js'])
 @endpush
 
 @push('sse-scripts')
-@vite(['resources/js/api.js'])
+    @vite(['resources/js/api.js'])
     <script src="{{ asset('js/api.js') }}"></script>
 @endpush
