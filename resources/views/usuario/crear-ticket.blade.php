@@ -60,11 +60,11 @@
             </div>
 
             <div id="info-extra"
-                class="hidden mt-3 p-4 bg-blue-50 border-l-4 border-primary rounded-r-xl transition-all animate-fade-in">
+                class="hidden mt-3 p-4 bg-blue-50 border-l-4 border-secondary rounded-r-xl transition-all animate-fade-in">
                 <div class="flex gap-3">
-                    <span class="material-symbols-outlined text-primary">info</span>
+                    <span class="material-symbols-outlined text-secondary">info</span>
                     <div>
-                        <p class="text-xs font-black text-primary uppercase tracking-wider">Información del servicio</p>
+                        <p class="text-xs font-black text-secondary uppercase tracking-wider">Información del servicio</p>
                         <p id="texto-ayuda" class="text-sm text-slate-600 mt-1 italic"></p>
                     </div>
                 </div>
