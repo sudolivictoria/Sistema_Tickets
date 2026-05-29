@@ -118,9 +118,6 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <script src="{{ asset('js/ticket-form.js') }}"></script>
 
     <script>
         window.todosLosTipos = @json($tipos ?? []);
@@ -182,4 +179,8 @@
             });
         </script>
     @endif
+@endpush
+
+@push('page-scripts')
+    @vite(['resources/js/ticket-form.js'])
 @endpush

@@ -3,8 +3,8 @@
 @section('content')
     <div class="max-w-4xl w-full mx-auto p-4 md:p-8">
         <div class="mb-6 md:mb-10 border-b border-slate-200 pb-6">
-            <h2 class="text-2xl md:text-3xl font-black text-primary mb-2 flex items-center gap-3">
-                <span class="material-symbols-outlined text-3xl md:text-4xl text-secondary">confirmation_number</span>
+            <h2 class="text-2xl md:text-3xl font-black text-secondary mb-2 flex items-center gap-3">
+                <span class="material-symbols-outlined text-3xl md:text-4xl text-primary">confirmation_number</span>
                 Enviar Nueva Solicitud
             </h2>
         </div>
@@ -15,18 +15,18 @@
             @csrf
 
             <div class="flex flex-col gap-2.5">
-                <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Asunto del Ticket</label>
+                <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Asunto del Ticket</label>
                 <input name="asunto" value="{{ old('asunto') }}"
-                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all placeholder:text-slate-300 font-medium text-slate-700"
+                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-300 font-medium text-slate-700"
                     placeholder="Ej: Falla en equipo de cómputo" type="text" required />
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div class="flex flex-col gap-2.5">
-                    <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Categoría</label>
+                    <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Categoría</label>
                     <div class="relative">
                         <select name="categoria_id"
-                            class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
+                            class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
                             <option value="" disabled selected>Seleccione</option>
                             @foreach ($categorias as $categoria)
@@ -44,10 +44,10 @@
                 </div>
 
                 <div class="flex flex-col gap-2.5">
-                    <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Solicitud</label>
+                    <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Solicitud</label>
                     <div class="relative">
                         <select name="tipo_solicitud_id"
-                            class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
+                            class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
                             <option value="" disabled selected>Seleccione</option>
                         </select>
@@ -71,14 +71,14 @@
             </div>
 
             <div class="flex flex-col gap-2.5">
-                <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Descripción Detallada</label>
+                <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Descripción Detallada</label>
                 <textarea name="descripcion"
-                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all resize-none font-medium text-slate-700"
+                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none font-medium text-slate-700"
                     rows="5" placeholder="Explique brevemente el problema..." required>{{ old('descripcion') }}</textarea>
             </div>
 
             <div class="flex flex-col gap-2.5">
-                <label class="text-sm font-black text-primary uppercase tracking-widest ml-1">Nivel de Urgencia</label>
+                <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Nivel de Urgencia</label>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     @foreach ($prioridades as $prio)
                         <label class="cursor-pointer">
@@ -86,7 +86,7 @@
                                 {{ $prio->nombre_prioridad == 'Media' ? 'checked' : '' }} />
                             <div
                                 class="py-3 px-2 md:px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center text-xs md:text-sm transition-all 
-                                        peer-checked:border-secondary peer-checked:bg-secondary/5 peer-checked:text-secondary peer-checked:shadow-sm
+                                        peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary peer-checked:shadow-sm
                                         hover:border-slate-200">
                                 {{ $prio->nombre_prioridad }}
                             </div>
@@ -103,7 +103,7 @@
                     Cancelar
                 </a>
                 <button
-                    class="w-full md:w-auto px-10 py-3.5 rounded-2xl bg-secondary text-primary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
+                    class="w-full md:w-auto px-10 py-3.5 rounded-2xl bg-primary text-secondary font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
                     type="submit" id="btn-enviar">
                     <span>Enviar</span>
                     <span class="material-symbols-outlined text-lg">send</span>
@@ -114,10 +114,6 @@
 @endsection
 
 @push('scripts')
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script src="{{ asset('js/ticket-form.js') }}"></script>
 
     <script>
         window.todosLosTipos = @json($tipos ?? []);
@@ -179,4 +175,9 @@
             });
         </script>
     @endif
+@endpush
+
+@push('page-scripts')
+    @vite(['resources/js/ticket-form.js'])
+    @vite(['resources/js/usuario-menu.js'])
 @endpush

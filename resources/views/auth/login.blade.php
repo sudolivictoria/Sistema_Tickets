@@ -10,7 +10,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    
+    @vite(['resources/css/login.css'])
 
 
 </head>
@@ -32,7 +33,8 @@
                 @if (request()->get('session_expired'))
                     <div class="error"
                         style="background-color: #fff3cd; color: #856404; border-left: 4px solid #eab308; padding: 12px; margin-bottom: 15px; border-radius: 6px;">
-                        <p style="margin: 0; font-weight: 500;">Tu sesión expiró por inactividad. Por favor, inicia sesión nuevamente.</p>
+                        <p style="margin: 0; font-weight: 500;">Tu sesión expiró por inactividad. Por favor, inicia
+                            sesión nuevamente.</p>
                     </div>
                 @endif
 
@@ -51,7 +53,8 @@
                     @csrf
                     <div class="field">
                         <label for="email">Correo</label>
-                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus>
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                            autofocus>
                     </div>
 
                     <div class="field" style="position: relative;">
@@ -59,8 +62,8 @@
                         <input id="password" type="password" name="password" required>
                         <button type="button" id="toggle-password"
                             style="position: absolute; top: 36px; right: 12px; background: transparent; border: none; cursor: pointer; padding: 0;">
-                            <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#005c0c"
-                                viewBox="0 0 24 24">
+                            <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                fill="#005c0c" viewBox="0 0 24 24">
                                 <path
                                     d="M12 5c-7.633 0-11 6.52-11 7s3.367 7 11 7 11-6.52 11-7-3.367-7-11-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5zm0-8.5c-1.931 0-3.5 1.569-3.5 3.5s1.569 3.5 3.5 3.5 3.5-1.569 3.5-3.5-1.569-3.5-3.5-3.5z" />
                             </svg>
@@ -84,7 +87,7 @@
         const eyeOpen = document.getElementById('eye-open');
         const eyeClosed = document.getElementById('eye-closed');
 
-        toggleBtn.addEventListener('click', function () {
+        toggleBtn.addEventListener('click', function() {
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeOpen.style.display = 'none';

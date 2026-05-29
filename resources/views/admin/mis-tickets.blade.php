@@ -72,12 +72,13 @@
 
     {{-- Detalle ticket --}}
     @include('partials.detalle_ticket')
-@endsection {{-- 🎯 CIERRE DEL CONTENT MOVIDO AQUÍ AL FINAL CORRESPONDIENTE --}}
+@endsection 
 
 @push('page-scripts')
-    <script src="{{ asset('js/mis-tickets.js') }}"></script>
+    @vite(['resources/js/mis-tickets.js'])
 @endpush
 
 @push('sse-scripts')
+@vite(['resources/js/api.js'])
     <script src="{{ asset('js/api.js') }}"></script>
 @endpush

@@ -204,9 +204,9 @@
 @endsection
 
 @push('page-scripts')
-    <script src="{{ asset('js/admin.js') }}"></script>
+    @vite(['resources/js/admin.js'])
 @endpush
 
 @push('sse-scripts')
-    <script src="{{ asset('js/api.js') }}"></script>
+    @vite(['resources/js/api.js'])
 @endpush

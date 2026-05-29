@@ -11,24 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('css')
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#04003B",
-                        "secondary": "#84cc16"
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                },
-            },
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         .material-symbols-outlined {
@@ -67,7 +52,6 @@
         }
     </style>
 
-    <link rel="stylesheet" href="{{ asset('css/tickets.css') }}?v={{ time() }}">
 </head>
 
 <body class="bg-slate-50 font-display text-slate-900 antialiased">
@@ -76,7 +60,7 @@
         <div class="flex flex-col items-center">
             <div class="h-16 w-16 animate-spin rounded-full border-4 border-slate-200 border-t-secondary"></div>
 
-            <p class="mt-4 text-sm font-black uppercase tracking-widest text-primary animate-pulse">
+            <p class="mt-4 text-sm font-black uppercase tracking-widest text-secondary animate-pulse">
                 Cargando sistema...
             </p>
         </div>
@@ -85,18 +69,18 @@
         class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
 
         <div class="flex items-center gap-3 lg:gap-4 min-w-0">
-            <button id="menu-toggle" class="lg:hidden p-2 rounded-lg text-primary hover:bg-slate-100 relative z-[100]">
+            <button id="menu-toggle" class="lg:hidden p-2 rounded-lg text-secondary hover:bg-slate-100 relative z-[100]">
                 <span id="menu-icon" class="material-symbols-outlined">menu</span>
             </button>
 
             <div
-                class="size-9 bg-secondary rounded-lg flex items-center justify-center text-primary shadow-sm shrink-0">
+                class="size-9 bg-primary rounded-lg flex items-center justify-center text-secondary shadow-sm shrink-0">
                 <span class="material-symbols-outlined font-bold text-2xl">support_agent</span>
             </div>
 
             <div class="min-w-0">
-                <h2 class="text-xl font-bold text-primary tracking-tight">Help Desk Istu <span
-                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-secondary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Usuario' }}</span>
+                <h2 class="text-xl font-bold text-secondary tracking-tight">Help Desk Istu <span
+                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Usuario' }}</span>
                 </h2>
             </div>
         </div>
@@ -108,27 +92,28 @@
         </div>
     </header>
 
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-primary border-r border-blue-800 flex flex-col pt-32 p-4
+    <aside id="sidebar"
+        class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-secondary border-r border-blue-800 flex flex-col pt-32 p-4
     transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-50 lg:z-40">
         <nav class="space-y-3 flex-1">
-            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.dashboard') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.dashboard') ? 'bg-primary text-secondary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.dashboard') }}">
                 <span class="material-symbols-outlined text-xl">dashboard</span>
                 <span class="text-sm">Dashboard</span>
             </a>
             <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-1 px-4 font-black">
                 Servicios</p>
-            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.crear-ticket') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.crear-ticket') ? 'bg-primary text-secondary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.crear-ticket') }}">
                 <span class="material-symbols-outlined text-xl">add_circle</span>
                 <span class="text-sm">Crear Ticket</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.mis-tickets') ? 'bg-secondary text-primary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
+            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.mis-tickets') ? 'bg-primary text-secondary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
                 href="{{ route('usuario.mis-tickets') }}">
                 <span class="material-symbols-outlined text-xl">history</span>
                 <span class="text-sm">Mis Tickets</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.recursos') ? 'bg-secondary text-primary' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold transition-all"
+            <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.recursos') ? 'bg-primary text-secondary' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-xl font-bold transition-all"
                 href="{{ route('usuario.recursos') }}">
                 <span class="material-symbols-outlined text-xl">library_books</span>
                 <span class="text-sm">Recursos</span>
@@ -156,15 +141,9 @@
         </div>
     </main>
 
-
-
-    @stack('scripts')
-
-    <script src="{{ asset('js/usuario-menu.js') }}?v={{ time() }}" defer></script>
-
     <script>
         //-----------preloader 
-        window.addEventListener('load', function () {
+        window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -175,7 +154,7 @@
         });
 
         //-----reloj 
-        window.iniciarReloj = function () {
+        window.iniciarReloj = function() {
             const contenedorReloj = document.getElementById('relojSistema');
 
             if (!contenedorReloj) return;
@@ -193,12 +172,15 @@
             }, 1000);
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             iniciarReloj();
         });
     </script>
 
+    @stack('scripts')
+
     @stack('page-scripts')
+
     @stack('sse-scripts')
 
 </body>

@@ -11,28 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
 
+    @stack('css')
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#84cc16",
-                        "secondary": "#04003B",
-                        "background-light": "#f8fafc",
-                        "background-dark": "#0f172a",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                },
-            },
-        }
-    </script>
-
 
     <style>
         /* Scrollbar personalizado */
@@ -196,11 +177,9 @@
         </div>
     </div>
 
-    {{-- LIBRERIAS --}}
-    @stack('scripts')
     <script>
         //-----------preloader
-        window.addEventListener('load', function () {
+        window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -211,7 +190,7 @@
         });
 
         //-----reloj 
-        window.iniciarReloj = function () {
+        window.iniciarReloj = function() {
             const contenedorReloj = document.getElementById('relojSistema');
 
             if (!contenedorReloj) return;
@@ -229,10 +208,12 @@
             }, 1000);
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             iniciarReloj();
         });
     </script>
+
+    @stack('scripts')
 
     @stack('page-scripts')
 

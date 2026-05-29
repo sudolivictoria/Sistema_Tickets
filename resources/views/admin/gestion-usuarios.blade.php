@@ -1,7 +1,9 @@
 @extends('layouts.admin')
 
 @section('content')
-    <link rel="stylesheet" href="{{ asset('css/tickets.css') }}">
+    @push('css')
+        @vite(['resources/css/tickets.css'])
+    @endpush
 
     <div class="space-y-6">
         <div class="flex items-center justify-between mb-10 border-b border-slate-200 pb-6">
@@ -54,14 +56,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($usuarios as $user)
+                    @foreach ($usuarios as $user)
                         <tr class="text-[13px]">
                             <td class="px-4 py-4 font-black">{{ $user->name }}</td>
                             <td class="px-4 py-4 font-black">{{ $user->rol->nombre_rol }}</td>
                             <td class="px-4 py-4 font-black">{{ $user->email }}</td>
                             <td class="px-4 py-4 font-black">{{ $user->unidad->nombre_unidad }}</td>
                             <td class="px-4 py-4 font-black">{{ $user->cargo }}</td>
-                            <td class="px-4 py-4 font-black">{{ $user->telefono ?? 'N/A'}}</td>
+                            <td class="px-4 py-4 font-black">{{ $user->telefono ?? 'N/A' }}</td>
                             <td class="px-4 py-4">
                                 <span
                                     class="px-2 py-1 rounded-full border font-black text-[9px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-[#008F7E] border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">
@@ -70,15 +72,16 @@
                             </td>
                             <td class="px-4 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
-                                    {{--BOTÓN EDITAR--}}
+                                    {{-- BOTÓN EDITAR --}}
                                     <button type="button" onclick="abrirModal('editar', {{ json_encode($user) }})"
                                         @disabled($user->id === auth()->id())
                                         class="p-2 rounded-xl {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-105 transition-transform' }}">
                                         <span class="material-symbols-outlined text-[18px]">edit</span>
                                     </button>
 
-                                    {{--BOTÓN ESTADO ACTIVO / DESACTIVADO--}}
-                                    <form action="{{ route('admin.usuarios.toggle', $user->id) }}" method="POST" class="m-0">
+                                    {{-- BOTÓN ESTADO ACTIVO / DESACTIVADO --}}
+                                    <form action="{{ route('admin.usuarios.toggle', $user->id) }}" method="POST"
+                                        class="m-0">
                                         @csrf @method('PATCH')
 
                                         <button type="submit" @disabled($user->id === auth()->id())
@@ -119,13 +122,13 @@
                     <input type="password" name="password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                     <button type="button" class="toggle-password"
                         style="position: absolute; top: 38px; right: 12px; background: transparent; border: none; cursor: pointer; padding: 0;">
-                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#64748b"
-                            viewBox="0 0 24 24">
+                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            fill="#64748b" viewBox="0 0 24 24">
                             <path
                                 d="M12 5c-7.633 0-11 6.52-11 7s3.367 7 11 7 11-6.52 11-7-3.367-7-11-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5zm0-8.5c-1.931 0-3.5 1.569-3.5 3.5s1.569 3.5 3.5 3.5 3.5-1.569 3.5-3.5-1.569-3.5-3.5-3.5z" />
                         </svg>
-                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#64748b"
-                            viewBox="0 0 24 24" style="display:none;">
+                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            fill="#64748b" viewBox="0 0 24 24" style="display:none;">
                             <path
                                 d="M12 5c-7.633 0-11 6.52-11 7s3.367 7 11 7c1.645 0 3.223-.314 4.692-.884l3.186 3.186 1.414-1.414-18-18-1.414 1.414 3.705 3.705c-2.216 1.381-3.947 3.268-4.972 4.778 1.112 1.618 3.385 4.096 6.667 5.238l-1.38-1.38c-2.142-.702-3.715-2.43-4.268-3.506.982-1.336 3.124-3.932 7.481-3.932 1.763 0 3.34.408 4.683 1.09l1.937-1.937c-1.787-.926-3.847-1.561-6.62-1.561zm3.931 10.931l-1.655-1.655c.435-.484.724-1.121.724-1.776 0-1.378-1.122-2.5-2.5-2.5-.655 0-1.292.289-1.776.724l-1.655-1.655c.888-.66 1.957-1.064 3.431-1.064 2.761 0 5 2.239 5 5 0 1.474-.404 2.543-1.069 3.431z" />
                         </svg>
@@ -135,14 +138,16 @@
                     <div>
                         <label class="text-[12px] font-black uppercase text-secondary">Rol</label>
                         <select name="rol_id" class="w-full mt-1 p-3 bg-slate-50 border rounded-md" required>
-                            @foreach($roles as $rol) <option value="{{$rol->id}}">{{$rol->nombre_rol}}</option>
+                            @foreach ($roles as $rol)
+                                <option value="{{ $rol->id }}">{{ $rol->nombre_rol }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
                         <label class="text-[12px] font-black uppercase text-secondary">Unidad</label>
                         <select name="unidad_id" class="w-full mt-1 p-3 bg-slate-50 border rounded-md" required>
-                            @foreach($unidades as $u) <option value="{{$u->id}}">{{$u->nombre_unidad}}</option>
+                            @foreach ($unidades as $u)
+                                <option value="{{ $u->id }}">{{ $u->nombre_unidad }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -182,17 +187,17 @@
 
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Nombre Completo</label>
-                    <input type="text" name="name" id="edit_nombre" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
-                        required>
+                    <input type="text" name="name" id="edit_nombre"
+                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                 </div>
 
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Email</label>
-                    <input type="email" name="email" id="edit_email" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
-                        required>
+                    <input type="email" name="email" id="edit_email"
+                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                 </div>
 
-                {{--opcional--}}
+                {{-- opcional --}}
                 <div class="relative">
                     <label class="text-[12px] font-black uppercase text-secondary">Contraseña (Dejar vacío para no
                         cambiar)</label>
@@ -200,13 +205,13 @@
 
                     <button type="button" class="toggle-password"
                         style="position: absolute; top: 38px; right: 12px; background: transparent; border: none; cursor: pointer; padding: 0;">
-                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#64748b"
-                            viewBox="0 0 24 24">
+                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            fill="#64748b" viewBox="0 0 24 24">
                             <path
                                 d="M12 5c-7.633 0-11 6.52-11 7s3.367 7 11 7 11-6.52 11-7-3.367-7-11-7zm0 12c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5zm0-8.5c-1.931 0-3.5 1.569-3.5 3.5s1.569 3.5 3.5 3.5 3.5-1.569 3.5-3.5-1.569-3.5-3.5-3.5z" />
                         </svg>
-                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#64748b"
-                            viewBox="0 0 24 24" style="display:none;">
+                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            fill="#64748b" viewBox="0 0 24 24" style="display:none;">
                             <path
                                 d="M12 5c-7.633 0-11 6.52-11 7s3.367 7 11 7c1.645 0 3.223-.314 4.692-.884l3.186 3.186 1.414-1.414-18-18-1.414 1.414 3.705 3.705c-2.216 1.381-3.947 3.268-4.972 4.778 1.112 1.618 3.385 4.096 6.667 5.238l-1.38-1.38c-2.142-.702-3.715-2.43-4.268-3.506.982-1.336 3.124-3.932 7.481-3.932 1.763 0 3.34.408 4.683 1.09l1.937-1.937c-1.787-.926-3.847-1.561-6.62-1.561zm3.931 10.931l-1.655-1.655c.435-.484.724-1.121.724-1.776 0-1.378-1.122-2.5-2.5-2.5-.655 0-1.292.289-1.776.724l-1.655-1.655c.888-.66 1.957-1.064 3.431-1.064 2.761 0 5 2.239 5 5 0 1.474-.404 2.543-1.069 3.431z" />
                         </svg>
@@ -216,23 +221,28 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-[12px] font-black uppercase text-secondary">Rol</label>
-                        <select name="rol_id" id="edit_rol" class="w-full mt-1 p-3 bg-slate-50 border rounded-md" required>
-                            @foreach($roles as $rol) <option value="{{$rol->id}}">{{$rol->nombre_rol}}</option> @endforeach
+                        <select name="rol_id" id="edit_rol" class="w-full mt-1 p-3 bg-slate-50 border rounded-md"
+                            required>
+                            @foreach ($roles as $rol)
+                                <option value="{{ $rol->id }}">{{ $rol->nombre_rol }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div>
                         <label class="text-[12px] font-black uppercase text-secondary">Unidad</label>
                         <select name="unidad_id" id="edit_unidad" class="w-full mt-1 p-3 bg-slate-50 border rounded-md"
                             required>
-                            @foreach($unidades as $u) <option value="{{$u->id}}">{{$u->nombre_unidad}}</option> @endforeach
+                            @foreach ($unidades as $u)
+                                <option value="{{ $u->id }}">{{ $u->nombre_unidad }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
 
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Cargo</label>
-                    <input type="text" name="cargo" id="edit_cargo" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
-                        required>
+                    <input type="text" name="cargo" id="edit_cargo"
+                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                 </div>
 
                 <div>
@@ -250,12 +260,8 @@
     <!----------------FIN MODAL EDITAR USUARIO------------>
 @endsection
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('js/gestion-usuarios.js') }}"></script>
-
 @push('scripts')
-    @if(session('success'))
+    @if (session('success'))
         <script>
             Swal.fire({
                 icon: 'success',
@@ -266,7 +272,7 @@
         </script>
     @endif
 
-    @if($errors->any())
+    @if ($errors->any())
         <script>
             Swal.fire({
                 icon: 'error',
@@ -276,4 +282,8 @@
             });
         </script>
     @endif
+@endpush
+
+@push('page-scripts')
+    @vite(['resources/js/gestion-usuarios.js'])
 @endpush

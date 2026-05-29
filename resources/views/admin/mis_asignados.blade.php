@@ -1,6 +1,8 @@
 @extends('layouts.admin')
 @section('content')
-    <link rel="stylesheet" href="{{ asset('css/tickets.css') }}">
+    @push('css')
+        @vite(['resources/css/tickets.css'])
+    @endpush
 
     <div class="p-1">
         <div class="mb-10 border-b border-slate-200 pb-6">
@@ -131,9 +133,9 @@
 
 
 @push('page-scripts')
-    <script src="{{ asset('js/mis-asignados.js') }}"></script>
+    @vite(['resources/js/mis-asignados.js'])
 @endpush
 
 @push('sse-scripts')
-    <script src="{{ asset('js/api.js') }}"></script>
+    @vite(['resources/js/api.js'])
 @endpush

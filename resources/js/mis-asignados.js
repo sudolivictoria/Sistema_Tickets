@@ -163,9 +163,10 @@ window.cerrarModalUsuario = function () {
 };
 
 //------------------AUTO REFRESCO-----------------
-document.addEventListener("DOMContentLoaded", function () {
-    if (document.querySelector("#tablaMisAsignados")) {
-        window.inicializarTablaTickets("#tablaMisAsignados");
+$(document).ready(function () {
+    const selectorTabla = "#tablaMisAsignados";
+    if ($(selectorTabla).length) {
+        window.inicializarTablaTickets(selectorTabla);
     }
 });
 

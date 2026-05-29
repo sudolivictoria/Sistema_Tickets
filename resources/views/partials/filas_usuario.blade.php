@@ -2,9 +2,9 @@
     <tr class="hover:bg-slate-50/50 transition-colors group">
         <td class="px-2 py-4 font-bold text-slate-900 whitespace-nowrap">
             <div class="flex items-center">
-                <span class="text-primary font-black text-[12px]">#</span>
-                <span class="text-primary font-black text-[12px] tracking-tighter">TK</span>
-                <span class="text-primary font-black tracking-tight text-[12px]">
+                <span class="text-secondary font-black text-[12px]">#</span>
+                <span class="text-secondary font-black text-[12px] tracking-tighter">TK</span>
+                <span class="text-secondary font-black tracking-tight text-[12px]">
                     {{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
                 </span>
             </div>
