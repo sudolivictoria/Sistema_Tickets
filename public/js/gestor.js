@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-
+    //-------eventos para modales de detalles de ticket y usuario
     $(document).on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");
@@ -77,7 +77,7 @@ window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
     const fecha = document.getElementById("modalFechaApertura");
-
+    //---verificar que todos los elementos existen antes de intentar usarlos para evitar errores
     if (modal && titulo && desc && tipo && fecha) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;

@@ -6,12 +6,13 @@ const AutoRefrescoSSE = (() => {
     let evtSource = null;
     let isRefreshing = false;
 
-    // Control de interfaz: Bloquea el refresco si el usuario escribe o tiene un modal abierto
-    function hayAccionEnCurso() {
+    //--bloque si el usuario tiene alguna acción en curso (modal abierto, buscador activo, etc)
+    window.hayAccionEnCurso = function () {
         const modalAbierto = document.querySelector(
             ".modal:not(.hidden), #modalTicket:not(.hidden), #modalUsuario:not(.hidden), #modalAgregar:not(.hidden), #modalEditar:not(.hidden), .swal2-container:not(.hidden)",
         );
 
+        //--buscador de DataTables o buscador general activo
         const buscadorDeTabla =
             document.activeElement &&
             (document.activeElement.getAttribute("type") === "search" ||
@@ -24,17 +25,18 @@ const AutoRefrescoSSE = (() => {
             buscadorDeTabla ||
             (buscadorGeneral && buscadorGeneral === document.activeElement)
         );
-    }
+    };
 
-    function actualizarElemento(id, valor, esHTML = false) {
+    //---función para actualizar texto o HTML de un elemento por ID
+    window.actualizarElemento = function (id, valor, esHTML = false) {
         const el = document.getElementById(id);
         if (!el || valor === undefined || valor === null) return;
         if (esHTML) el.innerHTML = valor;
         else el.textContent = String(valor);
-    }
+    };
 
-    // Procesamiento y Renderizado de Tablas
-    function procesarTabla(htmlNuevo) {
+    //---función para procesar la tabla recibida del servidor
+    window.procesarTabla = function (htmlNuevo) {
         if (!htmlNuevo || isRefreshing) return;
         isRefreshing = true;
 
@@ -45,15 +47,14 @@ const AutoRefrescoSSE = (() => {
             isRefreshing = false;
             return;
         }
-
+        //---extraer solo el tbody del HTML nuevo para evitar conflictos con DataTables
         const tablaId = tablaElement.id;
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) {
             isRefreshing = false;
             return;
         }
-
-        // Si no existe DataTables o jQuery listo, renderiza el HTML crudo
+        //---si no hay DataTables, simplemente reemplazar el tbody y salir
         if (
             !window.$ ||
             !$.fn.DataTable ||
@@ -63,42 +64,38 @@ const AutoRefrescoSSE = (() => {
             isRefreshing = false;
             return;
         }
-
+        //---si hay DataTables, destruir instancia, reemplazar tbody y re-inicializar
         const $tabla = $(tablaElement);
         let paginaActual = 0;
         let buscadorTermino = "";
-
-        // Guardar el estado actual del usuario (Página y búsqueda) antes de destruir
+        //---intentar preservar estado de paginación y búsqueda antes de destruir
         try {
             const dtInstancia = $tabla.DataTable();
             paginaActual = dtInstancia.page();
             buscadorTermino = dtInstancia.search();
         } catch (_) {}
-
-        // Destrucción limpia para evitar el error de duplicidad
+        //---destruir instancia previa para evitar conflictos
         try {
             $tabla.DataTable().destroy();
         } catch (_) {}
-
-        // Inserción del HTML nuevo usando un DOMParser seguro
+        //---reemplazar solo el tbody con el nuevo HTML
         const parser = new DOMParser();
         const doc = parser.parseFromString(
             "<table>" + htmlNuevo + "</table>",
             "text/html",
         );
+        //----extraer solo el tbody del nuevo HTML para evitar conflictos con DataTables
         const tbodyEl = doc.querySelector("tbody");
         tablaBody.innerHTML = tbodyEl ? tbodyEl.innerHTML : "";
-
-        // RE-INICIALIZACIÓN CONTROLADA SEGÚN LA TABLA
+        //---re-inicializar DataTables con la nueva tabla
         if (
             tablaId === "userTable" &&
             typeof window.inicializarUserTable === "function"
         ) {
-            window.inicializarUserTable();
+            window.inicializarUserTable(); //---función específica para tabla de usuarios (si existe)
         } else if (typeof window.inicializarTablaTickets === "function") {
-            window.inicializarTablaTickets("#" + tablaId);
+            window.inicializarTablaTickets("#" + tablaId); //---función genérica para tablas de tickets (si existe)
         } else {
-            // Respaldo genérico si la tabla no tiene inicializador propio
             $tabla.DataTable({
                 destroy: true,
                 responsive: true,
@@ -107,8 +104,16 @@ const AutoRefrescoSSE = (() => {
                 dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
                 language: {
                     processing: "Procesando...",
-                    zeroRecords: "No se encontraron resultados",
-                    emptyTable: "No hay datos disponibles en la tabla",
+                    zeroRecords: `
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">search_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No se encontraron resultados</p>
+                    </div>`,
+                    emptyTable: `
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No hay datos disponibles</p>
+                    </div>`,
                     info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
                     infoFiltered: "(filtrado de un total de _MAX_ registros)",
                     infoEmpty: "Mostrando 0 registros",
@@ -121,12 +126,13 @@ const AutoRefrescoSSE = (() => {
             });
         }
 
-        // Restaurar estado estricto y aplicar las clases estéticas de Tailwind
         try {
+            //--restaurar estado de búsqueda y paginación después de re-inicializar
             const dtNuevo = $tabla.DataTable();
             if (buscadorTermino) {
                 dtNuevo.search(buscadorTermino).draw(false);
             }
+            //--ajustar página actual solo si sigue siendo válida después de la actualización
             const totalPaginas = dtNuevo.page.info().pages;
             if (paginaActual > 0 && paginaActual < totalPaginas) {
                 dtNuevo.page(paginaActual).draw(false);
@@ -137,40 +143,37 @@ const AutoRefrescoSSE = (() => {
         } finally {
             isRefreshing = false;
         }
-    }
-
-    // Solución al problema visual: Aplica clases Tailwind a los botones de la captura
+    };
+    //--función para aplicar estilos personalizados a los controles de paginación de DataTables
     function aplicarEstilosPaginacion() {
         const wrappers = document.querySelectorAll(".dataTables_wrapper");
+        //--estilos para select de cantidad de registros
         wrappers.forEach((wrap) => {
             const lengthSelect = wrap.querySelector(
                 ".dataTables_length select",
             );
+            //---aplicar clases de Tailwind al select de cantidad de registros
             if (lengthSelect) {
                 lengthSelect.className =
                     "mx-2 px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl focus:outline-none";
             }
-
+            //---aplicar clases de Tailwind a los botones de paginación
             const paginateContainer = wrap.querySelector(
                 ".dataTables_paginate",
             );
+            //---reemplazar clases de paginación por estilos personalizados
             if (paginateContainer) {
-                // Separar los botones con un flex ordenado
                 paginateContainer.className =
                     "dataTables_paginate flex items-center gap-1.5 mt-4 justify-end text-slate-600 text-xs font-medium";
 
-                // Buscar tanto enlaces <a> como botones nativos creados por DataTables
                 const links = paginateContainer.querySelectorAll(
                     "a, .paginate_button",
                 );
                 links.forEach((btn) => {
-                    btn.removeAttribute("style"); // Borrar estilos en línea de DataTables
-
-                    // Diseño base de botón redondeado elegante
+                    btn.removeAttribute("style");
                     btn.className =
                         "px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border select-none no-underline inline-block ";
 
-                    // Condición para el botón de la página actual activa
                     if (
                         btn.classList.contains("current") ||
                         btn.classList.contains("active")
@@ -181,18 +184,14 @@ const AutoRefrescoSSE = (() => {
                             "border-secondary",
                             "shadow-sm",
                         );
-                    }
-                    // Condición para botones deshabilitados (ej: Anterior/Siguiente en los extremos)
-                    else if (btn.classList.contains("disabled")) {
+                    } else if (btn.classList.contains("disabled")) {
                         btn.classList.add(
                             "bg-slate-50",
                             "text-slate-300",
                             "border-slate-100",
                             "pointer-events-none",
                         );
-                    }
-                    // Botones interactivos normales
-                    else {
+                    } else {
                         btn.classList.add(
                             "bg-slate-100",
                             "text-slate-600",
@@ -206,42 +205,34 @@ const AutoRefrescoSSE = (() => {
         });
     }
 
+    //--función para inicializar tabla de tickets (si existe)
     function iniciar() {
         detener();
         const tablaElement = document.querySelector(
             '.dataTable, table[id*="tabla"], table[id*="Table"]',
         );
+        //--si no se encuentra tabla, no iniciar SSE para evitar conexiones innecesarias
         if (!tablaElement) return;
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) return;
-
+        //---determinar tipo de tabla para enviar al servidor como parámetro (dashboard, asignar, etc)
         const tipoTabla = tablaBody.getAttribute("data-tipo") || "dashboard";
-
-        // 🎯 NUEVO MOTOR DE DETECCIÓN DE FILTROS (A prueba de balas)
+        //--determinar estado actual del filtro para enviar al servidor como parámetro (abiertos, proceso, resueltos, etc)
         let filtroEstado = "todos";
-
-        // Intento 1: Buscar por clases de Tailwind comunes en tu proyecto
         const botonActivo = document.querySelector(
             '.filtro-btn.bg-secondary, .filtro-btn.active, [id="filtrosEstado"] .bg-secondary',
         );
-
+        //--si se encuentra un botón activo, usar su estado; si no, usar el filtroSseActual como respaldo (que se actualiza al hacer clic en cualquier botón de filtro)
         if (botonActivo) {
             filtroEstado = botonActivo.getAttribute("data-estado") || "todos";
         } else {
-            // Intento 2: Si falla el CSS, buscamos cuál es el botón que el usuario cliqueó basándonos en el almacenamiento global temporal
             filtroEstado = window.filtroSseActual || "todos";
         }
-
-        // Conectar pasándole el parámetro real corregido
+        //---iniciar conexión SSE con parámetros de tipo de tabla y estado de filtro
         evtSource = new EventSource(
             `/api/tickets-stream?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`,
         );
-
-        // Conectar pasándole el parámetro exacto a Laravel
-        evtSource = new EventSource(
-            `/api/tickets-stream?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`,
-        );
-
+        //---evento para procesar datos recibidos del servidor
         evtSource.onmessage = function (event) {
             if (hayAccionEnCurso()) return;
             try {
@@ -251,10 +242,9 @@ const AutoRefrescoSSE = (() => {
                         window.location.href = "/login";
                     return;
                 }
-
+                //---si el servidor envía un nuevo HTML para la tabla, procesarlo
                 procesarTabla(data.html);
-
-                // Actualizar contadores y métricas superiores de los Dashboards
+                //---actualizar otros elementos del dashboard si se incluyen en la respuesta
                 if (data.contadores) {
                     actualizarElemento(
                         "contador-abiertos",
@@ -300,24 +290,28 @@ const AutoRefrescoSSE = (() => {
             }
         };
 
+        //---evento para manejar errores de conexión y reconectar automáticamente
         evtSource.onerror = function () {
-            console.debug("[SSE] Buscando canal activo...");
+            if (evtSource && evtSource.readyState === EventSource.CLOSED) {
+                console.warn("[SSE] Canal cerrado definitivamente.");
+                detener();
+            } else {
+                console.debug("[SSE] Reconectando...");
+            }
         };
     }
-
+    //--función para detener la conexión SSEy limpiar recursos
     function detener() {
         if (evtSource) {
             evtSource.close();
             evtSource = null;
         }
     }
-
+    //--función para forzar un refresco manual desde el cliente (por ejemplo, al cambiar de filtro)
     return {
         iniciar,
         detener,
-        forzarRefresco: () => {
-            iniciar();
-        },
+        forzarRefresco: () => iniciar(),
         aplicarEstilosPaginacion,
     };
 })();
@@ -325,26 +319,32 @@ const AutoRefrescoSSE = (() => {
 // =============================================================
 // INTERCEPCIÓN Y DISPARADORES SEGUROS DE JQUERY / DOM
 // =============================================================
+
+//---inicializar DataTables y configurar eventos después de cargar el DOM
 document.addEventListener("DOMContentLoaded", function () {
-    // Escucha permanente: Si DataTables redibuja la tabla, re-aplica los estilos visuales de inmediato
     if (window.$ && $.fn.DataTable) {
         $(document).on("draw.dt", function () {
             AutoRefrescoSSE.aplicarEstilosPaginacion();
         });
     }
-
-    // Iniciar conexión en tiempo real
-    AutoRefrescoSSE.iniciar();
+    AutoRefrescoSSE.iniciar(); //---iniciar SSE al cargar la página
 });
 
+//---detener SSE al salir de la página para evitar conexiones persistentes innecesarias
 window.addEventListener("beforeunload", () => {
     AutoRefrescoSSE.detener();
 });
 
-// Interruptor Universal de Estados (Garantiza sincronía visual y corte de canal)
+//---listener global para actualizar la variable de filtroSseActual al hacer clic en cualquier botón de filtro, incluso si el botón no tiene el atributo data-estado (como en algunos casos personalizados)
 window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
     if (!elementoBoton) return;
 
+    //--si el estado objetivo es el mismo que el filtro actual, no hacer nada para evitar refrescos innecesarios
+    if (window.filtroSseActual === estadoObjetivo) {
+        return;
+    }
+    window.filtroSseActual = estadoObjetivo;
+    //---resetear estilos de todos los botones de filtro en el mismo contenedor (ya sea #filtrosEstado o cualquier contenedor padre común)
     const contenedorFiltros = elementoBoton.closest("#filtrosEstado, .flex");
     if (contenedorFiltros) {
         contenedorFiltros.querySelectorAll(".filtro-btn").forEach((btn) => {
@@ -365,26 +365,18 @@ window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
         "shadow-md",
     );
 
-    // Forzar reconexión del SSE mandándole el nuevo estado capturado
     AutoRefrescoSSE.forzarRefresco();
 };
 
-// Variable global de respaldo para que el cliente mantenga el filtro en memoria
-window.filtroSseActual = 'todos';
+//--variable global para mantener el estado del filtro seleccionado y enviarlo al servidor en cada conexión SSE, incluso si el usuario navega a otras páginas sin botones de filtro (como detalles de ticket) o si el botón de filtro no tiene el atributo data-estado
+window.filtroSseActual = "todos";
 
-// Escuchar los clics del usuario en CUALQUIER botón de filtro de la aplicación
-document.addEventListener('click', function (event) {
-    const boton = event.target.closest('.filtro-btn, [onclick*="filtrarEstado"]');
+//----cambiarFiltroSistema es el único responsable de disparar el refresco---
+document.addEventListener("click", function (event) {
+    const boton = event.target.closest(
+        '.filtro-btn, [onclick*="filtrarEstado"]',
+    );
     if (boton) {
-        // Capturar el estado directamente desde el atributo HTML
-        const estado = boton.getAttribute('data-estado') || 'todos';
-        window.filtroSseActual = estado;
-        
-        // Darle un pequeño respiro al navegador para que actualice las clases visuales y refrescar el SSE
-        setTimeout(() => {
-            if (typeof AutoRefrescoSSE !== 'undefined') {
-                AutoRefrescoSSE.forzarRefresco();
-            }
-        }, 50);
+        window.filtroSseActual = boton.getAttribute("data-estado") || "todos";
     }
 });

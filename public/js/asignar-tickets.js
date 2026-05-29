@@ -6,11 +6,11 @@ window.inicializarTablaTickets = function (
 ) {
     const tableElement = $(selectorId);
     if (!tableElement.length) return;
-
+    //---destruir instancia previa si existe para evitar conflictos
     if ($.fn.DataTable.isDataTable(selectorId)) {
         $(selectorId).DataTable().destroy();
     }
-
+    //--configuración de idioma y opciones de DataTables
     $.fn.dataTable.ext.pager.numbers_length = 5;
     table = tableElement.DataTable({
         stateSave: true,
@@ -46,12 +46,14 @@ window.inicializarTablaTickets = function (
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
+    //---buscador
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
 
+    //--eventos para modales de detalles de ticket y usuario
     $(document).on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");

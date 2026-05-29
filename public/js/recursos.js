@@ -6,6 +6,7 @@ window.filtrar = function (catId, event) {
     //---filtrar
     const tarjetas = document.querySelectorAll(".manual-card");
 
+    //---filtrar tarjetas
     tarjetas.forEach((tarjeta) => {
         const tarjetaCat = tarjeta.getAttribute("data-categoria");
 
@@ -17,6 +18,7 @@ window.filtrar = function (catId, event) {
         }
     });
 
+    //---estilos de botones
     const botones = document.querySelectorAll(".filter-btn");
     botones.forEach((btn) => {
         btn.classList.remove(

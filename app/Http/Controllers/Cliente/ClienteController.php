@@ -57,7 +57,7 @@ class ClienteController extends Controller
         return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'categorias', 'manuales', 'todosLosTickets'));
     }
 
-
+    //---metodo para mostrar formulario de creacion de ticket
     public function create()
     {
         $categorias = Categoria::all();
@@ -67,11 +67,9 @@ class ClienteController extends Controller
         return view('usuario.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
-
-
+    //---metodo para procesar el formulario de creacion de ticket
     public function store(Request $request)
     {
-
         $userId = Auth::id();
         $checkSum = md5($userId . trim($request->asunto));
         $cacheKey = 'submit_lock_' . $checkSum;

@@ -46,12 +46,14 @@ window.inicializarTablaTickets = function (
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
+    //--buscador
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
 
+    //--eventos para modales de detalles de ticket y usuario
     $(document).on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");

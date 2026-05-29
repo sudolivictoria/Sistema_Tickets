@@ -1,7 +1,7 @@
 /**
  * Gestión de Manuales y Recursos
  */
-
+//---filtro por categoría
 window.filtrar = function (catId, event) {
     //---filtrar
     const tarjetas = document.querySelectorAll(".manual-card");
@@ -16,7 +16,7 @@ window.filtrar = function (catId, event) {
             tarjeta.style.display = "none";
         }
     });
-
+    //---estilos de botones
     const botones = document.querySelectorAll(".filter-btn");
     botones.forEach((btn) => {
         btn.classList.remove(
@@ -32,7 +32,7 @@ window.filtrar = function (catId, event) {
             "hover:text-[#04003B]",
         );
     });
-
+    //---destacar botón activo
     if (event) {
         const botonActivo = event.currentTarget;
         botonActivo.classList.remove(
@@ -77,7 +77,7 @@ window.abrirVisor = function (url, titulo = "Recurso") {
                 Tu navegador no soporta videos.
             </video>`;
     }
-
+    //---mostrar modal
     const modal = document.getElementById("modalVisor");
     modal.classList.remove("hidden");
     modal.classList.add("flex"); //--centrar el visor
@@ -88,7 +88,7 @@ window.abrirVisor = function (url, titulo = "Recurso") {
 window.editarManual = function (id, titulo, categoriaId) {
     const form = document.getElementById("formEditar");
     form.action = `/admin/manuales/${id}`;
-
+    //---llenar campos del formulario
     document.getElementById("edit_titulo").value = titulo;
     document.getElementById("edit_categoria_id").value = categoriaId;
     document.getElementById("modalEditar").classList.remove("hidden");

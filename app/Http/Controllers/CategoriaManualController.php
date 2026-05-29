@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class CategoriaManualController extends Controller
 {
+    //----crear nueva categoria de manual
     public function store(Request $request) 
     {
         $request->validate([

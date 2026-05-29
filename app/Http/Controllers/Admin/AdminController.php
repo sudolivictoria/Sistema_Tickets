@@ -24,7 +24,9 @@ class AdminController extends Controller
 {
     public function index()
     {
+        //--unidad del admin autenticado
         $miUnidadId = Auth::user()->unidad_id;
+        //---estados cerrados
         $estadosCerrados = [3, 4, 5];
 
         //--tickets asignados por unidad del admin autenticado
@@ -46,8 +48,6 @@ class AdminController extends Controller
             ->whereIn('estado_id', $estadosCerrados)
             ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
             ->count();
-
-
 
         //---limitar a solo mostrar los tickets del mes
         $inicioMes = Carbon::now()->startOfMonth();
@@ -98,7 +98,6 @@ class AdminController extends Controller
             ];
         }
 
-
         //----manuales
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
         $manuales = Manual::with('categoria')->latest()->get();
@@ -116,11 +115,9 @@ class AdminController extends Controller
         return view('admin.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
-
-
+    //---metodo para crear ticket
     public function store(Request $request)
     {
-
         $userId = Auth::id();
         $checkSum = md5($userId . trim($request->asunto));
         $cacheKey = 'submit_lock_' . $checkSum;
@@ -177,7 +174,6 @@ class AdminController extends Controller
             $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
         }
 
-
         //--------notificacion a la unidad correspondiente
         try {
             //---identificar unidad por medio de la categoria del ticket
@@ -212,6 +208,7 @@ class AdminController extends Controller
         return view('admin.mis-tickets', compact('misTickets'));
     }
 
+    //----metodo para mostrar recursos
     public function recursos()
     {
         $categorias = CategoriaManual::all();
@@ -233,6 +230,7 @@ class AdminController extends Controller
             ->latest()
             ->get();
 
+        //---obtener tecnicos
         $tecnicos = User::where('unidad_id', $miUnidadId)
             ->where('activo', true)
             ->get();
@@ -240,17 +238,14 @@ class AdminController extends Controller
         return view('admin.asignar-tickets', compact('tickets', 'tecnicos'));
     }
 
-    //--- Actualizar Prioridad ---
+    //---Actualizar Prioridad---
     public function actualizarPrioridad(Request $request, Ticket $ticket)
     {
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
-
         if (in_array($ticket->estado_id, [3, 4, 5])) {
             return back()->with('sweet_error', 'No se puede modificar la prioridad este ticket ha sido resuelto o cerrado.');
         }
-
         $ticket->update(['prioridad_id' => $request->prioridad_id]);
-
         return back()->with('sweet_success', 'Prioridad actualizada correctamente');
     }
 
@@ -300,6 +295,7 @@ class AdminController extends Controller
         return back()->with('sweet_success', $mensaje);
     }
 
+    //---metodo para mostrar los tickets asignados al tecnico autenticado
     public function misAsignados()
     {
         $user = Auth::user();
@@ -316,35 +312,34 @@ class AdminController extends Controller
         return view('admin.mis_asignados', compact('tickets', 'tecnicos', 'prioridades'));
     }
 
+    //---metodo para mostrar gestion de usuarios
     public function gestionUsuarios()
     {
         $usuarios = User::all();
         return view('admin.gestion-usuarios', compact('usuarios'));
     }
-
+    //---metodo para mostrar gestion de recursos
     public function gestionRecursos()
     {
         $categorias = CategoriaManual::all();
         $manuales = Manual::with('categoria')->latest()->get();
         return view('admin.gestion-recursos', compact('categorias', 'manuales'));
     }
-
+    //---metodo para mostrar historial de tickets con filtros y métricas
     public function historial()
     {
-        $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
-
         //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
         $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
             ->whereYear('created_at', date('Y'))
             ->latest()
             ->get();
 
-
         //----metricas
         $cargaTrabajo = $tickets->filter(function ($ticket) {
             return Carbon::parse($ticket->created_at)->isToday();
         })->count();
 
+        //---tickets resueltos en las ultimas 24 horas
         $resueltos24h = $tickets->whereIn('estado_id', [3, 4, 5])
             ->filter(function ($ticket) {
                 return $ticket->fecha_cierre && Carbon::parse($ticket->fecha_cierre)->gte(now()->subDay());
@@ -355,15 +350,11 @@ class AdminController extends Controller
         $ticketsDelMes = $tickets->filter(function ($ticket) {
             return Carbon::parse($ticket->created_at)->isCurrentMonth();
         });
-
         $totalTickets = $ticketsDelMes->count();
         $cerradosTickets = $ticketsDelMes->whereIn('estado_id', [3, 4, 5])->count();
         $tasaCierre = $totalTickets > 0 ? round(($cerradosTickets / $totalTickets) * 100) : 0;
-
         $estados = Estado::all();
         $categorias = Categoria::all();
-
-
         return view('admin.historial', compact('tickets', 'cargaTrabajo', 'resueltos24h', 'tasaCierre', 'estados', 'categorias'));
     }
 

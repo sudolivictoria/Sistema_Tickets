@@ -162,6 +162,7 @@ table.dataTable thead th {
     font-weight: 1000 !important;
 }
 
+/*evitar que el scroll horizontal corte la tabla y deje un espacio en blanco debajo*/
 .dataTables_wrapper,
 .dataTables_scroll,
 .dataTables_scrollBody,
@@ -193,15 +194,12 @@ table.dataTable thead th {
     white-space: nowrap;
 }
 
-/* 1. Resetear por completo los botones nativos que inyecta DataTables */
+/*Resetear por completo los botones nativos que inyecta DataTables*/
 .custom-footer-tabla .dataTables_paginate .paginate_button {
     background: #f1f5f9 !important;
-    /* bg-slate-100 */
     color: #64748b !important;
-    /* text-slate-500 */
     border: none !important;
     border-radius: 9999px !important;
-    /* Círculo perfecto */
     width: 36px !important;
     height: 36px !important;
     display: inline-flex !important;
@@ -213,7 +211,7 @@ table.dataTable thead th {
     box-shadow: none !important;
 }
 
-/* 2. Estilo para el botón de la página actual (Verde Manzana) */
+/*Estilo para el botón de la página actual*/
 .custom-footer-tabla .dataTables_paginate .paginate_button.current,
 .custom-footer-tabla .dataTables_paginate .paginate_button.current:hover {
     background: #84cc16 !important;
@@ -222,13 +220,13 @@ table.dataTable thead th {
     box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3) !important;
 }
 
-/* 3. Efecto Hover para los botones que no están activos */
+/*Efecto Hover para los botones que no están activos*/
 .custom-footer-tabla .dataTables_paginate .paginate_button:hover:not(.current) {
     background: #cdff81 !important;
     color: #166534 !important;
 }
 
-/* 4. Estilo para el texto de "Mostrando..." */
+/* Estilo para el texto de "Mostrando..." */
 .custom-footer-tabla .dataTables_info {
     font-size: 11px !important;
     font-weight: 700 !important;
@@ -237,7 +235,7 @@ table.dataTable thead th {
     letter-spacing: 0.05em !important;
 }
 
-/* 5. Limpiar el contenedor interno de números que a veces mete la librería */
+/*Limpiar el contenedor interno de números que a veces mete la librería*/
 .custom-footer-tabla .dataTables_paginate span {
     background: transparent !important;
     border: none !important;
@@ -250,12 +248,11 @@ table.dataTable thead th {
 [class*="paging"] .current,
 [class*="paging"] .active {
     background-color: #84cc16 !important;
-    /* Verde manzana */
     color: white !important;
     font-weight: bold !important;
 }
 
-/* Forzar el HOVER */
+/*Forzar el HOVER*/
 [class*="paginate"] a:hover:not(.current):not(.active),
 [class*="paginate"] button:hover:not(.current):not(.active),
 [class*="paging"] a:hover:not(.current):not(.active),
@@ -272,7 +269,7 @@ table.dataTable thead th {
     letter-spacing: 0.05em !important;
 }
 
-/* 1. 🎯 ALINEACIÓN DEL CONTENEDOR PRINCIPAL (Obliga a todo a estar en una sola línea recta) */
+/*--linea recta---*/
 .dataTables_paginate,
 .dt-paging,
 [class*="paginate"],
@@ -284,7 +281,7 @@ table.dataTable thead th {
     vertical-align: middle !important;
 }
 
-/* 2. El contenedor intermedio (span) que a veces mete DataTables para los números */
+/*El contenedor intermedio (span) que a veces mete DataTables para los números*/
 [class*="paginate"] span,
 [class*="paging"] span {
     display: inline-flex !important;
@@ -292,7 +289,7 @@ table.dataTable thead th {
     gap: 6px !important;
 }
 
-/* 3. Estilo base para todos los botones (Números y Flechas perfectamente centrados) */
+/*Estilo base para todos los botones (Números y Flechas perfectamente centrados)*/
 [class*="paginate"] a,
 [class*="paginate"] button,
 [class*="paging"] a,
@@ -303,23 +300,21 @@ table.dataTable thead th {
     border-radius: 9999px !important;
     width: 36px !important;
     height: 36px !important;
-    
-    /* Flexbox interno para centrar el texto/icono exactamente en medio del círculo */
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     
-    margin: 0 !important; /* Eliminamos márgenes viejos que desalinean */
+    margin: 0 !important;
     padding: 0 !important;
     cursor: pointer !important;
     font-size: 14px !important;
     font-weight: 600 !important;
-    line-height: 1 !important; /* Evita que el tamaño de línea empuje el número hacia abajo */
+    line-height: 1 !important; 
     transition: all 0.2s ease !important;
     box-sizing: border-box !important;
 }
 
-/* 4. 🎯 ALINEAR LOS PUNTOS SUSPENSIVOS (...) */
+/*----ALINEAR LOS PUNTOS SUSPENSIVOS (...)---*/
 .dataTables_paginate .ellipsis,
 .dt-paging .ellipsis,
 [class*="paginate"] .ellipsis,
@@ -327,8 +322,8 @@ table.dataTable thead th {
     background: transparent !important;
     color: #94a3b8 !important;
     border: none !important;
-    width: 36px !important; /* Mismo ancho para no romper el ritmo */
-    height: 36px !important; /* Misma altura */
+    width: 36px !important; 
+    height: 36px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -338,7 +333,7 @@ table.dataTable thead th {
     cursor: default !important;
 }
 
-/* 5. Asegurar que los iconos de flecha dentro de los botones no floten */
+/*---Asegurar que los iconos de flecha dentro de los botones no floten---*/
 [class*="paginate"] .material-symbols-outlined,
 [class*="paging"] .material-symbols-outlined {
     display: flex !important;
@@ -350,7 +345,7 @@ table.dataTable thead th {
     width: 100% !important;
 }
 
-/* 6. OCULTAR EL PRIMERO Y EL ÚLTIMO COMPLETAMENTE */
+/*--OCULTAR EL PRIMERO Y EL ÚLTIMO COMPLETAMENTE--*/
 .dataTables_paginate .first,
 .dataTables_paginate .last,
 .dt-paging .first,

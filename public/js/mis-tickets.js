@@ -54,6 +54,7 @@ window.inicializarTablaTickets = function (selectorId) {
             table.search(this.value).draw(false);
         });
 
+    //--eventos para modales de detalles de ticket y usuario
     $(document).on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");

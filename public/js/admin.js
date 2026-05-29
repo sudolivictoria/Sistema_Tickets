@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const toggleBtn = document.getElementById("toggle-canales");
+    const toggleBtn = document.getElementById("toggle-canales"); //canales
     if (toggleBtn) {
         toggleBtn.addEventListener("click", function () {
             const list = document.getElementById("canales-list");
@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    //-------eventos para modales de detalles de ticket y usuario
     $(document).on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");
@@ -30,6 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+//--función para ejecutar los filtros por estado
 window.ejecutarFiltros = function (estadoSeleccionado) {
     const estadoFiltro = String(estadoSeleccionado).trim().toLowerCase();
     const listaEstados = estadoFiltro.split(",");
@@ -62,6 +64,7 @@ window.filtrarEstado = function (estado, btn) {
     ejecutarFiltros(estado);
 };
 
+//---funciones para mostrar detalles en modales
 window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");

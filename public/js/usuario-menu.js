@@ -7,6 +7,7 @@ const initSidebar = () => {
     //---precaucion para no rompel el codigo
     if (!menuToggle || !sidebar || !overlay) return;
 
+    //--funciones para abrir y cerrar el menu
     const abrirMenu = () => {
         sidebar.classList.remove("-translate-x-full");
         overlay.classList.remove("hidden");

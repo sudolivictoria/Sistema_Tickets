@@ -320,7 +320,6 @@ class AdminUnidadController extends Controller
             ->latest()
             ->get();
 
-
         //----metricas
         $cargaTrabajo = $tickets->filter(function ($ticket) {
             return Carbon::parse($ticket->created_at)->isToday();
@@ -340,11 +339,8 @@ class AdminUnidadController extends Controller
         $totalTickets = $ticketsDelMes->count();
         $cerradosTickets = $ticketsDelMes->whereIn('estado_id', [3, 4, 5])->count();
         $tasaCierre = $totalTickets > 0 ? round(($cerradosTickets / $totalTickets) * 100) : 0;
-
         $estados = Estado::all();
         $categorias = Categoria::all();
-
-
 
         return view('gestor.historial', compact('tickets', 'cargaTrabajo', 'resueltos24h', 'tasaCierre', 'estados', 'categorias'));
     }

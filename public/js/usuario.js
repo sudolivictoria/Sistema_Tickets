@@ -1,5 +1,6 @@
 //----desplegable de canales directos
 document.addEventListener("DOMContentLoaded", function () {
+    //--canales directos
     const toggleBtn = document.getElementById("toggle-canales");
 
     if (toggleBtn) {
@@ -17,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    //-------eventos para modales de detalles de ticket y usuario
     $(document).on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");

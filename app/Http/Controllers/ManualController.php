@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ManualController extends Controller
 {
+    //--metodo para mostrar la vista de gestion de manuales
     public function index()
     {
         $categorias = CategoriaManual::all();
