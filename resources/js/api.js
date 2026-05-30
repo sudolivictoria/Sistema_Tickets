@@ -2,7 +2,7 @@
 // AUTO-REFRESCO UNIVERSAL POR EVENTOS DEL SERVIDOR (SSE) - BLINDADO
 // =============================================================
 
-const AutoRefrescoSSE = (() => {
+window.AutoRefrescoSSE = (() => {
     let evtSource = null;
     let isRefreshing = false;
 
@@ -35,7 +35,7 @@ const AutoRefrescoSSE = (() => {
 
     //---procesamiento y rendimiento 
     function procesarTabla(htmlNuevo) {
-        if (!htmlNuevo || isRefreshing) return;
+        if (htmlNuevo === undefined || htmlNuevo === null || isRefreshing) return;
         isRefreshing = true;
 
         const tablaElement = document.querySelector(
@@ -128,7 +128,7 @@ const AutoRefrescoSSE = (() => {
     function aplicarEstilosPaginacion() {
         const wrappers = document.querySelectorAll(".dataTables_wrapper");
         wrappers.forEach((wrap) => {
-            // 🌟 REGLA DE ORO 2: No aplicar estilos automáticos al contenedor del historial
+
             if (wrap.id === "tablaHistorial_wrapper") return;
 
             const lengthSelect = wrap.querySelector(
@@ -195,7 +195,7 @@ const AutoRefrescoSSE = (() => {
         );
         if (!tablaElement) return;
 
-        // 🌟 REGLA DE ORO 3: Evita que el flujo automático cargue datos en el Historial al entrar
+        //---no cargar datos en el historial hasta filtrado
         if (tablaElement.id === "tablaHistorial") {
             console.log("[SSE] Pantalla de Historial detectada: Auto-refresco en segundo plano desactivado.");
             return; 
@@ -215,8 +215,7 @@ const AutoRefrescoSSE = (() => {
             filtroEstado = window.filtroSseActual || "todos";
         }
 
-        // 🌟 REGLA DE ORO 4: Mantener estable el filtro múltiple (comas) en Asignados y Dashboard.
-        if (filtroEstado.includes(",") && tipoTabla !== "asignados" && tipoTabla !== "dashboard") {
+        if (filtroEstado.includes(",") && tipoTabla !== "asignados" && tipoTabla !== "dashboard" && tipoTabla !== "mis-tickets") {
             filtroEstado = "cerrado";
         }
 
@@ -311,7 +310,6 @@ const AutoRefrescoSSE = (() => {
 document.addEventListener("DOMContentLoaded", function () {
     if (window.$ && $.fn.DataTable) {
         $(document).on("draw.dt", function (e, settings) {
-            // 🌟 REGLA DE ORO 5: Detener eventos cruzados si provienen del historial
             if (settings && settings.nTable && settings.nTable.id === "tablaHistorial") return;
             AutoRefrescoSSE.aplicarEstilosPaginacion();
         });

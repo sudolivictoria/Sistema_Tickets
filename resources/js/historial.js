@@ -5,7 +5,6 @@ window.inicializarHistorialDataTable = function () {
     if ($.fn.DataTable.isDataTable("#tablaHistorial")) {
         $("#tablaHistorial").DataTable().destroy();
     }
-    //---data table configuracion exaxta
     tableHistorial = $("#tablaHistorial").DataTable({
         language: {
             processing: "Procesando...",
@@ -89,6 +88,7 @@ window.limpiarFiltrosHistorial = function () {
     
     tableHistorial.search("").draw(); //--vista vacia
 };
+
 //----DETALLE TICKET Y USUARIO---
 window.verDetalle = function (asunto, descripcion, tipoNombre) {
     const modal = document.getElementById("modalTicket");
