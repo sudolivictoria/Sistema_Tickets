@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Manual;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Models\CategoriaManual;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -141,12 +142,15 @@ class ApiTableController extends Controller
             try {
                 //--- Obtener los recursos de la base de datos ordenados por los últimos subidos
                 $manuales = Manual::with('categoria')->latest()->get();
+                $categorias = CategoriaManual ::orderBy('nombre_categoria_manual', 'asc')->get();
                 //--- Renderizar el archivo blade parcial que contiene la estructura HTML de las tarjetas
                 $htmlCards = view('partials.filas_recursos', compact('manuales'))->render();
+                $htmlCategorias = view('partials.filtros_recursos', compact('categorias'))->render();
 
                 //--- Transmitir la estructura HTML limpia a tu script recursos-api.js
                 echo "data: " . json_encode([
-                    'html' => $htmlCards
+                    'html' => $htmlCards,
+                    'htmlCategorias' => $htmlCategorias
                 ]) . "\n\n";
             } catch (Throwable $e) {
                 Log::error('ApiTableController streamRecursos Error: ' . $e->getMessage());

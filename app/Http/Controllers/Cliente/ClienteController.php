@@ -51,7 +51,7 @@ class ClienteController extends Controller
             ->paginate(5);
 
         //----manuales
-        $categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
+        $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
         $manuales = Manual::with('categoria')->latest()->get();
 
         return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'categorias', 'manuales', 'todosLosTickets'));

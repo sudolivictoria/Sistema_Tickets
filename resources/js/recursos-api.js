@@ -8,29 +8,38 @@ const AutoRefrescoSSE = (() => {
     //--bloquea la inyección si el usuario está interactuando (viendo un PDF/Video o buscando)
     window.hayAccionEnCurso = function () {
         const modalAbierto = document.querySelector(
-            "#modalVisor:not(.hidden), .swal2-container:not(.hidden)"
+            "#modalVisor:not(.hidden), .swal2-container:not(.hidden)",
         );
 
         const buscadorGeneral = document.getElementById("inputBusqueda");
-        const buscadorActivo = buscadorGeneral && buscadorGeneral === document.activeElement;
+        const buscadorActivo =
+            buscadorGeneral && buscadorGeneral === document.activeElement;
 
         return !!(modalAbierto || buscadorActivo);
     };
 
     //-----procesa e inyecta nuevas tarjetas
-    window.procesarTarjetasRecursos = function (htmlNuevo) {
+    window.procesarTarjetasRecursos = function (htmlNuevo, htmlCategorias) {
         if (!htmlNuevo || isRefreshing) return;
         isRefreshing = true;
 
-        //---contenedor principal cards
-        const contenedorRecursos = document.querySelector(".grid, #contenedor-recursos");
-        if (!contenedorRecursos) {
-            isRefreshing = false;
-            return;
+        //----actualizar Tarjetas
+        const contenedorRecursos = document.querySelector(
+            ".grid, #contenedor-manuales",
+        );
+        if (contenedorRecursos) {
+            contenedorRecursos.innerHTML = htmlNuevo;
         }
 
-        //---nuevas tarjetas
-        contenedorRecursos.innerHTML = htmlNuevo;
+        //----actualizar Botones de Categorías
+        if (htmlCategorias) {
+            const contenedorFiltros = document.querySelector(
+                "#contenedor-categorias",
+            );
+            if (contenedorFiltros) {
+                contenedorFiltros.innerHTML = htmlCategorias;
+            }
+        }
 
         //---filtro categoria
         if (typeof window.filtrar === "function") {
@@ -40,32 +49,34 @@ const AutoRefrescoSSE = (() => {
         isRefreshing = false;
     };
 
-   
     function iniciar() {
         detener();
-        const contenedorRecursos = document.querySelector(".grid, #contenedor-recursos");
+        const contenedorRecursos = document.querySelector(
+            ".grid, #contenedor-recursos",
+        );
         if (!contenedorRecursos) return;
         const categoriaFiltro = window.categoriaActivaActual || "all";
 
         //---------conexion
         evtSource = new EventSource(
-            `/api/recursos-stream?categoria=${encodeURIComponent(categoriaFiltro)}`
+            `/api/recursos-stream?categoria=${encodeURIComponent(categoriaFiltro)}`,
         );
 
         //----actualizacion servidor
         evtSource.onmessage = function (event) {
             if (hayAccionEnCurso()) return;
-            
+
             try {
                 const data = JSON.parse(event.data);
-                
+
                 if (data.error) {
-                    if (data.error === "No autenticado") window.location.href = "/login";
+                    if (data.error === "No autenticado")
+                        window.location.href = "/login";
                     return;
                 }
 
                 if (data.html) {
-                    procesarTarjetasRecursos(data.html);
+                    procesarTarjetasRecursos(data.html, data.htmlCategorias);
                 }
             } catch (err) {
                 console.error("[SSE Recursos] JSON Parse Error:", err);
@@ -92,7 +103,7 @@ const AutoRefrescoSSE = (() => {
     return {
         iniciar,
         detener,
-        forzarRefresco: () => iniciar()
+        forzarRefresco: () => iniciar(),
     };
 })();
 
@@ -106,19 +117,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const botonFiltro = event.target.closest(".filter-btn");
         if (botonFiltro) {
             const catId = botonFiltro.getAttribute("data-id") || "all";
-            
-            //si  hace clic en el mismo botón que ya está activo, no reconectamos de forma innecesaria
+
+            //---si  hace clic en el mismo botón que ya está activo, no reconectamos de forma innecesaria
             if (window.categoriaActivaActual === catId) return;
 
-            //variable global para que recursos.js y este script estén sincronizados
+            //---variable global para que recursos.js y este script estén sincronizados
             window.categoriaActivaActual = catId;
-            
-            //forzamos el refresco del canal para avisar al servidor de la nueva categoría
+
+            //---forzamos el refresco del canal para avisar al servidor de la nueva categoría
             AutoRefrescoSSE.forzarRefresco();
         }
     });
 
-    //arrancar el SSE automáticamente al cargar la página
+    //----arrancar el SSE automáticamente al cargar la página
     AutoRefrescoSSE.iniciar();
 });
 

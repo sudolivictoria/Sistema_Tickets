@@ -209,7 +209,7 @@ class AdminUnidadController extends Controller
 
     public function recursos()
     {
-        $categorias = CategoriaManual::all();
+        $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
         $manuales = Manual::with('categoria')->latest()->get();
         return view('gestor.recursos', compact('categorias', 'manuales'));
     }

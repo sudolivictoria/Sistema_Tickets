@@ -211,7 +211,7 @@ class AdminController extends Controller
     //----metodo para mostrar recursos
     public function recursos()
     {
-        $categorias = CategoriaManual::all();
+        $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
         $manuales = Manual::with('categoria')->latest()->get();
         return view('admin.recursos', compact('categorias', 'manuales'));
     }
@@ -321,7 +321,7 @@ class AdminController extends Controller
     //---metodo para mostrar gestion de recursos
     public function gestionRecursos()
     {
-        $categorias = CategoriaManual::all();
+        $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
         $manuales = Manual::with('categoria')->latest()->get();
         return view('admin.gestion-recursos', compact('categorias', 'manuales'));
     }
