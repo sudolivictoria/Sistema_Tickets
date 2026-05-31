@@ -19,6 +19,8 @@ window.inicializarTablaTickets = function (selectorId) {
         info: false,
         responsive: true,
         autoWidth: false,
+        order: [[0, "desc"]],
+        stateSave: false,
         dom: "rt",
         language: {
             zeroRecords: `

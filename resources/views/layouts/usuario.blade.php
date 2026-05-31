@@ -58,7 +58,7 @@
     <div id="preloader"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-1000">
         <div class="flex flex-col items-center">
-            <div class="h-16 w-16 animate-spin rounded-full border-4 border-slate-200 border-t-secondary"></div>
+            <div class="h-16 w-16 animate-spin rounded-full border-4 border-slate-200 border-t-primary"></div>
 
             <p class="mt-4 text-sm font-black uppercase tracking-widest text-secondary animate-pulse">
                 Cargando sistema...

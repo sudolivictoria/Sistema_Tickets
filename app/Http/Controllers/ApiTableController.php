@@ -254,9 +254,7 @@ class ApiTableController extends Controller
                 if ($tipo === 'dashboard') {
                     $queryTickets->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
                 } else {
-                    $queryTickets->where(function ($q) {
-                        $q->where('estado_id', 1)->orWhereNotIn('estado_id', self::ESTADOS_CERRADOS);
-                    });
+                    $queryTickets->where('estado_id', 1);
                 }
                 break;
 
@@ -268,6 +266,8 @@ class ApiTableController extends Controller
                 }
                 break;
 
+            case 'cerrado':
+            case 'resuelto,equivocado,no corresponde':
             case 'resuelto':
             case 'equivocado':
             case 'no corresponde':

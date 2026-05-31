@@ -19,6 +19,8 @@ window.inicializarTablaTickets = function (selectorId) {
         info: false,
         responsive: true,
         dom: "rt",
+        order: [[0, "desc"]],
+        stateSave: false,
         language: {
             zeroRecords: `
                 <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
@@ -33,7 +35,7 @@ window.inicializarTablaTickets = function (selectorId) {
                     <h5 class="text-xs font-black uppercase text-slate-400 tracking-widest">Bandeja Vacía</h5>
                     <p class="text-[11px] text-slate-400 font-medium mt-1">No existen tickets disponibles bajo este estado.</p>
                 </div>
-            `
+            `,
         },
     });
 };

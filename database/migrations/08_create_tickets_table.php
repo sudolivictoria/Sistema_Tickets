@@ -16,7 +16,6 @@ return new class extends Migration
 
             $table->string('asunto');
             $table->text('descripcion');
-            $table->text('comentario')->nullable();
 
             //---quien genera el ticket
             $table->foreignId('user_id')->constrained('users');

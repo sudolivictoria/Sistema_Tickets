@@ -4,7 +4,6 @@
     @push('css')
         @vite(['resources/css/tickets.css'])
     @endpush
-    >
 
     <div class="p-1">
         <div class="mb-10 border-b border-slate-200 pb-6">
@@ -84,5 +83,4 @@
 
 @push('sse-scripts')
     @vite(['resources/js/api.js'])
-    <script src="{{ asset('js/api.js') }}"></script>
 @endpush

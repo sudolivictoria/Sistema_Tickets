@@ -48,7 +48,6 @@ window.AutoRefrescoSSE = (() => {
 
         const tablaId = tablaElement.id;
 
-        // 🌟 REGLA DE ORO 1: Si es la tabla de Historial, la API SSE jamás la toca ni le altera el HTML
         if (tablaId === "tablaHistorial") {
             isRefreshing = false;
             return; 
@@ -144,7 +143,7 @@ window.AutoRefrescoSSE = (() => {
             );
             if (paginateContainer) {
                 paginateContainer.className =
-                    "dataTables_paginate flex items-center gap-1.5 mt-4 justify-end text-slate-600 text-xs font-medium";
+                    "dataTables_paginate flex items-center gap-1.5 mt-4 justify-center md:justify-end w-full text-slate-600 text-xs font-medium ml-auto";
 
                 const links = paginateContainer.querySelectorAll(
                     "a, .paginate_button",
