@@ -25,14 +25,15 @@ precisas para desplegar y probar el **Sistema de Tickets** en un entorno local d
 
 # ------------------------- Configuración .env ---------------------#
 
-# cp .env.example.env
+# cp .env.example .env
 
 -->abrir el archivo .env y pegar las configuraciones correspondientes.
 
 
 # -------------------------Instalación dependencias --------------#
 
-# composer install 
+# composer install --prefer-source
+# composer require barryvdh/laravel-dompdf --prefer-source
 # npm install
 # npm install @tailwindcss/forms @tailwindcss/container-queries
 # npm install jquery datatables.net-dt sweetalert2
@@ -44,11 +45,12 @@ precisas para desplegar y probar el **Sistema de Tickets** en un entorno local d
 # php artisan config:clear
 # php artisan cache:clear
 # php artisan view:clear
+# php artisan optimize:clear
 
 # ------------------BD, datos de prueba y archivos---------------------#
 
-# php artian migrate:fresh --seed
-# php artisan storge:link
+# php artisan migrate:fresh --seed
+# php artisan storage:link
 
 # ------------------Compilacion FrontEnd------------------------------#
 
@@ -60,7 +62,7 @@ precisas para desplegar y probar el **Sistema de Tickets** en un entorno local d
 # php artisan serve
 
 # PROCESAROR DE CORREOS (QUEUES)
-# php artisan queue:work
+# php artisan queue:local
 
 # Acceso Super Admin #
 --> Con este usuario puede crear nuevos usuarios super admin, gestor o un usuario normal en gestion de usuario.

@@ -1,6 +1,6 @@
 var tableHistorial;
-//----no cargar datos al inicio
 var filtrosAplicados = false;
+
 window.inicializarHistorialDataTable = function () {
     if ($.fn.DataTable.isDataTable("#tablaHistorial")) {
         $("#tablaHistorial").DataTable().destroy();
@@ -27,8 +27,7 @@ window.inicializarHistorialDataTable = function () {
                 first: "Primero",
                 last: "Último",
                 next: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_right</span>',
-                previous:
-                    '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
+                previous: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
             },
         },
         responsive: false,
@@ -38,7 +37,6 @@ window.inicializarHistorialDataTable = function () {
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
-    //---modal detalle delegación eventos
     $("#tablaHistorial").on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");
@@ -56,21 +54,21 @@ window.inicializarHistorialDataTable = function () {
     });
     tableHistorial.draw();
 };
-//--------filtrado
+
+//--------aplicar filtros historial--------//
 window.aplicarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     filtrosAplicados = true;
-    //---filtrado buscador
     const textoBuscar = document.getElementById("filtroBuscar").value;
     tableHistorial.search(textoBuscar);
-    //---redibujar la tabla
     tableHistorial.draw();
 };
-//---limpar filtros
+
+//--------limpiar filtros historial--------//
 window.limpiarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     filtrosAplicados = false;
-    //---resetear inputs verificando que existan primero para evitar errores
+    
     const elBuscar = document.getElementById("filtroBuscar");
     if (elBuscar) elBuscar.value = "";
 
@@ -86,10 +84,38 @@ window.limpiarFiltrosHistorial = function () {
     const elCategoria = document.getElementById("filtroCategoria");
     if (elCategoria) elCategoria.value = "todos";
     
-    tableHistorial.search("").draw(); //--vista vacia
+    tableHistorial.search("").draw(); 
 };
 
-//----DETALLE TICKET Y USUARIO---
+//--------aplicar filtros historial--------//
+window.exportarHistorial = function(formato) {
+    if (!filtrosAplicados) {
+        alert("Por favor, aplique los filtros primero antes de exportar un reporte.");
+        return;
+    }
+
+    //-----valores del dom
+    const buscar = document.getElementById("filtroBuscar").value;
+    const fechaInicio = document.getElementById("filtroFechaInicio").value;
+    const fechaFin = document.getElementById("filtroFechaFin").value;
+    const estado = document.getElementById("filtroEstado").value;
+    const categoria = document.getElementById("filtroCategoria").value;
+
+    //---peticion descarga
+    const params = new URLSearchParams({
+        tipo: formato, //-------pdf o excel
+        buscar: buscar,
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        estado: estado,
+        categoria: categoria
+    });
+
+    //------descarga 
+    window.location.href = `/admin/reportes/exportar?${params.toString()}`;
+};
+
+//--------ver detalle del ticket historial--------//
 window.verDetalle = function (asunto, descripcion, tipoNombre) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
@@ -103,6 +129,7 @@ window.verDetalle = function (asunto, descripcion, tipoNombre) {
         document.body.style.overflow = "hidden";
     }
 };
+
 window.cerrarModal = function () {
     const modal = document.getElementById("modalTicket");
     if (modal) {
@@ -110,6 +137,8 @@ window.cerrarModal = function () {
         document.body.style.overflow = "auto";
     }
 };
+
+//--------ver detalle del usuario historial--------//
 window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const modal = document.getElementById("modalUsuario");
     const nombre = document.getElementById("userNombre");
@@ -136,6 +165,7 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
         document.body.style.overflow = "hidden";
     }
 };
+
 window.cerrarModalUsuario = function () {
     const modal = document.getElementById("modalUsuario");
     if (modal) {
@@ -143,39 +173,32 @@ window.cerrarModalUsuario = function () {
         document.body.style.overflow = "auto";
     }
 };
+
+//--------filtros personalizados para historial--------//
 document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaHistorial")) {
-        //----filtros
         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             if (settings.nTable.id !== "tablaHistorial") return true;
-            //---no mostrar nada hasta ver los filtros
             if (!filtrosAplicados) {
                 return false;
             }
-            //---obtener el elemento de filtrado
             const filaTr = settings.aoData[dataIndex].nTr;
             const fechaFilaRaw = filaTr.getAttribute("data-fecha");
             const estadoFilaId = filaTr.getAttribute("data-estado-id");
             const categoriaFilaId = filaTr.getAttribute("data-categoria-id");
-            //---filtro del estado
+            
             const estadoSel = document.getElementById("filtroEstado").value;
             if (estadoSel !== "todos" && estadoFilaId !== estadoSel) {
                 return false;
             }
-            //----categoria
             const elCategoria = document.getElementById("filtroCategoria");
             if (elCategoria) {
                 const categoriaSel = elCategoria.value;
-                if (
-                    categoriaSel !== "todos" &&
-                    categoriaFilaId !== categoriaSel
-                ) {
+                if (categoriaSel !== "todos" && categoriaFilaId !== categoriaSel) {
                     return false;
                 }
             }
-            //---fechas
-            const fInicioRaw =
-                document.getElementById("filtroFechaInicio").value;
+            const fInicioRaw = document.getElementById("filtroFechaInicio").value;
             const fFinRaw = document.getElementById("filtroFechaFin").value;
 
             if (fechaFilaRaw) {
@@ -192,7 +215,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             return true;
         });
-        //--inicializacion
         window.inicializarHistorialDataTable();
     }
 });

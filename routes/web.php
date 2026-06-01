@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\AdminUnidad\AdminUnidadController;
 use App\Http\Controllers\ApiTableController;
 use App\Http\Controllers\UserController;
@@ -12,9 +13,7 @@ use App\Http\Controllers\CategoriaManualController;
 use App\Http\Controllers\Cliente\ClienteController;
 use App\Http\Controllers\ManualController;
 use App\Http\Controllers\TicketController;
-use App\Models\Ticket;
-
-Volt::route('/test-livewire', 'pages.test-livewire')->name('test.livewire');
+use App\Models\Ticket;  
 
 //----------login 
 Route::get('/', [LoginController::class, 'showLoginForm']);
@@ -92,6 +91,9 @@ Route::middleware(['auth'])->group(function () {
 
         //----gestion de categorias manuales
         Route::post('/categorias-manuales', [CategoriaManualController::class, 'store'])->name('categorias.store');
+
+        //------reportes
+        Route::get('/reportes/exportar', [ReporteController::class, 'exportar'])->name('admin.reportes.exportar');
     });
 
     //---Rol Usuario
