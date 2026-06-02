@@ -12,25 +12,25 @@ precisas para desplegar y probar el **Sistema de Tickets** en un entorno local d
 
 
 
-# ---------------- Clonación del Proyecto ----------------------- #
+# ---------- Clonación del Proyecto ---------------- #
 ---> Abra la terminal en su carpeta de proyectos y ejecute:
 
 # git clone https://github.com/sudolivictoria/Sistema_Tickets.git
 
 
-# -------------------------- Base de datos ----------------------- #
+# -------------- Base de datos ----------------------- #
 ---> Abra phpMyAdmin (http://localhost/phpmyadmin).
 ---> Cree una base de datos con el nombre exacto: sistema_tickets
 ---> Use el cotejamiento: utf8mb4_unicode_ci
 
-# ------------------------- Configuración .env ---------------------#
+# ----------- Configuración .env ---------------------#
 
 # cp .env.example .env
 
 -->abrir el archivo .env y pegar las configuraciones correspondientes.
 
 
-# -------------------------Instalación dependencias --------------#
+# -------------Instalación dependencias --------------#
 
 # composer install --prefer-source
 # composer require barryvdh/laravel-dompdf --prefer-source
@@ -47,16 +47,16 @@ precisas para desplegar y probar el **Sistema de Tickets** en un entorno local d
 # php artisan view:clear
 # php artisan optimize:clear
 
-# ------------------BD, datos de prueba y archivos---------------------#
+# ------------BD, datos de prueba y archivos--------------------#
 
 # php artisan migrate:fresh --seed
 # php artisan storage:link
 
-# ------------------Compilacion FrontEnd------------------------------#
+# ----------------Compilacion FrontEnd---------------------------#
 
 # npm run build
 
-# ----------------Ejecución Servicios en paralelo---------------------#
+# -------------Ejecución Servicios en paralelo-------------------#
 
 # SERVIDOR DE LARAVEL
 # php artisan serve
@@ -79,7 +79,6 @@ precisas para desplegar y probar el **Sistema de Tickets** en un entorno local d
 **Gestion Usuarios**
 **Gestion Recursos**
 **Historial**
-**Reporteria**
 
 **Crear ticket**
 **Mis tickets**
