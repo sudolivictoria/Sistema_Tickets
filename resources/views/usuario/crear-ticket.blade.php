@@ -4,7 +4,7 @@
     <div class="max-w-4xl w-full mx-auto p-4 md:p-8">
         <div class="mb-6 md:mb-10 border-b border-slate-200 pb-6">
             <h2 class="text-2xl md:text-3xl font-black text-secondary mb-2 flex items-center gap-3">
-                <span class="material-symbols-outlined text-3xl md:text-4xl text-primary">confirmation_number</span>
+                <span class="material-symbols-outlined text-3xl md:text-4xl text-primary">add_circle</span>
                 Enviar Nueva Solicitud
             </h2>
         </div>
