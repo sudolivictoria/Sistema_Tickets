@@ -238,15 +238,18 @@ class AdminUnidadController extends Controller
     //--- Actualizar Prioridad ---
     public function actualizarPrioridad(Request $request, Ticket $ticket)
     {
+        $urlOrigen = request()->headers->get('referer');
+
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
 
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return back()->with('sweet_error', 'No se puede modificar la prioridad este ticket ha sido resuelto o cerrado.');
+            return redirect()->to($urlOrigen)->with('sweet_error', 'No se puede modificar la prioridad este ticket ha sido resuelto o cerrado.');
         }
 
         $ticket->update(['prioridad_id' => $request->prioridad_id]);
 
-        return back()->with('sweet_success', 'Prioridad actualizada correctamente');
+        return redirect()->to($urlOrigen)
+            ->with('sweet_success', 'Prioridad actualizada correctamente');
     }
 
     //--- Actualizar Técnico ---
@@ -267,16 +270,18 @@ class AdminUnidadController extends Controller
             ]
         ]);
 
+        $urlOrigen = request()->headers->get('referer');
+
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return back()->with('sweet_error', '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.');
+            return redirect()->to($urlOrigen)->with('sweet_error', '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.');
         }
         if ($request->filled('tecnico_id')) {
             if ($ticket->tecnico_id !== null && $ticket->tecnico_id != $request->tecnico_id) {
-                return back()->with('sweet_error', '¡Demasiado tarde! Otro usuario ya asignó este ticket a un técnico diferente.');
+                return redirect()->to($urlOrigen)->with('sweet_error', '¡Demasiado tarde! Otro usuario ya asignó este ticket a un técnico diferente.');
             }
         } else {
             if ($ticket->tecnico_id === null) {
-                return back()->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
+                return redirect()->to($urlOrigen)->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
             }
         }
         //---actualizar datos
@@ -289,7 +294,7 @@ class AdminUnidadController extends Controller
             ? 'Técnico asignado correctamente.'
             : 'Ticket devuelto a la cola de pendientes.';
 
-        return back()->with('sweet_success', $mensaje);
+        return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 
     public function misAsignados()
@@ -341,7 +346,7 @@ class AdminUnidadController extends Controller
         $cerradosTickets = $ticketsDelMes->whereIn('estado_id', [3, 4, 5])->count();
         $tasaCierre = $totalTickets > 0 ? round(($cerradosTickets / $totalTickets) * 100) : 0;
         $estados = Estado::all();
-        $categorias = Categoria::all();
+        $categorias = Categoria::where('unidad_id', $miUnidadId)->get();
 
         return view('gestor.historial', compact('tickets', 'cargaTrabajo', 'resueltos24h', 'tasaCierre', 'estados', 'categorias'));
     }

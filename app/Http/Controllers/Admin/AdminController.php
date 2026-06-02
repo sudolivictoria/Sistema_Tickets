@@ -186,7 +186,7 @@ class AdminController extends Controller
 
             if (!empty($destinatarios)) {
                 //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
-                Mail::bcc($destinatarios)->send(new NuevaSolicitudUnidadMail($nuevoTicket));
+                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
             }
         } catch (\Exception $e) {
             Log::error("Error avisando a la unidad: " . $e->getMessage());
@@ -241,12 +241,16 @@ class AdminController extends Controller
     //---Actualizar Prioridad---
     public function actualizarPrioridad(Request $request, Ticket $ticket)
     {
+        $urlOrigen = request()->headers->get('referer');
+
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return back()->with('sweet_error', 'No se puede modificar la prioridad este ticket ha sido resuelto o cerrado.');
+            return redirect()->to($urlOrigen)->with('sweet_error', 'No se puede modificar la prioridad este ticket ha sido resuelto o cerrado.');
         }
         $ticket->update(['prioridad_id' => $request->prioridad_id]);
-        return back()->with('sweet_success', 'Prioridad actualizada correctamente');
+
+        return redirect()->to($urlOrigen)
+            ->with('sweet_success', 'Prioridad actualizada correctamente');
     }
 
     //--- Actualizar Técnico ---
@@ -267,17 +271,19 @@ class AdminController extends Controller
             ]
         ]);
 
+        $urlOrigen = request()->headers->get('referer');
+
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return back()->with('sweet_error', '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.');
+            return redirect()->to($urlOrigen)->with('sweet_error', '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.');
         }
 
         if ($request->filled('tecnico_id')) {
             if ($ticket->tecnico_id !== null && $ticket->tecnico_id != $request->tecnico_id) {
-                return back()->with('sweet_error', '¡Demasiado tarde! Otro usuario ya asignó este ticket a un técnico diferente.');
+                return redirect()->to($urlOrigen)->with('sweet_error', '¡Demasiado tarde! Otro usuario ya asignó este ticket a un técnico diferente.');
             }
         } else {
             if ($ticket->tecnico_id === null) {
-                return back()->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
+                return redirect()->to($urlOrigen)->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
             }
         }
 
@@ -292,7 +298,7 @@ class AdminController extends Controller
             ? 'Técnico asignado correctamente.'
             : 'Ticket devuelto a la cola de pendientes.';
 
-        return back()->with('sweet_success', $mensaje);
+        return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 
     //---metodo para mostrar los tickets asignados al tecnico autenticado
