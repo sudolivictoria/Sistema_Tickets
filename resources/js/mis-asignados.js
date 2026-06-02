@@ -175,14 +175,6 @@ function procesarAccionTicket(btn, config) {
         customClass: { popup: "rounded-3xl" },
     }).then((result) => {
         if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Procesando...',
-                text: 'Por favor espera un momento.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
             form.submit();
         }
     });
