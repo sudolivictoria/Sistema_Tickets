@@ -13,17 +13,17 @@ window.inicializarTablaTickets = function (
     //--configuración de idioma y opciones de DataTables
     $.fn.dataTable.ext.pager.numbers_length = 5;
     table = tableElement.DataTable({
-        stateSave: true,
+        stateSave: false,
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",
             zeroRecords: `
-                    <div class="flex flex-col items-center justify-center py-10">
+                    <div class="flex flex-col items-center h-[300px] justify-center py-10">
                         <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">search_off</span>
                         <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No se encontraron resultados</p>
                     </div>`,
             emptyTable: `
-                    <div class="flex flex-col items-center justify-center py-10">
+                    <div class="flex flex-col items-center h-[300px] justify-center py-10">
                         <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_off</span>
                         <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No hay datos disponibles</p>
                     </div>`,

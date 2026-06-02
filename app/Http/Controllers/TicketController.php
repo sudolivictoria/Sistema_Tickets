@@ -35,13 +35,6 @@ class TicketController extends Controller
             return response()->json(['success' => true, 'message' => $mensaje]);
         }
 
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => $mensaje
-            ]);
-        }
-
         return redirect()->back()->with('sweet_success', $mensaje);
     }
 
@@ -67,13 +60,6 @@ class TicketController extends Controller
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => $mensaje]);
-        }
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => $mensaje
-            ]);
         }
 
         return redirect()->back()->with('sweet_success', $mensaje);
@@ -102,13 +88,6 @@ class TicketController extends Controller
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => $mensaje]);
-        }
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => $mensaje
-            ]);
         }
 
         return redirect()->back()->with('sweet_success', $mensaje);

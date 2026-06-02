@@ -301,6 +301,7 @@ class AdminController extends Controller
         $user = Auth::user();
         $tickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tipo_solicitud', 'categoria'])
             ->where('tecnico_id', $user->id)
+            ->where('estado_id', 2) //---solo pendientes asignados
             ->latest()
             ->get();
 

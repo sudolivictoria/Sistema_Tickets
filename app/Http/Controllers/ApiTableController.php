@@ -142,7 +142,7 @@ class ApiTableController extends Controller
             try {
                 //--- Obtener los recursos de la base de datos ordenados por los últimos subidos
                 $manuales = Manual::with('categoria')->latest()->get();
-                $categorias = CategoriaManual ::orderBy('nombre_categoria_manual', 'asc')->get();
+                $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
                 //--- Renderizar el archivo blade parcial que contiene la estructura HTML de las tarjetas
                 $htmlCards = view('partials.filas_recursos', compact('manuales'))->render();
                 $htmlCategorias = view('partials.filtros_recursos', compact('categorias'))->render();
@@ -299,7 +299,8 @@ class ApiTableController extends Controller
             return;
         }
         if ($tipo === 'mis_asignados') {
-            $query->where('tecnico_id', $user->id);
+            $query->where('tecnico_id', $user->id)
+                ->where('estado_id', 2);
             return;
         }
         if ($tipo === 'historial') {
@@ -327,7 +328,8 @@ class ApiTableController extends Controller
             return;
         }
         if ($tipo === 'mis_asignados') {
-            $query->where('tecnico_id', $user->id);
+            $query->where('tecnico_id', $user->id)
+                ->where('estado_id', 2);
             return;
         }
         if ($tipo === 'historial' && $user->rol_id == 1) {
@@ -394,7 +396,11 @@ class ApiTableController extends Controller
             'mis_tickets' => view('partials.filas_mis_tickets', ['misTickets' => $ticketsResult])->render(),
             'historial'   => view('partials.filas_historial', ['tickets' => $ticketsResult])->render(),
             'recursos'    => view('partials.filas_recursos', ['manuales' => Manual::with('categoria')->latest()->get()])->render(),
-            'asignar', 'mis_asignados' => view("partials.filas_{$tipo}", [
+            'asignar' => view('partials.filas_asignar', [
+                'tickets'  => $ticketsResult,
+                'tecnicos' => User::where('unidad_id', $miUnidadId)->where('activo', true)->get(),
+            ])->render(),
+            'mis_asignados' => view('partials.filas_mis_asignados', [
                 'tickets'  => $ticketsResult,
                 'tecnicos' => User::where('unidad_id', $miUnidadId)->where('activo', true)->get(),
             ])->render(),

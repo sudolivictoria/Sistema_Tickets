@@ -91,36 +91,6 @@ $(document).ready(function () {
     }
 });
 
-/****************** FILTROS ******************/
-window.filtrarEstado = function (estado, btn) {
-    //--actualizar estilos de botones
-    $(".filtro-btn")
-        .removeClass("bg-secondary text-white shadow-md")
-        .addClass("bg-slate-100 text-slate-500");
-    $(btn)
-        .removeClass("bg-slate-100 text-slate-500")
-        .addClass("bg-secondary text-white shadow-md");
-
-    setTimeout(() => {
-        let valorBusqueda = "";
-        if (estado !== "todos") {
-            const estados = String(estado)
-                .split(",")
-                .map((e) => e.trim());
-
-            valorBusqueda = `(${estados.join("|")})`;
-        }
-
-        //---filtros de estado
-        table.column(2).search(valorBusqueda, true, false, true).draw();
-    }, 10);
-};
-
-String.prototype.stripHtml = function () {
-    return this.replace(/<[^>]*>/g, "");
-};
-
-
 /**
  * Gestión de Modal de detalles
  */
@@ -224,7 +194,6 @@ function procesarAccionTicket(btn, config) {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        AutoRefrescoSSE.forzarRefresco();
                         Swal.fire({
                             title: config.tituloExito,
                             text: data.message,
