@@ -42,7 +42,7 @@ window.inicializarTablaTickets = function (
         responsive: false,
         autoWidth: false,
         pageLength: 5,
-        order: [[0, "desc"]],
+        order: [[columnaOrden, sentido]], 
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
@@ -161,7 +161,6 @@ window.cerrarModalUsuario = function () {
 //-------funcion dry---------------
 function procesarAccionTicket(btn, config) {
     const form = btn.closest("form");
-    const url = form.action;
 
     Swal.fire({
         title: config.tituloConfirmacion,
@@ -176,39 +175,15 @@ function procesarAccionTicket(btn, config) {
         customClass: { popup: "rounded-3xl" },
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]',
-                    ).content,
-                    "X-Requested-With": "XMLHttpRequest",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams(new FormData(form)),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: config.tituloExito,
-                            text: data.message,
-                            icon: "success",
-                            iconColor: "#84cc16",
-                            timer: 1500,
-                            showConfirmButton: false,
-                            customClass: { popup: "rounded-3xl" },
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    Swal.fire(
-                        "Error",
-                        "No se pudo procesar la solicitud",
-                        "error",
-                    );
-                });
+            Swal.fire({
+                title: 'Procesando...',
+                text: 'Por favor espera un momento.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            form.submit();
         }
     });
 }
@@ -218,8 +193,6 @@ function procesarAccionTicket(btn, config) {
 // =====================================================================
 
 window.confirmarResolver = function (btn) {
-    if (event) event.preventDefault(); // <-- Bloquea la recarga de la página
-
     procesarAccionTicket(btn, {
         tituloConfirmacion: "¿Marcar como Resuelto?",
         textoBoton: "Sí, resolver",
@@ -228,8 +201,6 @@ window.confirmarResolver = function (btn) {
 };
 
 window.confirmarEquivocado = function (btn) {
-    if (event) event.preventDefault();
-
     procesarAccionTicket(btn, {
         tituloConfirmacion: "¿Marcar como Equivocado?",
         textoBoton: "Sí, marcar",
@@ -238,8 +209,6 @@ window.confirmarEquivocado = function (btn) {
 };
 
 window.confirmarNoCorresponde = function (btn) {
-    if (event) event.preventDefault();
-
     procesarAccionTicket(btn, {
         tituloConfirmacion: "¿Marcar No Corresponde?",
         textoBoton: "Sí, marcar",
