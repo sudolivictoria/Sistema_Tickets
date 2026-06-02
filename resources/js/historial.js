@@ -27,7 +27,8 @@ window.inicializarHistorialDataTable = function () {
                 first: "Primero",
                 last: "Último",
                 next: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_right</span>',
-                previous: '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
+                previous:
+                    '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
             },
         },
         responsive: false,
@@ -68,7 +69,7 @@ window.aplicarFiltrosHistorial = function () {
 window.limpiarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     filtrosAplicados = false;
-    
+
     const elBuscar = document.getElementById("filtroBuscar");
     if (elBuscar) elBuscar.value = "";
 
@@ -83,14 +84,20 @@ window.limpiarFiltrosHistorial = function () {
 
     const elCategoria = document.getElementById("filtroCategoria");
     if (elCategoria) elCategoria.value = "todos";
-    
-    tableHistorial.search("").draw(); 
+
+    tableHistorial.search("").draw();
 };
 
 //--------aplicar filtros historial--------//
-window.exportarHistorial = function(formato) {
+window.exportarHistorial = function (formato) {
     if (!filtrosAplicados) {
-        alert("Por favor, aplique los filtros primero antes de exportar un reporte.");
+        Swal.fire({
+            title: "¡Filtros requeridos!",
+            text: "Por favor, aplique los filtros primero antes de exportar un reporte.",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+            confirmButtonColor: "#04003B", 
+        });
         return;
     }
 
@@ -108,10 +115,10 @@ window.exportarHistorial = function(formato) {
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFin,
         estado: estado,
-        categoria: categoria
+        categoria: categoria,
     });
 
-    //------descarga 
+    //------descarga
     window.location.href = `/admin/reportes/exportar?${params.toString()}`;
 };
 
@@ -186,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const fechaFilaRaw = filaTr.getAttribute("data-fecha");
             const estadoFilaId = filaTr.getAttribute("data-estado-id");
             const categoriaFilaId = filaTr.getAttribute("data-categoria-id");
-            
+
             const estadoSel = document.getElementById("filtroEstado").value;
             if (estadoSel !== "todos" && estadoFilaId !== estadoSel) {
                 return false;
@@ -194,11 +201,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const elCategoria = document.getElementById("filtroCategoria");
             if (elCategoria) {
                 const categoriaSel = elCategoria.value;
-                if (categoriaSel !== "todos" && categoriaFilaId !== categoriaSel) {
+                if (
+                    categoriaSel !== "todos" &&
+                    categoriaFilaId !== categoriaSel
+                ) {
                     return false;
                 }
             }
-            const fInicioRaw = document.getElementById("filtroFechaInicio").value;
+            const fInicioRaw =
+                document.getElementById("filtroFechaInicio").value;
             const fFinRaw = document.getElementById("filtroFechaFin").value;
 
             if (fechaFilaRaw) {

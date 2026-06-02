@@ -80,9 +80,7 @@ $(document).ready(function () {
     }
 });
 
-/**
- * Filtro por estado - CONECTADO A SSE (CORREGIDO)
- */
+/****************** FILTROS ******************/
 window.filtrarEstado = function (estado, btn) {
     //--actualizar estilos de botones
     $(".filtro-btn")
@@ -92,17 +90,25 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-secondary text-white shadow-md");
 
-    let valorBusqueda = "";
-    if (estado !== "todos") {
-        const estados = String(estado)
-            .split(",")
-            .map((e) => e.trim());
+    setTimeout(() => {
+        let valorBusqueda = "";
+        if (estado !== "todos") {
+            const estados = String(estado)
+                .split(",")
+                .map((e) => e.trim());
 
-        valorBusqueda = `(${estados.join("|")})`;
-    }
-    //---filtros de estado
-    table.column(2).search(valorBusqueda, true, false, true).draw();
+            valorBusqueda = `(${estados.join("|")})`;
+        }
+
+        //---filtros de estado
+        table.column(2).search(valorBusqueda, true, false, true).draw();
+    }, 10);
 };
+
+String.prototype.stripHtml = function () {
+    return this.replace(/<[^>]*>/g, "");
+};
+
 /**
  * Gestión de Modal de detalles
  */

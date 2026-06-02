@@ -357,9 +357,4 @@ class AdminController extends Controller
         $categorias = Categoria::all();
         return view('admin.historial', compact('tickets', 'cargaTrabajo', 'resueltos24h', 'tasaCierre', 'estados', 'categorias'));
     }
-
-    public function reportes()
-    {
-        return view('admin.reportes');
-    }
 }

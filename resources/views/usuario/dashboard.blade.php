@@ -109,7 +109,7 @@
                                 <span class="material-symbols-outlined text-lg">folder</span>
                             </div>
                             <div
-                                class="overflow-hidden text-[11px] font-black text-slate-700 truncate group-hover:text-secondary transition-colors uppercase">
+                                class="overflow-hidden text-[12px] font-black text-slate-700 truncate group-hover:text-secondary transition-colors uppercase">
                                 {{ $cat->nombre_categoria_manual }}
                             </div>
                         </a>

@@ -69,7 +69,8 @@
         class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
 
         <div class="flex items-center gap-3 lg:gap-4 min-w-0">
-            <button id="menu-toggle" class="lg:hidden p-2 rounded-lg text-secondary hover:bg-slate-100 relative z-[100]">
+            <button id="menu-toggle"
+                class="lg:hidden p-2 rounded-lg text-secondary hover:bg-slate-100 relative z-[100]">
                 <span id="menu-icon" class="material-symbols-outlined">menu</span>
             </button>
 
@@ -156,20 +157,24 @@
         //-----reloj 
         window.iniciarReloj = function() {
             const contenedorReloj = document.getElementById('relojSistema');
-
             if (!contenedorReloj) return;
 
-            setInterval(() => {
+            //---actualizar hora cada segundo
+            const actualizarHora = () => {
                 const ahora = new Date();
-                let horaFormateada = ahora.toLocaleTimeString('es-SV', {
+                contenedorReloj.innerText = ahora.toLocaleTimeString('es-SV', {
                     hour: '2-digit',
                     minute: '2-digit',
                     second: '2-digit',
                     hour12: true
                 });
+            };
 
-                contenedorReloj.innerText = horaFormateada;
-            }, 1000);
+            //-----sin delay
+            actualizarHora();
+
+            //-----corre cada segundo
+            setInterval(actualizarHora, 1000);
         }
 
         document.addEventListener('DOMContentLoaded', function() {

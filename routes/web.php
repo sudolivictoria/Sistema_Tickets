@@ -56,7 +56,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/mis-asignados', [AdminController::class, 'misAsignados'])->name('mis-asignados');
         Route::get('/gestion-recursos', [AdminController::class, 'gestionRecursos'])->name('gestion-recursos');
         Route::get('/historial', [AdminController::class, 'historial'])->name('historial');
-        Route::get('/reportes', [AdminController::class, 'reportes'])->name('reportes');
 
         //---acciones para gestion de usuarios
         Route::post('/usuarios/store', [UserController::class, 'store'])->name('usuarios.store');

@@ -36,7 +36,7 @@ window.inicializarTablaTickets = function (selectorId) {
                     <h5 class="text-xs font-black uppercase text-slate-400 tracking-widest">Bandeja Vacía</h5>
                     <p class="text-[11px] text-slate-400 font-medium mt-1">No existen tickets disponibles bajo este estado.</p>
                 </div>
-            `
+            `,
         },
     });
 };
@@ -84,16 +84,19 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-secondary text-white shadow-md");
 
-    let valorBusqueda = "";
-    if (estado !== "todos") {
-        const estados = String(estado)
-            .split(",")
-            .map((e) => e.trim());
+    setTimeout(() => {
+        let valorBusqueda = "";
+        if (estado !== "todos") {
+            const estados = String(estado)
+                .split(",")
+                .map((e) => e.trim());
 
-        valorBusqueda = `(${estados.join("|")})`;
-    }
-    //---filtros de estado
-    table.column(3).search(valorBusqueda, true, false, true).draw();
+            valorBusqueda = `(${estados.join("|")})`;
+        }
+
+        //---filtros de estado
+        table.column(3).search(valorBusqueda, true, false, true).draw();
+    }, 10);
 };
 
 String.prototype.stripHtml = function () {
@@ -101,7 +104,7 @@ String.prototype.stripHtml = function () {
 };
 
 // =====================================================================
-//                       FUNCIONES AUXILIARES MODALES
+//                       FUNCIONES  MODALES
 // =====================================================================
 window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const modal = document.getElementById("modalTicket");

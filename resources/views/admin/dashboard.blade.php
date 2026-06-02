@@ -96,7 +96,7 @@
                 {{-- Cabecera con Filtros y Buscador --}}
                 <div class="p-5 border-b border-slate-100 flex flex-wrap gap-4 justify-between items-center bg-white">
                     <div class="flex items-center gap-4">
-                          <div class="flex gap-2" id="filtrosEstado">
+                        <div class="flex gap-2" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)" data-estado="todos"
                                 class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">
                                 Todos
@@ -162,7 +162,7 @@
                                     <span class="material-symbols-outlined text-lg">folder</span>
                                 </div>
                                 <div
-                                    class="overflow-hidden text-[11px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
+                                    class="overflow-hidden text-[12px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
                                     {{ $cat->nombre_categoria_manual }}
                                 </div>
                             </a>

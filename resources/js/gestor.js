@@ -88,37 +88,36 @@ $(document).ready(function () {
         });
 });
 
-//----ejecutar filtros
-window.ejecutarFiltros = function (estadoSeleccionado) {
-    const estadoFiltro = String(estadoSeleccionado).trim().toLowerCase();
-    const listaEstados = estadoFiltro.split(",");
+/**
+ * Filtro por estado definitivo, con soporte para estados múltiples (separados por coma)
+ */
+/****************** FILTROS ******************/
+window.filtrarEstado = function (estado, btn) {
+    //--actualizar estilos de botones
+    $(".filtro-btn")
+        .removeClass("bg-secondary text-white shadow-md")
+        .addClass("bg-slate-100 text-slate-500");
+    $(btn)
+        .removeClass("bg-slate-100 text-slate-500")
+        .addClass("bg-secondary text-white shadow-md");
 
-    document.querySelectorAll(".ticket-fila").forEach((fila) => {
-        const estadoIdFila = String(fila.dataset.estadoId || "")
-            .trim()
-            .toLowerCase();
-        const coincide =
-            estadoFiltro === "todos" || listaEstados.includes(estadoIdFila);
-        fila.classList.toggle("hidden", !coincide);
-    });
+    setTimeout(() => {
+        let valorBusqueda = "";
+        if (estado !== "todos") {
+            const estados = String(estado)
+                .split(",")
+                .map((e) => e.trim());
+
+            valorBusqueda = `(${estados.join("|")})`;
+        }
+
+        //---filtros de estado
+        table.column(3).search(valorBusqueda, true, false, true).draw();
+    }, 10);
 };
 
-//--filtros por estado
-window.filtrarEstado = function (estado, btn) {
-    //--resetear estilos
-    document.querySelectorAll(".filtro-btn").forEach((b) => {
-        b.classList.remove("bg-secondary", "text-white", "shadow-md");
-        b.classList.add("bg-slate-100", "text-slate-500");
-    });
-
-    //--destacar botón seleccionado
-    if (btn) {
-        btn.classList.remove("bg-slate-100", "text-slate-500");
-        btn.classList.add("bg-secondary", "text-white", "shadow-md");
-    }
-
-    //--ejecutar filtrado
-    ejecutarFiltros(estado);
+String.prototype.stripHtml = function () {
+    return this.replace(/<[^>]*>/g, "");
 };
 
 /**

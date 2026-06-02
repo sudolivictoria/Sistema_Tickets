@@ -98,16 +98,22 @@
                     <div class="flex items-center gap-4">
                         <div class="flex gap-2" id="filtrosEstado">
                             <button type="button" onclick="filtrarEstado('todos', this)" data-estado="todos"
-                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[11px] font-black uppercase shadow-md transition-all">Todos</button>
-
-                            <button type="button" onclick="filtrarEstado('1', this)" data-estado="1"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">Abierto</button>
-
-                            <button type="button" onclick="filtrarEstado('2', this)" data-estado="2"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">Procesando</button>
-
-                            <button type="button" onclick="filtrarEstado('3,4,5', this)" data-estado="3,4,5"
-                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[11px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">Cerrado</button>
+                                class="filtro-btn px-4 py-1.5 bg-secondary text-white rounded-xl text-[12px] font-black uppercase shadow-md transition-all">
+                                Todos
+                            </button>
+                            <button type="button" onclick="filtrarEstado('abierto', this)" data-estado="abierto"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-red-100 hover:text-red-600 transition-all">
+                                Abierto
+                            </button>
+                            <button type="button" onclick="filtrarEstado('procesando', this)" data-estado="procesando"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-blue-100 hover:text-blue-600 transition-all">
+                                Pendientes
+                            </button>
+                            <button type="button" onclick="filtrarEstado('resuelto,equivocado,no corresponde', this)"
+                                data-estado="resuelto,equivocado,no corresponde"
+                                class="filtro-btn px-4 py-1.5 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase hover:bg-green-100 hover:text-green-600 transition-all">
+                                Cerrado
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -156,7 +162,7 @@
                                 <span class="material-symbols-outlined text-lg">folder</span>
                             </div>
                             <div
-                                class="overflow-hidden text-[11px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
+                                class="overflow-hidden text-[12px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
                                 {{ $cat->nombre_categoria_manual }}
                             </div>
                         </a>

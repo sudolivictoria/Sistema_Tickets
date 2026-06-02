@@ -28,7 +28,7 @@
                         <select name="categoria_id"
                             class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
-                            <option value="" disabled selected>Seleccione categoría</option>
+                            <option value="" disabled selected>Seleccione</option>
                             @foreach ($categorias as $categoria)
                                 <option value="{{ $categoria->id }}"
                                     {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
@@ -50,8 +50,7 @@
                         <select name="tipo_solicitud_id"
                             class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
-                            <option value="" disabled selected>Seleccione tipo</option>
-                            {{-- Aquí iría tu foreach de tipos --}}
+                            <option value="" disabled selected>Seleccione</option>
                         </select>
                         <span
                             class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -101,7 +100,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-4 pt-8 border-t border-slate-100">
-                <a href="{{ route('usuario.dashboard') }}"
+                <a href="{{ route('admin.dashboard') }}"
                     class="px-8 py-3.5 rounded-2xl font-black text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest text-xs">
                     Cancelar
                 </a>
