@@ -38,7 +38,7 @@ precisas para desplegar y probar el **Sistema de Tickets** en un entorno local d
 # npm install @tailwindcss/forms @tailwindcss/container-queries
 # npm install jquery datatables.net-dt sweetalert2
 
-# ------------------Inicializacion llaves y limpieza de cache---------#
+# -------Inicializacion llaves y limpieza de cache-------#
 
 # php artisan key:generate
 # php artisan route:clear
@@ -47,16 +47,16 @@ precisas para desplegar y probar el **Sistema de Tickets** en un entorno local d
 # php artisan view:clear
 # php artisan optimize:clear
 
-# ------------BD, datos de prueba y archivos--------------------#
+# ------------BD, datos de prueba y archivos---------------#
 
 # php artisan migrate:fresh --seed
 # php artisan storage:link
 
-# ----------------Compilacion FrontEnd---------------------------#
+# ----------------Compilacion FrontEnd--------------------#
 
 # npm run build
 
-# -------------Ejecución Servicios en paralelo-------------------#
+# -------------Ejecución Servicios en paralelo------------#
 
 # SERVIDOR DE LARAVEL
 # php artisan serve
