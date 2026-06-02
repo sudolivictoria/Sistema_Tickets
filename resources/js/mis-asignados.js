@@ -13,24 +13,20 @@ window.inicializarTablaTickets = function (
 
     $.fn.dataTable.ext.pager.numbers_length = 5;
     table = tableElement.DataTable({
-        stateSave: false,     
+        stateSave: false,
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",
             zeroRecords: `
-                <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
-                    <span class="material-symbols-outlined text-primary text-4xl mb-3 animate-spin" style="animation-duration: 2s;">sync</span>
-                    <h5 class="text-xs font-black uppercase text-slate-500 tracking-widest animate-pulse">Buscando coincidencias...</h5>
-                    <p class="text-[11px] text-slate-400 font-medium mt-1">Sincronizando el estado de los tickets en tiempo real.</p>
-                </div>
-            `,
+                    <div class="flex flex-col items-center h-[300px] justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">search_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No se encontraron resultados</p>
+                    </div>`,
             emptyTable: `
-                <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
-                    <span class="material-symbols-outlined text-slate-300 text-4xl mb-2 select-none">folder_off</span>
-                    <h5 class="text-xs font-black uppercase text-slate-400 tracking-widest">Bandeja Vacía</h5>
-                    <p class="text-[11px] text-slate-400 font-medium mt-1">No existen tickets disponibles bajo este estado.</p>
-                </div>
-            `,
+                    <div class="flex flex-col items-center h-[300px] justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No hay datos disponibles</p>
+                    </div>`,
             info: "Mostrando del _START_ al _END_ de _TOTAL_ registros",
             infoFiltered: "(filtrado de un total de _MAX_ registros)",
             infoEmpty: "Mostrando 0 registros",
