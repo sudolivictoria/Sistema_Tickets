@@ -195,7 +195,7 @@ function procesarAccionTicket(btn, config) {
                             text: data.message,
                             icon: "success",
                             iconColor: "#84cc16",
-                            timer: 3000,
+                            timer: 1500,
                             showConfirmButton: false,
                             customClass: { popup: "rounded-3xl" },
                         });
