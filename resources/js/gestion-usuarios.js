@@ -2,7 +2,7 @@ var table;
 
 $(document).ready(function () {
     //---inicializacion datatable
-    $.fn.dataTable.ext.pager.numbers_length = 5;
+    $.fn.dataTable.ext.pager.numbers_length = 1;
     table = $("#userTable").DataTable({
         language: {
             processing: "Procesando...",

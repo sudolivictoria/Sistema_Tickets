@@ -25,9 +25,9 @@ window.inicializarTablaTickets = function (selectorId) {
         language: {
             zeroRecords: `
                 <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
-                    <span class="material-symbols-outlined text-primary text-4xl mb-3 animate-spin" style="animation-duration: 2s;">sync</span>
-                    <h5 class="text-xs font-black uppercase text-slate-500 tracking-widest animate-pulse">Buscando coincidencias...</h5>
-                    <p class="text-[11px] text-slate-400 font-medium mt-1">Sincronizando el estado de los tickets en tiempo real.</p>
+                    <span class="material-symbols-outlined text-slate-300 text-4xl mb-2 select-none">folder_off</span>
+                    <h5 class="text-xs font-black uppercase text-slate-400 tracking-widest">Bandeja Vacía</h5>
+                    <p class="text-[11px] text-slate-400 font-medium mt-1">No existen tickets disponibles bajo este estado.</p>
                 </div>
             `,
             emptyTable: `
@@ -72,11 +72,11 @@ $(document).ready(function () {
 });
 
 /**
- * Filtro por estado definitivo, con soporte para estados múltiples (separados por coma)
+ * Filtro por estado
  */
-/****************** FILTROS ******************/
+/****************** FILTROS OPTIMIZADOS ******************/
 window.filtrarEstado = function (estado, btn) {
-    //--actualizar estilos de botones
+    //--actualizar estilos de botones inmediatamente
     $(".filtro-btn")
         .removeClass("bg-secondary text-white shadow-md")
         .addClass("bg-slate-100 text-slate-500");
@@ -84,19 +84,25 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-secondary text-white shadow-md");
 
-    setTimeout(() => {
-        let valorBusqueda = "";
-        if (estado !== "todos") {
-            const estados = String(estado)
-                .split(",")
-                .map((e) => e.trim());
+    //---deshabilitar temporalmente el buscador para evitar conflictos de renderizado
+    let valorBusqueda = "";
+    if (estado !== "todos") {
+        const estados = String(estado)
+            .split(",")
+            .map((e) => e.trim());
 
-            valorBusqueda = `(${estados.join("|")})`;
-        }
+        valorBusqueda = `(${estados.join("|")})`;
+    }
 
-        //---filtros de estado
-        table.column(3).search(valorBusqueda, true, false, true).draw();
-    }, 10);
+    //---ocultamos el cuerpo de la tabla un milisegundo antes para que el cambio de filas sea invisible al ojo
+    const $tbody = table.table().body();
+    $($tbody).css("opacity", "0.5"); 
+
+    //---filtros de estado nativos y síncronos (eliminamos el setTimeout errático)
+    table.column(3).search(valorBusqueda, true, false, true).draw(false);
+    
+    // Restablecemos la opacidad de golpe con las nuevas filas renderizadas
+    $($tbody).css("opacity", "1");
 };
 
 String.prototype.stripHtml = function () {

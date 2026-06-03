@@ -45,7 +45,7 @@
     margin-top: 1rem !important;
 }
 
-/*estilo para todos los botones incluyendo flechas*/
+/*estilo para botones y flechas de paginacion*/
 .dataTables_paginate .paginate_button {
     width: 36px !important;
     height: 36px !important;
@@ -107,49 +107,6 @@
     font-weight: 700 !important;
     color: #94a3b8 !important;
     text-transform: uppercase;
-}
-
-/*---mensaje tabla vacia---*/
-#tablaMisTickets .dataTables_empty {
-    text-align: center !important;
-    padding: 40px !important;
-    font-size: 14px !important;
-    color: #5c697b !important;
-    font-style: italic;
-    background-color: #f8fafc !important;
-}
-
-
-#tablaMisTickets .dataTables_empty::before {
-    content: 'search_off';
-    font-family: 'Material Symbols Outlined';
-    display: block;
-    font-size: 32px;
-    margin-bottom: 8px;
-    color: #5c6775;
-    font-style: normal;
-}
-
-
-/*---mensaje tabla vacia---*/
-#userTable .dataTables_empty {
-    text-align: center !important;
-    padding: 40px !important;
-    font-size: 14px !important;
-    color: #5c697b !important;
-    font-style: italic;
-    background-color: #f8fafc !important;
-}
-
-
-#userTable .dataTables_empty::before {
-    content: 'search_off';
-    font-family: 'Material Symbols Outlined';
-    display: block;
-    font-size: 32px;
-    margin-bottom: 8px;
-    color: #5c6775;
-    font-style: normal;
 }
 
 .dataTables_wrapper .dataTables_scrollBody {
@@ -277,11 +234,10 @@ table.dataTable thead th {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 6px !important; /* Espacio uniforme entre círculos */
+    gap: 6px !important; 
     vertical-align: middle !important;
 }
 
-/*El contenedor intermedio (span) que a veces mete DataTables para los números*/
 [class*="paginate"] span,
 [class*="paging"] span {
     display: inline-flex !important;
@@ -294,7 +250,7 @@ table.dataTable thead th {
 [class*="paginate"] button,
 [class*="paging"] a,
 [class*="paging"] button {
-    background-color: #f1f5f9 !important; /* bg-slate-100 */
+    background-color: #f1f5f9 !important; 
     color: #64748b !important;
     border: none !important;
     border-radius: 9999px !important;

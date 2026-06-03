@@ -18,15 +18,16 @@ window.inicializarTablaTickets = function (selectorId) {
         searching: true,
         info: false,
         responsive: true,
+        autoWidth: false,
         dom: "rt",
         order: [[0, "desc"]],
         stateSave: false,
         language: {
-            zeroRecords: `
+            emptyTable: `
                 <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
-                    <span class="material-symbols-outlined text-primary text-4xl mb-3 animate-spin" style="animation-duration: 2s;">sync</span>
-                    <h5 class="text-xs font-black uppercase text-slate-500 tracking-widest animate-pulse">Buscando coincidencias...</h5>
-                    <p class="text-[11px] text-slate-400 font-medium mt-1">Sincronizando el estado de los tickets en tiempo real.</p>
+                    <span class="material-symbols-outlined text-slate-300 text-4xl mb-2 select-none">folder_off</span>
+                    <h5 class="text-xs font-black uppercase text-slate-400 tracking-widest">Bandeja Vacía</h5>
+                    <p class="text-[11px] text-slate-400 font-medium mt-1">No existen tickets disponibles bajo este estado.</p>
                 </div>
             `,
             emptyTable: `
@@ -63,7 +64,9 @@ document.addEventListener("DOMContentLoaded", function () {
 //                         DETALLES E INICIALIZACION
 // =====================================================================
 $(document).ready(function () {
+    // Inicializa la tabla apuntando al ID del Gestor
     window.inicializarTablaTickets("#tablaGestor");
+    
     $(document)
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
@@ -89,11 +92,11 @@ $(document).ready(function () {
 });
 
 /**
- * Filtro por estado definitivo, con soporte para estados múltiples (separados por coma)
+ * Filtro por estado definitivo, con soporte para estados múltiples (sin parpadeos)
  */
-/****************** FILTROS ******************/
+/****************** FILTROS OPTIMIZADOS ******************/
 window.filtrarEstado = function (estado, btn) {
-    //--actualizar estilos de botones
+    //--actualizar estilos de botones al instante
     $(".filtro-btn")
         .removeClass("bg-secondary text-white shadow-md")
         .addClass("bg-slate-100 text-slate-500");
@@ -101,19 +104,22 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-secondary text-white shadow-md");
 
-    setTimeout(() => {
-        let valorBusqueda = "";
-        if (estado !== "todos") {
-            const estados = String(estado)
-                .split(",")
-                .map((e) => e.trim());
+    let valorBusqueda = "";
+    if (estado !== "todos") {
+        const estados = String(estado)
+            .split(",")
+            .map((e) => e.trim());
 
-            valorBusqueda = `(${estados.join("|")})`;
-        }
+        valorBusqueda = `(${estados.join("|")})`;
+    }
 
-        //---filtros de estado
-        table.column(3).search(valorBusqueda, true, false, true).draw();
-    }, 10);
+    const $tbody = table.table().body();
+    $($tbody).css("opacity", "0.5"); 
+
+    //---filtros de estado nativos pasando false para mantener posiciones estables
+    table.column(3).search(valorBusqueda, true, false, true).draw(false);
+ 
+    $($tbody).css("opacity", "1");
 };
 
 String.prototype.stripHtml = function () {
@@ -129,7 +135,7 @@ window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
     const fecha = document.getElementById("modalFechaApertura");
-    //---verificar que todos los elementos existen antes de intentar usarlos para evitar errores
+    
     if (modal && titulo && desc && tipo && fecha) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
@@ -156,8 +162,6 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const departamento = document.getElementById("userUnidad");
     const puesto = document.getElementById("userCargo");
     const contacto = document.getElementById("userTelefono");
-
-    //----------------envio de correos directo----------------
     const elLinkCorreo = document.getElementById("linkCorreo");
 
     if (nombre && correo && departamento && puesto && contacto && modal) {
@@ -169,7 +173,6 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
 
         //-----------------GMAIL--------------
         if (email && email !== "---") {
-            //----abre gmail directamente para su redaccion
             elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=Consulta sobre su Ticket&body=Hola ${name},`;
             elLinkCorreo.classList.remove("opacity-50", "pointer-events-none");
         } else {
@@ -181,7 +184,7 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
     }
 };
 
-window.cerrarModalUsuario = function () {
+window.clearModalUsuario = window.cerrarModalUsuario = function () {
     const modal = document.getElementById("modalUsuario");
     if (modal) {
         modal.classList.add("hidden");
