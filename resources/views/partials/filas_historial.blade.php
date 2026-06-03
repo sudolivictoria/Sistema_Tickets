@@ -5,7 +5,7 @@
         data-fecha="{{ \Carbon\Carbon::parse($ticket->created_at)->format('Y-m-d') }}">
         {{-- ID --}}
         <td class="px-5 py-4 font-black text-slate-700">
-            <span class="text-slate-400 font-semibold">#</span>TK-{{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
+            <span class="text-slate-400 font-semibold">#</span>TK{{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
         </td>
         <!--datos del usuario-->
         <td class="px-2 py-4">
