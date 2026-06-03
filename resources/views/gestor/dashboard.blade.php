@@ -119,17 +119,20 @@
                 </div>
 
                 {{-- Contenedor con Scroll --}}
-                <div class="overflow-y-auto" style="max-height: 400px;">
-                    <table class="w-full text-left border-separate border-spacing-0" id="tablaGestor">
+                <div
+                    class="w-full bg-white rounded-2xl shadow-sm border border-slate-100/80 h-[400px] overflow-y-auto overflow-x-auto">
+                    <table id="tablaGestor" class="w-full text-left border-collapse table-fixed">
                         <thead class="sticky top-0 z-10 bg-slate-50 font-black">
                             <tr
                                 class="text-[13px] uppercase text-[#008F7E] font-black tracking-widest border-b border-slate-200">
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">ID</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Usuario</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
-                                <th class="px-2 py-4 border-b border-slate-200 font-black">Detalle</th>
+                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[10%]">ID</th>
+                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[30%]">Usuario</th>
+                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[15%]">Prioridad
+                                </th>
+                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[15%]">Estado</th>
+                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[20%]">Tecnico</th>
+                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[10%] text-center">
+                                    Detalle</th>
                             </tr>
                         </thead>
                         <tbody id="tablaBody" data-tipo="dashboard" class="divide-y divide-slate-100 text-[12px]">
