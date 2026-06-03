@@ -5,6 +5,7 @@ window.inicializarHistorialDataTable = function () {
     if ($.fn.DataTable.isDataTable("#tablaHistorial")) {
         $("#tablaHistorial").DataTable().destroy();
     }
+    $.fn.dataTable.ext.pager.numbers_length = 1;
     tableHistorial = $("#tablaHistorial").DataTable({
         language: {
             processing: "Procesando...",
