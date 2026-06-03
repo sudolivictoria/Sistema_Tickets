@@ -5,7 +5,7 @@
         <div class="mb-10 border-b border-slate-200 pb-6">
             <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
                 <span class="material-symbols-outlined text-4xl text-primary">add_circle</span>
-                Enviar Nueva Solicitud
+                Nueva Solicitud
             </h2>
         </div>
 
