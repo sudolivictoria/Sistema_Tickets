@@ -180,6 +180,7 @@ class AdminUnidadController extends Controller
             $unidadId = $nuevoTicket->categoria->unidad_id;
             //---obtener emails de gestores de la unidad
             $destinatarios = User::where('unidad_id', $unidadId)
+                ->where('activo', true)
                 ->pluck('email')
                 ->toArray();
 
