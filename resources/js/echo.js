@@ -10,12 +10,16 @@ window.Echo = new Echo({
     key: import.meta.env.VITE_REVERB_APP_KEY,
     wsHost: import.meta.env.VITE_REVERB_HOST,
     
+    //----PRODUCCION PUERTO 80
     wsPort: import.meta.env.VITE_REVERB_PORT ?? (esProduccion ? 80 : 8080),
     wssPort: import.meta.env.VITE_REVERB_PORT ?? (esProduccion ? 80 : 8080),
     
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? "http") === "https",
+    //-------SI NO UTILIZA HTTPS EN PRODUCCIÓN, ASEGURARSE DE QUE forceTLS ESTÉ EN false PARA EVITAR PROBLEMAS DE CONEXIÓN
+    forceTLS: esProduccion ? false : ((import.meta.env.VITE_REVERB_SCHEME ?? "http") === "https"),
     enabledTransports: ["ws", "wss"],
 
-    wsPath: esProduccion ? "/sistema-tickets/app" : undefined,
+    //----------Pusher añade de forma automática '/app/{key}'
+    wsPath: esProduccion ? "/sistema-tickets" : undefined,
+    
     authEndpoint: esProduccion ? "/sistema-tickets/api/broadcasting/auth" : "/broadcasting/auth",
 });
