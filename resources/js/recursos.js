@@ -1,11 +1,29 @@
 /**
- * Manuales y Recursos (Vista de Usuario con SSE)
+ * Manuales y Recursos 
  */
 
-window.categoriaActivaActual = "all"; // Guarda de forma global qué filtro tiene el usuario
+window.categoriaActivaActual = "all"; //---------guarda de forma global qué filtro tiene el usuario
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modalVisor = document.getElementById("modalVisor");
+    if (modalVisor) {
+        document.body.appendChild(modalVisor);
+    }
+
+    //---Obtener el filtrado desde la URL al cargar---
+    const params = new URLSearchParams(window.location.search);
+    const catId = params.get("categoria");
+
+    if (catId) {
+        setTimeout(() => {
+            window.filtrar(catId);
+        }, 100);
+    }
+});
 
 window.filtrar = function (catId, event) {
-    window.categoriaActivaActual = catId; // Actualiza la categoría activa
+    window.categoriaActivaActual = catId; //---------Actualiza la categoría activa
     const tarjetas = document.querySelectorAll(".manual-card");
 
     //---filtrar tarjetas
@@ -39,7 +57,7 @@ window.filtrar = function (catId, event) {
 
     let botonActivo;
 
-    //---Filtrado desde evento o url
+    //---Filtrado desde evento o url-----
     if (event && event.currentTarget) {
         botonActivo = event.currentTarget;
     } else {
@@ -62,19 +80,7 @@ window.filtrar = function (catId, event) {
     }
 };
 
-//---obtener el filtrado desde la URL al cargar
-document.addEventListener("DOMContentLoaded", function () {
-    const params = new URLSearchParams(window.location.search);
-    const catId = params.get("categoria");
-
-    if (catId) {
-        setTimeout(() => {
-            window.filtrar(catId);
-        }, 100);
-    }
-});
-
-//--Visor de manuales
+//----------------------Visor de manuales-------------------------
 window.abrirVisor = function (url, titulo = "Recurso") {
     const ext = url.split(".").pop().toLowerCase();
     const visor = document.getElementById("contenedor-visor");
@@ -89,7 +95,7 @@ window.abrirVisor = function (url, titulo = "Recurso") {
 
     visor.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#04003B]"></div>`;
 
-    //--cargar contenido
+    //--cargar contenido----------
     if (ext === "pdf") {
         if (iconoVisor) iconoVisor.innerText = "picture_as_pdf";
 
@@ -129,10 +135,21 @@ window.cerrarVisor = function () {
     const contenedor = document.getElementById("contenedor-visor");
 
     if (modal) {
+        //-------------Solo restauramos el scroll si el modal realmente estaba desplegado
+        if (!modal.classList.contains("hidden")) {
+            document.body.style.overflow = "auto";
+        }
+        modal.classList.remove("flex");
         modal.classList.add("hidden");
-        document.body.style.overflow = "auto";
     }
     if (contenedor) {
         contenedor.innerHTML = "";
     }
 };
+
+//----Cerrar también presionando la tecla Escape por comodidad del usuario ---
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+        window.cerrarVisor();
+    }
+});
