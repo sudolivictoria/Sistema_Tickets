@@ -19,6 +19,8 @@
         "datatables.net": "^2.3.8",
         "datatables.net-dt": "^2.3.8",
         "jquery": "^4.0.0",
+        "laravel-echo": "^2.3.7",
+        "pusher-js": "^8.5.0",
         "sweetalert2": "^11.26.25"
     }
 }

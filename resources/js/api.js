@@ -1,9 +1,8 @@
-// =============================================================
-// AUTO-REFRESCO UNIVERSAL POR EVENTOS DEL SERVIDOR (SSE) - BLINDADO
-// =============================================================
+// ===================================================
+// AUTO-REFRESCO UNIVERSAL POR WEBSOCKETS (REVERB) 
+// ===================================================
 
-window.AutoRefrescoSSE = (() => {
-    let evtSource = null;
+window.AutoRefresco = (() => {
     let isRefreshing = false;
 
     //---bloquea refresco si el usuario esta trabajando
@@ -33,9 +32,10 @@ window.AutoRefrescoSSE = (() => {
         else el.textContent = String(valor);
     }
 
-    //---procesamiento y rendimiento 
+    //---procesamiento y rendimiento
     function procesarTabla(htmlNuevo) {
-        if (htmlNuevo === undefined || htmlNuevo === null || isRefreshing) return;
+        if (htmlNuevo === undefined || htmlNuevo === null || isRefreshing)
+            return;
         isRefreshing = true;
 
         const tablaElement = document.querySelector(
@@ -50,7 +50,7 @@ window.AutoRefrescoSSE = (() => {
 
         if (tablaId === "tablaHistorial") {
             isRefreshing = false;
-            return; 
+            return;
         }
 
         const tablaBody = tablaElement.querySelector("tbody");
@@ -103,7 +103,7 @@ window.AutoRefrescoSSE = (() => {
             window.inicializarUserTable();
         } else if (typeof window.inicializarTablaTickets === "function") {
             window.inicializarTablaTickets("#" + tablaId);
-        } 
+        }
 
         //---clases estaticas
         try {
@@ -117,7 +117,7 @@ window.AutoRefrescoSSE = (() => {
             }
             aplicarEstilosPaginacion();
         } catch (err) {
-            console.error("[SSE] Error al restaurar DataTables:", err);
+            console.error("[Reverb] Error al restaurar DataTables:", err);
         } finally {
             isRefreshing = false;
         }
@@ -127,7 +127,6 @@ window.AutoRefrescoSSE = (() => {
     function aplicarEstilosPaginacion() {
         const wrappers = document.querySelectorAll(".dataTables_wrapper");
         wrappers.forEach((wrap) => {
-
             if (wrap.id === "tablaHistorial_wrapper") return;
 
             const lengthSelect = wrap.querySelector(
@@ -164,16 +163,14 @@ window.AutoRefrescoSSE = (() => {
                             "border-secondary",
                             "shadow-sm",
                         );
-                    }
-                    else if (btn.classList.contains("disabled")) {
+                    } else if (btn.classList.contains("disabled")) {
                         btn.classList.add(
                             "bg-slate-50",
                             "text-slate-300",
                             "border-slate-100",
                             "pointer-events-none",
                         );
-                    }
-                    else {
+                    } else {
                         btn.classList.add(
                             "bg-slate-100",
                             "text-slate-600",
@@ -196,13 +193,16 @@ window.AutoRefrescoSSE = (() => {
 
         //---no cargar datos en el historial hasta filtrado
         if (tablaElement.id === "tablaHistorial") {
-            console.log("[SSE] Pantalla de Historial detectada: Auto-refresco en segundo plano desactivado.");
-            return; 
+            console.log(
+                "[Reverb] Pantalla de Historial detectada: Auto-refresco en segundo plano desactivado.",
+            );
+            return;
         }
 
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) return;
         const tipoTabla = tablaBody.getAttribute("data-tipo") || "dashboard";
+
         //---deteccion filtrados
         let filtroEstado = "todos";
         const botonActivo = document.querySelector(
@@ -214,82 +214,96 @@ window.AutoRefrescoSSE = (() => {
             filtroEstado = window.filtroSseActual || "todos";
         }
 
-        if (filtroEstado.includes(",") && tipoTabla !== "asignados" && tipoTabla !== "dashboard" && tipoTabla !== "mis-tickets") {
+        if (
+            filtroEstado.includes(",") &&
+            tipoTabla !== "asignados" &&
+            tipoTabla !== "dashboard" &&
+            tipoTabla !== "mis-tickets"
+        ) {
             filtroEstado = "cerrado";
         }
 
-        //-----------API
-        evtSource = new EventSource(
-            `/api/tickets-stream?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`,
-        );
+        // --- CONEXIÓN WEBSOCKETS (REVERB) ---
+        if (window.Echo) {
+            window.Echo.channel("tickets-publicos").listen(
+                ".TicketActualizado",
+                (e) => {
+                    if (hayAccionEnCurso()) return;
 
-        evtSource.onmessage = function (event) {
-            if (hayAccionEnCurso()) return;
-            try {
-                const data = JSON.parse(event.data);
-                if (data.error) {
-                    if (data.error === "No autenticado")
-                        window.location.href = "/login";
-                    return;
-                }
+                    const url = `/api/refresh?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`;
 
-                procesarTabla(data.html);
+                    fetch(url)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.error) {
+                                if (data.error === "No autenticado")
+                                    window.location.href = "/login";
+                                return;
+                            }
 
-                //---CONTADORES Y METRICAS
-                if (data.contadores) {
-                    actualizarElemento(
-                        "contador-abiertos",
-                        data.contadores.abiertos,
-                    );
-                    actualizarElemento(
-                        "contador-proceso",
-                        data.contadores.proceso,
-                    );
-                    actualizarElemento(
-                        "contador-resueltos",
-                        data.contadores.resueltos,
-                    );
-                }
-                if (data.contadorAsignados !== undefined)
-                    actualizarElemento(
-                        "contador-asignados",
-                        data.contadorAsignados,
-                    );
-                if (data.grafico)
-                    actualizarElemento(
-                        "barras-rendimiento",
-                        data.grafico,
-                        true,
-                    );
-                if (data.cargaTrabajo !== undefined)
-                    actualizarElemento(
-                        "metric-carga-trabajo",
-                        data.cargaTrabajo,
-                    );
-                if (data.resueltos24h !== undefined)
-                    actualizarElemento(
-                        "metric-resueltos-24h",
-                        data.resueltos24h,
-                    );
-                if (data.tasaCierre !== undefined)
-                    actualizarElemento(
-                        "metric-tasa-cierre",
-                        data.tasaCierre + "%",
-                    );
-            } catch (err) {
-                console.error("[SSE] JSON Parse Error:", err);
-            }
-        };
+                            // Reutilizamos toda tu lógica de pintado
+                            procesarTabla(data.html);
 
-        evtSource.onerror = function () {
-            console.debug("[SSE] Buscando canal activo...");
-        };
+                            // --- CONTADORES Y METRICAS ---
+                            if (data.contadores) {
+                                actualizarElemento(
+                                    "contador-abiertos",
+                                    data.contadores.abiertos,
+                                );
+                                actualizarElemento(
+                                    "contador-proceso",
+                                    data.contadores.proceso,
+                                );
+                                actualizarElemento(
+                                    "contador-resueltos",
+                                    data.contadores.resueltos,
+                                );
+                            }
+                            if (data.contadorAsignados !== undefined)
+                                actualizarElemento(
+                                    "contador-asignados",
+                                    data.contadorAsignados,
+                                );
+                            if (data.grafico)
+                                actualizarElemento(
+                                    "barras-rendimiento",
+                                    data.grafico,
+                                    true,
+                                );
+                            if (data.cargaTrabajo !== undefined)
+                                actualizarElemento(
+                                    "metric-carga-trabajo",
+                                    data.cargaTrabajo,
+                                );
+                            if (data.resueltos24h !== undefined)
+                                actualizarElemento(
+                                    "metric-resueltos-24h",
+                                    data.resueltos24h,
+                                );
+                            if (data.tasaCierre !== undefined)
+                                actualizarElemento(
+                                    "metric-tasa-cierre",
+                                    data.tasaCierre + "%",
+                                );
+                        })
+                        .catch((err) =>
+                            console.error(
+                                "[Reverb] Error al hacer fetch:",
+                                err,
+                            ),
+                        );
+                },
+            );
+        } else {
+            console.warn(
+                "[Reverb] window.Echo no está definido. Asegúrate de compilar con Vite.",
+            );
+        }
     }
 
     function detener() {
-        if (evtSource) {
-            evtSource.close();
-            evtSource = null;
+        if (window.Echo) {
+            window.Echo.leaveChannel("tickets-publicos");
         }
     }
 
@@ -298,10 +312,41 @@ window.AutoRefrescoSSE = (() => {
         detener,
         forzarRefresco: () => {
             iniciar();
+
+            const tablaElement = document.querySelector(
+                '.dataTable, table[id*="tabla"], table[id*="Table"]',
+            );
+            if (!tablaElement || tablaElement.id === "tablaHistorial") return;
+            const tablaBody = tablaElement.querySelector("tbody");
+            if (!tablaBody) return;
+
+            const tipoTabla =
+                tablaBody.getAttribute("data-tipo") || "dashboard";
+            let filtroEstado = window.filtroSseActual || "todos";
+            if (
+                filtroEstado.includes(",") &&
+                tipoTabla !== "asignados" &&
+                tipoTabla !== "dashboard" &&
+                tipoTabla !== "mis-tickets"
+            ) {
+                filtroEstado = "cerrado";
+            }
+
+            const url = `/api/refresh?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`;
+            fetch(url)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (!data.error) {
+                        procesarTabla(data.html);
+                    }
+                })
+                .catch((err) => console.error(err));
         },
         aplicarEstilosPaginacion,
     };
 })();
+
+window.AutoRefrescoSSE = window.AutoRefresco;
 
 // =============================================================
 // INTERCEPCIÓN Y DISPARADORES SEGUROS DE JQUERY / DOM
@@ -309,18 +354,22 @@ window.AutoRefrescoSSE = (() => {
 document.addEventListener("DOMContentLoaded", function () {
     if (window.$ && $.fn.DataTable) {
         $(document).on("draw.dt", function (e, settings) {
-            if (settings && settings.nTable && settings.nTable.id === "tablaHistorial") return;
-            AutoRefrescoSSE.aplicarEstilosPaginacion();
+            if (
+                settings &&
+                settings.nTable &&
+                settings.nTable.id === "tablaHistorial"
+            )
+                return;
+            window.AutoRefresco.aplicarEstilosPaginacion();
         });
     }
     //---CONEXION EN TIEMPO REAL
-    AutoRefrescoSSE.iniciar();
+    window.AutoRefresco.iniciar();
 });
 
 window.addEventListener("beforeunload", () => {
-    AutoRefrescoSSE.detener();
+    window.AutoRefresco.detener();
 });
-
 
 window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
     if (!elementoBoton) return;
@@ -347,23 +396,24 @@ window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
 
     //---ESTADO E INICIAR
     window.filtroSseActual = estadoObjetivo;
-    AutoRefrescoSSE.forzarRefresco();
+    window.AutoRefresco.forzarRefresco();
 };
 
-
-window.filtroSseActual = 'todos';
+window.filtroSseActual = "todos";
 
 //---MANEJA CUALQUIER FILTRO
-document.addEventListener('click', function (event) {
-    const boton = event.target.closest('.filtro-btn, [onclick*="filtrarEstado"]');
+document.addEventListener("click", function (event) {
+    const boton = event.target.closest(
+        '.filtro-btn, [onclick*="filtrarEstado"]',
+    );
     if (boton) {
-        const estado = boton.getAttribute('data-estado') || 'todos';
+        const estado = boton.getAttribute("data-estado") || "todos";
         window.filtroSseActual = estado;
-        
+
         //--EVITA LLAMADA EN FALSO
         setTimeout(() => {
-            if (typeof AutoRefrescoSSE !== 'undefined') {
-                AutoRefrescoSSE.forzarRefresco();
+            if (typeof window.AutoRefresco !== "undefined") {
+                window.AutoRefresco.forzarRefresco();
             }
         }, 50);
     }

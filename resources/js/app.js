@@ -16,3 +16,5 @@ import DataTable from 'datatables.net';
 window.DataTable = DataTable;
 
 DataTable.use(jQuery);
+
+import './echo';

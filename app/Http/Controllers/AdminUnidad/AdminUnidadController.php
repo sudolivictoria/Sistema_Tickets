@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\AdminUnidad;
 
+use App\Events\TicketActualizado;
 use App\Http\Controllers\Controller;
 use App\Mail\NuevaSolicitudUnidadMail;
 use App\Mail\TicketCreadoMail;
@@ -192,6 +193,8 @@ class AdminUnidadController extends Controller
             Log::error("Error avisando a la unidad: " . $e->getMessage());
         }
 
+        broadcast(new TicketActualizado());
+
         //--redireccionar con mensaje de exito o error en el correo
         return redirect()->route('gestor.crear-ticket')
             ->with('success', $mensajeFlash);
@@ -249,6 +252,8 @@ class AdminUnidadController extends Controller
 
         $ticket->update(['prioridad_id' => $request->prioridad_id]);
 
+        broadcast(new TicketActualizado());
+
         return redirect()->to($urlOrigen)
             ->with('sweet_success', 'Prioridad actualizada correctamente');
     }
@@ -294,6 +299,8 @@ class AdminUnidadController extends Controller
         $mensaje = $request->tecnico_id
             ? 'Técnico asignado correctamente.'
             : 'Ticket devuelto a la cola de pendientes.';
+
+        broadcast(new TicketActualizado());
 
         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }

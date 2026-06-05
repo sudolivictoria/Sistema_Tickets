@@ -59,7 +59,3 @@
     @vite(['resources/js/recursos.js'])
     @vite(['resources/js/usuario-menu.js'])
 @endpush
-
-@push('sse-scripts')
-    @vite(['resources/js/recursos-api.js'])
-@endpush

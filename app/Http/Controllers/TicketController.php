@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TicketActualizado;
 use App\Mail\TicketResueltoMail;
 use App\Models\Ticket;
 use Carbon\Carbon;
@@ -20,6 +21,8 @@ class TicketController extends Controller
             'fecha_cierre' => Carbon::now()
         ]);
 
+        broadcast(new TicketActualizado());
+
         $mensaje = 'Ticket marcado como resuelto el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
         //---ENVIAR EL CORREO---
@@ -28,8 +31,6 @@ class TicketController extends Controller
         } catch (\Exception $e) {
             Log::error("Error enviando correo de ticket resuelto: " . $e->getMessage());
         }
-
-        $mensaje = 'Ticket marcado como resuelto el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => $mensaje]);
@@ -47,6 +48,8 @@ class TicketController extends Controller
             'fecha_cierre' => Carbon::now()
         ]);
 
+        broadcast(new TicketActualizado());
+
         $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
         //---ENVIAR EL CORREO---
@@ -56,7 +59,7 @@ class TicketController extends Controller
             Log::error("Error enviando correo de ticket cerrado: " . $e->getMessage());
         }
 
-        $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
+        broadcast(new TicketActualizado());
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => $mensaje]);
@@ -66,7 +69,7 @@ class TicketController extends Controller
     }
 
 
-      public function nocorresponde(Request $request, $id)
+    public function nocorresponde(Request $request, $id)
     {
         $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
 
@@ -74,6 +77,8 @@ class TicketController extends Controller
             'estado_id' => 5,
             'fecha_cierre' => Carbon::now()
         ]);
+
+        broadcast(new TicketActualizado());
 
         $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
@@ -83,8 +88,6 @@ class TicketController extends Controller
         } catch (\Exception $e) {
             Log::error("Error enviando correo de ticket cerrado: " . $e->getMessage());
         }
-
-        $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => $mensaje]);

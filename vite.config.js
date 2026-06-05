@@ -25,7 +25,6 @@ export default defineConfig({
                 "resources/js/historial.js",
                 "resources/js/reportes.js",
                 "resources/js/api.js",
-                "resources/js/recursos-api.js"
             ],
             refresh: true,
         }),

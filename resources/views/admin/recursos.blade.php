@@ -58,7 +58,3 @@
 @push('page-scripts')
     @vite(['resources/js/recursos.js'])
 @endpush
-
-@push('sse-scripts')
-    @vite(['resources/js/recursos-api.js'])
-@endpush

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cliente;
 
+use App\Events\TicketActualizado;
 use App\Http\Controllers\Controller;
 use App\Mail\NuevaSolicitudUnidadMail;
 use App\Mail\TicketCreadoMail;
@@ -145,6 +146,8 @@ class ClienteController extends Controller
             Log::error("Error avisando a la unidad: " . $e->getMessage());
         }
 
+        broadcast(new TicketActualizado());
+
         //--redireccionar con mensaje de exito o error en el correo
         return redirect()->route('usuario.crear-ticket')
             ->with('success', $mensajeFlash);
@@ -162,7 +165,7 @@ class ClienteController extends Controller
 
     public function recursos()
     {
-        $categorias = CategoriaManual::all();
+        $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
         $manuales = Manual::with('categoria')->latest()->get();
         return view('usuario.recursos', compact('categorias', 'manuales'));
     }
