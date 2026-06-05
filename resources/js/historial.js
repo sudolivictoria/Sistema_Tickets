@@ -39,14 +39,14 @@ window.inicializarHistorialDataTable = function () {
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
-    $("#tablaHistorial").on("click", ".btn-ver-detalle", function () {
+    $("#tablaHistorial").off("click", ".btn-ver-detalle").on("click", ".btn-ver-detalle", function () {
         const asunto = $(this).data("asunto");
         const descripcion = $(this).data("descripcion");
         const tipo = $(this).data("tipo");
         const fecha = $(this).data("fecha");
         verDetalle(asunto, descripcion, tipo, fecha);
     });
-    $("#tablaHistorial").on("click", ".btn-ver-usuario", function () {
+    $("#tablaHistorial").off("click", ".btn-ver-usuario").on("click", ".btn-ver-usuario", function () {
         const nombre = $(this).data("nombre");
         const email = $(this).data("email");
         const unidad = $(this).data("unidad");
@@ -57,11 +57,40 @@ window.inicializarHistorialDataTable = function () {
     tableHistorial.draw();
 };
 
-//--------aplicar filtros historial--------//
+
 window.aplicarFiltrosHistorial = function () {
     if (!tableHistorial) return;
+    const textoBuscar = document.getElementById("filtroBuscar").value.trim();
+    const fechaInicio = document.getElementById("filtroFechaInicio").value;
+    const fechaFin = document.getElementById("filtroFechaFin").value;
+    const estado = document.getElementById("filtroEstado").value;
+    const categoria = document.getElementById("filtroCategoria") ? document.getElementById("filtroCategoria").value : "todos";
+
+    //------validar si todos los parámetros están en su estado vacío por defecto
+    if (!textoBuscar && !fechaInicio && !fechaFin && estado === "todos" && categoria === "todos") {
+        Swal.fire({
+            title: "¡Búsqueda demasiado amplia!",
+            text: "Para proteger el rendimiento del sistema, debe seleccionar al menos un filtro específico (Estado, Categoría, Rango de fechas o escribir un término de búsqueda).",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+            confirmButtonColor: "#04003B",
+        });
+        return; 
+    }
+
+    //------rango de fechas, complete ambos campos
+    if ((fechaInicio && !fechaFin) || (!fechaInicio &&  fechaFin)) {
+        Swal.fire({
+            title: "Rango de fechas incompleto",
+            text: "Por favor, especifique tanto la 'Fecha Inicio' como la 'Fecha Fin' para procesar el filtro de tiempo correctamente.",
+            icon: "info",
+            confirmButtonText: "Completar rango",
+            confirmButtonColor: "#04003B",
+        });
+        return; 
+    }
+
     filtrosAplicados = true;
-    const textoBuscar = document.getElementById("filtroBuscar").value;
     tableHistorial.search(textoBuscar);
     tableHistorial.draw();
 };
@@ -89,7 +118,7 @@ window.limpiarFiltrosHistorial = function () {
     tableHistorial.search("").draw();
 };
 
-//--------aplicar filtros historial--------//
+//--------exportar historial--------//
 window.exportarHistorial = function (formato) {
     if (!filtrosAplicados) {
         Swal.fire({
@@ -102,16 +131,14 @@ window.exportarHistorial = function (formato) {
         return;
     }
 
-    //-----valores del dom
     const buscar = document.getElementById("filtroBuscar").value;
     const fechaInicio = document.getElementById("filtroFechaInicio").value;
     const fechaFin = document.getElementById("filtroFechaFin").value;
     const estado = document.getElementById("filtroEstado").value;
-    const categoria = document.getElementById("filtroCategoria").value;
+    const categoria = document.getElementById("filtroCategoria") ? document.getElementById("filtroCategoria").value : "todos";
 
-    //---peticion descarga
     const params = new URLSearchParams({
-        tipo: formato, //-------pdf o excel
+        tipo: formato,
         buscar: buscar,
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFin,
@@ -119,7 +146,6 @@ window.exportarHistorial = function (formato) {
         categoria: categoria,
     });
 
-    //------descarga
     window.location.href = `/admin/reportes/exportar?${params.toString()}`;
 };
 
@@ -187,9 +213,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaHistorial")) {
         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             if (settings.nTable.id !== "tablaHistorial") return true;
+            
             if (!filtrosAplicados) {
                 return false;
             }
+            
             const filaTr = settings.aoData[dataIndex].nTr;
             const fechaFilaRaw = filaTr.getAttribute("data-fecha");
             const estadoFilaId = filaTr.getAttribute("data-estado-id");

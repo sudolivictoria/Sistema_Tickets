@@ -36,7 +36,10 @@ class TicketController extends Controller
             return response()->json(['success' => true, 'message' => $mensaje]);
         }
 
-        return redirect()->back()->with('sweet_success', $mensaje);
+        
+        $urlOrigen = request()->headers->get('referer');
+
+         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 
     public function equivocacion(Request $request, $id)
@@ -65,7 +68,9 @@ class TicketController extends Controller
             return response()->json(['success' => true, 'message' => $mensaje]);
         }
 
-        return redirect()->back()->with('sweet_success', $mensaje);
+         $urlOrigen = request()->headers->get('referer');
+
+         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 
 
@@ -93,6 +98,8 @@ class TicketController extends Controller
             return response()->json(['success' => true, 'message' => $mensaje]);
         }
 
-        return redirect()->back()->with('sweet_success', $mensaje);
+         $urlOrigen = request()->headers->get('referer');
+
+         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 }

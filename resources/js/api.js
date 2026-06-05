@@ -1,5 +1,5 @@
 // ===================================================
-// AUTO-REFRESCO UNIVERSAL POR WEBSOCKETS (REVERB) 
+// AUTO-REFRESCO UNIVERSAL POR WEBSOCKETS (REVERB)
 // ===================================================
 
 window.AutoRefresco = (() => {
@@ -36,94 +36,90 @@ window.AutoRefresco = (() => {
     function procesarTabla(htmlNuevo) {
         if (htmlNuevo === undefined || htmlNuevo === null || isRefreshing)
             return;
+
         isRefreshing = true;
 
-        const tablaElement = document.querySelector(
-            '.dataTable, table[id*="tabla"], table[id*="Table"]',
-        );
-        if (!tablaElement) {
-            isRefreshing = false;
-            return;
-        }
-
-        const tablaId = tablaElement.id;
-
-        if (tablaId === "tablaHistorial") {
-            isRefreshing = false;
-            return;
-        }
-
-        const tablaBody = tablaElement.querySelector("tbody");
-        if (!tablaBody) {
-            isRefreshing = false;
-            return;
-        }
-
-        //---si no existe datatable o jquery
-        if (
-            !window.$ ||
-            !$.fn.DataTable ||
-            !$.fn.DataTable.isDataTable(tablaElement)
-        ) {
-            tablaBody.innerHTML = htmlNuevo;
-            isRefreshing = false;
-            return;
-        }
-
-        const $tabla = $(tablaElement);
-        let paginaActual = 0;
-        let buscadorTermino = "";
-
-        //---guarda estado actual y paginacion
         try {
-            const dtInstancia = $tabla.DataTable();
-            paginaActual = dtInstancia.page();
-            buscadorTermino = dtInstancia.search();
-        } catch (_) {}
+            const tablaElement = document.querySelector(
+                '.dataTable, table[id*="tabla"], table[id*="Table"]',
+            );
+            if (!tablaElement) return;
 
-        //---destruccion limpia
-        try {
-            $tabla.DataTable().destroy();
-        } catch (_) {}
+            const tablaId = tablaElement.id;
+            const tablaBody = tablaElement.querySelector("tbody");
+            if (!tablaBody) return;
 
-        //----insercion html
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(
-            "<table>" + htmlNuevo + "</table>",
-            "text/html",
-        );
-        const tbodyEl = doc.querySelector("tbody");
-        tablaBody.innerHTML = tbodyEl ? tbodyEl.innerHTML : "";
+            if (tablaId !== "tablaHistorial") {
+                if (
+                    !window.$ ||
+                    !$.fn.DataTable ||
+                    !$.fn.DataTable.isDataTable(tablaElement)
+                ) {
+                    tablaBody.innerHTML = htmlNuevo;
+                    return;
+                }
 
-        //----reinicializacion
-        if (
-            tablaId === "userTable" &&
-            typeof window.inicializarUserTable === "function"
-        ) {
-            window.inicializarUserTable();
-        } else if (typeof window.inicializarTablaTickets === "function") {
-            window.inicializarTablaTickets("#" + tablaId);
-        }
+                const $tabla = $(tablaElement);
+                let paginaActual = 0;
+                let buscadorTermino = "";
 
-        //---clases estaticas
-        try {
-            const dtNuevo = $tabla.DataTable();
-            if (buscadorTermino) {
-                dtNuevo.search(buscadorTermino).draw(false);
+                //---guarda estado actual y paginacion
+                try {
+                    const dtInstancia = $tabla.DataTable();
+                    paginaActual = dtInstancia.page();
+                    buscadorTermino = dtInstancia.search();
+                } catch (_) {}
+
+                //---destruccion limpia
+                try {
+                    $tabla.DataTable().destroy();
+                } catch (_) {}
+
+                //----insercion html
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(
+                    "<table>" + htmlNuevo + "</table>",
+                    "text/html",
+                );
+                const tbodyEl = doc.querySelector("tbody");
+                tablaBody.innerHTML = tbodyEl ? tbodyEl.innerHTML : "";
+
+                //----reinicializacion
+                if (
+                    tablaId === "userTable" &&
+                    typeof window.inicializarUserTable === "function"
+                ) {
+                    window.inicializarUserTable();
+                } else if (
+                    typeof window.inicializarTablaTickets === "function"
+                ) {
+                    window.inicializarTablaTickets("#" + tablaId);
+                }
+
+                //---clases estaticas e inyección de estados DataTables
+                try {
+                    const dtNuevo = $tabla.DataTable();
+                    if (buscadorTermino) {
+                        dtNuevo.search(buscadorTermino).draw(false);
+                    }
+                    const totalPaginas = dtNuevo.page.info().pages;
+                    if (paginaActual > 0 && paginaActual < totalPaginas) {
+                        dtNuevo.page(paginaActual).draw(false);
+                    }
+                    aplicarEstilosPaginacion();
+                } catch (err) {
+                    console.error(
+                        "[Reverb] Error al restaurar DataTables:",
+                        err,
+                    );
+                }
             }
-            const totalPaginas = dtNuevo.page.info().pages;
-            if (paginaActual > 0 && paginaActual < totalPaginas) {
-                dtNuevo.page(paginaActual).draw(false);
-            }
-            aplicarEstilosPaginacion();
-        } catch (err) {
-            console.error("[Reverb] Error al restaurar DataTables:", err);
         } finally {
             isRefreshing = false;
         }
     }
 
-    //---tailwind
+    //---estilos paginacion
     function aplicarEstilosPaginacion() {
         const wrappers = document.querySelectorAll(".dataTables_wrapper");
         wrappers.forEach((wrap) => {
@@ -147,43 +143,48 @@ window.AutoRefresco = (() => {
                 const links = paginateContainer.querySelectorAll(
                     "a, .paginate_button",
                 );
-                links.forEach((btn) => {
-                    btn.removeAttribute("style");
-
-                    btn.className =
-                        "px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border select-none no-underline inline-block ";
-
-                    if (
-                        btn.classList.contains("current") ||
-                        btn.classList.contains("active")
-                    ) {
-                        btn.classList.add(
-                            "bg-secondary",
-                            "text-white",
-                            "border-secondary",
-                            "shadow-sm",
-                        );
-                    } else if (btn.classList.contains("disabled")) {
-                        btn.classList.add(
-                            "bg-slate-50",
-                            "text-slate-300",
-                            "border-slate-100",
-                            "pointer-events-none",
-                        );
-                    } else {
-                        btn.classList.add(
-                            "bg-slate-100",
-                            "text-slate-600",
-                            "border-slate-200",
-                            "hover:bg-slate-200",
-                            "hover:text-slate-900",
-                        );
-                    }
-                });
+                wrapperLinks(links);
             }
         });
     }
 
+    //---estilos paginacion, reutilizable para cualquier conjunto de links
+    function wrapperLinks(links) {
+        links.forEach((btn) => {
+            btn.removeAttribute("style");
+            btn.className =
+                "px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border select-none no-underline inline-block ";
+
+            if (
+                btn.classList.contains("current") ||
+                btn.classList.contains("active")
+            ) {
+                btn.classList.add(
+                    "bg-secondary",
+                    "text-white",
+                    "border-secondary",
+                    "shadow-sm",
+                );
+            } else if (btn.classList.contains("disabled")) {
+                btn.classList.add(
+                    "bg-slate-50",
+                    "text-slate-300",
+                    "border-slate-100",
+                    "pointer-events-none",
+                );
+            } else {
+                btn.classList.add(
+                    "bg-slate-100",
+                    "text-slate-600",
+                    "border-slate-200",
+                    "hover:bg-slate-200",
+                    "hover:text-slate-900",
+                );
+            }
+        });
+    }
+
+    //---inicializacion y conexion
     function iniciar() {
         detener();
         const tablaElement = document.querySelector(
@@ -191,17 +192,13 @@ window.AutoRefresco = (() => {
         );
         if (!tablaElement) return;
 
-        //---no cargar datos en el historial hasta filtrado
-        if (tablaElement.id === "tablaHistorial") {
-            console.log(
-                "[Reverb] Pantalla de Historial detectada: Auto-refresco en segundo plano desactivado.",
-            );
-            return;
-        }
-
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) return;
-        const tipoTabla = tablaBody.getAttribute("data-tipo") || "dashboard";
+
+        const tipoTabla =
+            tablaElement.id === "tablaHistorial"
+                ? "historial"
+                : tablaBody.getAttribute("data-tipo") || "dashboard";
 
         //---deteccion filtrados
         let filtroEstado = "todos";
@@ -223,7 +220,7 @@ window.AutoRefresco = (() => {
             filtroEstado = "cerrado";
         }
 
-        // --- CONEXIÓN WEBSOCKETS (REVERB) ---
+        //==============================CONEXIÓN WEBSOCKETS (REVERB)====================================
         if (window.Echo) {
             window.Echo.channel("tickets-publicos").listen(
                 ".TicketActualizado",
@@ -240,11 +237,9 @@ window.AutoRefresco = (() => {
                                     window.location.href = "/login";
                                 return;
                             }
-
-                            // Reutilizamos toda tu lógica de pintado
                             procesarTabla(data.html);
 
-                            // --- CONTADORES Y METRICAS ---
+                            //**********CONTADORES Y METRICAS******************/
                             if (data.contadores) {
                                 actualizarElemento(
                                     "contador-abiertos",
@@ -316,12 +311,15 @@ window.AutoRefresco = (() => {
             const tablaElement = document.querySelector(
                 '.dataTable, table[id*="tabla"], table[id*="Table"]',
             );
-            if (!tablaElement || tablaElement.id === "tablaHistorial") return;
+            if (!tablaElement) return;
             const tablaBody = tablaElement.querySelector("tbody");
             if (!tablaBody) return;
 
             const tipoTabla =
-                tablaBody.getAttribute("data-tipo") || "dashboard";
+                tablaElement.id === "tablaHistorial"
+                    ? "historial"
+                    : tablaBody.getAttribute("data-tipo") || "dashboard";
+
             let filtroEstado = window.filtroSseActual || "todos";
             if (
                 filtroEstado.includes(",") &&
