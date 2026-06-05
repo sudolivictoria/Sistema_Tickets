@@ -29,7 +29,7 @@
     <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 md:gap-8">
         <div class="xl:col-span-3 space-y-6 md:space-y-8">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                <div class="bg-white p-6 rounded-2xl border-b-4 border-secondary shadow-sm flex items-center gap-4">
+                <div class="bg-white p-6 rounded-2xl border-b-4 border-secondary shadow-sm flex items-center gap-4 hover:translate-y-[-6px] transition-all duration-300">
                     <div class="p-3 bg-red-50 text-red-500 rounded-2xl"><span
                             class="material-symbols-outlined text-2xl font-bold">priority_high</span></div>
                     <div>
@@ -38,7 +38,7 @@
                     </div>
                 </div>
                 <div
-                    class="bg-secondary p-6 rounded-2xl shadow-lg flex items-center gap-4 border-b-4 border-secondary text-white">
+                    class="bg-secondary p-6 rounded-2xl shadow-lg flex items-center gap-4 border-b-4 border-secondary text-white hover:translate-y-[-6px] transition-all duration-300">
                     <div class="p-3 bg-blue-700 text-secondary rounded-2xl"><span
                             class="material-symbols-outlined text-2xl">engineering</span></div>
                     <div>
@@ -46,7 +46,7 @@
                         <div class="text-[14px] font-black uppercase text-blue-200">En Proceso</div>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border-b-4 border-secondary shadow-sm flex items-center gap-4">
+                <div class="bg-white p-6 rounded-2xl border-b-4 border-secondary shadow-sm flex items-center gap-4 hover:translate-y-[-6px] transition-all duration-300">
                     <div class="p-3 bg-lime-50 text-primary rounded-2xl"><span
                             class="material-symbols-outlined text-2xl font-bold">check_circle</span></div>
                     <div>
