@@ -7,7 +7,7 @@
         <div>
             <div class="flex items-center gap-4">
                 <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-4xl text-primary">contract</span>
+                    <span class="material-symbols-outlined text-4xl text-primary">analytics</span>
                     Historial
                 </h2>
             </div>
