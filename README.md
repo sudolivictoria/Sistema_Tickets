@@ -99,6 +99,12 @@ php artisan serve
 php artisan queue:local
 ```
 
+* **Terminal 1 (Actualización de datos):**
+
+```bash
+php artisan reverb:start
+```
+
 ## 9. Acceso de Prueba (Super Admin)
 
 Utiliza las siguientes credenciales para ingresar al sistema con el rol de soporte total. Desde esta cuenta podrás administrar y crear otros usuarios.
