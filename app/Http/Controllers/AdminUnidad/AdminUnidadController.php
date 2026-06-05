@@ -281,11 +281,9 @@ class AdminUnidadController extends Controller
         if (in_array($ticket->estado_id, [3, 4, 5])) {
             return redirect()->to($urlOrigen)->with('sweet_error', '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.');
         }
-        if ($request->filled('tecnico_id')) {
-        } else {
-            if ($ticket->tecnico_id === null) {
-                return redirect()->to($urlOrigen)->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
-            }
+        if (!$request->filled('tecnico_id') && $ticket->tecnico_id === null) {
+            return redirect()->to($urlOrigen)
+                ->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
         }
         //---actualizar datos
         $ticket->update([
