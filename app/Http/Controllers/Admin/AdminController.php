@@ -284,9 +284,6 @@ class AdminController extends Controller
         }
 
         if ($request->filled('tecnico_id')) {
-            if ($ticket->tecnico_id !== null && $ticket->tecnico_id != $request->tecnico_id) {
-                return redirect()->to($urlOrigen)->with('sweet_error', '¡Demasiado tarde! Otro usuario ya asignó este ticket a un técnico diferente.');
-            }
         } else {
             if ($ticket->tecnico_id === null) {
                 return redirect()->to($urlOrigen)->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
