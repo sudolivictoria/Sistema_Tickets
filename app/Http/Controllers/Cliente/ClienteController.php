@@ -55,7 +55,7 @@ class ClienteController extends Controller
         $prioridades = Prioridad::all();
         $tipos = TipoSolicitud::all();
 
-        return view('usuario.index', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos'));
+        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos'));
     }
 
     //---metodo para mostrar formulario de creacion de ticket
