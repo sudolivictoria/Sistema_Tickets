@@ -23,39 +23,39 @@ class ClienteController extends Controller
 {
     public function index()
     {
-
-
         $userId = Auth::id();
         $estadosCerrados = [3, 4, 5];
 
-        //----estadisticas tickets del cliente autenticado
-        $abiertos = Ticket::whereYear('created_at', date('Y'))
-            ->where('user_id', $userId)
+        //----estadísticas de tickets activos del cliente (Históricos / Sin límite de año)
+        $abiertos = Ticket::where('user_id', $userId)
             ->whereNull('tecnico_id')
             ->whereNotIn('estado_id', $estadosCerrados)
             ->count();
 
-        $enProceso = Ticket::whereYear('created_at', date('Y'))
-            ->where('user_id', $userId)
+        $enProceso = Ticket::where('user_id', $userId)
             ->whereNotNull('tecnico_id')
-            ->whereNotIn('estado_id', $estadosCerrados)
+            ->where('estado_id', 2)
             ->count();
 
-        $resueltos = Ticket::whereYear('created_at', date('Y'))
-            ->where('user_id', $userId)
+        //----tickets resueltos del cliente (SINCRO CON API: Únicamente del MES Y AÑO ACTUAL)
+        $resueltos = Ticket::where('user_id', $userId)
             ->whereIn('estado_id', $estadosCerrados)
+            ->whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'))
             ->count();
 
-        //----tickets del cliente autenticado
-        $todosLosTickets = Ticket::where('user_id', Auth::id())
-            ->latest()
-            ->paginate(5);
+        $todosLosTickets = Ticket::where('user_id', $userId)
+            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
+            ->orderBy('created_at', 'desc')
+            ->take(5) 
+            ->get();
 
-        //----manuales
-        $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
-        $manuales = Manual::with('categoria')->latest()->get();
+        //----Parámetros estáticos para modales de creación
+        $categorias = Categoria::all();
+        $prioridades = Prioridad::all();
+        $tipos = TipoSolicitud::all();
 
-        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'categorias', 'manuales', 'todosLosTickets'));
+        return view('usuario.index', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos'));
     }
 
     //---metodo para mostrar formulario de creacion de ticket

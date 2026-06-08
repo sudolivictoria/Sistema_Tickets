@@ -16,14 +16,13 @@ use Throwable;
 
 class ApiTableController extends Controller
 {
-    //--variables para controlar la frecuencia de actualización y evitar solapamientos en el procesamiento de respuestas
     private const TIPOS_VALIDOS = ['dashboard', 'usuario', 'asignar', 'mis_tickets', 'mis_asignados', 'historial'];
     private const TIPOS_SOLO_CONTENIDO = ['recursos'];
     private const TIPOS_SOLO_STAFF = ['asignar', 'historial', 'mis_asignados'];
     private const ESTADOS_CERRADOS = [3, 4, 5];
 
     /**
-     * Endpoint HTTP Clásico de consulta / fallback manual
+     * Endpoint HTTP de Consulta y Sincronización Asíncrona
      */
     public function refresh(Request $request): JsonResponse
     {
@@ -38,51 +37,76 @@ class ApiTableController extends Controller
 
         $tipo = (string) $request->query('tipo', 'dashboard');
         if (!in_array($tipo, self::TIPOS_VALIDOS, true) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
-            return response()->json(['error' => 'Tipo no válido.'], 422);
+            return response()->json(['error' => 'Tipo de tabla no válido.'], 400);
         }
 
-        //-- Si el tipo de vista es de contenido manual/tarjetas, renderizar directamente pasándole los parámetros correctos
-        if (in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
-            return response()->json(['html' => $this->renderizarVista($tipo, collect(), (int)$user->unidad_id)]);
-        }
-
-        if ($user->rol_id == 2 && in_array($tipo, self::TIPOS_SOLO_STAFF, true)) {
-            return response()->json(['error' => 'Acceso denegado.'], 403);
+        if (in_array($tipo, self::TIPOS_SOLO_STAFF, true) && !in_array($user->rol_id, [1, 3])) {
+            return response()->json(['error' => 'No autorizado.'], 403);
         }
 
         try {
+            if (in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
+                return response()->json([
+                    'html' => $this->renderizarVista($tipo, null, (int)$user->unidad_id)
+                ]);
+            }
+
+            $estadoFiltro = (string) $request->query('estado', 'todos');
             $miUnidadId = (int) $user->unidad_id;
-            $añoActual  = (int) date('Y');
-            $estadoFiltro = strtolower(trim((string) $request->query('estado', 'todos')));
-            $queryTickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tecnico', 'tipo_solicitud', 'categoria']);
 
-            $this->aplicarFiltrosBase($queryTickets, $user, $tipo, $miUnidadId);
-            $this->inyectarFiltroEstado($queryTickets, $estadoFiltro, $tipo);
+            //----------------------CONTADORES DE ESTADOS----------------------
+            $queryAbiertos  = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
+            $queryProceso   = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
+            $queryResueltos = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
+                ->whereMonth('created_at', date('m'))
+                ->whereYear('created_at', date('Y'));
 
-            $limit = ($tipo === 'usuario') ? 5 : null;
-            $ticketsResult = $limit
-                ? $queryTickets->latest()->limit($limit)->get()
-                : $queryTickets->latest()->get();
+            //------------------------FILTRADO POR UNIDAD------------------------
+            if ($miUnidadId && ($user->rol_id == 1 || $user->rol_id == 3)) {
+                $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
+                $queryAbiertos->whereHas('categoria', $filterUnidad);
+                $queryProceso->whereHas('categoria', $filterUnidad);
+                $queryResueltos->whereHas('categoria', $filterUnidad);
+            }
 
-            $statsBase = function () use ($añoActual, $user, $tipo, $miUnidadId) {
-                $q = Ticket::whereYear('created_at', $añoActual);
-                $this->aplicarFiltrosStats($q, $user, $tipo, $miUnidadId);
-                return $q;
-            };
+            //-------------------------FILTRADO POR USUARIO (Clientes solo ven sus tickets)-------------------------
+            if ($user->rol_id == 2) {
+                $queryAbiertos->where('user_id', $user->id);
+                $queryProceso->where('user_id', $user->id);
+                $queryResueltos->where('user_id', $user->id);
+            }
 
+            //-------------------------CONTADORES FINALES PARA LA BURBUJA DE NOTIFICACIÓN-------------------------
             $contadores = [
-                'abiertos'  => $statsBase()->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
-                'proceso'   => $statsBase()->whereNotNull('tecnico_id')->where('estado_id', 2)->count(),
-                'resueltos' => $statsBase()->whereIn('estado_id', self::ESTADOS_CERRADOS)->count(),
+                'abiertos'  => $queryAbiertos->count(),
+                'proceso'   => $queryProceso->count(),
+                'resueltos' => $queryResueltos->count(),
             ];
 
-            $graficoHtml = ($user->rol_id != 2) ? $this->generarGrafico($miUnidadId, $añoActual) : null;
-            $contadorMisAsignados = Ticket::where('tecnico_id', $user->id)->where('estado_id', 2)->count();
+            //----------------CONTADOR DE TICKETS ASIGNADOS AL USUARIO ACTUAL (Solo para técnicos)-----------------
+            $contadorMisAsignados = Ticket::where('tecnico_id', $user->id)
+                ->where('estado_id', 2)
+                ->count();
 
+            //--------------------------CONSULTA PRINCIPAL DE TICKETS CON FILTROS DINÁMICOS-------------------------
+            $query = Ticket::with(['user', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
+
+            $this->aplicarFiltrosBase($query, $user, $tipo, $miUnidadId);
+            $this->inyectarFiltroEstado($query, $estadoFiltro);
+
+            //--------------LIMITACIÓN DE RESULTADOS PARA LA VISTA DE USUARIOS (Solo los 5 más recientes)-----------------
+            $limit = ($tipo === 'usuario') ? 5 : null;
+            $ticketsResult = $limit ? $query->latest()->limit($limit)->get() : $query->latest()->get();
+
+            //---------------------------------GENERACIÓN DEL GRÁFICO DE RENDIMIENTO ANUAL PARA EL DASHBOARD---------------------------------
+            $graficoHtml = ($tipo === 'dashboard' && in_array($user->rol_id, [1, 3])) ? $this->generarGrafico($miUnidadId) : '';
+
+            //-----------------------------------MÉTRICAS AVANZADAS PARA LA VISTA HISTORIAL (Solo para roles de staff)--------------------
             [$cargaTrabajo, $resueltos24h, $tasaCierre] = ($tipo === 'historial')
-                ? $this->calcularMetricas($user, $miUnidadId, $añoActual)
+                ? $this->calcularMetricas($ticketsResult)
                 : [0, 0, 0];
 
+            //------------------------------------RENDERIZADO UNIFICADO DE FRAGMENTOS HTML PARA LA RESPUESTA AJAX------------------------------------
             return response()->json([
                 'html'              => $this->renderizarVista($tipo, $ticketsResult, $miUnidadId),
                 'contadores'        => $contadores,
@@ -93,155 +117,141 @@ class ApiTableController extends Controller
                 'tasaCierre'        => (int) $tasaCierre,
             ]);
         } catch (Throwable $e) {
-            Log::error('ApiTableController Refresh Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Error interno.'], 500);
+            Log::error("Error crítico en refresh: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Error interno del servidor.'], 500);
         }
     }
 
     /**
-     * Mapeo estricto del estado solicitado para inyección SQL limpia
-     */
-    private function inyectarFiltroEstado($queryTickets, string $estadoFiltro, string $tipo): void
-    {
-        if ($estadoFiltro === 'todos' || $estadoFiltro === '') {
-            return;
-        }
-
-        switch ($estadoFiltro) {
-            case '1':
-            case 'abierto':
-                if ($tipo === 'dashboard') {
-                    $queryTickets->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
-                } else {
-                    $queryTickets->where('estado_id', 1);
-                }
-                break;
-
-            case 'procesando':
-                if ($tipo === 'dashboard') {
-                    $queryTickets->whereNotNull('tecnico_id')->where('estado_id', 2);
-                } else {
-                    $queryTickets->where('estado_id', 2);
-                }
-                break;
-
-            case 'cerrado':
-            case 'resuelto,equivocado,no corresponde':
-            case 'resuelto':
-            case 'equivocado':
-            case 'no corresponde':
-                $queryTickets->whereIn('estado_id', self::ESTADOS_CERRADOS);
-                break;
-
-            default:
-                if (is_numeric($estadoFiltro)) {
-                    $queryTickets->where('estado_id', (int) $estadoFiltro);
-                }
-                break;
-        }
-    }
-
-    /**
-     * Filtros base comunes para todas las vistas
+     * Lógica centralizada de alcance por roles, unidades y pantallas
      */
     private function aplicarFiltrosBase($query, $user, string $tipo, int $miUnidadId): void
     {
+        //-----------------Clientes solo ven sus tickets en cualquier vista-----------------
         if ($tipo === 'mis_tickets' || $user->rol_id == 2) {
             $query->where('user_id', $user->id);
-            if ($tipo !== 'mis_tickets') {
-                $query->whereYear('created_at', date('Y'));
+            return;
+        }
+
+        //------------------Dashboard principal con filtro dinámico por estado y departamento-----------------
+        if ($tipo === 'dashboard') {
+            $estadoBoton = request()->query('estado', 'todos');
+
+            if ($estadoBoton === 'resuelto,equivocado,no corresponde') {
+                $query->whereIn('estado_id', self::ESTADOS_CERRADOS)
+                    ->whereMonth('created_at', date('m'))
+                    ->whereYear('created_at', date('Y'));
+            } else {
+                $query->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
             }
-            return;
-        }
-        if ($tipo === 'mis_asignados') {
-            $query->where('tecnico_id', $user->id)
-                ->where('estado_id', 2);
-            return;
-        }
-        if ($tipo === 'historial') {
-            if ($user->rol_id != 1) {
+            if ($miUnidadId) {
                 $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
             }
-        } else {
-            $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            return;
         }
-        if ($tipo === 'asignar') {
-            $query->where('estado_id', 1);
+
+        if ($tipo === 'asignar' || $tipo === 'mis_asignados') {
+            if ($tipo === 'mis_asignados') {
+                $query->where('tecnico_id', $user->id);
+            }
+            if ($miUnidadId) {
+                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            }
+            return;
         }
-        if ($tipo === 'dashboard') {
-            $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+
+        if ($tipo === 'historial') {
+            if ($miUnidadId) {
+                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            }
+            return;
         }
     }
 
     /**
-     * Filtros específicos para estadísticas
+     * Mapeo de sub-filtros de estados del panel
      */
-    private function aplicarFiltrosStats($query, $user, string $tipo, int $miUnidadId): void
+    private function inyectarFiltroEstado($query, string $estado): void
     {
-        if ($tipo === 'mis_tickets' || $user->rol_id == 2) {
-            $query->where('user_id', $user->id);
-            return;
-        }
-        if ($tipo === 'mis_asignados') {
-            $query->where('tecnico_id', $user->id)
-                ->where('estado_id', 2);
-            return;
-        }
-        if ($tipo === 'historial' && $user->rol_id == 1) {
-            return;
-        }
-        $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
-    }
+        switch ($estado) {
+            case 'abierto':
+                $query->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
+                break;
 
-    private function generarGrafico(int $miUnidadId, int $año): ?string
-    {
-        $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-        $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
-            ->whereYear('created_at', $año)
-            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
-            ->groupBy('mes', 'estado_id')
-            ->get();
+            case 'procesando':
+                $query->whereNotNull('tecnico_id')->where('estado_id', 2);
+                break;
 
-        $mesesGrafico = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $res   = $statsMensuales->where('mes', $i)->whereIn('estado_id', self::ESTADOS_CERRADOS)->sum('total');
-            $pen   = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->sum('total');
-            $total = $res + $pen;
-
-            $mesesGrafico[] = [
-                'nombre'         => $nombresMeses[$i - 1],
-                'resueltos_pct'  => $total > 0 ? (int) round(($res / $total) * 100) : 0,
-                'pendientes_pct' => $total > 0 ? (int) round(($pen / $total) * 100) : 0,
-                'total'          => $total,
-            ];
+            case 'resuelto,equivocado,no corresponde':
+                $query->whereIn('estado_id', self::ESTADOS_CERRADOS);
+                break;
         }
-        return view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
     }
 
     /**
-     * Calcular métricas adicionales para la vista de historial
+     * Renderizado del gráfico de productividad anual para el departamento
      */
-    private function calcularMetricas($user, int $miUnidadId, int $año): array
+    private function generarGrafico(int $miUnidadId): string
     {
-        $query = Ticket::whereYear('created_at', $año);
-        if ($user->rol_id != 1) {
-            $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
-        }
-        $tickets = $query->get(['id', 'estado_id', 'created_at', 'fecha_cierre']);
+        try {
+            $añoActual = (int) date('Y');
+            $query = Ticket::whereYear('created_at', $añoActual);
 
+            if ($miUnidadId) {
+                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            }
+
+            $ticketsAño = $query->selectRaw('MONTH(created_at) as mes, estado_id')->get();
+
+            $resueltosPorMes = array_fill(1, 12, 0);
+            $totalesPorMes   = array_fill(1, 12, 0);
+
+            foreach ($ticketsAño as $t) {
+                $m = (int)$t->mes;
+                if ($m >= 1 && $m <= 12) {
+                    $totalesPorMes[$m]++;
+                    if (in_array((int)$t->estado_id, self::ESTADOS_CERRADOS, true)) {
+                        $resueltosPorMes[$m]++;
+                    }
+                }
+            }
+
+            $porcentajes = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $porcentajes[] = $totalesPorMes[$i] > 0
+                    ? (int) round(($resueltosPorMes[$i] / $totalesPorMes[$i]) * 100)
+                    : 0;
+            }
+
+            return view('partials.grafico_rendimiento', ['porcentajesExito' => $porcentajes])->render();
+        } catch (Throwable $e) {
+            Log::error("Error en gráfico: " . $e->getMessage());
+            return '<div class="text-danger p-4">No se pudo cargar el gráfico.</div>';
+        }
+    }
+
+    /**
+     * Métricas avanzadas para la vista Historial
+     */
+    private function calcularMetricas($tickets): array
+    {
         $cargaTrabajo = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isToday())->count();
+
+        $hace24Horas = now()->subDay();
         $resueltos24h = $tickets->whereIn('estado_id', self::ESTADOS_CERRADOS)
-            ->filter(fn($t) => $t->fecha_cierre && Carbon::parse($t->fecha_cierre)->gte(now()->subDay()))
+            ->filter(fn($t) => $t->fecha_cierre && Carbon::parse($t->fecha_cierre)->gte($hace24Horas))
             ->count();
-        $delMes     = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isCurrentMonth());
-        $total      = $delMes->count();
+
+        $delMes = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isCurrentMonth());
+        $total  = $delMes->count();
         $cerrados   = $delMes->whereIn('estado_id', self::ESTADOS_CERRADOS)->count();
         $tasaCierre = $total > 0 ? (int) round(($cerrados / $total) * 100) : 0;
+
         return [$cargaTrabajo, $resueltos24h, $tasaCierre];
     }
 
     /**
-     * Renderizado centralizado de vistas parciales
+     * Renderizado unificado de fragmentos HTML Blade
      */
     private function renderizarVista(string $tipo, $ticketsResult, int $miUnidadId): string
     {
@@ -255,11 +265,7 @@ class ApiTableController extends Controller
                 'tickets'  => $ticketsResult,
                 'tecnicos' => User::where('unidad_id', $miUnidadId)->where('activo', true)->get(),
             ])->render(),
-            'mis_asignados' => view('partials.filas_mis_asignados', [
-                'tickets'  => $ticketsResult,
-                'tecnicos' => User::where('unidad_id', $miUnidadId)->where('activo', true)->get(),
-            ])->render(),
-            default => '',
+            'mis_asignados' => view('partials.filas_mis_asignados', ['misAsignados' => $ticketsResult])->render(),
         };
     }
 }

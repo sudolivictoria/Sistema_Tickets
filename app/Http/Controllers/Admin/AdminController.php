@@ -31,37 +31,52 @@ class AdminController extends Controller
         $estadosCerrados = [3, 4, 5];
 
         //--tickets asignados por unidad del admin autenticado
-        $noAsignados = Ticket::whereYear('created_at', date('Y'))
-            ->whereNull('tecnico_id')
-            ->whereNotIn('estado_id', $estadosCerrados)
-            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
-            ->count();
+        $queryAbiertos = Ticket::whereNull('tecnico_id')
+            ->whereNotIn('estado_id', $estadosCerrados);
 
         //--tickets pendientes por unidad del admin autenticado
-        $pendientes = Ticket::whereYear('created_at', date('Y'))
-            ->whereNotNull('tecnico_id')
-            ->whereNotIn('estado_id', $estadosCerrados)
-            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
-            ->count();
+        $queryProceso = Ticket::whereNotNull('tecnico_id')
+            ->where('estado_id', 2);
 
         //--tickets resueltos por unidad del admin autenticado
-        $resueltos = Ticket::whereYear('created_at', date('Y'))
-            ->whereIn('estado_id', $estadosCerrados)
-            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
-            ->count();
+        $queryResueltos = Ticket::whereIn('estado_id', $estadosCerrados)
+            ->whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'));
 
         //---limitar a solo mostrar los tickets del mes
         $inicioMes = Carbon::now()->startOfMonth();
         $finMes = Carbon::now()->endOfMonth();
 
-        //--tickets recientes por unidad del admin autenticado
-        $todosLosTickets = Ticket::with(['user', 'categoria', 'estado'])
-            ->whereHas('categoria', function ($q) use ($miUnidadId) {
-                $q->where('unidad_id', $miUnidadId);
-            })
-            ->whereBetween('created_at', [$inicioMes, $finMes])
-            ->latest()
-            ->get();
+        //------FILTRO POR UNIDAD DE CATEGORÍA------
+        if ($miUnidadId) {
+            $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
+            $queryAbiertos->whereHas('categoria', $filterUnidad);
+            $queryProceso->whereHas('categoria', $filterUnidad);
+            $queryResueltos->whereHas('categoria', $filterUnidad);
+        }
+
+        //--------EJECUTAR CONTADORES----------
+        $noAsignados = $queryAbiertos->count();
+        $pendientes  = $queryProceso->count();
+        $resueltos   = $queryResueltos->count();
+
+        $estadoBoton = request()->query('estado', 'todos');
+
+        $queryTabla = Ticket::with(['user', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
+
+        if ($estadoBoton === 'resuelto,equivocado,no corresponde' || $estadoBoton === 'cerrado') {
+            $queryTabla->whereIn('estado_id', $estadosCerrados)
+                ->whereMonth('created_at', date('m'))
+                ->whereYear('created_at', date('Y'));
+        } else {
+            $queryTabla->whereNotIn('estado_id', $estadosCerrados);
+        }
+
+        if ($miUnidadId) {
+            $queryTabla->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+        }
+
+        $todosLosTickets = $queryTabla->latest()->get();
 
         //--tickets asignados al admin autenticado
         $ticketsAsignados = Ticket::where('tecnico_id', Auth::id())
@@ -259,7 +274,7 @@ class AdminController extends Controller
             ->with('sweet_success', 'Prioridad actualizada correctamente');
     }
 
-    //--- Actualizar Técnico ---
+    //---Actualizar Técnico---
     public function actualizarTecnico(Request $request, Ticket $ticket)
     {
         $request->validate([
