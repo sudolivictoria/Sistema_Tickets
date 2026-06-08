@@ -23,7 +23,6 @@ export default defineConfig({
                 "resources/js/admin.js",
                 "resources/js/usuario-menu.js",
                 "resources/js/historial.js",
-                "resources/js/reportes.js",
                 "resources/js/api.js",
             ],
             refresh: true,

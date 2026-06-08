@@ -71,12 +71,9 @@ $(document).ready(function () {
         });
 });
 
-/**
- * Filtro por estado
- */
-/****************** FILTROS OPTIMIZADOS ******************/
+/****************** FILTROS ******************/
 window.filtrarEstado = function (estado, btn) {
-    //--actualizar estilos de botones inmediatamente
+    //--actualizar estilos de botones
     $(".filtro-btn")
         .removeClass("bg-secondary text-white shadow-md")
         .addClass("bg-slate-100 text-slate-500");
@@ -84,29 +81,13 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-secondary text-white shadow-md");
 
-    //---deshabilitar temporalmente el buscador para evitar conflictos de renderizado
-    let valorBusqueda = "";
-    if (estado !== "todos") {
-        const estados = String(estado)
-            .split(",")
-            .map((e) => e.trim());
+    //---estado actual para mantener el filtro activo al refrescar
+    window.filtroSseActual = estado;
 
-        valorBusqueda = `(${estados.join("|")})`;
+    //----Reverb del filtro a la tabla
+    if (typeof window.AutoRefresco !== "undefined") {
+        window.AutoRefresco.forzarRefresco();
     }
-
-    //---ocultamos el cuerpo de la tabla un milisegundo antes para que el cambio de filas sea invisible al ojo
-    const $tbody = table.table().body();
-    $($tbody).css("opacity", "0.5"); 
-
-    //---filtros de estado nativos y síncronos (eliminamos el setTimeout errático)
-    table.column(3).search(valorBusqueda, true, false, true).draw(false);
-    
-    // Restablecemos la opacidad de golpe con las nuevas filas renderizadas
-    $($tbody).css("opacity", "1");
-};
-
-String.prototype.stripHtml = function () {
-    return this.replace(/<[^>]*>/g, "");
 };
 
 // =====================================================================

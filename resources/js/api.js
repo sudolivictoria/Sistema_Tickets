@@ -399,20 +399,3 @@ window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
 
 window.filtroSseActual = "todos";
 
-//---MANEJA CUALQUIER FILTRO
-document.addEventListener("click", function (event) {
-    const boton = event.target.closest(
-        '.filtro-btn, [onclick*="filtrarEstado"]',
-    );
-    if (boton) {
-        const estado = boton.getAttribute("data-estado") || "todos";
-        window.filtroSseActual = estado;
-
-        //--EVITA LLAMADA EN FALSO
-        setTimeout(() => {
-            if (typeof window.AutoRefresco !== "undefined") {
-                window.AutoRefresco.forzarRefresco();
-            }
-        }, 50);
-    }
-});

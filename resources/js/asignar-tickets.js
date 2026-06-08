@@ -52,6 +52,13 @@ window.inicializarTablaTickets = function (
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
+
+    //---ajuste tamaño de tabla
+    const $wrapper = $(tableElement).closest(".dataTables_wrapper");
+    $wrapper.addClass("relative w-full");
+    $(tableElement)
+        .addClass("w-full")
+        .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
 };
 
 // =====================================================================
@@ -86,28 +93,6 @@ $(document).ready(function () {
         window.inicializarTablaTickets(selectorTabla);
     }
 });
-
-/****************** FILTROS ******************/
-window.filtrarEstado = function (estado, btn) {
-    //--actualizar estilos de botones
-    $(".filtro-btn")
-        .removeClass("bg-secondary text-white shadow-md")
-        .addClass("bg-slate-100 text-slate-500");
-    $(btn)
-        .removeClass("bg-slate-100 text-slate-500")
-        .addClass("bg-secondary text-white shadow-md");
-
-    let valorBusqueda = "";
-    if (estado !== "todos") {
-        const estados = String(estado)
-            .split(",")
-            .map((e) => e.trim());
-
-        valorBusqueda = `(${estados.join("|")})`;
-    }
-    //---filtros de estado
-    table.column(2).search(valorBusqueda, true, false, true).draw();
-};
 
 /**
  * Gestión de Modal de detalles

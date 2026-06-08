@@ -23,7 +23,7 @@ window.inicializarTablaTickets = function (selectorId) {
         order: [[0, "desc"]],
         stateSave: false,
         language: {
-            emptyTable: `
+            zeroRecords: `
                 <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
                     <span class="material-symbols-outlined text-slate-300 text-4xl mb-2 select-none">folder_off</span>
                     <h5 class="text-xs font-black uppercase text-slate-400 tracking-widest">Bandeja Vacía</h5>
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
 $(document).ready(function () {
     // Inicializa la tabla apuntando al ID del Gestor
     window.inicializarTablaTickets("#tablaGestor");
-    
+
     $(document)
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
@@ -91,12 +91,9 @@ $(document).ready(function () {
         });
 });
 
-/**
- * Filtro por estado definitivo, con soporte para estados múltiples (sin parpadeos)
- */
-/****************** FILTROS OPTIMIZADOS ******************/
+/****************** FILTROS ******************/
 window.filtrarEstado = function (estado, btn) {
-    //--actualizar estilos de botones al instante
+    //--actualizar estilos de botones
     $(".filtro-btn")
         .removeClass("bg-secondary text-white shadow-md")
         .addClass("bg-slate-100 text-slate-500");
@@ -104,26 +101,13 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-secondary text-white shadow-md");
 
-    let valorBusqueda = "";
-    if (estado !== "todos") {
-        const estados = String(estado)
-            .split(",")
-            .map((e) => e.trim());
+    //---estado actual para mantener el filtro activo al refrescar
+    window.filtroSseActual = estado;
 
-        valorBusqueda = `(${estados.join("|")})`;
+    //----Reverb del filtro a la tabla
+    if (typeof window.AutoRefresco !== "undefined") {
+        window.AutoRefresco.forzarRefresco();
     }
-
-    const $tbody = table.table().body();
-    $($tbody).css("opacity", "0.5"); 
-
-    //---filtros de estado nativos pasando false para mantener posiciones estables
-    table.column(3).search(valorBusqueda, true, false, true).draw(false);
- 
-    $($tbody).css("opacity", "1");
-};
-
-String.prototype.stripHtml = function () {
-    return this.replace(/<[^>]*>/g, "");
 };
 
 /**
@@ -135,7 +119,7 @@ window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
     const fecha = document.getElementById("modalFechaApertura");
-    
+
     if (modal && titulo && desc && tipo && fecha) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;

@@ -14,6 +14,7 @@ window.inicializarTablaTickets = function (
     $.fn.dataTable.ext.pager.numbers_length = 1;
     table = tableElement.DataTable({
         stateSave: true,
+        stateDuration: 60,
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",
@@ -42,7 +43,7 @@ window.inicializarTablaTickets = function (
         responsive: false,
         autoWidth: false,
         pageLength: 5,
-        order: [[columnaOrden, sentido]], 
+        order: [[columnaOrden, sentido]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
@@ -52,6 +53,13 @@ window.inicializarTablaTickets = function (
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
+
+    //---ajuste tamaño de tabla
+    const $wrapper = $(tableElement).closest(".dataTables_wrapper");
+    $wrapper.addClass("relative w-full");
+    $(tableElement)
+        .addClass("w-full")
+        .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
 };
 
 // =====================================================================

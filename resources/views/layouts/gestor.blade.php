@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>@yield('title', 'Help Desk Istu - Gestor')</title>
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/logo_istu.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo_istu.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -155,7 +157,7 @@
     </div>
 
     <script>
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -166,7 +168,7 @@
         });
 
         //-----reloj 
-        window.iniciarReloj = function() {
+        window.iniciarReloj = function () {
             const contenedorReloj = document.getElementById('relojSistema');
             if (!contenedorReloj) return;
 
@@ -188,7 +190,7 @@
             setInterval(actualizarHora, 1000);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             iniciarReloj();
         });
     </script>

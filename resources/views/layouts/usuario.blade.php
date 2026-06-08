@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Help Desk Istu - Usuario</title>
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/logo_istu.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo_istu.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -93,8 +95,7 @@
         </div>
     </header>
 
-    <aside id="sidebar"
-        class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-secondary border-r border-blue-800 flex flex-col pt-32 p-4
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-secondary border-r border-blue-800 flex flex-col pt-32 p-4
     transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-50 lg:z-40">
         <nav class="space-y-3 flex-1">
             <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.dashboard') ? 'bg-primary text-secondary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
@@ -144,7 +145,7 @@
 
     <script>
         //-----------preloader 
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -155,7 +156,7 @@
         });
 
         //-----reloj 
-        window.iniciarReloj = function() {
+        window.iniciarReloj = function () {
             const contenedorReloj = document.getElementById('relojSistema');
             if (!contenedorReloj) return;
 
@@ -177,7 +178,7 @@
             setInterval(actualizarHora, 1000);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             iniciarReloj();
         });
     </script>

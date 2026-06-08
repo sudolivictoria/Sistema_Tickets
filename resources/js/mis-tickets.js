@@ -18,9 +18,9 @@ window.inicializarTablaTickets = function (selectorId) {
         language: {
             lengthMenu: "Mostrar _MENU_ registros",
             zeroRecords: `
-                     <div class="flex flex-col items-center h-[300px] justify-center py-10">
-                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_off</span>
-                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No hay datos disponibles</p>
+                    <div class="flex flex-col items-center h-[300px] justify-center py-10">
+                        <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">search_off</span>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No se encontraron resultados</p>
                     </div>`,
             emptyTable: `
                     <div class="flex flex-col items-center h-[300px] justify-center py-10">
@@ -52,6 +52,13 @@ window.inicializarTablaTickets = function (selectorId) {
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
+
+    //---ajuste tamaño de tabla
+    const $wrapper = $(tableElement).closest(".dataTables_wrapper");
+    $wrapper.addClass("relative w-full");
+    $(tableElement)
+        .addClass("w-full")
+        .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
 };
 
 // =====================================================================
@@ -85,23 +92,13 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-secondary text-white shadow-md");
 
-    setTimeout(() => {
-        let valorBusqueda = "";
-        if (estado !== "todos") {
-            const estados = String(estado)
-                .split(",")
-                .map((e) => e.trim());
+    //---estado actual para mantener el filtro activo al refrescar
+    window.filtroSseActual = estado;
 
-            valorBusqueda = `(${estados.join("|")})`;
-        }
-
-        //---filtros de estado
-        table.column(2).search(valorBusqueda, true, false, true).draw();
-    }, 10);
-};
-
-String.prototype.stripHtml = function () {
-    return this.replace(/<[^>]*>/g, "");
+    //----Reverb del filtro a la tabla
+    if (typeof window.AutoRefresco !== "undefined") {
+        window.AutoRefresco.forzarRefresco();
+    }
 };
 
 /**

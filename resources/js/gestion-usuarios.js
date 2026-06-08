@@ -7,12 +7,12 @@ $(document).ready(function () {
         language: {
             processing: "Procesando...",
             zeroRecords: `
-                    <div class="flex flex-col items-center justify-center py-10">
+                    <div class="flex flex-col items-center h-[300px] justify-center py-10">
                         <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">search_off</span>
                         <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No se encontraron resultados</p>
                     </div>`,
             emptyTable: `
-                    <div class="flex flex-col items-center justify-center py-10">
+                    <div class="flex flex-col items-center h-[300px] justify-center py-10">
                         <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_off</span>
                         <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No hay datos disponibles</p>
                     </div>`,
@@ -48,6 +48,12 @@ $(document).ready(function () {
         table.search(this.value).draw();
     });
 
+    const $wrapper = $("#userTable").closest(".dataTables_wrapper");
+    $wrapper.addClass("relative w-full");
+    $("#userTable")
+        .addClass("w-full")
+        .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
+
     //--toggle password visibility (Usando delegación de eventos)
     $(document).on("click", ".toggle-password", function () {
         const btn = $(this);
@@ -81,7 +87,7 @@ window.filtrarEstado = function (estado, btn) {
     table
         .column(6)
         .search(estado === "" ? "" : `^${estado}$`, true, false)
-        .draw();
+        .draw(false);
 };
 
 //---open/close modals
