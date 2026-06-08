@@ -47,15 +47,16 @@ class ClienteController extends Controller
         $todosLosTickets = Ticket::where('user_id', $userId)
             ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
             ->orderBy('created_at', 'desc')
-            ->take(5) 
+            ->take(5)
             ->get();
 
         //----Parámetros estáticos para modales de creación
         $categorias = Categoria::all();
         $prioridades = Prioridad::all();
         $tipos = TipoSolicitud::all();
+        $categoriasManuales = CategoriaManual::orderBy('nombre_categoria_manual')->get();
 
-        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos'));
+        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos', 'categoriasManuales'));
     }
 
     //---metodo para mostrar formulario de creacion de ticket
