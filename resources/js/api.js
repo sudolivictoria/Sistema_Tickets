@@ -5,7 +5,7 @@
 window.AutoRefresco = (() => {
     let isRefreshing = false;
 
-    //---bloquea refresco si el usuario esta trabajando
+    //------SEGURO
     function hayAccionEnCurso() {
         const modalAbierto = document.querySelector(
             ".modal:not(.hidden), #modalTicket:not(.hidden), #modalUsuario:not(.hidden), #modalAgregar:not(.hidden), #modalEditar:not(.hidden), .swal2-container:not(.hidden)",
@@ -32,7 +32,7 @@ window.AutoRefresco = (() => {
         else el.textContent = String(valor);
     }
 
-    //---procesamiento y rendimiento
+    //---PROCESAMIENTO Y REFRESCO
     function procesarTabla(htmlNuevo) {
         if (htmlNuevo === undefined || htmlNuevo === null || isRefreshing)
             return;
@@ -63,19 +63,16 @@ window.AutoRefresco = (() => {
                 let paginaActual = 0;
                 let buscadorTermino = "";
 
-                //---guarda estado actual y paginacion
                 try {
                     const dtInstancia = $tabla.DataTable();
                     paginaActual = dtInstancia.page();
                     buscadorTermino = dtInstancia.search();
                 } catch (_) {}
 
-                //---destruccion limpia
                 try {
                     $tabla.DataTable().destroy();
                 } catch (_) {}
 
-                //----insercion html
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(
                     "<table>" + htmlNuevo + "</table>",
@@ -84,7 +81,6 @@ window.AutoRefresco = (() => {
                 const tbodyEl = doc.querySelector("tbody");
                 tablaBody.innerHTML = tbodyEl ? tbodyEl.innerHTML : "";
 
-                //----reinicializacion
                 if (
                     tablaId === "userTable" &&
                     typeof window.inicializarUserTable === "function"
@@ -96,7 +92,6 @@ window.AutoRefresco = (() => {
                     window.inicializarTablaTickets("#" + tablaId);
                 }
 
-                //---clases estaticas e inyección de estados DataTables
                 try {
                     const dtNuevo = $tabla.DataTable();
                     if (buscadorTermino) {
@@ -108,10 +103,7 @@ window.AutoRefresco = (() => {
                     }
                     aplicarEstilosPaginacion();
                 } catch (err) {
-                    console.error(
-                        "[Reverb] Error al restaurar DataTables:",
-                        err,
-                    );
+                    console.error("[Reverb] Error al restaurar DataTables:", err);
                 }
             }
         } finally {
@@ -119,72 +111,47 @@ window.AutoRefresco = (() => {
         }
     }
 
-    //---estilos paginacion
+    //---ESTILOS DE PAGINACIÓN
     function aplicarEstilosPaginacion() {
         const wrappers = document.querySelectorAll(".dataTables_wrapper");
         wrappers.forEach((wrap) => {
             if (wrap.id === "tablaHistorial_wrapper") return;
 
-            const lengthSelect = wrap.querySelector(
-                ".dataTables_length select",
-            );
+            const lengthSelect = wrap.querySelector(".dataTables_length select");
             if (lengthSelect) {
                 lengthSelect.className =
                     "mx-2 px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl focus:outline-none";
             }
 
-            const paginateContainer = wrap.querySelector(
-                ".dataTables_paginate",
-            );
+            const paginateContainer = wrap.querySelector(".dataTables_paginate");
             if (paginateContainer) {
                 paginateContainer.className =
                     "dataTables_paginate flex items-center gap-1.5 mt-4 justify-center md:justify-end w-full text-slate-600 text-xs font-medium ml-auto";
 
-                const links = paginateContainer.querySelectorAll(
-                    "a, .paginate_button",
-                );
+                const links = paginateContainer.querySelectorAll("a, .paginate_button");
                 wrapperLinks(links);
             }
         });
     }
 
-    //---estilos paginacion, reutilizable para cualquier conjunto de links
+    //--ESTILOS DE PAGINACIÓN: CLASES DINÁMICAS PARA ESTADOS
     function wrapperLinks(links) {
         links.forEach((btn) => {
             btn.removeAttribute("style");
             btn.className =
                 "px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border select-none no-underline inline-block ";
 
-            if (
-                btn.classList.contains("current") ||
-                btn.classList.contains("active")
-            ) {
-                btn.classList.add(
-                    "bg-secondary",
-                    "text-white",
-                    "border-secondary",
-                    "shadow-sm",
-                );
+            if (btn.classList.contains("current") || btn.classList.contains("active")) {
+                btn.classList.add("bg-secondary", "text-white", "border-secondary", "shadow-sm");
             } else if (btn.classList.contains("disabled")) {
-                btn.classList.add(
-                    "bg-slate-50",
-                    "text-slate-300",
-                    "border-slate-100",
-                    "pointer-events-none",
-                );
+                btn.classList.add("bg-slate-50", "text-slate-300", "border-slate-100", "pointer-events-none");
             } else {
-                btn.classList.add(
-                    "bg-slate-100",
-                    "text-slate-600",
-                    "border-slate-200",
-                    "hover:bg-slate-200",
-                    "hover:text-slate-900",
-                );
+                btn.classList.add("bg-slate-100", "text-slate-600", "border-slate-200", "hover:bg-slate-200", "hover:text-slate-900");
             }
         });
     }
 
-    //---inicializacion y conexion
+    //------SSE: INICIAR, DETENER Y FORZAR REFRESCO
     function iniciar() {
         detener();
         const tablaElement = document.querySelector(
@@ -195,12 +162,9 @@ window.AutoRefresco = (() => {
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) return;
 
-        const tipoTabla =
-            tablaElement.id === "tablaHistorial"
-                ? "historial"
-                : tablaBody.getAttribute("data-tipo") || "dashboard";
+        let tipoTablaRaw = tablaElement.id === "tablaHistorial" ? "historial" : tablaBody.getAttribute("data-tipo") || "dashboard";
+        const tipoTabla = tipoTablaRaw.toLowerCase().replace('-', '_');
 
-        //---deteccion filtrados
         let filtroEstado = "todos";
         const botonActivo = document.querySelector(
             '.filtro-btn.bg-secondary, .filtro-btn.active, [id="filtrosEstado"] .bg-secondary',
@@ -215,12 +179,11 @@ window.AutoRefresco = (() => {
             filtroEstado.includes(",") &&
             tipoTabla !== "asignados" &&
             tipoTabla !== "dashboard" &&
-            tipoTabla !== "mis-tickets"
+            tipoTabla !== "mis_tickets" 
         ) {
             filtroEstado = "cerrado";
         }
 
-        //==============================CONEXIÓN WEBSOCKETS (REVERB)====================================
         if (window.Echo) {
             window.Echo.channel("tickets-publicos").listen(
                 ".TicketActualizado",
@@ -239,63 +202,33 @@ window.AutoRefresco = (() => {
                             }
                             procesarTabla(data.html);
 
-                            //**********CONTADORES Y METRICAS******************/
                             if (data.contadores) {
-                                actualizarElemento(
-                                    "contador-abiertos",
-                                    data.contadores.abiertos,
-                                );
-                                actualizarElemento(
-                                    "contador-proceso",
-                                    data.contadores.proceso,
-                                );
-                                actualizarElemento(
-                                    "contador-resueltos",
-                                    data.contadores.resueltos,
-                                );
+                                actualizarElemento("contador-abiertos", data.contadores.abiertos);
+                                actualizarElemento("contador-proceso", data.contadores.proceso);
+                                actualizarElemento("contador-resueltos", data.contadores.resueltos);
                             }
                             if (data.contadorAsignados !== undefined)
-                                actualizarElemento(
-                                    "contador-asignados",
-                                    data.contadorAsignados,
-                                );
+                                actualizarElemento("contador-asignados", data.contadorAsignados);
+                            
                             if (data.grafico)
-                                actualizarElemento(
-                                    "barras-rendimiento",
-                                    data.grafico,
-                                    true,
-                                );
+                                actualizarElemento("barras-rendimiento", data.grafico, true);
+                                
                             if (data.cargaTrabajo !== undefined)
-                                actualizarElemento(
-                                    "metric-carga-trabajo",
-                                    data.cargaTrabajo,
-                                );
+                                actualizarElemento("metric-carga-trabajo", data.cargaTrabajo);
                             if (data.resueltos24h !== undefined)
-                                actualizarElemento(
-                                    "metric-resueltos-24h",
-                                    data.resueltos24h,
-                                );
+                                actualizarElemento("metric-resueltos-24h", data.resueltos24h);
                             if (data.tasaCierre !== undefined)
-                                actualizarElemento(
-                                    "metric-tasa-cierre",
-                                    data.tasaCierre + "%",
-                                );
+                                actualizarElemento("metric-tasa-cierre", data.tasaCierre + "%");
                         })
-                        .catch((err) =>
-                            console.error(
-                                "[Reverb] Error al hacer fetch:",
-                                err,
-                            ),
-                        );
+                        .catch((err) => console.error("[Reverb] Error al hacer fetch:", err));
                 },
             );
         } else {
-            console.warn(
-                "[Reverb] window.Echo no está definido. Asegúrate de compilar con Vite.",
-            );
+            console.warn("[Reverb] window.Echo no está definido.");
         }
     }
 
+    //------SSE: DETENER
     function detener() {
         if (window.Echo) {
             window.Echo.leaveChannel("tickets-publicos");
@@ -315,17 +248,15 @@ window.AutoRefresco = (() => {
             const tablaBody = tablaElement.querySelector("tbody");
             if (!tablaBody) return;
 
-            const tipoTabla =
-                tablaElement.id === "tablaHistorial"
-                    ? "historial"
-                    : tablaBody.getAttribute("data-tipo") || "dashboard";
+            let tipoTablaRaw = tablaElement.id === "tablaHistorial" ? "historial" : tablaBody.getAttribute("data-tipo") || "dashboard";
+            const tipoTabla = tipoTablaRaw.toLowerCase().replace('-', '_');
 
             let filtroEstado = window.filtroSseActual || "todos";
             if (
                 filtroEstado.includes(",") &&
                 tipoTabla !== "asignados" &&
                 tipoTabla !== "dashboard" &&
-                tipoTabla !== "mis-tickets"
+                tipoTabla !== "mis_tickets"
             ) {
                 filtroEstado = "cerrado";
             }
@@ -346,22 +277,15 @@ window.AutoRefresco = (() => {
 
 window.AutoRefrescoSSE = window.AutoRefresco;
 
-// =============================================================
-// INTERCEPCIÓN Y DISPARADORES SEGUROS DE JQUERY / DOM
-// =============================================================
+//------INICIALIZACIÓN AUTOMÁTICA AL CARGAR LA PÁGINA
 document.addEventListener("DOMContentLoaded", function () {
     if (window.$ && $.fn.DataTable) {
         $(document).on("draw.dt", function (e, settings) {
-            if (
-                settings &&
-                settings.nTable &&
-                settings.nTable.id === "tablaHistorial"
-            )
+            if (settings && settings.nTable && settings.nTable.id === "tablaHistorial")
                 return;
             window.AutoRefresco.aplicarEstilosPaginacion();
         });
     }
-    //---CONEXION EN TIEMPO REAL
     window.AutoRefresco.iniciar();
 });
 
@@ -375,27 +299,15 @@ window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
     const contenedorFiltros = elementoBoton.closest("#filtrosEstado, .flex");
     if (contenedorFiltros) {
         contenedorFiltros.querySelectorAll(".filtro-btn").forEach((btn) => {
-            btn.classList.remove(
-                "bg-secondary",
-                "active",
-                "text-white",
-                "shadow-md",
-            );
+            btn.classList.remove("bg-secondary", "active", "text-white", "shadow-md");
             btn.classList.add("bg-slate-100", "text-slate-500");
         });
     }
     elementoBoton.classList.remove("bg-slate-100", "text-slate-500");
-    elementoBoton.classList.add(
-        "bg-secondary",
-        "active",
-        "text-white",
-        "shadow-md",
-    );
+    elementoBoton.classList.add("bg-secondary", "active", "text-white", "shadow-md");
 
-    //---ESTADO E INICIAR
     window.filtroSseActual = estadoObjetivo;
     window.AutoRefresco.forzarRefresco();
 };
 
 window.filtroSseActual = "todos";
-
