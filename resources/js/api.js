@@ -103,7 +103,10 @@ window.AutoRefresco = (() => {
                     }
                     aplicarEstilosPaginacion();
                 } catch (err) {
-                    console.error("[Reverb] Error al restaurar DataTables:", err);
+                    console.error(
+                        "[Reverb] Error al restaurar DataTables:",
+                        err,
+                    );
                 }
             }
         } finally {
@@ -117,18 +120,24 @@ window.AutoRefresco = (() => {
         wrappers.forEach((wrap) => {
             if (wrap.id === "tablaHistorial_wrapper") return;
 
-            const lengthSelect = wrap.querySelector(".dataTables_length select");
+            const lengthSelect = wrap.querySelector(
+                ".dataTables_length select",
+            );
             if (lengthSelect) {
                 lengthSelect.className =
                     "mx-2 px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl focus:outline-none";
             }
 
-            const paginateContainer = wrap.querySelector(".dataTables_paginate");
+            const paginateContainer = wrap.querySelector(
+                ".dataTables_paginate",
+            );
             if (paginateContainer) {
                 paginateContainer.className =
                     "dataTables_paginate flex items-center gap-1.5 mt-4 justify-center md:justify-end w-full text-slate-600 text-xs font-medium ml-auto";
 
-                const links = paginateContainer.querySelectorAll("a, .paginate_button");
+                const links = paginateContainer.querySelectorAll(
+                    "a, .paginate_button",
+                );
                 wrapperLinks(links);
             }
         });
@@ -141,12 +150,31 @@ window.AutoRefresco = (() => {
             btn.className =
                 "px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border select-none no-underline inline-block ";
 
-            if (btn.classList.contains("current") || btn.classList.contains("active")) {
-                btn.classList.add("bg-secondary", "text-white", "border-secondary", "shadow-sm");
+            if (
+                btn.classList.contains("current") ||
+                btn.classList.contains("active")
+            ) {
+                btn.classList.add(
+                    "bg-secondary",
+                    "text-white",
+                    "border-secondary",
+                    "shadow-sm",
+                );
             } else if (btn.classList.contains("disabled")) {
-                btn.classList.add("bg-slate-50", "text-slate-300", "border-slate-100", "pointer-events-none");
+                btn.classList.add(
+                    "bg-slate-50",
+                    "text-slate-300",
+                    "border-slate-100",
+                    "pointer-events-none",
+                );
             } else {
-                btn.classList.add("bg-slate-100", "text-slate-600", "border-slate-200", "hover:bg-slate-200", "hover:text-slate-900");
+                btn.classList.add(
+                    "bg-slate-100",
+                    "text-slate-600",
+                    "border-slate-200",
+                    "hover:bg-slate-200",
+                    "hover:text-slate-900",
+                );
             }
         });
     }
@@ -162,8 +190,11 @@ window.AutoRefresco = (() => {
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) return;
 
-        let tipoTablaRaw = tablaElement.id === "tablaHistorial" ? "historial" : tablaBody.getAttribute("data-tipo") || "dashboard";
-        const tipoTabla = tipoTablaRaw.toLowerCase().replace('-', '_');
+        let tipoTablaRaw =
+            tablaElement.id === "tablaHistorial"
+                ? "historial"
+                : tablaBody.getAttribute("data-tipo") || "dashboard";
+        const tipoTabla = tipoTablaRaw.toLowerCase().replace("-", "_");
 
         let filtroEstado = "todos";
         const botonActivo = document.querySelector(
@@ -179,7 +210,7 @@ window.AutoRefresco = (() => {
             filtroEstado.includes(",") &&
             tipoTabla !== "asignados" &&
             tipoTabla !== "dashboard" &&
-            tipoTabla !== "mis_tickets" 
+            tipoTabla !== "mis_tickets"
         ) {
             filtroEstado = "cerrado";
         }
@@ -203,24 +234,53 @@ window.AutoRefresco = (() => {
                             procesarTabla(data.html);
 
                             if (data.contadores) {
-                                actualizarElemento("contador-abiertos", data.contadores.abiertos);
-                                actualizarElemento("contador-proceso", data.contadores.proceso);
-                                actualizarElemento("contador-resueltos", data.contadores.resueltos);
+                                actualizarElemento(
+                                    "contador-abiertos",
+                                    data.contadores.abiertos,
+                                );
+                                actualizarElemento(
+                                    "contador-proceso",
+                                    data.contadores.proceso,
+                                );
+                                actualizarElemento(
+                                    "contador-resueltos",
+                                    data.contadores.resueltos,
+                                );
                             }
                             if (data.contadorAsignados !== undefined)
-                                actualizarElemento("contador-asignados", data.contadorAsignados);
-                            
-                            if (data.grafico)
-                                actualizarElemento("barras-rendimiento", data.grafico, true);
-                                
+                                actualizarElemento(
+                                    "contador-asignados",
+                                    data.contadorAsignados,
+                                );
+
+                            const contenedorGrafico =
+                                document.getElementById("barras-rendimiento");
+                            if (contenedorGrafico && data.grafico) {
+                                contenedorGrafico.innerHTML = data.grafico;
+                            }
+
                             if (data.cargaTrabajo !== undefined)
-                                actualizarElemento("metric-carga-trabajo", data.cargaTrabajo);
+                                actualizarElemento(
+                                    "metric-carga-trabajo",
+                                    data.cargaTrabajo,
+                                );
                             if (data.resueltos24h !== undefined)
-                                actualizarElemento("metric-resueltos-24h", data.resueltos24h);
+                                actualizarElemento(
+                                    "metric-resueltos-24h",
+                                    data.resueltos24h,
+                                );
                             if (data.tasaCierre !== undefined)
-                                actualizarElemento("metric-tasa-cierre", data.tasaCierre + "%");
+                                actualizarElemento(
+                                    "metric-tasa-cierre",
+                                    data.tasaCierre + "%",
+                                );
                         })
-                        .catch((err) => console.error("[Reverb] Error al hacer fetch:", err));
+                        .catch((err) =>
+                            console.error(
+                                "[Reverb] Error al hacer fetch:",
+                                err,
+                            ),
+                        );
                 },
             );
         } else {
@@ -248,8 +308,11 @@ window.AutoRefresco = (() => {
             const tablaBody = tablaElement.querySelector("tbody");
             if (!tablaBody) return;
 
-            let tipoTablaRaw = tablaElement.id === "tablaHistorial" ? "historial" : tablaBody.getAttribute("data-tipo") || "dashboard";
-            const tipoTabla = tipoTablaRaw.toLowerCase().replace('-', '_');
+            let tipoTablaRaw =
+                tablaElement.id === "tablaHistorial"
+                    ? "historial"
+                    : tablaBody.getAttribute("data-tipo") || "dashboard";
+            const tipoTabla = tipoTablaRaw.toLowerCase().replace("-", "_");
 
             let filtroEstado = window.filtroSseActual || "todos";
             if (
@@ -281,7 +344,11 @@ window.AutoRefrescoSSE = window.AutoRefresco;
 document.addEventListener("DOMContentLoaded", function () {
     if (window.$ && $.fn.DataTable) {
         $(document).on("draw.dt", function (e, settings) {
-            if (settings && settings.nTable && settings.nTable.id === "tablaHistorial")
+            if (
+                settings &&
+                settings.nTable &&
+                settings.nTable.id === "tablaHistorial"
+            )
                 return;
             window.AutoRefresco.aplicarEstilosPaginacion();
         });
@@ -299,12 +366,22 @@ window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
     const contenedorFiltros = elementoBoton.closest("#filtrosEstado, .flex");
     if (contenedorFiltros) {
         contenedorFiltros.querySelectorAll(".filtro-btn").forEach((btn) => {
-            btn.classList.remove("bg-secondary", "active", "text-white", "shadow-md");
+            btn.classList.remove(
+                "bg-secondary",
+                "active",
+                "text-white",
+                "shadow-md",
+            );
             btn.classList.add("bg-slate-100", "text-slate-500");
         });
     }
     elementoBoton.classList.remove("bg-slate-100", "text-slate-500");
-    elementoBoton.classList.add("bg-secondary", "active", "text-white", "shadow-md");
+    elementoBoton.classList.add(
+        "bg-secondary",
+        "active",
+        "text-white",
+        "shadow-md",
+    );
 
     window.filtroSseActual = estadoObjetivo;
     window.AutoRefresco.forzarRefresco();

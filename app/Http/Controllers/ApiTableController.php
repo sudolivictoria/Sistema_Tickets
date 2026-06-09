@@ -176,6 +176,10 @@ class ApiTableController extends Controller
 
     private function generarGrafico(int $miUnidadId): string
     {
+        if (request()->query('tipo') !== 'dashboard') {
+            return '';
+        }
+
         try {
             $añoActual = (int) date('Y');
             $query = Ticket::whereYear('created_at', $añoActual);
@@ -185,6 +189,10 @@ class ApiTableController extends Controller
             }
 
             $ticketsAño = $query->selectRaw('MONTH(created_at) as mes, estado_id')->get();
+
+            if ($ticketsAño->isEmpty()) {
+                return '<div class="text-slate-400 text-xs p-4 text-center">Sin datos para el gráfico.</div>';
+            }
 
             $resueltosPorMes = array_fill(1, 12, 0);
             $totalesPorMes   = array_fill(1, 12, 0);
@@ -209,7 +217,7 @@ class ApiTableController extends Controller
             return view('partials.grafico_rendimiento', ['porcentajesExito' => $porcentajes])->render();
         } catch (Throwable $e) {
             Log::error("Error en gráfico: " . $e->getMessage());
-            return '<div class="text-danger p-4">No se pudo cargar el gráfico.</div>';
+            return '';
         }
     }
 
