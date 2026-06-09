@@ -179,9 +179,33 @@ window.AutoRefresco = (() => {
         });
     }
 
+    function restaurarElementosGlobales() {
+        const cachedGrafico = localStorage.getItem("global_grafico_html");
+        const contenedorGrafico = document.getElementById("barras-rendimiento");
+        if (contenedorGrafico && cachedGrafico) {
+            contenedorGrafico.innerHTML = cachedGrafico;
+        }
+
+        const contadores = ["abiertos", "proceso", "resueltos", "asignados"];
+        contadores.forEach(key => {
+            const cachedVal = localStorage.getItem(`global_contador_${key}`);
+            if (cachedVal) actualizarElemento(`contador-${key}`, cachedVal);
+        });
+
+        //------------METRICAS
+        const metricas = ["carga-trabajo", "resueltos-24h", "tasa-cierre"];
+        metricas.forEach(key => {
+            const cachedVal = localStorage.getItem(`global_metric_${key}`);
+            if (cachedVal) actualizarElemento(`metric-${key}`, cachedVal);
+        });
+    }
+
     //------SSE: INICIAR, DETENER Y FORZAR REFRESCO
     function iniciar() {
         detener();
+
+        restaurarElementosGlobales();
+
         const tablaElement = document.querySelector(
             '.dataTable, table[id*="tabla"], table[id*="Table"]',
         );
@@ -208,7 +232,6 @@ window.AutoRefresco = (() => {
 
         if (
             filtroEstado.includes(",") &&
-            tipoTabla !== "asignados" &&
             tipoTabla !== "dashboard" &&
             tipoTabla !== "mis_tickets"
         ) {
@@ -234,52 +257,44 @@ window.AutoRefresco = (() => {
                             procesarTabla(data.html);
 
                             if (data.contadores) {
-                                actualizarElemento(
-                                    "contador-abiertos",
-                                    data.contadores.abiertos,
-                                );
-                                actualizarElemento(
-                                    "contador-proceso",
-                                    data.contadores.proceso,
-                                );
-                                actualizarElemento(
-                                    "contador-resueltos",
-                                    data.contadores.resueltos,
-                                );
+                                actualizarElemento("contador-abiertos", data.contadores.abiertos);
+                                actualizarElemento("contador-proceso", data.contadores.proceso);
+                                actualizarElemento("contador-resueltos", data.contadores.resueltos);
+                                
+                                localStorage.setItem("global_contador_abiertos", data.contadores.abiertos);
+                                localStorage.setItem("global_contador_proceso", data.contadores.proceso);
+                                localStorage.setItem("global_contador_resueltos", data.contadores.resueltos);
                             }
-                            if (data.contadorAsignados !== undefined)
-                                actualizarElemento(
-                                    "contador-asignados",
-                                    data.contadorAsignados,
-                                );
-
-                            const contenedorGrafico =
-                                document.getElementById("barras-rendimiento");
-                            if (contenedorGrafico && data.grafico) {
-                                contenedorGrafico.innerHTML = data.grafico;
+                            
+                            if (data.contadorAsignados !== undefined) {
+                                actualizarElemento("contador-asignados", data.contadorAsignados);
+                                localStorage.setItem("global_contador_asignados", data.contadorAsignados);
                             }
 
-                            if (data.cargaTrabajo !== undefined)
-                                actualizarElemento(
-                                    "metric-carga-trabajo",
-                                    data.cargaTrabajo,
-                                );
-                            if (data.resueltos24h !== undefined)
-                                actualizarElemento(
-                                    "metric-resueltos-24h",
-                                    data.resueltos24h,
-                                );
-                            if (data.tasaCierre !== undefined)
-                                actualizarElemento(
-                                    "metric-tasa-cierre",
-                                    data.tasaCierre + "%",
-                                );
+                            if (data.grafico !== undefined && data.grafico !== '') {
+                                localStorage.setItem("global_grafico_html", data.grafico);
+                                const contenedorGrafico = document.getElementById("barras-rendimiento");
+                                if (contenedorGrafico) {
+                                    contenedorGrafico.innerHTML = data.grafico;
+                                }
+                            }
+
+                            if (data.cargaTrabajo !== undefined) {
+                                actualizarElemento("metric-carga-trabajo", data.cargaTrabajo);
+                                localStorage.setItem("global_metric_carga-trabajo", data.cargaTrabajo);
+                            }
+                            if (data.resueltos24h !== undefined) {
+                                actualizarElemento("metric-resueltos-24h", data.resueltos24h);
+                                localStorage.setItem("global_metric_resueltos-24h", data.resueltos24h);
+                            }
+                            if (data.tasaCierre !== undefined) {
+                                const formatoTasa = data.tasaCierre + "%";
+                                actualizarElemento("metric-tasa-cierre", formatoTasa);
+                                localStorage.setItem("global_metric_tasa-cierre", formatoTasa);
+                            }
                         })
                         .catch((err) =>
-                            console.error(
-                                "[Reverb] Error al hacer fetch:",
-                                err,
-                            ),
+                            console.error("[Reverb] Error al hacer fetch:", err),
                         );
                 },
             );
@@ -330,11 +345,16 @@ window.AutoRefresco = (() => {
                 .then((data) => {
                     if (!data.error) {
                         procesarTabla(data.html);
+                        
+                        if (data.grafico !== undefined && data.grafico !== '') {
+                            localStorage.setItem("global_grafico_html", data.grafico);
+                        }
                     }
                 })
                 .catch((err) => console.error(err));
         },
         aplicarEstilosPaginacion,
+        restaurarElementosGlobales 
     };
 })();
 

@@ -49,14 +49,13 @@ class ApiTableController extends Controller
             $estadoFiltro = (string) $request->query('estado', 'todos');
             $miUnidadId = (int) $user->unidad_id;
 
-            //--------CONTADORES PRINCIPALES PARA DASHBOARD Y USUARIO--------
+            //-------- CONTADORES PRINCIPALES --------
             $queryAbiertos  = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
             $queryProceso   = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
             $queryResueltos = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
                 ->whereMonth('created_at', date('m'))
                 ->whereYear('created_at', date('Y'));
 
-            //--------FILTRADO POR UNIDAD
             if ($miUnidadId && in_array($user->rol_id, [1, 3])) {
                 $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
                 $queryAbiertos->whereHas('categoria', $filterUnidad);
@@ -64,7 +63,6 @@ class ApiTableController extends Controller
                 $queryResueltos->whereHas('categoria', $filterUnidad);
             }
 
-            //------CLIENTES SOLO VEN SUS TICKETS EN LOS CONTADORES PRINCIPALES
             if ($user->rol_id == 2) {
                 $queryAbiertos->where('user_id', $user->id);
                 $queryProceso->where('user_id', $user->id);
@@ -81,17 +79,16 @@ class ApiTableController extends Controller
                 ->where('estado_id', 2)
                 ->count();
 
+            //-------- CONSULTA PRINCIPAL PARA ENRUTAR LA TABLA REQUERIDA --------
             $query = Ticket::with(['user', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
 
-            //--------APLICAR FILTROS BASES SEGÚN TIPO DE TABLA Y ROL DE USUARIO--------
             $this->aplicarFiltrosBase($query, $user, $tipo, $miUnidadId);
             $this->inyectarFiltroEstado($query, $estadoFiltro);
 
             $limit = ($tipo === 'usuario') ? 5 : null;
             $ticketsResult = $limit ? $query->latest()->limit($limit)->get() : $query->latest()->get();
 
-            //------RENDERIZAR GRÁFICO SOLO PARA DASHBOARD PRINCIPAL Y USUARIOS CON ROL ADMIN O TECNICO
-            $graficoHtml = ($tipo === 'dashboard' && in_array($user->rol_id, [1, 3])) ? $this->generarGrafico($miUnidadId) : '';
+            $graficoHtml = in_array($user->rol_id, [1, 3]) ? $this->generarGrafico($miUnidadId) : '';
 
             [$cargaTrabajo, $resueltos24h, $tasaCierre] = ($tipo === 'historial')
                 ? $this->calcularMetricas($ticketsResult)
@@ -119,7 +116,6 @@ class ApiTableController extends Controller
             return;
         }
 
-        //-------------DASHBOARD PRINCIPAL: FILTRADO POR ESTADO Y UNIDAD DE MANERA SEGURA PARA CLIENTES Y STAFF----------------
         if ($tipo === 'dashboard') {
             $estadoBoton = request()->query('estado', 'todos');
 
@@ -144,6 +140,8 @@ class ApiTableController extends Controller
         if ($tipo === 'asignar' || $tipo === 'mis_asignados') {
             if ($tipo === 'mis_asignados') {
                 $query->where('tecnico_id', $user->id);
+            } else {
+                $query->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
             }
             if ($miUnidadId) {
                 $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
@@ -176,22 +174,19 @@ class ApiTableController extends Controller
 
     private function generarGrafico(int $miUnidadId): string
     {
-        if (request()->query('tipo') !== 'dashboard') {
-            return '';
-        }
-
         try {
             $añoActual = (int) date('Y');
-            $query = Ticket::whereYear('created_at', $añoActual);
+
+            $queryGrafico = Ticket::whereYear('created_at', $añoActual);
 
             if ($miUnidadId) {
-                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+                $queryGrafico->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
             }
 
-            $ticketsAño = $query->selectRaw('MONTH(created_at) as mes, estado_id')->get();
+            $ticketsAño = $queryGrafico->selectRaw('MONTH(created_at) as mes, estado_id')->get();
 
             if ($ticketsAño->isEmpty()) {
-                return '<div class="text-slate-400 text-xs p-4 text-center">Sin datos para el gráfico.</div>';
+                return '<div class="text-slate-400 text-xs p-4 text-center">Sin datos suficientes para el gráfico.</div>';
             }
 
             $resueltosPorMes = array_fill(1, 12, 0);
@@ -241,12 +236,12 @@ class ApiTableController extends Controller
     private function renderizarVista(string $tipo, $ticketsResult, int $miUnidadId): string
     {
         return match ($tipo) {
-            'dashboard'   => view('partials.filas_dashboard', ['todosLosTickets' => $ticketsResult])->render(),
-            'usuario'     => view('partials.filas_usuario', ['todosLosTickets' => $ticketsResult])->render(),
-            'mis_tickets' => view('partials.filas_mis_tickets', ['misTickets' => $ticketsResult])->render(),
-            'historial'   => view('partials.filas_historial', ['tickets' => $ticketsResult])->render(),
-            'recursos'    => view('partials.filas_recursos', ['manuales' => Manual::with('categoria')->latest()->get()])->render(),
-            'asignar' => view('partials.filas_asignar', [
+            'dashboard'     => view('partials.filas_dashboard', ['todosLosTickets' => $ticketsResult])->render(),
+            'usuario'       => view('partials.filas_usuario', ['todosLosTickets' => $ticketsResult])->render(),
+            'mis_tickets'   => view('partials.filas_mis_tickets', ['misTickets' => $ticketsResult])->render(),
+            'historial'     => view('partials.filas_historial', ['tickets' => $ticketsResult])->render(),
+            'recursos'      => view('partials.filas_recursos', ['manuales' => Manual::with('categoria')->latest()->get()])->render(),
+            'asignar'       => view('partials.filas_asignar', [
                 'tickets'  => $ticketsResult,
                 'tecnicos' => User::where('unidad_id', $miUnidadId)->where('activo', true)->get(),
             ])->render(),
