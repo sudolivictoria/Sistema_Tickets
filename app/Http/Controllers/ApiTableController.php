@@ -32,11 +32,7 @@ class ApiTableController extends Controller
             return response()->json(['error' => 'No autenticado.'], 401);
         }
 
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_write_close();
-        }
-
-        $tipo = (string) $request->query('tipo', 'dashboard');
+        $tipo = (string) $request->input('tipo', 'dashboard');
 
         if (!in_array($tipo, self::TIPOS_VALIDOS, true) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
             return response()->json(['error' => 'Tipo de tabla no válido.'], 400);
