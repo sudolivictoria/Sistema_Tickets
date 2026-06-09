@@ -5,7 +5,6 @@
 window.AutoRefresco = (() => {
     let isRefreshing = false;
 
-    //------SEGURO
     function hayAccionEnCurso() {
         const modalAbierto = document.querySelector(
             ".modal:not(.hidden), #modalTicket:not(.hidden), #modalUsuario:not(.hidden), #modalAgregar:not(.hidden), #modalEditar:not(.hidden), .swal2-container:not(.hidden)",
@@ -25,359 +24,162 @@ window.AutoRefresco = (() => {
         );
     }
 
-    function actualizarElemento(id, valor, esHTML = false) {
-        const el = document.getElementById(id);
-        if (!el || valor === undefined || valor === null) return;
-        if (esHTML) el.innerHTML = valor;
-        else el.textContent = String(valor);
+    function procesarTabla(tablaId, htmlNuevo) {
+        const tablaElement = document.getElementById(tablaId);
+        if (!tablaElement || !htmlNuevo) return;
+
+        const tbody = tablaElement.querySelector("tbody") || tablaElement;
+
+        // Guardamos el scroll para evitar saltos molestos de pantalla
+        const scrollX = window.scrollX;
+        const scrollY = window.scrollY;
+
+        tbody.innerHTML = htmlNuevo;
+
+        window.scrollTo(scrollX, scrollY);
     }
 
-    //---PROCESAMIENTO Y REFRESCO
-    function procesarTabla(htmlNuevo) {
-        if (htmlNuevo === undefined || htmlNuevo === null || isRefreshing)
+    function restaurarElementosGlobales(contadores, metricas) {
+        // Sincronizar contadores superiores con el HTML
+        if (contadores) {
+            const mappings = {
+                abiertos: "contador-abiertos",
+                proceso: "contador-proceso",
+                resueltos: "contador-resueltos",
+                asignados: "contador-asignados",
+            };
+
+            Object.keys(mappings).forEach((key) => {
+                const elementId = mappings[key];
+                const el = document.getElementById(elementId);
+                if (el && contadores[key] !== undefined) {
+                    el.textContent = String(contadores[key]);
+                }
+            });
+        }
+
+        // Sincronizar métricas de KPI en Historial
+        if (metricas) {
+            const metricMappings = {
+                cargaTrabajo: "metric-carga-trabajo",
+                resueltos24h: "metric-resueltos-24h",
+                tasaCierre: "metric-tasa-cierre",
+            };
+
+            Object.keys(metricMappings).forEach((key) => {
+                const elementId = metricMappings[key];
+                const el = document.getElementById(elementId);
+                if (el && metricas[key] !== undefined) {
+                    el.textContent =
+                        key === "tasaCierre"
+                            ? `${metricas[key]}%`
+                            : String(metricas[key]);
+                }
+            });
+        }
+    }
+
+    async function ejecutarPeticionRefresco() {
+        if (isRefreshing) return;
+
+        // 1. Buscamos CUALQUIER elemento que tenga tu atributo "data-tipo"
+        const contenedorConTipo = document.querySelector("[data-tipo]");
+        if (!contenedorConTipo) return;
+
+        // Aseguramos que no haya modales abiertos antes de refrescar
+        if (hayAccionEnCurso()) {
+            console.log("[AutoRefresco] Pausado por actividad del usuario.");
             return;
+        }
+
+        // 2. Leemos tu atributo original "data-tipo" (ej: "mis_tickets" o "mis_asignados")
+        const tipoTabla = contenedorConTipo.getAttribute("data-tipo");
+        const filtroEstado = window.filtroSseActual || "todos";
 
         isRefreshing = true;
 
         try {
-            const tablaElement = document.querySelector(
-                '.dataTable, table[id*="tabla"], table[id*="Table"]',
+            const token = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content");
+
+            // CORRECCIÓN: Pasamos el tipo en la URL (?tipo=...) para que tu controlador actual lo lea sin problemas
+            const response = await fetch(
+                `/api/table/refresh?tipo=${tipoTabla}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": token,
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify({
+                        estado: filtroEstado,
+                    }),
+                },
             );
-            if (!tablaElement) return;
 
-            const tablaId = tablaElement.id;
-            const tablaBody = tablaElement.querySelector("tbody");
-            if (!tablaBody) return;
+            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
-            if (tablaId !== "tablaHistorial") {
-                if (
-                    !window.$ ||
-                    !$.fn.DataTable ||
-                    !$.fn.DataTable.isDataTable(tablaElement)
-                ) {
-                    tablaBody.innerHTML = htmlNuevo;
-                    return;
+            const data = await response.json();
+
+            if (data.success) {
+                // Buscamos la tabla para inyectar las filas en su respectivo tbody
+                const tablaElement = document.querySelector("table");
+                if (tablaElement) {
+                    const tbody =
+                        tablaElement.querySelector("tbody") || tablaElement;
+
+                    const scrollX = window.scrollX;
+                    const scrollY = window.scrollY;
+
+                    tbody.innerHTML = data.html; // Inyecta las filas renderizadas
+
+                    window.scrollTo(scrollX, scrollY);
                 }
 
-                const $tabla = $(tablaElement);
-                let paginaActual = 0;
-                let buscadorTermino = "";
-
-                try {
-                    const dtInstancia = $tabla.DataTable();
-                    paginaActual = dtInstancia.page();
-                    buscadorTermino = dtInstancia.search();
-                } catch (_) {}
-
-                try {
-                    $tabla.DataTable().destroy();
-                } catch (_) {}
-
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(
-                    "<table>" + htmlNuevo + "</table>",
-                    "text/html",
-                );
-                const tbodyEl = doc.querySelector("tbody");
-                tablaBody.innerHTML = tbodyEl ? tbodyEl.innerHTML : "";
-
+                // Actualizamos contadores
                 if (
-                    tablaId === "userTable" &&
-                    typeof window.inicializarUserTable === "function"
+                    window.AutoRefresco &&
+                    typeof window.AutoRefresco.restaurarElementosGlobales ===
+                        "function"
                 ) {
-                    window.inicializarUserTable();
-                } else if (
-                    typeof window.inicializarTablaTickets === "function"
-                ) {
-                    window.inicializarTablaTickets("#" + tablaId);
-                }
-
-                try {
-                    const dtNuevo = $tabla.DataTable();
-                    if (buscadorTermino) {
-                        dtNuevo.search(buscadorTermino).draw(false);
-                    }
-                    const totalPaginas = dtNuevo.page.info().pages;
-                    if (paginaActual > 0 && paginaActual < totalPaginas) {
-                        dtNuevo.page(paginaActual).draw(false);
-                    }
-                    aplicarEstilosPaginacion();
-                } catch (err) {
-                    console.error(
-                        "[Reverb] Error al restaurar DataTables:",
-                        err,
+                    window.AutoRefresco.restaurarElementosGlobales(
+                        data.contadores,
+                        data.metricas,
                     );
                 }
             }
+        } catch (error) {
+            console.error("[AutoRefresco] Error al sincronizar:", error);
         } finally {
             isRefreshing = false;
         }
     }
 
-    //---ESTILOS DE PAGINACIÓN
-    function aplicarEstilosPaginacion() {
-        const wrappers = document.querySelectorAll(".dataTables_wrapper");
-        wrappers.forEach((wrap) => {
-            if (wrap.id === "tablaHistorial_wrapper") return;
-
-            const lengthSelect = wrap.querySelector(
-                ".dataTables_length select",
-            );
-            if (lengthSelect) {
-                lengthSelect.className =
-                    "mx-2 px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl focus:outline-none";
-            }
-
-            const paginateContainer = wrap.querySelector(
-                ".dataTables_paginate",
-            );
-            if (paginateContainer) {
-                paginateContainer.className =
-                    "dataTables_paginate flex items-center gap-1.5 mt-4 justify-center md:justify-end w-full text-slate-600 text-xs font-medium ml-auto";
-
-                const links = paginateContainer.querySelectorAll(
-                    "a, .paginate_button",
-                );
-                wrapperLinks(links);
-            }
-        });
-    }
-
-    //--ESTILOS DE PAGINACIÓN: CLASES DINÁMICAS PARA ESTADOS
-    function wrapperLinks(links) {
-        links.forEach((btn) => {
-            btn.removeAttribute("style");
-            btn.className =
-                "px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border select-none no-underline inline-block ";
-
-            if (
-                btn.classList.contains("current") ||
-                btn.classList.contains("active")
-            ) {
-                btn.classList.add(
-                    "bg-secondary",
-                    "text-white",
-                    "border-secondary",
-                    "shadow-sm",
-                );
-            } else if (btn.classList.contains("disabled")) {
-                btn.classList.add(
-                    "bg-slate-50",
-                    "text-slate-300",
-                    "border-slate-100",
-                    "pointer-events-none",
+    return {
+        iniciar: () => {
+            if (typeof window.Echo !== "undefined") {
+                window.Echo.channel("tickets").listen(
+                    "TicketActualizado",
+                    () => {
+                        console.log(
+                            "[WebSocket] Evento de actualización detectado.",
+                        );
+                        ejecutarPeticionRefresco();
+                    },
                 );
             } else {
-                btn.classList.add(
-                    "bg-slate-100",
-                    "text-slate-600",
-                    "border-slate-200",
-                    "hover:bg-slate-200",
-                    "hover:text-slate-900",
-                );
+                console.warn("[AutoRefresco] Laravel Echo no está disponible.");
             }
-        });
-    }
-
-    function restaurarElementosGlobales() {
-        const cachedGrafico = localStorage.getItem("global_grafico_html");
-        const contenedorGrafico = document.getElementById("barras-rendimiento");
-        if (contenedorGrafico && cachedGrafico) {
-            contenedorGrafico.innerHTML = cachedGrafico;
-        }
-
-        const contadores = ["abiertos", "proceso", "resueltos", "asignados"];
-        contadores.forEach(key => {
-            const cachedVal = localStorage.getItem(`global_contador_${key}`);
-            if (cachedVal) actualizarElemento(`contador-${key}`, cachedVal);
-        });
-
-        //------------METRICAS
-        const metricas = ["carga-trabajo", "resueltos-24h", "tasa-cierre"];
-        metricas.forEach(key => {
-            const cachedVal = localStorage.getItem(`global_metric_${key}`);
-            if (cachedVal) actualizarElemento(`metric-${key}`, cachedVal);
-        });
-    }
-
-    //------SSE: INICIAR, DETENER Y FORZAR REFRESCO
-    function iniciar() {
-        detener();
-
-        restaurarElementosGlobales();
-
-        const tablaElement = document.querySelector(
-            '.dataTable, table[id*="tabla"], table[id*="Table"]',
-        );
-        if (!tablaElement) return;
-
-        const tablaBody = tablaElement.querySelector("tbody");
-        if (!tablaBody) return;
-
-        let tipoTablaRaw =
-            tablaElement.id === "tablaHistorial"
-                ? "historial"
-                : tablaBody.getAttribute("data-tipo") || "dashboard";
-        const tipoTabla = tipoTablaRaw.toLowerCase().replace("-", "_");
-
-        let filtroEstado = "todos";
-        const botonActivo = document.querySelector(
-            '.filtro-btn.bg-secondary, .filtro-btn.active, [id="filtrosEstado"] .bg-secondary',
-        );
-        if (botonActivo) {
-            filtroEstado = botonActivo.getAttribute("data-estado") || "todos";
-        } else {
-            filtroEstado = window.filtroSseActual || "todos";
-        }
-
-        if (
-            filtroEstado.includes(",") &&
-            tipoTabla !== "dashboard" &&
-            tipoTabla !== "mis_tickets"
-        ) {
-            filtroEstado = "cerrado";
-        }
-
-        if (window.Echo) {
-            window.Echo.channel("tickets-publicos").listen(
-                ".TicketActualizado",
-                (e) => {
-                    if (hayAccionEnCurso()) return;
-
-                    const url = `/api/refresh?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`;
-
-                    fetch(url)
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.error) {
-                                if (data.error === "No autenticado")
-                                    window.location.href = "/login";
-                                return;
-                            }
-                            procesarTabla(data.html);
-
-                            if (data.contadores) {
-                                actualizarElemento("contador-abiertos", data.contadores.abiertos);
-                                actualizarElemento("contador-proceso", data.contadores.proceso);
-                                actualizarElemento("contador-resueltos", data.contadores.resueltos);
-                                
-                                localStorage.setItem("global_contador_abiertos", data.contadores.abiertos);
-                                localStorage.setItem("global_contador_proceso", data.contadores.proceso);
-                                localStorage.setItem("global_contador_resueltos", data.contadores.resueltos);
-                            }
-                            
-                            if (data.contadorAsignados !== undefined) {
-                                actualizarElemento("contador-asignados", data.contadorAsignados);
-                                localStorage.setItem("global_contador_asignados", data.contadorAsignados);
-                            }
-
-                            if (data.grafico !== undefined && data.grafico !== '') {
-                                localStorage.setItem("global_grafico_html", data.grafico);
-                                const contenedorGrafico = document.getElementById("barras-rendimiento");
-                                if (contenedorGrafico) {
-                                    contenedorGrafico.innerHTML = data.grafico;
-                                }
-                            }
-
-                            if (data.cargaTrabajo !== undefined) {
-                                actualizarElemento("metric-carga-trabajo", data.cargaTrabajo);
-                                localStorage.setItem("global_metric_carga-trabajo", data.cargaTrabajo);
-                            }
-                            if (data.resueltos24h !== undefined) {
-                                actualizarElemento("metric-resueltos-24h", data.resueltos24h);
-                                localStorage.setItem("global_metric_resueltos-24h", data.resueltos24h);
-                            }
-                            if (data.tasaCierre !== undefined) {
-                                const formatoTasa = data.tasaCierre + "%";
-                                actualizarElemento("metric-tasa-cierre", formatoTasa);
-                                localStorage.setItem("global_metric_tasa-cierre", formatoTasa);
-                            }
-                        })
-                        .catch((err) =>
-                            console.error("[Reverb] Error al hacer fetch:", err),
-                        );
-                },
-            );
-        } else {
-            console.warn("[Reverb] window.Echo no está definido.");
-        }
-    }
-
-    //------SSE: DETENER
-    function detener() {
-        if (window.Echo) {
-            window.Echo.leaveChannel("tickets-publicos");
-        }
-    }
-
-    return {
-        iniciar,
-        detener,
-        forzarRefresco: () => {
-            iniciar();
-
-            const tablaElement = document.querySelector(
-                '.dataTable, table[id*="tabla"], table[id*="Table"]',
-            );
-            if (!tablaElement) return;
-            const tablaBody = tablaElement.querySelector("tbody");
-            if (!tablaBody) return;
-
-            let tipoTablaRaw =
-                tablaElement.id === "tablaHistorial"
-                    ? "historial"
-                    : tablaBody.getAttribute("data-tipo") || "dashboard";
-            const tipoTabla = tipoTablaRaw.toLowerCase().replace("-", "_");
-
-            let filtroEstado = window.filtroSseActual || "todos";
-            if (
-                filtroEstado.includes(",") &&
-                tipoTabla !== "asignados" &&
-                tipoTabla !== "dashboard" &&
-                tipoTabla !== "mis_tickets"
-            ) {
-                filtroEstado = "cerrado";
-            }
-
-            const url = `/api/refresh?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`;
-            fetch(url)
-                .then((res) => res.json())
-                .then((data) => {
-                    if (!data.error) {
-                        procesarTabla(data.html);
-                        
-                        if (data.grafico !== undefined && data.grafico !== '') {
-                            localStorage.setItem("global_grafico_html", data.grafico);
-                        }
-                    }
-                })
-                .catch((err) => console.error(err));
         },
-        aplicarEstilosPaginacion,
-        restaurarElementosGlobales 
+        forzarRefresco: ejecutarPeticionRefresco,
     };
 })();
 
-window.AutoRefrescoSSE = window.AutoRefresco;
-
-//------INICIALIZACIÓN AUTOMÁTICA AL CARGAR LA PÁGINA
-document.addEventListener("DOMContentLoaded", function () {
-    if (window.$ && $.fn.DataTable) {
-        $(document).on("draw.dt", function (e, settings) {
-            if (
-                settings &&
-                settings.nTable &&
-                settings.nTable.id === "tablaHistorial"
-            )
-                return;
-            window.AutoRefresco.aplicarEstilosPaginacion();
-        });
-    }
+// Inicialización automática
+document.addEventListener("DOMContentLoaded", () => {
     window.AutoRefresco.iniciar();
-});
-
-window.addEventListener("beforeunload", () => {
-    window.AutoRefresco.detener();
 });
 
 window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
@@ -406,5 +208,3 @@ window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
     window.filtroSseActual = estadoObjetivo;
     window.AutoRefresco.forzarRefresco();
 };
-
-window.filtroSseActual = "todos";
