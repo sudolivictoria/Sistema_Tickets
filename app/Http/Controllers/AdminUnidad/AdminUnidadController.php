@@ -43,10 +43,6 @@ class AdminUnidadController extends Controller
             ->whereMonth('created_at', date('m'))
             ->whereYear('created_at', date('Y'));
 
-        //---limitar a solo mostrar los tickets del mes
-        $inicioMes = Carbon::now()->startOfMonth();
-        $finMes = Carbon::now()->endOfMonth();
-
         //------FILTRO POR UNIDAD DE CATEGORÍA------
         if ($miUnidadId) {
             $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
