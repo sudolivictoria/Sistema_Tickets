@@ -32,92 +32,118 @@ class ApiTableController extends Controller
             return response()->json(['error' => 'No autenticado.'], 401);
         }
 
-        $tipo = (string) $request->input('tipo', 'dashboard');
-
-        if (!in_array($tipo, self::TIPOS_VALIDOS, true) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
-            return response()->json(['error' => 'Tipo de tabla no válido.'], 400);
+        // Evita el bloqueo de peticiones síncronas en Laravel sin romper la sesión
+        if (session()->id()) {
+            session()->writeClose();
         }
 
-        if (in_array($tipo, self::TIPOS_SOLO_STAFF, true) && !in_array($user->rol_id, [1, 3])) {
-            return response()->json(['error' => 'No autorizado.'], 403);
+        // Captura el tipo desde el POST (JSON enviado por api.js)
+        $tipo = (string) $request->input('tipo', 'dashboard');
+        $miUnidadId = (int) $user->unidad_id;
+        $estadosCerrados = self::ESTADOS_CERRADOS;
+
+        if (!in_array($tipo, self::TIPOS_VALIDOS) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO)) {
+            return response()->json(['error' => 'Tipo de consulta no válido.'], 400);
         }
 
         try {
-            if (in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
-                return response()->json([
-                    'html' => $this->renderizarVista($tipo, null, (int) $user->unidad_id),
-                ]);
+            //--- 1. FILTRADO Y RENDERIZACIÓN DE TABLAS SEGÚN REGLAS DE ROLES
+            $htmlContenido = '';
+            if (!in_array($tipo, self::TIPOS_SOLO_CONTENIDO)) {
+                $query = Ticket::with(['user', 'categoria', 'estado', 'tecnico']);
+
+                // REGLA CLIENTE (Rol 3): Solo ve sus propios tickets en cualquier lado
+                if ($user->rol_id == 3) {
+                    $query->where('user_id', $user->id);
+                }
+                // REGLA ADMIN UNIDAD (Rol 2): Ve estrictamente su unidad en TODO
+                elseif ($user->rol_id == 2) {
+                    if ($miUnidadId > 0) {
+                        $query->whereHas('categoria', function ($q) use ($miUnidadId) {
+                            $q->where('unidad_id', $miUnidadId);
+                        });
+                    }
+                }
+                // REGLA ADMIN GENERAL (Rol 1): SOLO SU UNIDAD, EXCEPTO HISTORIAL QUE ES GLOBAL
+                elseif ($user->rol_id == 1) {
+                    // Si el tipo es HISTORIAL, no se le añade ningún filtro (es GLOBAL)
+                    // Si es cualquier otro tipo (dashboard, asignar, etc.), se filtra por su unidad
+                    if ($tipo !== 'historial' && $miUnidadId > 0) {
+                        $query->whereHas('categoria', function ($q) use ($miUnidadId) {
+                            $q->where('unidad_id', $miUnidadId);
+                        });
+                    }
+                }
+
+                $ticketsResult = $query->latest()->get();
+                $htmlContenido = $this->renderizarVista($tipo, $ticketsResult, $miUnidadId);
             }
 
-            $estadoFiltro = (string) $request->query('estado', 'todos');
-            $miUnidadId   = (int) $user->unidad_id;
-
-            // =====================================================================
-            // ---------------------------CONTADORES--------------------------------
-            // =====================================================================
-            $queryAbiertos  = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
-            $queryProceso   = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
-
-            $queryResueltos = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
+            //--- 2. CÁLCULO DE CONTADORES EN TIEMPO REAL
+            $qAbiertos = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', $estadosCerrados);
+            $qProceso  = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
+            $qResueltos = Ticket::whereIn('estado_id', $estadosCerrados)
                 ->whereMonth('created_at', date('m'))
                 ->whereYear('created_at', date('Y'));
 
-            if ($miUnidadId && in_array($user->rol_id, [1, 3])) {
-                // Admins y gestores: segmentar por unidad
-                $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
-                $queryAbiertos->whereHas('categoria', $filterUnidad);
-                $queryProceso->whereHas('categoria', $filterUnidad);
-                $queryResueltos->whereHas('categoria', $filterUnidad);
+            // Aplicar restricciones a los contadores superiores basados en el Rol
+            if ($user->rol_id == 3) {
+                // Cliente: Contadores de lo suyo
+                $userId = $user->id;
+                $qAbiertos->where('user_id', $userId);
+                $qProceso->where('user_id', $userId);
+                $qResueltos->where('user_id', $userId);
+
+                $ticketsContadores = Ticket::where('user_id', $userId)->whereYear('created_at', date('Y'))->get();
+            } elseif ($user->rol_id == 2) {
+                // Admin de Unidad: Contadores de su unidad
+                $filtroUnidad = function ($q) use ($miUnidadId) {
+                    $q->where('unidad_id', $miUnidadId);
+                };
+                $qAbiertos->whereHas('categoria', $filtroUnidad);
+                $qProceso->whereHas('categoria', $filtroUnidad);
+                $qResueltos->whereHas('categoria', $filtroUnidad);
+
+                $ticketsContadores = Ticket::whereYear('created_at', date('Y'))->whereHas('categoria', $filtroUnidad)->get();
+            } else {
+                // Admin General (Rol 1): Como está viendo el "dashboard" o pestañas normales, 
+                // sus contadores deben ser de SU UNIDAD (siguiendo tu regla de negocio).
+                if ($miUnidadId > 0) {
+                    $filtroUnidad = function ($q) use ($miUnidadId) {
+                        $q->where('unidad_id', $miUnidadId);
+                    };
+                    $qAbiertos->whereHas('categoria', $filtroUnidad);
+                    $qProceso->whereHas('categoria', $filtroUnidad);
+                    $qResueltos->whereHas('categoria', $filtroUnidad);
+
+                    $ticketsContadores = Ticket::whereYear('created_at', date('Y'))->whereHas('categoria', $filtroUnidad)->get();
+                } else {
+                    $ticketsContadores = Ticket::whereYear('created_at', date('Y'))->get();
+                }
             }
 
-            if ($user->rol_id == 2) {
-                // Cliente: solo sus propios tickets
-                $queryAbiertos->where('user_id', $user->id);
-                $queryProceso->where('user_id', $user->id);
-                $queryResueltos->where('user_id', $user->id);
-            }
-
+            // Empaquetado final para los selectores de api.js
             $contadores = [
-                'abiertos'  => $queryAbiertos->count(),
-                'proceso'   => $queryProceso->count(),
-                'resueltos' => $queryResueltos->count(),
+                'abiertos'   => $qAbiertos->count(),
+                'proceso'    => $qProceso->count(),
+                'resueltos'  => $qResueltos->count(),
+                'asignados'  => Ticket::where('tecnico_id', $user->id)->whereNotIn('estado_id', $estadosCerrados)->count(),
             ];
 
-            $contadorMisAsignados = Ticket::where('tecnico_id', $user->id)
-                ->where('estado_id', 2)
-                ->count();
-
-            // =====================================================================
-            // -----------------------------TABLA PRINCIPAL-------------------------
-            // =====================================================================
-            $query = Ticket::with(['user', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
-            $this->aplicarFiltrosBase($query, $user, $tipo, $miUnidadId, $estadoFiltro);
-
-            $limit         = ($tipo === 'usuario') ? 5 : null;
-            $ticketsResult = $limit
-                ? $query->latest()->limit($limit)->get()
-                : $query->latest()->get();
-
-            $graficoHtml = in_array($user->rol_id, [1, 3])
-                ? $this->generarGrafico($miUnidadId)
-                : '';
-
-            [$cargaTrabajo, $resueltos24h, $tasaCierre] = ($tipo === 'historial')
-                ? $this->calcularMetricas($ticketsResult)
-                : [0, 0, 0];
+            //--- 3. KPIs MÈTRICAS
+            [$cargaTrabajo, $resueltos24h, $tasaCierre] = $this->calcularMetricas($ticketsContadores);
 
             return response()->json([
-                'html'              => $this->renderizarVista($tipo, $ticketsResult, $miUnidadId),
-                'contadores'        => $contadores,
-                'grafico'           => $graficoHtml,
-                'contadorAsignados' => (int) $contadorMisAsignados,
-                'cargaTrabajo'      => (int) $cargaTrabajo,
-                'resueltos24h'      => (int) $resueltos24h,
-                'tasaCierre'        => (int) $tasaCierre,
+                'html'         => $htmlContenido,
+                'contadores'   => $contadores,
+                'kpis'         => [
+                    'carga'     => $cargaTrabajo,
+                    'resueltos' => $resueltos24h,
+                    'tasa'      => $tasaCierre
+                ]
             ]);
-
         } catch (Throwable $e) {
-            Log::error('ApiTableController refresh error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error("Fallo crítico en Auto-Refresco [Tipo: $tipo]: " . $e->getMessage());
             return response()->json(['error' => 'Error interno del servidor.'], 500);
         }
     }
@@ -222,7 +248,6 @@ class ApiTableController extends Controller
             }
 
             return view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
-
         } catch (Throwable $e) {
             Log::error('Error generando gráfico: ' . $e->getMessage());
             return '<div class="text-slate-400 text-xs p-4 text-center">Error al actualizar el gráfico.</div>';
