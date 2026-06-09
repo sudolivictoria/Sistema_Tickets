@@ -13,7 +13,7 @@ window.inicializarTablaTickets = function (
     //--configuración de idioma y opciones de DataTables
     $.fn.dataTable.ext.pager.numbers_length = 1;
     table = tableElement.DataTable({
-        stateSave: true,
+        stateSave: false,
         language: {
             processing: "Procesando...",
             lengthMenu: "Mostrar _MENU_ registros",
