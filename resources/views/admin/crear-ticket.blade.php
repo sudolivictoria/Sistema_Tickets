@@ -119,7 +119,7 @@
 
     <script>
         window.todosLosTipos = @json($tipos ?? []);
-
+        //--------categoria y tipo de solicitud
         document.addEventListener('DOMContentLoaded', function() {
             const oldCategoria = '{{ old('categoria_id') }}';
             if (oldCategoria) {

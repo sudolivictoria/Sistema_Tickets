@@ -50,7 +50,14 @@
                 <span class="material-symbols-outlined text-primary text-3xl">verified</span>
             </div>
             <div>
-                <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Cerrados</p>
+                <div class="flex items-baseline gap-2">
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest leading-none">
+                        Cerrados
+                    </p>
+                    <span class="text-[11px] font-semibold text-slate-400lowercase italic font-sans leading-none">
+                        (este mes)
+                    </span>
+                </div>
                 <h3 id="contador-resueltos" class="text-3xl font-black text-slate-800 leading-none">{{ $resueltos ?? 0 }}
                 </h3>
             </div>

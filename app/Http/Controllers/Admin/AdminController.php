@@ -38,14 +38,10 @@ class AdminController extends Controller
         $queryProceso = Ticket::whereNotNull('tecnico_id')
             ->where('estado_id', 2);
 
-        //--tickets resueltos por unidad del admin autenticado
+        //--tickets resueltos por unidad del admin autenticado (mes)
         $queryResueltos = Ticket::whereIn('estado_id', $estadosCerrados)
             ->whereMonth('created_at', date('m'))
             ->whereYear('created_at', date('Y'));
-
-        //---limitar a solo mostrar los tickets del mes
-        $inicioMes = Carbon::now()->startOfMonth();
-        $finMes = Carbon::now()->endOfMonth();
 
         //------FILTRO POR UNIDAD DE CATEGORÍA------
         if ($miUnidadId) {
@@ -60,10 +56,13 @@ class AdminController extends Controller
         $pendientes  = $queryProceso->count();
         $resueltos   = $queryResueltos->count();
 
+        //--captura el filtrado
         $estadoBoton = request()->query('estado', 'todos');
 
+        //-----tickets
         $queryTabla = Ticket::with(['user', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
 
+        //----filtrado por estado
         if ($estadoBoton === 'resuelto,equivocado,no corresponde' || $estadoBoton === 'cerrado') {
             $queryTabla->whereIn('estado_id', $estadosCerrados)
                 ->whereMonth('created_at', date('m'))
@@ -209,6 +208,7 @@ class AdminController extends Controller
             Log::error("Error avisando a la unidad: " . $e->getMessage());
         }
 
+        //---websocket
         broadcast(new TicketActualizado());
 
         //--redireccionar con mensaje de exito o error en el correo

@@ -270,25 +270,6 @@ table.dataTable thead th {
     box-sizing: border-box !important;
 }
 
-/*----ALINEAR LOS PUNTOS SUSPENSIVOS (...)---*/
-.dataTables_paginate .ellipsis,
-.dt-paging .ellipsis,
-[class*="paginate"] .ellipsis,
-[class*="paging"] .ellipsis {
-    background: transparent !important;
-    color: #94a3b8 !important;
-    border: none !important;
-    width: 36px !important; 
-    height: 36px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 !important;
-    font-weight: 700 !important;
-    letter-spacing: 1px;
-    cursor: default !important;
-}
-
 /*---Asegurar que los iconos de flecha dentro de los botones no floten---*/
 [class*="paginate"] .material-symbols-outlined,
 [class*="paging"] .material-symbols-outlined {

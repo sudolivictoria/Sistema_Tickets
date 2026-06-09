@@ -12,24 +12,37 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
+/**
+ * Controller ApiTableController
+ * * Gestiona las peticiones de auto-refresco en tiempo real (vía WebSockets/SSE) para las tablas, 
+ * contadores, métricas y gráficos de rendimiento según el rol del usuario autenticado.
+ */
 class ApiTableController extends Controller
 {
+    //----constantes de configuracion y control de accesos
     private const TIPOS_VALIDOS = ['dashboard', 'usuario', 'asignar', 'mis_tickets', 'mis_asignados', 'historial'];
     private const TIPOS_SOLO_CONTENIDO = ['recursos'];
     private const TIPOS_SOLO_STAFF = ['asignar', 'historial', 'mis_asignados'];
     private const ESTADOS_CERRADOS = [3, 4, 5];
 
+    /**
+     * Procesa la solicitud de actualización de datos de la interfaz.
+     * Devuelve estructuras HTML pre-renderizadas, contadores globales y métricas en formato JSON.
+     */
     public function refresh(Request $request): JsonResponse
     {
+        //---verificacion autenticacion
         $user = Auth::user();
         if (!$user) {
             return response()->json(['error' => 'No autenticado.'], 401);
         }
 
+        //---concurrencia (evita bloqueo de sesion por peticiones rapida)
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_write_close();
         }
 
+        //-------validacion de tipo de vista solicitando
         $tipo = (string) $request->query('tipo', 'dashboard');
         if (!in_array($tipo, self::TIPOS_VALIDOS, true) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
             return response()->json(['error' => 'Tipo de tabla no válido.'], 400);
@@ -46,54 +59,57 @@ class ApiTableController extends Controller
                 ]);
             }
 
+            //----parametros base construccion de consultas
             $estadoFiltro = (string) $request->query('estado', 'todos');
             $miUnidadId = (int) $user->unidad_id;
 
+            //========================================
             //-------- CONTADORES PRINCIPALES --------
+            //========================================
             $queryAbiertos  = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
             $queryProceso   = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
             $queryResueltos = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
                 ->whereMonth('created_at', date('m'))
                 ->whereYear('created_at', date('Y'));
-
+            //----segmentacion x unidad administradores y gestores
             if ($miUnidadId && in_array($user->rol_id, [1, 3])) {
                 $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
                 $queryAbiertos->whereHas('categoria', $filterUnidad);
                 $queryProceso->whereHas('categoria', $filterUnidad);
                 $queryResueltos->whereHas('categoria', $filterUnidad);
             }
-
+            //--------segmentacion x propietario
             if ($user->rol_id == 2) {
                 $queryAbiertos->where('user_id', $user->id);
                 $queryProceso->where('user_id', $user->id);
                 $queryResueltos->where('user_id', $user->id);
             }
-
+            //-----------contadores 
             $contadores = [
                 'abiertos'  => $queryAbiertos->count(),
                 'proceso'   => $queryProceso->count(),
                 'resueltos' => $queryResueltos->count(),
             ];
-
+            //------------contador mis asignados
             $contadorMisAsignados = Ticket::where('tecnico_id', $user->id)
                 ->where('estado_id', 2)
                 ->count();
 
             //-------- CONSULTA PRINCIPAL PARA ENRUTAR LA TABLA REQUERIDA --------
             $query = Ticket::with(['user', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
-
+            //-----filtros basados en vista activa y estados seleccionados
             $this->aplicarFiltrosBase($query, $user, $tipo, $miUnidadId);
             $this->inyectarFiltroEstado($query, $estadoFiltro);
-
+            //-----------limitacion registros en la vista cliente
             $limit = ($tipo === 'usuario') ? 5 : null;
             $ticketsResult = $limit ? $query->latest()->limit($limit)->get() : $query->latest()->get();
-
+            //----------generacion grafico
             $graficoHtml = in_array($user->rol_id, [1, 3]) ? $this->generarGrafico($miUnidadId) : '';
-
+            //----------calculo analitico metricas historial
             [$cargaTrabajo, $resueltos24h, $tasaCierre] = ($tipo === 'historial')
                 ? $this->calcularMetricas($ticketsResult)
                 : [0, 0, 0];
-
+            //************* RETORNO ESTRUCTURADO DE DATOS DE PROCESAMIENTO EXCLUSIVO EN HISTORIAL****************/
             return response()->json([
                 'html'              => $this->renderizarVista($tipo, $ticketsResult, $miUnidadId),
                 'contadores'        => $contadores,
@@ -109,6 +125,7 @@ class ApiTableController extends Controller
         }
     }
 
+    //---------------RESTRUCCIONES ESTRUCTURALES
     private function aplicarFiltrosBase($query, $user, string $tipo, int $miUnidadId): void
     {
         if (($tipo === 'mis_tickets' || $user->rol_id == 2) && $tipo !== 'dashboard') {
@@ -157,6 +174,9 @@ class ApiTableController extends Controller
         }
     }
 
+    /**
+     * Traduce los estados string provenientes de los botones frontend en condiciones numéricas SQL.
+     */
     private function inyectarFiltroEstado($query, string $estado): void
     {
         switch ($estado) {
@@ -172,6 +192,9 @@ class ApiTableController extends Controller
         }
     }
 
+    /**
+     * Construye los porcentajes comparativos mensuales del año en curso y renderiza el componente HTML del gráfico.
+     */
     private function generarGrafico(int $miUnidadId): string
     {
         try {
@@ -179,14 +202,12 @@ class ApiTableController extends Controller
             $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
             $mesesGrafico = [];
 
-            // Usamos la propiedad self::ESTADOS_CERRADOS que ya tienes definida arriba en el controlador
             $estadosCerrados = self::ESTADOS_CERRADOS;
 
             //--- Agrupa tickets por mes y estado replicando tu consulta original
             $queryGrafico = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
                 ->whereYear('created_at', $añoActual);
 
-            // Aplicamos el filtro de unidad solo si existe el ID de unidad (para evitar fallos si es un administrador global)
             if ($miUnidadId) {
                 $queryGrafico->whereHas('categoria', function ($q) use ($miUnidadId) {
                     $q->where('unidad_id', $miUnidadId);
@@ -194,14 +215,12 @@ class ApiTableController extends Controller
             }
 
             $statsMensuales = $queryGrafico->groupBy('mes', 'estado_id')->get();
-
+            //-----------Mapeo matematico del comportamiento proporcional de los 12 meses
             for ($i = 1; $i <= 12; $i++) {
                 //---resueltos
                 $res = $statsMensuales->where('mes', $i)->whereIn('estado_id', $estadosCerrados)->sum('total');
-
                 //--pendientes   
                 $pen = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', $estadosCerrados)->sum('total');
-
                 $total = $res + $pen;
 
                 $mesesGrafico[] = [
@@ -213,17 +232,20 @@ class ApiTableController extends Controller
             }
 
             return view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
-            
         } catch (Throwable $e) {
             Log::error("Error en auto-refresco del gráfico: " . $e->getMessage());
             return '<div class="text-slate-400 text-xs p-4 text-center">Error al actualizar el gráfico.</div>';
         }
     }
 
+    /**
+     * Procesa analíticamente colecciones de datos en memoria (via Eloquent Collections) para extraer KPIs operacionales.
+     */
     private function calcularMetricas($tickets): array
     {
+        //KPIs 1
         $cargaTrabajo = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isToday())->count();
-
+        //KPIs 2
         $hace24Horas = now()->subDay();
         $resueltos24h = $tickets->whereIn('estado_id', self::ESTADOS_CERRADOS)
             ->filter(fn($t) => $t->fecha_cierre && Carbon::parse($t->fecha_cierre)->gte($hace24Horas))
@@ -232,11 +254,15 @@ class ApiTableController extends Controller
         $delMes = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isCurrentMonth());
         $total  = $delMes->count();
         $cerrados   = $delMes->whereIn('estado_id', self::ESTADOS_CERRADOS)->count();
+        //KPIs 3
         $tasaCierre = $total > 0 ? (int) round(($cerrados / $total) * 100) : 0;
-
         return [$cargaTrabajo, $resueltos24h, $tasaCierre];
     }
 
+    /**
+     * Enrutador de Renderizado Dinámico de Vistas Blade parciales.
+     * Vincula el origen del parámetro 'tipo' con su respectiva plantilla y variables requeridas.
+     */
     private function renderizarVista(string $tipo, $ticketsResult, int $miUnidadId): string
     {
         return match ($tipo) {
