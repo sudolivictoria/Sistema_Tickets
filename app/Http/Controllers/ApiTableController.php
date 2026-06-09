@@ -175,44 +175,48 @@ class ApiTableController extends Controller
     private function generarGrafico(int $miUnidadId): string
     {
         try {
-            $añoActual = (int) date('Y');
+            $añoActual = date('Y');
+            $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+            $mesesGrafico = [];
 
-            $queryGrafico = Ticket::whereYear('created_at', $añoActual);
+            // Usamos la propiedad self::ESTADOS_CERRADOS que ya tienes definida arriba en el controlador
+            $estadosCerrados = self::ESTADOS_CERRADOS;
 
+            //--- Agrupa tickets por mes y estado replicando tu consulta original
+            $queryGrafico = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
+                ->whereYear('created_at', $añoActual);
+
+            // Aplicamos el filtro de unidad solo si existe el ID de unidad (para evitar fallos si es un administrador global)
             if ($miUnidadId) {
-                $queryGrafico->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+                $queryGrafico->whereHas('categoria', function ($q) use ($miUnidadId) {
+                    $q->where('unidad_id', $miUnidadId);
+                });
             }
 
-            $ticketsAño = $queryGrafico->selectRaw('MONTH(created_at) as mes, estado_id')->get();
+            $statsMensuales = $queryGrafico->groupBy('mes', 'estado_id')->get();
 
-            if ($ticketsAño->isEmpty()) {
-                return '<div class="text-slate-400 text-xs p-4 text-center">Sin datos suficientes para el gráfico.</div>';
-            }
-
-            $resueltosPorMes = array_fill(1, 12, 0);
-            $totalesPorMes   = array_fill(1, 12, 0);
-
-            foreach ($ticketsAño as $t) {
-                $m = (int)$t->mes;
-                if ($m >= 1 && $m <= 12) {
-                    $totalesPorMes[$m]++;
-                    if (in_array((int)$t->estado_id, self::ESTADOS_CERRADOS, true)) {
-                        $resueltosPorMes[$m]++;
-                    }
-                }
-            }
-
-            $porcentajes = [];
             for ($i = 1; $i <= 12; $i++) {
-                $porcentajes[] = $totalesPorMes[$i] > 0
-                    ? (int) round(($resueltosPorMes[$i] / $totalesPorMes[$i]) * 100)
-                    : 0;
+                //---resueltos
+                $res = $statsMensuales->where('mes', $i)->whereIn('estado_id', $estadosCerrados)->sum('total');
+
+                //--pendientes   
+                $pen = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', $estadosCerrados)->sum('total');
+
+                $total = $res + $pen;
+
+                $mesesGrafico[] = [
+                    'nombre' => $nombresMeses[$i - 1],
+                    'resueltos_pct' => $total > 0 ? (int) round(($res / $total) * 100) : 0,
+                    'pendientes_pct' => $total > 0 ? (int) round(($pen / $total) * 100) : 0,
+                    'total' => $total
+                ];
             }
 
-            return view('partials.grafico_rendimiento', ['porcentajesExito' => $porcentajes])->render();
+            return view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
+            
         } catch (Throwable $e) {
-            Log::error("Error en gráfico: " . $e->getMessage());
-            return '';
+            Log::error("Error en auto-refresco del gráfico: " . $e->getMessage());
+            return '<div class="text-slate-400 text-xs p-4 text-center">Error al actualizar el gráfico.</div>';
         }
     }
 
