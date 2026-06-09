@@ -82,17 +82,19 @@ window.AutoRefresco = (() => {
     async function ejecutarPeticionRefresco() {
         if (isRefreshing) return;
 
-        // 1. Buscamos CUALQUIER elemento que tenga tu atributo "data-tipo"
+        // 1. Buscamos tu atributo original "data-tipo" en la pantalla
         const contenedorConTipo = document.querySelector("[data-tipo]");
         if (!contenedorConTipo) return;
 
-        // Aseguramos que no haya modales abiertos antes de refrescar
+        // Seguro para no interrumpir si el usuario está usando un modal o escribiendo
         if (hayAccionEnCurso()) {
-            console.log("[AutoRefresco] Pausado por actividad del usuario.");
+            console.log(
+                "[AutoRefresco] Sincronización pausada por actividad del usuario.",
+            );
             return;
         }
 
-        // 2. Leemos tu atributo original "data-tipo" (ej: "mis_tickets" o "mis_asignados")
+        // 2. Leemos el valor de tu atributo (ej: 'dashboard', 'mis_tickets', 'mis_asignados')
         const tipoTabla = contenedorConTipo.getAttribute("data-tipo");
         const filtroEstado = window.filtroSseActual || "todos";
 
@@ -103,51 +105,51 @@ window.AutoRefresco = (() => {
                 .querySelector('meta[name="csrf-token"]')
                 ?.getAttribute("content");
 
-            // CORRECCIÓN: Pasamos el tipo en la URL (?tipo=...) para que tu controlador actual lo lea sin problemas
-            const response = await fetch(
-                `/api/table/refresh?tipo=${tipoTabla}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": token,
-                        Accept: "application/json",
-                    },
-                    body: JSON.stringify({
-                        estado: filtroEstado,
-                    }),
+            // CORRECCIÓN: Usamos window.location.origin para que detecte la IP actual (172.16.116.80)
+            // y le pegamos la ruta /api/table/refresh pasando el tipo en la URL
+            const urlBase = window.location.origin;
+            const urlDestino = `${urlBase}/api/table/refresh?tipo=${tipoTabla}`;
+
+            const response = await fetch(urlDestino, {
+                method: "POST", // Coincide exactamente con el Route::post de Laravel
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token,
+                    Accept: "application/json",
                 },
-            );
+                body: JSON.stringify({
+                    estado: filtroEstado,
+                }),
+            });
 
             if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
             const data = await response.json();
 
             if (data.success) {
-                // Buscamos la tabla para inyectar las filas en su respectivo tbody
+                // Buscamos la tabla en pantalla para actualizar sus filas
                 const tablaElement = document.querySelector("table");
                 if (tablaElement) {
+                    // Buscamos el tbody de la tabla
                     const tbody =
                         tablaElement.querySelector("tbody") || tablaElement;
 
+                    // Mantenemos la posición del scroll para evitar saltos
                     const scrollX = window.scrollX;
                     const scrollY = window.scrollY;
 
-                    tbody.innerHTML = data.html; // Inyecta las filas renderizadas
+                    // Inyectamos el HTML limpio que devuelve el controlador
+                    tbody.innerHTML = data.html;
 
                     window.scrollTo(scrollX, scrollY);
                 }
 
-                // Actualizamos contadores
+                // Actualizamos los contadores de las tarjetas superiores
                 if (
-                    window.AutoRefresco &&
-                    typeof window.AutoRefresco.restaurarElementosGlobales ===
-                        "function"
+                    data.contadores &&
+                    typeof restaurarElementosGlobales === "function"
                 ) {
-                    window.AutoRefresco.restaurarElementosGlobales(
-                        data.contadores,
-                        data.metricas,
-                    );
+                    restaurarElementosGlobales(data.contadores, data.metricas);
                 }
             }
         } catch (error) {
