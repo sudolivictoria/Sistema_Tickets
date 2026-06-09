@@ -32,42 +32,38 @@ class ApiTableController extends Controller
             return response()->json(['error' => 'No autenticado.'], 401);
         }
 
-        // Evita el bloqueo de peticiones síncronas en Laravel sin romper la sesión
         if (session()->id()) {
             session()->writeClose();
         }
 
-        // Captura el tipo desde el POST (JSON enviado por api.js)
         $tipo = (string) $request->input('tipo', 'dashboard');
         $miUnidadId = (int) $user->unidad_id;
         $estadosCerrados = self::ESTADOS_CERRADOS;
 
-        if (!in_array($tipo, self::TIPOS_VALIDOS) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO)) {
+        if (!in_array($tipo, self::TIPOS_VALIDOS, true) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
             return response()->json(['error' => 'Tipo de consulta no válido.'], 400);
         }
 
         try {
-            //--- 1. FILTRADO Y RENDERIZACIÓN DE TABLAS SEGÚN REGLAS DE ROLES
+            //--- 1. FILTRADO Y RENDERIZACIÓN DE TABLAS HTML
             $htmlContenido = '';
-            if (!in_array($tipo, self::TIPOS_SOLO_CONTENIDO)) {
+            if (!in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
                 $query = Ticket::with(['user', 'categoria', 'estado', 'tecnico']);
 
                 // REGLA CLIENTE (Rol 3): Solo ve sus propios tickets en cualquier lado
                 if ($user->rol_id == 3) {
                     $query->where('user_id', $user->id);
-                }
-                // REGLA ADMIN UNIDAD (Rol 2): Ve estrictamente su unidad en TODO
+                } 
+                // REGLA ADMIN UNIDAD (Rol 2): Ve estrictamente su unidad en todo
                 elseif ($user->rol_id == 2) {
                     if ($miUnidadId > 0) {
                         $query->whereHas('categoria', function ($q) use ($miUnidadId) {
                             $q->where('unidad_id', $miUnidadId);
                         });
                     }
-                }
+                } 
                 // REGLA ADMIN GENERAL (Rol 1): SOLO SU UNIDAD, EXCEPTO HISTORIAL QUE ES GLOBAL
                 elseif ($user->rol_id == 1) {
-                    // Si el tipo es HISTORIAL, no se le añade ningún filtro (es GLOBAL)
-                    // Si es cualquier otro tipo (dashboard, asignar, etc.), se filtra por su unidad
                     if ($tipo !== 'historial' && $miUnidadId > 0) {
                         $query->whereHas('categoria', function ($q) use ($miUnidadId) {
                             $q->where('unidad_id', $miUnidadId);
@@ -79,24 +75,25 @@ class ApiTableController extends Controller
                 $htmlContenido = $this->renderizarVista($tipo, $ticketsResult, $miUnidadId);
             }
 
-            //--- 2. CÁLCULO DE CONTADORES EN TIEMPO REAL
-            $qAbiertos = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', $estadosCerrados);
-            $qProceso  = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
+            //--- 2. CÁLCULO DE CONTADORES EN TIEMPO REAL (CORREGIDO: Instancias limpias sin herencia corrupta)
+            $qAbiertos  = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', $estadosCerrados);
+            $qProceso   = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
             $qResueltos = Ticket::whereIn('estado_id', $estadosCerrados)
-                ->whereMonth('created_at', date('m'))
-                ->whereYear('created_at', date('Y'));
+                                ->whereMonth('created_at', date('m'))
+                                ->whereYear('created_at', date('Y'));
 
-            // Aplicar restricciones a los contadores superiores basados en el Rol
+            // Aplicar filtros de alcance a los contadores superiores basados estrictamente en el Rol
             if ($user->rol_id == 3) {
-                // Cliente: Contadores de lo suyo
+                // Cliente: Cuenta solo sus tickets
                 $userId = $user->id;
                 $qAbiertos->where('user_id', $userId);
                 $qProceso->where('user_id', $userId);
                 $qResueltos->where('user_id', $userId);
 
                 $ticketsContadores = Ticket::where('user_id', $userId)->whereYear('created_at', date('Y'))->get();
-            } elseif ($user->rol_id == 2) {
-                // Admin de Unidad: Contadores de su unidad
+            } 
+            elseif ($user->rol_id == 2) {
+                // Admin de Unidad: Cuenta los de su unidad
                 $filtroUnidad = function ($q) use ($miUnidadId) {
                     $q->where('unidad_id', $miUnidadId);
                 };
@@ -105,9 +102,9 @@ class ApiTableController extends Controller
                 $qResueltos->whereHas('categoria', $filtroUnidad);
 
                 $ticketsContadores = Ticket::whereYear('created_at', date('Y'))->whereHas('categoria', $filtroUnidad)->get();
-            } else {
-                // Admin General (Rol 1): Como está viendo el "dashboard" o pestañas normales, 
-                // sus contadores deben ser de SU UNIDAD (siguiendo tu regla de negocio).
+            } 
+            else {
+                // Admin General (Rol 1): Contadores de SU UNIDAD en vistas comunes (Dashboard)
                 if ($miUnidadId > 0) {
                     $filtroUnidad = function ($q) use ($miUnidadId) {
                         $q->where('unidad_id', $miUnidadId);
@@ -122,7 +119,7 @@ class ApiTableController extends Controller
                 }
             }
 
-            // Empaquetado final para los selectores de api.js
+            // Mapeo limpio de llaves que busca tu api.js
             $contadores = [
                 'abiertos'   => $qAbiertos->count(),
                 'proceso'    => $qProceso->count(),
@@ -130,7 +127,7 @@ class ApiTableController extends Controller
                 'asignados'  => Ticket::where('tecnico_id', $user->id)->whereNotIn('estado_id', $estadosCerrados)->count(),
             ];
 
-            //--- 3. KPIs MÈTRICAS
+            //--- 3. KPIs MÉTRICAS
             [$cargaTrabajo, $resueltos24h, $tasaCierre] = $this->calcularMetricas($ticketsContadores);
 
             return response()->json([
@@ -142,6 +139,7 @@ class ApiTableController extends Controller
                     'tasa'      => $tasaCierre
                 ]
             ]);
+
         } catch (Throwable $e) {
             Log::error("Fallo crítico en Auto-Refresco [Tipo: $tipo]: " . $e->getMessage());
             return response()->json(['error' => 'Error interno del servidor.'], 500);
@@ -248,6 +246,7 @@ class ApiTableController extends Controller
             }
 
             return view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
+
         } catch (Throwable $e) {
             Log::error('Error generando gráfico: ' . $e->getMessage());
             return '<div class="text-slate-400 text-xs p-4 text-center">Error al actualizar el gráfico.</div>';
