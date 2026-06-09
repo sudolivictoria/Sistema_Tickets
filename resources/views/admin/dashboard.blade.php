@@ -54,7 +54,7 @@
                     <p class="text-xs font-black text-slate-400 uppercase tracking-widest leading-none">
                         Cerrados
                     </p>
-                    <span class="text-[11px] font-semibold text-slate-400lowercase italic font-sans leading-none">
+                    <span class="text-[11px] font-semibold text-slate-400 lowercase italic font-sans leading-none">
                         (este mes)
                     </span>
                 </div>
