@@ -47,14 +47,14 @@ class ApiTableController extends Controller
 
         try {
             $estadoFiltro = strtolower(trim((string) $request->query('estado', 'todos')));
-            
+
             // =================================
             //    QUERY EXACTA PARA LA TABLA
             // =================================
             $queryTickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tecnico', 'tipo_solicitud', 'categoria']);
-            
+
             $this->aplicarFiltrosTabla($queryTickets, $user, $tipo, $miUnidadId, $estadoFiltro);
-            
+
             $limit = ($tipo === 'usuario') ? 5 : null;
             $ticketsResult = $limit
                 ? $queryTickets->latest()->take($limit)->get()
@@ -85,7 +85,6 @@ class ApiTableController extends Controller
                 'resueltos24h'      => (int) $resueltos24h,
                 'tasaCierre'        => (int) $tasaCierre,
             ]);
-
         } catch (Throwable $e) {
             Log::error('ApiTableController Refresh Error: ' . $e->getMessage());
             return response()->json(['error' => 'Error interno.'], 500);
@@ -98,8 +97,22 @@ class ApiTableController extends Controller
     private function aplicarFiltrosTabla($query, $user, string $tipo, $miUnidadId, string $estadoFiltro): void
     {
         //-------El cliente solo observa lo que le corresponde
-        if ($user->rol_id == 2) {
-            $query->where('user_id', $user->id);
+        if ($tipo === 'usuario' || $tipo === 'mis_tickets') {
+            $query->where('user_id', $user->id); //-----encapsula la consulta al usuario autenticado (Cliente, Admin o Gestor por igual)
+
+            if ($estadoFiltro === 'resuelto,equivocado,no corresponde' || $estadoFiltro === 'cerrado') {
+                $query->whereIn('estado_id', self::ESTADOS_CERRADOS)
+                    ->whereMonth('created_at', date('m'))
+                    ->whereYear('created_at', date('Y'));
+            } else {
+                if ($estadoFiltro === 'abierto' || $estadoFiltro === '1') {
+                    $query->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
+                } elseif ($estadoFiltro === 'procesando' || $estadoFiltro === '2') {
+                    $query->whereNotNull('tecnico_id')->where('estado_id', 2);
+                } else {
+                    $query->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
+                }
+            }
             return;
         }
         //-----------tipos de tablas
@@ -107,15 +120,15 @@ class ApiTableController extends Controller
             case 'dashboard':
                 if ($estadoFiltro === 'resuelto,equivocado,no corresponde' || $estadoFiltro === 'cerrado') {
                     $query->whereIn('estado_id', self::ESTADOS_CERRADOS)
-                          ->whereMonth('created_at', date('m'))
-                          ->whereYear('created_at', date('Y'));
+                        ->whereMonth('created_at', date('m'))
+                        ->whereYear('created_at', date('Y'));
                 } else {
                     if ($estadoFiltro === 'abierto' || $estadoFiltro === '1') {
                         $query->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
                     } elseif ($estadoFiltro === 'procesando' || $estadoFiltro === '2') {
                         $query->whereNotNull('tecnico_id')->where('estado_id', 2);
                     } else {
-                        $query->whereNotIn('estado_id', self::ESTADOS_CERRADOS); 
+                        $query->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
                     }
                 }
 
@@ -152,23 +165,23 @@ class ApiTableController extends Controller
         if ($user->rol_id == 2 || $tipo === 'usuario' || $tipo === 'mis_tickets') {
             return [
                 'abiertos'  => Ticket::where('user_id', $user->id)
-                                ->whereNull('tecnico_id')
-                                ->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
+                    ->whereNull('tecnico_id')
+                    ->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
                 'proceso'   => Ticket::where('user_id', $user->id)
-                                ->whereNotNull('tecnico_id')
-                                ->where('estado_id', 2)->count(),
+                    ->whereNotNull('tecnico_id')
+                    ->where('estado_id', 2)->count(),
                 'resueltos' => Ticket::where('user_id', $user->id)
-                                ->whereIn('estado_id', self::ESTADOS_CERRADOS)
-                                ->whereMonth('created_at', date('m'))
-                                ->whereYear('created_at', date('Y'))->count(),
+                    ->whereIn('estado_id', self::ESTADOS_CERRADOS)
+                    ->whereMonth('created_at', date('m'))
+                    ->whereYear('created_at', date('Y'))->count(),
             ];
         }
 
         $queryAbiertos = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
         $queryProceso = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
         $queryResueltos = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
-                                ->whereMonth('created_at', date('m'))
-                                ->whereYear('created_at', date('Y'));
+            ->whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'));
 
         //--------restringe contadores por unidad
         if ($miUnidadId) {
@@ -191,7 +204,7 @@ class ApiTableController extends Controller
     private function generarGrafico($miUnidadId, int $año): ?string
     {
         $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-        
+
         // Ambos controladores agrupan la gráfica obligatoriamente pasando la variable de unidad del usuario autenticado
         $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
             ->whereYear('created_at', $año)
@@ -221,7 +234,7 @@ class ApiTableController extends Controller
     private function calcularMetricasHistorial($user, $miUnidadId, int $año): array
     {
         $query = Ticket::whereYear('created_at', $año);
-        
+
         //----Gestor solo observa metricas de su unidad y admin a nivel global
         if ($user->rol_id == 3 && $miUnidadId) {
             $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
@@ -236,7 +249,7 @@ class ApiTableController extends Controller
         $total      = $delMes->count();
         $cerrados   = $delMes->whereIn('estado_id', self::ESTADOS_CERRADOS)->count();
         $tasaCierre = $total > 0 ? (int) round(($cerrados / $total) * 100) : 0;
-        
+
         return [$cargaTrabajo, $resueltos24h, $tasaCierre];
     }
 
