@@ -103,11 +103,8 @@ class ApiTableController extends Controller
             if ($estadoFiltro === 'todos' || $estadoFiltro === '') {
                 return;
             }
-
             if ($estadoFiltro === 'resuelto,equivocado,no corresponde' || $estadoFiltro === 'cerrado') {
-                $query->whereIn('estado_id', self::ESTADOS_CERRADOS)
-                    ->whereMonth('created_at', date('m'))
-                    ->whereYear('created_at', date('Y'));
+                $query->whereIn('estado_id', self::ESTADOS_CERRADOS);
             } else {
                 if ($estadoFiltro === 'abierto' || $estadoFiltro === '1') {
                     $query->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
