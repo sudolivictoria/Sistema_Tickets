@@ -26,7 +26,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
 
     //---api para refresco automatico
-    Route::get('/api/table/refresh', [ApiTableController::class, 'refresh'])->name('api.table.refresh');
+    Route::get('/api/refresh', [ApiTableController::class, 'refresh'])->name('api.table.refresh');
 
     Route::get('/dashboard', function () {
         $user = Auth::user();
