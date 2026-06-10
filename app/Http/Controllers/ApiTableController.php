@@ -16,7 +16,7 @@ class ApiTableController extends Controller
 {
     private const TIPOS_VALIDOS = ['dashboard', 'usuario', 'asignar', 'mis_tickets', 'mis_asignados', 'historial'];
     private const TIPOS_SOLO_CONTENIDO = ['recursos'];
-    private const TIPOS_SOLO_STAFF = ['asignar', 'historial', 'mis_asignados'];
+    private const TIPOS_SOLO_STAFF = ['dashboard','asignar', 'historial', 'mis_asignados'];
     private const ESTADOS_CERRADOS = [3, 4, 5];
 
     public function refresh(Request $request): JsonResponse
@@ -103,6 +103,7 @@ class ApiTableController extends Controller
             if ($estadoFiltro === 'todos' || $estadoFiltro === '') {
                 return;
             }
+
             if ($estadoFiltro === 'resuelto,equivocado,no corresponde' || $estadoFiltro === 'cerrado') {
                 $query->whereIn('estado_id', self::ESTADOS_CERRADOS);
             } else {
