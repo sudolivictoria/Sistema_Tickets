@@ -114,7 +114,7 @@ class AdminUnidadController extends Controller
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
         $manuales = Manual::with('categoria')->latest()->get();
 
-        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'categorias', 'manuales', 'ticketsAsignados'));
+        return view('gestor.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'categorias', 'manuales', 'ticketsAsignados'));
     }
 
 
