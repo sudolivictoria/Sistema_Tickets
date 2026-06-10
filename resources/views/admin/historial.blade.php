@@ -24,7 +24,9 @@
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-orange-500 hover:translate-y-[-6px] transition-all duration-300">
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Abiertos (Últimas 24h)</p>
-                <h3 class="text-3xl font-black text-orange-500" id="metric-carga-trabajo">{{ $cargaTrabajo ?? 0 }}</h3>
+                <h3 class="text-3xl font-black text-orange-500" id="metric-carga-trabajo">{{ $cargaTrabajo ?? 0 }}
+                    <span class="text-sm font-bold text-slate-400">Tkts</span>
+                </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
                 <span class="material-symbols-outlined text-2xl">pending_actions</span>
@@ -34,7 +36,9 @@
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-primary hover:translate-y-[-6px] transition-all duration-300">
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Cerrados (Últimas 24h)</p>
-                <h3 class="text-3xl font-black text-primary" id="metric-resueltos-24h">{{ $resueltos24h ?? 0 }}</h3>
+                <h3 class="text-3xl font-black text-primary" id="metric-resueltos-24h">{{ $resueltos24h ?? 0 }}
+                    <span class="text-sm font-bold text-slate-400">Tkts</span>
+                </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-green-50 text-primary flex items-center justify-center">
                 <span class="material-symbols-outlined text-2xl">bolt</span>
@@ -44,7 +48,9 @@
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-secondary hover:translate-y-[-6px] transition-all duration-300">
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Tasa de Cierre Mensual %</p>
-                <h3 class="text-3xl font-black text-secondary" id="metric-tasa-cierre">{{ $tasaCierre ?? 0 }}</h3>
+                <h3 class="text-3xl font-black text-secondary" id="metric-tasa-cierre">{{ $tasaCierre ?? 0 }}
+                    <span class="text-sm font-bold text-secondary">%</span>
+                </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-blue-50 text-secondary flex items-center justify-center">
                 <span class="material-symbols-outlined text-2xl">analytics</span>
@@ -154,7 +160,7 @@
 @push('scripts')
     @if (session('error'))
         <script>
-            document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener("DOMContentLoaded", function () {
                 Swal.fire({
                     title: '¡Atención!',
                     text: '{!! session('error') !!}',
