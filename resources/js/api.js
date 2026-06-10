@@ -215,7 +215,7 @@ window.AutoRefresco = (() => {
             filtroEstado.includes(",") &&
             tipoTabla !== "asignados" &&
             tipoTabla !== "dashboard" &&
-            tipoTabla !== "mis-tickets"
+            tipoTabla !== "mis_tickets"
         ) {
             filtroEstado = "cerrado";
         }
@@ -325,7 +325,7 @@ window.AutoRefresco = (() => {
                 filtroEstado.includes(",") &&
                 tipoTabla !== "asignados" &&
                 tipoTabla !== "dashboard" &&
-                tipoTabla !== "mis-tickets"
+                tipoTabla !== "mis_tickets"
             ) {
                 filtroEstado = "cerrado";
             }
