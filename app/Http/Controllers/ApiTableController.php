@@ -100,6 +100,10 @@ class ApiTableController extends Controller
         if ($tipo === 'usuario' || $tipo === 'mis_tickets') {
             $query->where('user_id', $user->id); //-----encapsula la consulta al usuario autenticado (Cliente, Admin o Gestor por igual)
 
+            if ($estadoFiltro === 'todos' || $estadoFiltro === '') {
+                return;
+            }
+
             if ($estadoFiltro === 'resuelto,equivocado,no corresponde' || $estadoFiltro === 'cerrado') {
                 $query->whereIn('estado_id', self::ESTADOS_CERRADOS)
                     ->whereMonth('created_at', date('m'))
