@@ -203,7 +203,7 @@
                     <input type="password" name="password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl">
 
                     <button type="button" class="toggle-password"
-                        style="position: absolute; top: 38px; right: 12px; background: transparent; border: none; cursor: pointer; padding: 0;">
+                        style="position: absolute; top: 40px; right: 40px; background: transparent; border: none; cursor: pointer; padding: 0;">
                         <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#64748b"
                             viewBox="0 0 24 24">
                             <path

@@ -57,20 +57,20 @@ $(document).ready(function () {
     //--toggle password visibility (Usando delegación de eventos)
     $(document).on("click", ".toggle-password", function () {
         const btn = $(this);
+      
         const input = btn.siblings("input");
         const eyeOpen = btn.find(".eye-open");
         const eyeClosed = btn.find(".eye-closed");
 
-        const esPassword = input.attr("type") === "password";
-
-        if (esPassword) {
+     
+        if (input.attr("type") === "password") {
             input.attr("type", "text");
-            eyeOpen.addClass("hidden");
-            eyeClosed.removeClass("hidden");
+            eyeOpen.css("display", "none");
+            eyeClosed.css("display", "inline");
         } else {
             input.attr("type", "password");
-            eyeOpen.removeClass("hidden");
-            eyeClosed.addClass("hidden");
+            eyeOpen.css("display", "inline");
+            eyeClosed.css("display", "none");
         }
     });
 });

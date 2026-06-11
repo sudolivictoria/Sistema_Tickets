@@ -114,12 +114,6 @@
                             <span class="text-sm">Gestión Usuarios</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.gestion-recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('admin.gestion-recursos') }}">
-                            <span class="material-symbols-outlined text-xl">contract</span>
-                            <span class="text-sm">Gestión Recursos</span>
-                        </a>
-
                         <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('admin.historial') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
                             href="{{ route('admin.historial') }}">
                             <span class="material-symbols-outlined text-xl">analytics</span>

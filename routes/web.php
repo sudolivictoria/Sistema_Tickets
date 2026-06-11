@@ -52,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
         //--seccion administracion
         Route::get('/asignar-tickets', [AdminController::class, 'asignarTickets'])->name('asignar-tickets');
         Route::get('/mis-asignados', [AdminController::class, 'misAsignados'])->name('mis-asignados');
-        Route::get('/gestion-recursos', [AdminController::class, 'gestionRecursos'])->name('gestion-recursos');
+        //Route::get('/gestion-recursos', [AdminController::class, 'gestionRecursos'])->name('gestion-recursos');
         Route::get('/historial', [AdminController::class, 'historial'])->name('historial');
 
         //---acciones para gestion de usuarios
@@ -84,10 +84,10 @@ Route::middleware(['auth'])->group(function () {
             ->name('tickets.no-corresponde');
 
         //---gestion de recursos
-        Route::resource('manuales', ManualController::class);
+        //Route::resource('manuales', ManualController::class);
 
         //----gestion de categorias manuales
-        Route::post('/categorias-manuales', [CategoriaManualController::class, 'store'])->name('categorias.store');
+        //Route::post('/categorias-manuales', [CategoriaManualController::class, 'store'])->name('categorias.store');
 
         //------reportes
         Route::get('/reportes/exportar', [ReporteController::class, 'exportar'])->name('admin.reportes.exportar');

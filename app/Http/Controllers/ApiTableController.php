@@ -268,7 +268,6 @@ class ApiTableController extends Controller
             'usuario'       => view('partials.filas_usuario', ['todosLosTickets' => $ticketsResult])->render(),
             'mis_tickets'   => view('partials.filas_mis_tickets', ['misTickets' => $ticketsResult])->render(),
             'historial'     => view('partials.filas_historial', ['tickets' => $ticketsResult])->render(),
-            'recursos'      => view('partials.filas_recursos', ['manuales' => Manual::with('categoria')->latest()->get()])->render(),
             'asignar'       => view('partials.filas_asignar', ['tickets' => $ticketsResult, 'tecnicos' => $tecnicos])->render(),
             'mis_asignados' => view('partials.filas_mis_asignados', ['tickets' => $ticketsResult, 'tecnicos' => $tecnicos])->render(),
             default => '',

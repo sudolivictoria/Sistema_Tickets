@@ -114,10 +114,10 @@ class AdminController extends Controller
         }
 
         //----manuales
-        $categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
-        $manuales = Manual::with('categoria')->latest()->get();
+        //$categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
+        //$manuales = Manual::with('categoria')->latest()->get();
 
-        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'categorias', 'manuales', 'ticketsAsignados'));
+        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'ticketsAsignados'));
     }
 
     //-------------------------CLIENTE----------------------------
@@ -344,12 +344,13 @@ class AdminController extends Controller
         return view('admin.gestion-usuarios', compact('usuarios'));
     }
     //---metodo para mostrar gestion de recursos
-    public function gestionRecursos()
+    /*public function gestionRecursos()
     {
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
         $manuales = Manual::with('categoria')->latest()->get();
         return view('admin.gestion-recursos', compact('categorias', 'manuales'));
-    }
+    }*/
+        
     //---metodo para mostrar historial de tickets con filtros y métricas
     public function historial()
     {

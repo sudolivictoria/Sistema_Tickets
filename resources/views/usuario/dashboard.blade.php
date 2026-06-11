@@ -17,7 +17,7 @@
             </div>
             <div class="w-full md:w-auto md:pb-4 md:px-2">
                 <a href="{{ route('usuario.crear-ticket') }}"
-                    class="w-full md:w-32 flex items-center justify-center gap-2 bg-primary text-secondary font-black py-3 rounded-xl shadow-lg hover:scale-[1.02] transition-all uppercase text-[10px] tracking-widest"
+                    class="w-full md:w-32 flex items-center justify-center gap-2 bg-primary text-secondary font-black py-3 rounded-xl shadow-lg hover:scale-[1.07] transition-all uppercase text-[10px] tracking-widest"
                     style="height: 40px; min-width: 120px;">
                     Nuevo Ticket
                 </a>
@@ -54,8 +54,7 @@
                     <div>
                         <div id="contador-resueltos" class="text-2xl font-black text-secondary">{{ $resueltos ?? 0 }}</div>
                         <div class="text-[14px] font-black uppercase text-slate-400">
-                            Cerrados <span
-                                class="text-[11px] font-semibold text-slate-400 lowercase italic font-sans">(este
+                            Cerrados <span class="text-[11px] font-semibold text-slate-400 lowercase italic font-sans">(este
                                 mes)</span>
                         </div>
                     </div>
@@ -65,7 +64,10 @@
             {{-- Tickets Recientes --}}
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                 <div class="p-6 border-b border-slate-50 flex items-center justify-between">
-                    <h3 class="font-black text-lg tracking-[0.2em] text-secondary uppercase">Tickets Recientes</h3>
+                    <h3 class="font-black text-lg tracking-[0.2em] text-secondary uppercase flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xl">history_toggle_off</span>
+                        Tickets Recientes
+                    </h3>
                 </div>
 
                 <div class="flex items-center gap-2 mb-2 lg:hidden text-slate-400">
@@ -93,125 +95,128 @@
             </div>
         </div>
 
-        {{-- Recursos --}}
         <div class="space-y-6">
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+            {{-- Call to Action --}}
+            <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div
-                    class="absolute top-0 right-0 w-16 h-16 bg-secondary/5 rounded-bl-full flex items-center justify-center">
-                    <span class="material-symbols-outlined text-secondary/30">folder_open</span>
+                    class="absolute top-0 right-0 w-16 h-16 bg-secondary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-secondary/30">local_post_office</span>
                 </div>
 
-                <h4 class="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-4 bg-secondary rounded-full"></span> Recursos
-                </h4>
-
-                {{-- contenedor de categorias con scroll --}}
-                <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
-                    @foreach ($categoriasManuales as $cat)
-                        <a href="{{ route('usuario.recursos', ['categoria' => $cat->id]) }}"
-                            class="flex items-center gap-2 p-3 rounded-lg bg-slate-50 hover:bg-secondary/10 transition-all group border border-transparent hover:border-secondary/20">
-                            <div
-                                class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-secondary transition-colors">
-                                <span class="material-symbols-outlined text-lg">folder</span>
-                            </div>
-                            <div
-                                class="overflow-hidden text-[12px] font-black text-slate-700 truncate group-hover:text-secondary transition-colors uppercase">
-                                {{ $cat->nombre_categoria_manual }}
-                            </div>
-                        </a>
-                    @endforeach
+                <div class="relative z-10">
+                    <h4
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-600 mb-2 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-secondary rounded-full"></span>
+                        Bandeja
+                    </h4>
+                    <p class="text-[12px] text-slate-500 font-medium mb-6">
+                        Consulta el estado actual e historial de tus solicitudes.
+                    </p>
+                    <a href="{{ route('usuario.mis-tickets') }}"
+                        class="group w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white gap-2">
+                        <span
+                            class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">segment</span>
+                        Ver Mis Tickets
+                    </a>
                 </div>
-
-                <a href="{{ route('usuario.recursos') }}"
-                    class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white">
-                    Ir al Repositorio
-                </a>
             </div>
-            {{-- Final Recursos --}}
+            {{-- Final Call to Action --}}
 
             {{-- Canales de Atención --}}
-            <div class="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-                <div class="flex items-start gap-4 mb-8">
-                    <div
-                        class="bg-secondary size-8 rounded-xl flex items-center justify-center text-primary shadow-lg mt-1">
-                        <span class="material-symbols-outlined text-xl font-light">headset_mic</span>
-                    </div>
-                    <div>
-                        <h4 class="text-[14px] font-black uppercase tracking-[0.2em] text-secondary mb-2">USTS</h4>
-                        <p class="text-[12px] text-slate-500 font-medium">Contacto Directo</p>
-                    </div>
-                </div>
-                <button id="toggle-canales"
-                    class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center mb-4">
-                    <span class="material-symbols-outlined">expand_more</span> Ver Canales
-                </button>
-                <div id="canales-list" class="space-y-4" style="display: none;">
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ljalvarez@istu.gob.sv" target="_blank"
-                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
-                        <div
-                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-slate-700 text-[12px] truncate">ljalvarez@istu.gob.sv
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mnrodriguez@istu.gob.sv" target="_blank"
-                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
-                        <div
-                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-slate-700 text-[12px] truncate">mnrodriguez@istu.gob.sv
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=matorres@istu.gob.sv" target="_blank"
-                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
-                        <div
-                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-slate-700 text-[12px] truncate">matorres@istu.gob.sv
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jjramirez@istu.gob.sv" target="_blank"
-                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
-                        <div
-                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-slate-700 text-[12px] truncate">jjramirez@istu.gob.sv
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ovquintanilla@istu.gob.sv" target="_blank"
-                        class="flex items-center gap-1 p-1 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 transition-all group">
-                        <div
-                            class="size-8 rounded-lg flex items-center justify-center text-secondary group-hover:text-primary">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-slate-700 text-[12px] truncate">ovquintanilla@istu.gob.sv
-                            </div>
-                        </div>
-                    </a>
+            <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-100">
+                <div
+                    class="absolute top-0 right-0 w-16 h-16 bg-slate-200/50 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-slate-300">contact_mail</span>
                 </div>
 
-                <div class="mt-8 p-2 bg-slate-50 rounded-2xl border border-slate-100 flex gap-1.5 items-start">
-                    <span class="material-symbols-outlined text-secondary mt-0.5">info</span>
-                    <p class="text-[12px] text-slate-600 leading-relaxed font-medium">
-                        Al hacer clic en un correo, se redirige automáticamente.
+                <div class="relative z-10">
+                    <h4
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-slate-300 rounded-full"></span>
+                        USTS
+                    </h4>
+                    <p class="text-[12px] text-slate-500 font-medium mb-6">
+                        Contacto Directo.
                     </p>
+
+                    <button id="toggle-canales"
+                        class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-slate-400 hover:text-slate-500 transition-all flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined">expand_more</span> Ver Canales
+                    </button>
+
+                    <div id="canales-list" class="space-y-4" style="display: none;">
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ljalvarez@istu.gob.sv" target="_blank"
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">mail</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div
+                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
+                                    ljalvarez@istu.gob.sv</div>
+                            </div>
+                        </a>
+
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mnrodriguez@istu.gob.sv" target="_blank"
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">mail</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div
+                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
+                                    mnrodriguez@istu.gob.sv</div>
+                            </div>
+                        </a>
+
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=matorres@istu.gob.sv" target="_blank"
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">mail</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div
+                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
+                                    matorres@istu.gob.sv</div>
+                            </div>
+                        </a>
+
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jjramirez@istu.gob.sv" target="_blank"
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">mail</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div
+                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
+                                    jjramirez@istu.gob.sv</div>
+                            </div>
+                        </a>
+
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ovquintanilla@istu.gob.sv" target="_blank"
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">mail</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div
+                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
+                                    ovquintanilla@istu.gob.sv</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="mt-8 p-2 bg-slate-200/50 rounded-xl border border-slate-200/60 flex gap-1.5 items-start">
+                        <span class="material-symbols-outlined text-slate-400 mt-0.5 text-[16px]">info</span>
+                        <p class="text-[11px] text-slate-500 leading-relaxed font-medium">
+                            Al hacer clic en un correo, se redirige automáticamente.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

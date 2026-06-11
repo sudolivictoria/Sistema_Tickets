@@ -54,9 +54,9 @@ class ClienteController extends Controller
         $categorias = Categoria::all();
         $prioridades = Prioridad::all();
         $tipos = TipoSolicitud::all();
-        $categoriasManuales = CategoriaManual::orderBy('nombre_categoria_manual')->get();
+        //$categoriasManuales = CategoriaManual::orderBy('nombre_categoria_manual')->get();
 
-        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos', 'categoriasManuales'));
+        return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos'));
     }
 
     //---metodo para mostrar formulario de creacion de ticket

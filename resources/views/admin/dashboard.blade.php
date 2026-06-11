@@ -150,43 +150,7 @@
         </div>
         {{-- Final Tickets Registrados --}}
 
-        <!--recursos-->
         <div class="lg:col-span-1 space-y-6">
-            <div class="lg:col-span-1 space-y-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-                    <div
-                        class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-primary/30">folder_open</span>
-                    </div>
-                    <h4
-                        class="text-[14px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
-                        <span class="w-1.5 h-4 bg-primary rounded-full"></span> Recursos
-                    </h4>
-                    {{-- contenedor de categorias con scroll --}}
-                    <div class="space-y-3 overflow-y-auto pr-2 custom-scroll" style="max-height: 320px;">
-                        @foreach ($categorias as $cat)
-                            <a href="{{ route('admin.recursos', ['categoria' => $cat->id]) }}"
-                                class="flex items-center gap-2 p-3 rounded-lg bg-slate-50 hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20">
-                                <div
-                                    class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-lg">folder</span>
-                                </div>
-                                <div
-                                    class="overflow-hidden text-[12px] font-black text-slate-700 truncate group-hover:text-primary transition-colors uppercase">
-                                    {{ $cat->nombre_categoria_manual }}
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-
-                    <a href="{{ route('admin.recursos') }}"
-                        class="w-full mt-6 py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white">
-                        Ir al Repositorio
-                    </a>
-                </div>
-            </div>
-            <!--final recursos-->
-
             <!--contador de tickets asignados-->
             <div class="bg-secondary p-8 rounded-3xl text-white shadow-xl relative overflow-hidden group">
                 <div class="relative z-10">
@@ -209,6 +173,34 @@
                     assignment
                 </span>
             </div>
+
+            {{-- Call to Action --}}
+            <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div
+                    class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-primary/30">add_circle</span>
+                </div>
+
+                <div class="relative z-10">
+                    <h4
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-600 mb-2 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-primary rounded-full"></span>
+                        Nuevo Ticket
+                    </h4>
+                    <p class="text-[12px] text-slate-500 font-medium mb-6">
+                        Registra una nueva solicitud en el sistema.
+                    </p>
+                    <a href="{{ route('admin.crear-ticket') }}"
+                        class="group w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white gap-2">
+                        <span
+                            class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">add</span>
+                        Crear Ticket
+                    </a>
+                </div>
+            </div>
+            {{-- Final Call to Action --}}
+
+
         </div>
     </div>
 
