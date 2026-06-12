@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,28 +12,40 @@ class LoginController extends Controller
     //-----------vista del login
     public function showLoginForm()
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            if (!$user->rol) {
+                $user = User::find($user->id);
+            }
+
+            $rol = $user->rol ? $user->rol->nombre_rol : '';
+            return match ($rol) {
+                'Admin'   => redirect()->route('admin.dashboard'),
+                'Usuario' => redirect()->route('usuario.dashboard'),
+                'Gestor'  => redirect()->route('gestor.dashboard'),
+                default   => redirect('/'),
+            };
+        }
         return view('auth.login');
     }
 
     //---------proceso de login
     public function login(Request $request)
     {
-        //------validar credenciales del formulario
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        //----intentar inicio de sesion
         $remember = $request->boolean('remember');
+
         if (Auth::attempt($credentials, $remember)) {
 
-            //-----verificar si el usuario esta activo
             if (Auth::user()->activo == 0) {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Tu cuenta está desactivada.']);
             }
-
             $request->session()->regenerate();
             $user = Auth::user();
             $rol = $user->rol->nombre_rol; //---->obtener el nombre del rol del usuario autenticado
@@ -57,9 +70,17 @@ class LoginController extends Controller
     //---------cerrar sesion
     public function logout(Request $request)
     {
-        Auth::logout();
+        $user = User::find(Auth::id());
+
+        if ($user) {
+            $user->remember_token = null;
+            $user->save();
+        }
+
+        Auth::logout(); 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/login');
     }
 }

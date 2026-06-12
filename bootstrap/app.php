@@ -26,8 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
     ->withExceptions(function (Exceptions $exceptions) {
     $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
-        return redirect()->route('login')
-            ->withErrors(['session_expired' => 'Tu sesión expiró por inactividad. Por favor, inicia sesión nuevamente.']);
+       return response()->view('errors.419', [], 419);
     });
 
         $exceptions->shouldRenderJsonWhen(function (Request $request, \Throwable $e) {
