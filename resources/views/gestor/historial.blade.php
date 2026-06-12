@@ -26,7 +26,6 @@
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Abiertos (Últimas 24h)</p>
                 <h3 class="text-3xl font-black text-orange-500" id="metric-carga-trabajo">{{ $cargaTrabajo ?? 0 }}
-                    <span class="text-sm font-bold text-slate-400">Tkts</span>
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
@@ -39,7 +38,6 @@
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Cerrados (Últimas 24h)</p>
                 <h3 class="text-3xl font-black text-primary" id="metric-resueltos-24h">{{ $resueltos24h ?? 0 }}
-                    <span class="text-sm font-bold text-slate-400">Tkts</span>
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-green-50 text-primary flex items-center justify-center">
@@ -52,7 +50,6 @@
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Tasa de Cierre Mensual %</p>
                 <h3 class="text-3xl font-black text-secondary" id="metric-tasa-cierre">{{ $tasaCierre ?? 0 }}
-                    <span class="text-sm font-bold text-secondary">%</span>
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-blue-50 text-secondary flex items-center justify-center">
