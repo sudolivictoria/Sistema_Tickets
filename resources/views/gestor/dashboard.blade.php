@@ -185,7 +185,7 @@
 
                 <div class="relative z-10">
                     <h4
-                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-600 mb-2 flex items-center gap-2">
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-primary rounded-full"></span>
                         Nuevo Ticket
                     </h4>

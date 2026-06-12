@@ -280,6 +280,24 @@ window.AutoRefresco = (() => {
                                     "metric-tasa-cierre",
                                     data.tasaCierre + "%",
                                 );
+                            if (data.prioridades) {
+                                actualizarElemento(
+                                    "prio-critica",
+                                    data.prioridades.critica,
+                                );
+                                actualizarElemento(
+                                    "prio-alta",
+                                    data.prioridades.alta,
+                                );
+                                actualizarElemento(
+                                    "prio-media",
+                                    data.prioridades.media,
+                                );
+                                actualizarElemento(
+                                    "prio-baja",
+                                    data.prioridades.baja,
+                                );
+                            }
                         })
                         .catch((err) =>
                             console.error(

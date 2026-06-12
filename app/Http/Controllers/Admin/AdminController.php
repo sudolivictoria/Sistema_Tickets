@@ -113,11 +113,25 @@ class AdminController extends Controller
             ];
         }
 
+
+        $estadosCerrados = [3, 4, 5]; 
+        $queryPrioridades = Ticket::whereNotIn('estado_id', $estadosCerrados);
+
+        if ($miUnidadId) {
+            $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+        }
+
+        $prioridades = [
+            'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
+            'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
+            'media'   => (clone $queryPrioridades)->where('prioridad_id', 3)->count(),
+            'baja'    => (clone $queryPrioridades)->where('prioridad_id', 4)->count(),
+        ];
+
         //----manuales
         //$categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
         //$manuales = Manual::with('categoria')->latest()->get();
-
-        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'ticketsAsignados'));
+        return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'ticketsAsignados', 'prioridades'));
     }
 
     //-------------------------CLIENTE----------------------------
@@ -350,7 +364,7 @@ class AdminController extends Controller
         $manuales = Manual::with('categoria')->latest()->get();
         return view('admin.gestion-recursos', compact('categorias', 'manuales'));
     }*/
-        
+
     //---metodo para mostrar historial de tickets con filtros y métricas
     public function historial()
     {

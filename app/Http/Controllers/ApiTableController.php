@@ -16,7 +16,7 @@ class ApiTableController extends Controller
 {
     private const TIPOS_VALIDOS = ['dashboard', 'usuario', 'asignar', 'mis_tickets', 'mis_asignados', 'historial'];
     private const TIPOS_SOLO_CONTENIDO = ['recursos'];
-    private const TIPOS_SOLO_STAFF = ['dashboard','asignar', 'historial', 'mis_asignados'];
+    private const TIPOS_SOLO_STAFF = ['dashboard', 'asignar', 'historial', 'mis_asignados'];
     private const ESTADOS_CERRADOS = [3, 4, 5];
 
     public function refresh(Request $request): JsonResponse
@@ -76,9 +76,25 @@ class ApiTableController extends Controller
                 ? $this->calcularMetricasHistorial($user, $miUnidadId, $añoActual)
                 : [0, 0, 0];
 
+            $estadosCerrados = [3, 4, 5];
+            $queryPrioridades = Ticket::whereNotIn('estado_id', $estadosCerrados);
+
+            if ($miUnidadId) {
+                $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            }
+
+            $prioridades = [
+                'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
+                'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
+                'media'   => (clone $queryPrioridades)->where('prioridad_id', 3)->count(),
+                'baja'    => (clone $queryPrioridades)->where('prioridad_id', 4)->count(),
+            ];
+
+
             return response()->json([
                 'html'              => $this->renderizarVista($tipo, $ticketsResult, $miUnidadId),
                 'contadores'        => $contadores,
+                'prioridades'       => $prioridades,
                 'grafico'           => $graficoHtml,
                 'contadorAsignados' => (int) $contadorMisAsignados,
                 'cargaTrabajo'      => (int) $cargaTrabajo,

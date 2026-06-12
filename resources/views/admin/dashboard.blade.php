@@ -174,6 +174,61 @@
                 </span>
             </div>
 
+            <!--prioridades-->
+            <div class="mt-6 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
+                <div
+                    class="absolute top-0 right-0 w-16 h-16 bg-secondary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-secondary/30">low_priority</span>
+                </div>
+                <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-4 bg-slate-300 rounded-full"></span>
+                    Prioridades
+                </h4>
+
+                @php
+                    $prioConfig = [
+                        'critica' => [
+                            'border' => 'border-red-300',
+                            'numero' => 'text-red-500',
+                            'texto' => 'text-red-800'
+                        ],
+                        'alta' => [
+                            'border' => 'border-orange-300',
+                            'numero' => 'text-orange-500',
+                            'texto' => 'text-orange-800'
+                        ],
+                        'media' => [
+                            'border' => 'border-amber-300',
+                            'numero' => 'text-amber-500',
+                            'texto' => 'text-amber-800'
+                        ],
+                        'baja' => [
+                            'border' => 'border-green-300',
+                            'numero' => 'text-green-500',
+                            'texto' => 'text-green-800'
+                        ],
+                    ];
+                @endphp
+
+                <div class="grid grid-cols-2 gap-3">
+                    @foreach($prioConfig as $prio => $clases)
+                        <div
+                            class="flex flex-col items-center justify-center p-4 rounded-xl bg-white border-2 border-dashed {{ $clases['border'] }} hover:scale-105 transition-transform shadow-sm">
+
+                            <span id="prio-{{$prio}}"
+                                class="text-[24px] font-black {{ $clases['numero'] }} tabular-nums leading-none">
+                                {{ $prioridades[$prio] ?? 0 }}
+                            </span>
+
+                            <span class="font-black text-[9px] uppercase tracking-widest {{ $clases['texto'] }} mt-2">
+                                {{ ucfirst($prio) }}
+                            </span>
+
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             {{-- Call to Action --}}
             <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div
@@ -183,7 +238,7 @@
 
                 <div class="relative z-10">
                     <h4
-                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-600 mb-2 flex items-center gap-2">
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-primary rounded-full"></span>
                         Nuevo Ticket
                     </h4>
