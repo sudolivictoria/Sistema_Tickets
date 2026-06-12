@@ -27,44 +27,31 @@ class DatabaseSeeder extends Seeder
 
         //-----Unidades 
         $unidadIT = Unidad::create(['nombre_unidad' => 'USTS']);
-        $unidadRRHH = Unidad::create(['nombre_unidad' => 'RRHH']);
 
         $categoriaIT = Categoria::create(['nombre_categoria' => 'USTS', 'unidad_id' => $unidadIT->id]);
-        $categoriaRRHH = Categoria::create(['nombre_categoria' => 'RRHH', 'unidad_id' => $unidadRRHH->id]);
 
         //-----Usuario Admin de prueba
         User::create([
-            'name' => 'Olivia Victoria Quintanilla',
+            'name' => 'Olivia Victoria Amoss Quintanilla',
             'email' => 'ovquintanilla@istu.gob.sv',
             'password' => Hash::make('admin123'),
             'rol_id' => $adminRol->id,
             'unidad_id' => $unidadIT->id,
             'activo' => true,
-            'cargo' => 'Tecnico',
-            'telefono' => null,
+            'cargo' => 'Técnico',
+            'telefono' => '7949-9979',
         ]);
 
-        //-----Usuario Gestor de prueba
-        User::create([
-            'name' => 'Olivia Gestora',
-            'email' => 'oliviavictoriaquintanilla@gmail.com',
-            'password' => Hash::make('gestor123'),
-            'rol_id' => $adminUnidadRol->id,
-            'unidad_id' => $unidadRRHH->id,
-            'activo' => true,
-            'cargo' => 'Tecnico',
-            'telefono' => null,
-        ]);
 
-        //-----Usuario Cliente de prueba
+          //-----Usuario Admin de prueba
         User::create([
-            'name' => 'Olivia Victoria Amoss',
+            'name' => 'Cliente Pruebas',
             'email' => 'oamossquintanilla@gmail.com',
             'password' => Hash::make('cliente123'),
             'rol_id' => $clienteRol->id,
-            'unidad_id' => $unidadRRHH->id,
+            'unidad_id' => $unidadIT->id,
             'activo' => true,
-            'cargo' => 'Tecnico',
+            'cargo' => 'Técnico',
             'telefono' => null,
         ]);
 
@@ -118,9 +105,28 @@ class DatabaseSeeder extends Seeder
         ]);
 
         TipoSolicitud::create([
-            'nombre_tipo_solicitud' => 'REQUERIMIENTO DE PERSONAL',
-            'descripcion_solicitud' => 'Solicitud de nuevo personal, cambio de personal, eliminación de personal o cualquier requerimiento relacionado con el personal',
-            'categoria_id' => $categoriaRRHH->id,
+            'nombre_tipo_solicitud' => 'SOFTWARE',
+            'descripcion_solicitud' => 'Instalación y/o configuración de aplicaciones, sistemas o programas o reportes de errores.',
+            'categoria_id' => $categoriaIT->id,
+        ]);
+
+        TipoSolicitud::create([
+            'nombre_tipo_solicitud' => 'RED E INFRAESTRUCTURA',
+            'descripcion_solicitud' => 'Problemas de conectividad, VPN, internet caído, servidores, firewall/seguridad.',
+            'categoria_id' => $categoriaIT->id,
+        ]);
+
+        TipoSolicitud::create([
+            'nombre_tipo_solicitud' => 'ACCESOS Y/O CREDENCIALES',
+            'descripcion_solicitud' => 'Reset de contraseñas, permisos en aplicativos, sistemas o programas, creación de usuarios o cuentas.',
+            'categoria_id' => $categoriaIT->id,
+        ]);
+
+
+        TipoSolicitud::create([
+            'nombre_tipo_solicitud' => 'SOLICITUDES DE SERVICIOS',
+            'descripcion_solicitud' => 'Impresiones a color, altas / bajas de usuarios, requerimientos de mejora, otras solicitudes.',
+            'categoria_id' => $categoriaIT->id,
         ]);
     }
 }

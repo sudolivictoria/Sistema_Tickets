@@ -76,12 +76,20 @@
                         </button>
                     </div>
 
+                    <div class="field" style="display: flex; align-items: center; gap: 8px; margin-top: -5px; border-color: #005c0c;">
+                        <input id="remember" type="checkbox" name="remember"
+                            style="width: 16px; height: 16px; cursor: pointer; accent-color: #005c0c;">
+                        <label for="remember" style="margin: 0; font-size: 11px; color: #555; cursor: pointer;">
+                            Mantener sesión iniciada
+                        </label>
+                    </div>
                     <button type="submit" class="button">Iniciar sesión</button>
                 </form>
             </div>
         </div>
     </div>
 
+    <!--toggle password-->
     <script>
         const toggleBtn = document.getElementById('toggle-password');
         const passwordInput = document.getElementById('password');
