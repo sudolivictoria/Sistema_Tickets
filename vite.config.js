@@ -16,7 +16,6 @@ export default defineConfig({
                 "resources/js/mis-asignados.js",
                 "resources/js/ticket-form.js",
                 "resources/js/asignar-tickets.js",
-                "resources/js/usuario.js",
                 "resources/js/gestor.js",
                 "resources/js/admin.js",
                 "resources/js/usuario-menu.js",
