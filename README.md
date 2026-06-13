@@ -96,7 +96,7 @@ php artisan serve
 * **Terminal 1 (Correos / Queues):**
 
 ```bash
-php artisan queue:local
+php artisan queue:work
 ```
 
 * **Terminal 1 (Actualización de datos):**
