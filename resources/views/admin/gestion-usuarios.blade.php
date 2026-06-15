@@ -8,7 +8,7 @@
     <div class="space-y-6">
         <div class="flex items-center justify-between mb-10 border-b border-slate-200 pb-6">
             <h2 class="text-3xl font-black text-secondary mb-2 flex items-center gap-3">
-                <span class="material-symbols-outlined text-4xl text-primary">person_add</span>
+                <span class="material-symbols-outlined text-4xl text-primary">group</span>
                 Gestión de Usuarios
             </h2>
             <button onclick="abrirModal('agregar')"
