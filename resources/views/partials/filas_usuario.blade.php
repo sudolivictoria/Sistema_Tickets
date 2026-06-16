@@ -39,7 +39,7 @@
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp
-            <span class="px-2 py-1 rounded-full border font-black text-[11px] uppercase {{ $clasePrio }}">
+            <span class="px-2 py-1 border font-black text-[11px] uppercase {{ $clasePrio }}">
                 {{ $prio }}
             </span>
         </td>
@@ -49,7 +49,7 @@
         {{-- Botón Detalle (Descripción) --}}
         <td class="px-4 py-4 text-center">
             <button type="button"
-                class="btn-ver-detalle p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
+                class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>

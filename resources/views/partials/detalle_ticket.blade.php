@@ -6,16 +6,16 @@
             class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-primary">
             <div class="p-8">
                 <div class="flex justify-between items-start mb-6">
-                    <h3 id="modalTitulo" class="text-xl font-black text-secondary uppercase">---</h3>
+                    <h3 id="modalTitulo" class="text-xl font-black text-green-950 uppercase">---</h3>
                     <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
                 <div class="space-y-5">
                     <div>
-                        <div class="flex items-center gap-1.5 mb-2 text-secondary">
+                        <div class="flex items-center gap-1.5 mb-2">
                             <span class="material-symbols-outlined text-[16px] text-primary">category</span>
-                            <label class="text-[11px] font-black uppercase tracking-widest">Tipo de Solicitud</label>
+                            <label class="text-[11px] font-black uppercase tracking-widest text-green-950">Tipo de Solicitud</label>
                         </div>
                         <div id="modalTipoSolicitud"
                             class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line">
@@ -24,9 +24,9 @@
                     </div>
 
                     <div>
-                        <div class="flex items-center gap-1.5 mb-2 text-secondary">
+                        <div class="flex items-center gap-1.5 mb-2">
                             <span class="material-symbols-outlined text-[16px] text-primary">description</span>
-                            <label class="text-[11px] font-black uppercase tracking-widest">Descripción de la
+                            <label class="text-[11px] font-black uppercase tracking-widest text-green-950">Descripción de la
                                 solicitud</label>
                         </div>
                         <div id="modalDescripcion"
@@ -37,7 +37,7 @@
                 </div>
                 <div class="mt-8">
                     <button onclick="cerrarModal()"
-                        class="w-full py-4 bg-primary text-white font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-primary/20">
+                        class="w-full py-4 bg-primary text-green-950 font-black rounded-2xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-sm shadow-lg shadow-primary/20">
                         Cerrar Detalle
                     </button>
                 </div>

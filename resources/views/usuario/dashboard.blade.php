@@ -30,7 +30,7 @@
         <div class="xl:col-span-3 space-y-6 md:space-y-8">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <div
-                    class="bg-white p-6 rounded-2xl border-b-4 border-secondary shadow-sm flex items-center gap-4 hover:translate-y-[-6px] transition-all duration-300">
+                    class="bg-white p-6 rounded-2xl border-b-4 border-blue-100 shadow-sm flex items-center gap-4 hover:translate-y-[-6px] transition-all duration-300">
                     <div class="p-3 bg-red-50 text-red-500 rounded-2xl"><span
                             class="material-symbols-outlined text-2xl font-bold">priority_high</span></div>
                     <div>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
                 <div
-                    class="bg-white p-6 rounded-2xl border-b-4 border-secondary shadow-sm flex items-center gap-4 hover:translate-y-[-6px] transition-all duration-300">
+                    class="bg-white p-6 rounded-2xl border-b-4 border-blue-100 shadow-sm flex items-center gap-4 hover:translate-y-[-6px] transition-all duration-300">
                     <div class="p-3 bg-lime-50 text-primary rounded-2xl"><span
                             class="material-symbols-outlined text-2xl font-bold">check_circle</span></div>
                     <div>
@@ -99,21 +99,21 @@
             {{-- Call to Action --}}
             <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div
-                    class="absolute top-0 right-0 w-16 h-16 bg-secondary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
-                    <span class="material-symbols-outlined text-secondary/30">local_post_office</span>
+                    class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-primary/30">local_post_office</span>
                 </div>
 
                 <div class="relative z-10">
                     <h4
-                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-600 mb-2 flex items-center gap-2">
-                        <span class="w-1.5 h-4 bg-secondary rounded-full"></span>
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-green-950 mb-2 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-primary/50 rounded-full"></span>
                         Bandeja
                     </h4>
                     <p class="text-[12px] text-slate-500 font-medium mb-6">
                         Consulta el estado actual e historial de tus solicitudes.
                     </p>
                     <a href="{{ route('usuario.mis-tickets') }}"
-                        class="group w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white gap-2">
+                        class="group w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white gap-2">
                         <span
                             class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">segment</span>
                         Ver Mis Tickets
@@ -125,14 +125,14 @@
             {{-- Canales de Atención --}}
             <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-100">
                 <div
-                    class="absolute top-0 right-0 w-16 h-16 bg-slate-200/50 rounded-bl-full flex items-center justify-center pointer-events-none">
-                    <span class="material-symbols-outlined text-slate-300">contact_mail</span>
+                    class="absolute top-0 right-0 w-16 h-16 bg-blue-100/50 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-blue-200">contact_mail</span>
                 </div>
 
                 <div class="relative z-10">
                     <h4
-                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
-                        <span class="w-1.5 h-4 bg-slate-300 rounded-full"></span>
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-secondary mb-2 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-blue-200 rounded-full"></span>
                         USTS
                     </h4>
                     <p class="text-[12px] text-slate-500 font-medium mb-6">
@@ -140,7 +140,7 @@
                     </p>
 
                     <button id="toggle-canales"
-                        class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-slate-400 hover:text-slate-500 transition-all flex items-center justify-center mb-4">
+                        class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-blue-400 hover:text-blue-400 transition-all flex items-center justify-center mb-4">
                         <span class="material-symbols-outlined">expand_more</span> Ver Canales
                     </button>
 
@@ -148,7 +148,7 @@
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ljalvarez@istu.gob.sv" target="_blank"
                             class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -161,7 +161,7 @@
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mnrodriguez@istu.gob.sv" target="_blank"
                             class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -174,7 +174,7 @@
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=matorres@istu.gob.sv" target="_blank"
                             class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -187,7 +187,7 @@
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jjramirez@istu.gob.sv" target="_blank"
                             class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -200,7 +200,7 @@
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ovquintanilla@istu.gob.sv" target="_blank"
                             class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -211,9 +211,9 @@
                         </a>
                     </div>
 
-                    <div class="mt-8 p-2 bg-slate-200/50 rounded-xl border border-slate-200/60 flex gap-1.5 items-start">
-                        <span class="material-symbols-outlined text-slate-400 mt-0.5 text-[16px]">info</span>
-                        <p class="text-[11px] text-slate-500 leading-relaxed font-medium">
+                    <div class="mt-8 p-2 bg-blue-100/50 rounded-xl border border-slate-200/60 flex gap-1.5 items-start">
+                        <span class="material-symbols-outlined text-blue-900 mt-0.5 text-[16px]">info</span>
+                        <p class="text-[11px] text-blue-900 leading-relaxed font-medium">
                             Al hacer clic en un correo, se redirige automáticamente.
                         </p>
                     </div>

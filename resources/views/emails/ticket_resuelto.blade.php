@@ -60,7 +60,7 @@
         }
 
         .welcome-text {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
             color: #04003B;
             margin-bottom: 5px;

@@ -6,8 +6,8 @@
             class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-secondary z-10 animate-fade-in">
             <div class="p-8">
                 <div class="flex justify-between items-start mb-6">
-                    <h3 id="modalTitulo" class="text-xl font-black text-primary uppercase">---</h3>
-                    <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <h3 id="modalTitulo" class="text-xl font-black text-green-950 uppercase">---</h3>
+                    <button onclick="cerrarModal()" class="text-green-950 hover:text-green-900 transition-colors">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>

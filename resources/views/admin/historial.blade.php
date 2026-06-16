@@ -14,7 +14,7 @@
         </div>
         <div class="min-w-[180px] px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-end">
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Fecha de Consulta</p>
-            <span class="text-base font-black text-secondary">{{ date('d/m/Y') }}</span>
+            <span class="text-base font-black text-green-900">{{ date('d/m/Y') }}</span>
         </div>
     </div>
 
@@ -24,7 +24,7 @@
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-orange-500 hover:translate-y-[-6px] transition-all duration-300">
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Abiertos (Últimas 24h)</p>
-                <h3 class="text-3xl font-black text-orange-500" id="metric-carga-trabajo">{{ $cargaTrabajo ?? 0 }}
+                <h3 class="text-3xl font-black" id="metric-carga-trabajo">{{ $cargaTrabajo ?? 0 }}
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
@@ -35,7 +35,7 @@
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-primary hover:translate-y-[-6px] transition-all duration-300">
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Cerrados (Últimas 24h)</p>
-                <h3 class="text-3xl font-black text-primary" id="metric-resueltos-24h">{{ $resueltos24h ?? 0 }}
+                <h3 class="text-3xl font-black" id="metric-resueltos-24h">{{ $resueltos24h ?? 0 }}
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-green-50 text-primary flex items-center justify-center">
@@ -46,7 +46,7 @@
             class="rounded-2xl bg-white p-5 flex items-center justify-between shadow-sm border-t-4 border-secondary hover:translate-y-[-6px] transition-all duration-300">
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Tasa de Cierre Mensual %</p>
-                <h3 class="text-3xl font-black text-secondary" id="metric-tasa-cierre">{{ $tasaCierre ?? 0 }}
+                <h3 class="text-3xl font-black" id="metric-tasa-cierre">{{ $tasaCierre ?? 0 }}
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-xl bg-blue-50 text-secondary flex items-center justify-center">
@@ -134,8 +134,8 @@
                         class="bg-slate-50 text-[12px] uppercase text-[#008F7E] font-black tracking-widest border-b border-slate-200">
                         <th class="px-2 py-4 border-b border-slate-200 font-black">ID</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Usuario</th>
-                        <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Estado</th>
+                        <th class="px-2 py-4 border-b border-slate-200 font-black">Prioridad</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Tecnico</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Apertura</th>
                         <th class="px-2 py-4 border-b border-slate-200 font-black">Cierre</th>

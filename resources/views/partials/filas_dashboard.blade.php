@@ -34,22 +34,6 @@
 
         <td class="px-2 py-4">
             @php
-                $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
-                $clasePrio = match ($prio) {
-                    'Critica' => 'bg-red-100 text-red-700 border-red-200',
-                    'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
-                    'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                    'Baja' => 'bg-green-100 text-[#008F7E] border-green-200',
-                    default => 'bg-slate-100 text-slate-600 border-slate-200',
-                };
-            @endphp
-            <span class="px-2 py-1 rounded-full border font-black text-[10px] uppercase {{ $clasePrio }}">
-                {{ $prio }}
-            </span>
-        </td>
-
-        <td class="px-2 py-4">
-            @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
                 $claseEstado = match ($estado) {
                     'abierto' => 'bg-orange-100 text-orange-700 border-orange-200',
@@ -65,6 +49,23 @@
             </span>
         </td>
 
+
+        <td class="px-2 py-4">
+            @php
+                $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
+                $clasePrio = match ($prio) {
+                    'Critica' => 'bg-red-100 text-red-700 border-red-200',
+                    'Alta' => 'bg-orange-100 text-orange-700 border-orange-200',
+                    'Media' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
+                    'Baja' => 'bg-green-100 text-[#008F7E] border-green-200',
+                    default => 'bg-slate-100 text-slate-600 border-slate-200',
+                };
+            @endphp
+            <span class="px-2 py-1 border font-black text-[10px] uppercase {{ $clasePrio }}">
+                {{ $prio }}
+            </span>
+        </td>
+
         <td class="px-2 py-4 font-black">
             {{ $ticket->tecnico->name ?? 'Pendiente de Asignación' }}
         </td>
@@ -72,9 +73,10 @@
         {{--descripcion del ticket--}}
         <td class="px-2 py-4 text-center">
             <button type="button"
-                class="btn-ver-detalle p-2 bg-slate-100 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
+                class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
-                data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}" data-fecha="{{ $ticket->created_at->format('d/m/Y') }}">
+                data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
+                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

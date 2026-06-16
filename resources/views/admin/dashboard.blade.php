@@ -4,8 +4,8 @@
     <div class="flex justify-between items-center mb-8">
         <div>
             <div class="flex items-center gap-4">
-                <span class="text-4xl font-medium text-slate-600">
-                    Hola, <span class="text-secondary font-bold">{{ auth()->user()->name ?? 'Administrador' }}</span>
+                <span class="text-4xl font-black text-slate-600">
+                    Hola, <span class="text-secondary font-black">{{ auth()->user()->name ?? 'Administrador' }}</span>
                 </span>
             </div>
             <p class="text-slate-500 text-sm font-medium italic py-4">Administración, seguimiento y resolución eficiente de
@@ -14,7 +14,7 @@
         <div class="min-w-[180px] px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col items-end">
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Fecha de
                 Consulta</p>
-            <span class="text-base font-black text-secondary">{{ date('d/m/Y') }}</span>
+            <span class="text-base font-black text-green-900">{{ date('d/m/Y') }}</span>
         </div>
     </div>
 
@@ -133,9 +133,8 @@
                                 class="text-[13px] uppercase text-[#008F7E] font-black tracking-widest border-b border-slate-200">
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[10%]">ID</th>
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[30%]">Usuario</th>
-                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[15%]">Prioridad
-                                </th>
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[15%]">Estado</th>
+                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[15%]">Prioridad</th>
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[20%]">Tecnico</th>
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[10%] text-center">
                                     Detalle</th>
@@ -177,11 +176,11 @@
             <!--prioridades-->
             <div class="mt-6 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
                 <div
-                    class="absolute top-0 right-0 w-16 h-16 bg-secondary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
-                    <span class="material-symbols-outlined text-secondary/30">low_priority</span>
+                    class="absolute top-0 right-0 w-16 h-16 bg-blue-100/50 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-blue-200">low_priority</span>
                 </div>
-                <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-4 bg-slate-300 rounded-full"></span>
+                <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-secondary mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-4 bg-blue-200 rounded-full"></span>
                     Prioridades
                 </h4>
 
@@ -238,8 +237,8 @@
 
                 <div class="relative z-10">
                     <h4
-                        class="text-[12px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
-                        <span class="w-1.5 h-4 bg-primary rounded-full"></span>
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-green-900 mb-2 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-primary/50 rounded-full"></span>
                         Nuevo Ticket
                     </h4>
                     <p class="text-[12px] text-slate-500 font-medium mb-6">
