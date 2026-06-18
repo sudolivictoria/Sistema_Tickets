@@ -35,26 +35,57 @@ class DatabaseSeeder extends Seeder
             'name' => 'Olivia Victoria Amoss Quintanilla',
             'email' => 'ovquintanilla@istu.gob.sv',
             'password' => Hash::make('admin123'),
-            'rol_id' => $adminRol->id,
+            'rol_id' => $clienteRol->id,
             'unidad_id' => $unidadIT->id,
             'activo' => true,
             'cargo' => 'Técnico',
             'telefono' => '7949-9979',
         ]);
 
-
-          //-----Usuario Admin de prueba
         User::create([
-            'name' => 'Cliente Pruebas',
-            'email' => 'oamossquintanilla@gmail.com',
-            'password' => Hash::make('cliente123'),
-            'rol_id' => $clienteRol->id,
+            'name' => 'Leonardo Jonás Álvarez Cruz',
+            'email' => 'ljalvarez@istu.gob.sv',
+            'password' => Hash::make('admin123'),
+            'rol_id' => $adminRol->id,
+            'unidad_id' => $unidadIT->id,
+            'activo' => true,
+            'cargo' => 'Jefe de Unidad',
+            'telefono' => '',
+        ]);
+
+
+        User::create([
+            'name' => 'Monica Natalia Rodriguez Piche',
+            'email' => 'mnrodriguez@istu.gob.sv',
+            'password' => Hash::make('admin123'),
+            'rol_id' => $adminRol->id,
             'unidad_id' => $unidadIT->id,
             'activo' => true,
             'cargo' => 'Técnico',
-            'telefono' => null,
+            'telefono' => '',
         ]);
 
+        User::create([
+            'name' => 'Mario Alberto Ardón Torres',
+            'email' => 'matorres@istu.gob.sv',
+            'password' => Hash::make('admin123'),
+            'rol_id' => $adminRol->id,
+            'unidad_id' => $unidadIT->id,
+            'activo' => true,
+            'cargo' => 'Técnico',
+            'telefono' => '',
+        ]);
+
+        User::create([
+            'name' => 'José Javier Ramírez Gomez',
+            'email' => 'jjramirez@istu.gob.sv',
+            'password' => Hash::make('admin123'),
+            'rol_id' => $adminRol->id,
+            'unidad_id' => $unidadIT->id,
+            'activo' => true,
+            'cargo' => 'Técnico',
+            'telefono' => '',
+        ]);
 
         //------estados
         Estado::create([
