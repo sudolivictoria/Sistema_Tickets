@@ -38,7 +38,7 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        $remember = $request->boolean('remember');
+        $remember = true;
 
         if (Auth::attempt($credentials, $remember)) {
 
