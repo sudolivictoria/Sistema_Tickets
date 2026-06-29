@@ -21,11 +21,6 @@
                                 class="font-black text-green-800 bg-green-100/50 px-2 py-0.5 rounded-md">---</span>
                         </div>
                     </div>
-
-                    <button onclick="cerrarModal()"
-                        class="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all shrink-0">
-                        <span class="material-symbols-outlined text-[22px]">close</span>
-                    </button>
                 </div>
 
                 <div class="space-y-5">

@@ -1,23 +1,18 @@
 // ===================================================
 // AUTO-REFRESCO UNIVERSAL POR WEBSOCKETS (REVERB)
 // ===================================================
-
 window.AutoRefresco = (() => {
     let isRefreshing = false;
-
     //---bloquea refresco si el usuario esta trabajando
     function hayAccionEnCurso() {
         const modalAbierto = document.querySelector(
             ".modal:not(.hidden), #modalTicket:not(.hidden), #modalUsuario:not(.hidden), #modalAgregar:not(.hidden), #modalEditar:not(.hidden), .swal2-container:not(.hidden)",
         );
-
         const buscadorDeTabla =
             document.activeElement &&
             (document.activeElement.getAttribute("type") === "search" ||
                 document.activeElement.closest(".dataTables_filter"));
-
         const buscadorGeneral = document.getElementById("inputBusqueda");
-
         return !!(
             modalAbierto ||
             buscadorDeTabla ||
@@ -36,19 +31,15 @@ window.AutoRefresco = (() => {
     function procesarTabla(htmlNuevo) {
         if (htmlNuevo === undefined || htmlNuevo === null || isRefreshing)
             return;
-
         isRefreshing = true;
-
         try {
             const tablaElement = document.querySelector(
                 '.dataTable, table[id*="tabla"], table[id*="Table"]',
             );
             if (!tablaElement) return;
-
             const tablaId = tablaElement.id;
             const tablaBody = tablaElement.querySelector("tbody");
             if (!tablaBody) return;
-
             if (tablaId !== "tablaHistorial") {
                 if (
                     !window.$ ||
@@ -58,23 +49,19 @@ window.AutoRefresco = (() => {
                     tablaBody.innerHTML = htmlNuevo;
                     return;
                 }
-
                 const $tabla = $(tablaElement);
                 let paginaActual = 0;
                 let buscadorTermino = "";
-
                 //---guarda estado actual y paginacion
                 try {
                     const dtInstancia = $tabla.DataTable();
                     paginaActual = dtInstancia.page();
                     buscadorTermino = dtInstancia.search();
                 } catch (_) {}
-
                 //---destruccion limpia
                 try {
                     $tabla.DataTable().destroy();
                 } catch (_) {}
-
                 //----insercion html
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(
@@ -83,7 +70,6 @@ window.AutoRefresco = (() => {
                 );
                 const tbodyEl = doc.querySelector("tbody");
                 tablaBody.innerHTML = tbodyEl ? tbodyEl.innerHTML : "";
-
                 //----reinicializacion
                 if (
                     tablaId === "userTable" &&
@@ -95,7 +81,6 @@ window.AutoRefresco = (() => {
                 ) {
                     window.inicializarTablaTickets("#" + tablaId);
                 }
-
                 //---clases estaticas e inyección de estados DataTables
                 try {
                     const dtNuevo = $tabla.DataTable();
@@ -124,7 +109,6 @@ window.AutoRefresco = (() => {
         const wrappers = document.querySelectorAll(".dataTables_wrapper");
         wrappers.forEach((wrap) => {
             if (wrap.id === "tablaHistorial_wrapper") return;
-
             const lengthSelect = wrap.querySelector(
                 ".dataTables_length select",
             );
@@ -132,7 +116,6 @@ window.AutoRefresco = (() => {
                 lengthSelect.className =
                     "mx-2 px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl focus:outline-none";
             }
-
             const paginateContainer = wrap.querySelector(
                 ".dataTables_paginate",
             );
@@ -154,7 +137,6 @@ window.AutoRefresco = (() => {
             btn.removeAttribute("style");
             btn.className =
                 "px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border select-none no-underline inline-block ";
-
             if (
                 btn.classList.contains("current") ||
                 btn.classList.contains("active")
@@ -191,15 +173,12 @@ window.AutoRefresco = (() => {
             '.dataTable, table[id*="tabla"], table[id*="Table"]',
         );
         if (!tablaElement) return;
-
         const tablaBody = tablaElement.querySelector("tbody");
         if (!tablaBody) return;
-
         const tipoTabla =
             tablaElement.id === "tablaHistorial"
                 ? "historial"
                 : tablaBody.getAttribute("data-tipo") || "dashboard";
-
         //---deteccion filtrados
         let filtroEstado = "todos";
         const botonActivo = document.querySelector(
@@ -210,7 +189,6 @@ window.AutoRefresco = (() => {
         } else {
             filtroEstado = window.filtroSseActual || "todos";
         }
-
         if (
             filtroEstado.includes(",") &&
             tipoTabla !== "asignados" &&
@@ -226,9 +204,7 @@ window.AutoRefresco = (() => {
                 ".TicketActualizado",
                 (e) => {
                     if (hayAccionEnCurso()) return;
-
                     const url = `/api/refresh?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`;
-
                     fetch(url)
                         .then((response) => response.json())
                         .then((data) => {
@@ -238,7 +214,6 @@ window.AutoRefresco = (() => {
                                 return;
                             }
                             procesarTabla(data.html);
-
                             //**********CONTADORES Y METRICAS******************/
                             if (data.contadores) {
                                 actualizarElemento(
@@ -319,25 +294,21 @@ window.AutoRefresco = (() => {
             window.Echo.leaveChannel("tickets-publicos");
         }
     }
-
     return {
         iniciar,
         detener,
         forzarRefresco: () => {
             iniciar();
-
             const tablaElement = document.querySelector(
                 '.dataTable, table[id*="tabla"], table[id*="Table"]',
             );
             if (!tablaElement) return;
             const tablaBody = tablaElement.querySelector("tbody");
             if (!tablaBody) return;
-
             const tipoTabla =
                 tablaElement.id === "tablaHistorial"
                     ? "historial"
                     : tablaBody.getAttribute("data-tipo") || "dashboard";
-
             let filtroEstado = window.filtroSseActual || "todos";
             if (
                 filtroEstado.includes(",") &&
@@ -347,7 +318,6 @@ window.AutoRefresco = (() => {
             ) {
                 filtroEstado = "cerrado";
             }
-
             const url = `/api/refresh?tipo=${encodeURIComponent(tipoTabla)}&estado=${encodeURIComponent(filtroEstado)}`;
             fetch(url)
                 .then((res) => res.json())
@@ -361,9 +331,7 @@ window.AutoRefresco = (() => {
         aplicarEstilosPaginacion,
     };
 })();
-
 window.AutoRefrescoSSE = window.AutoRefresco;
-
 // =============================================================
 // INTERCEPCIÓN Y DISPARADORES SEGUROS DE JQUERY / DOM
 // =============================================================
@@ -382,14 +350,11 @@ document.addEventListener("DOMContentLoaded", function () {
     //---CONEXION EN TIEMPO REAL
     window.AutoRefresco.iniciar();
 });
-
 window.addEventListener("beforeunload", () => {
     window.AutoRefresco.detener();
 });
-
 window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
     if (!elementoBoton) return;
-
     const contenedorFiltros = elementoBoton.closest("#filtrosEstado, .flex");
     if (contenedorFiltros) {
         contenedorFiltros.querySelectorAll(".filtro-btn").forEach((btn) => {
@@ -409,14 +374,12 @@ window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
         "text-white",
         "shadow-md",
     );
-
     //---ESTADO E INICIAR
     window.filtroSseActual = estadoObjetivo;
     window.AutoRefresco.forzarRefresco();
 };
 
 window.filtroSseActual = "todos";
-
 //---MANEJA CUALQUIER FILTRO
 document.addEventListener("click", function (event) {
     const boton = event.target.closest(
@@ -425,7 +388,6 @@ document.addEventListener("click", function (event) {
     if (boton) {
         const estado = boton.getAttribute("data-estado") || "todos";
         window.filtroSseActual = estado;
-
         //--EVITA LLAMADA EN FALSO
         setTimeout(() => {
             if (typeof window.AutoRefresco !== "undefined") {

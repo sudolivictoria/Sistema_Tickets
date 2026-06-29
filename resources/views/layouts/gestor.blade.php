@@ -125,12 +125,6 @@
                             <span class="material-symbols-outlined text-xl">history</span>
                             <span class="text-sm">Mis Tickets</span>
                         </a>
-
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.recursos') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('gestor.recursos') }}">
-                            <span class="material-symbols-outlined text-xl">library_books</span>
-                            <span class="text-sm">Recursos</span>
-                        </a>
                     </nav>
 
                     <div class="mt-auto pt-2 border-t border-white/10">

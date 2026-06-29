@@ -134,7 +134,8 @@
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[10%]">ID</th>
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[30%]">Usuario</th>
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[15%]">Estado</th>
-                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[15%]">Prioridad</th>
+                                <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[15%]">Prioridad
+                                </th>
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[20%]">Tecnico</th>
                                 <th class="px-4 py-4 bg-slate-50 font-black border-b border-slate-200 w-[10%] text-center">
                                     Detalle</th>
@@ -232,29 +233,28 @@
             <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div
                     class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
-                    <span class="material-symbols-outlined text-primary/30">add_circle</span>
+                    <span class="material-symbols-outlined text-primary/30">auto_stories</span>
                 </div>
 
                 <div class="relative z-10">
                     <h4
                         class="text-[12px] font-black uppercase tracking-[0.2em] text-green-900 mb-2 flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-primary/50 rounded-full"></span>
-                        Nuevo Ticket
+                        Recursos
                     </h4>
                     <p class="text-[12px] text-slate-500 font-medium mb-6">
-                        Registra una nueva solicitud en el sistema.
+                        Explora nuestros recursos disponibles.
                     </p>
-                    <a href="{{ route('admin.crear-ticket') }}"
+                    <a href="https://anyflip.com/bookcase/ghert" target="_blank"
                         class="group w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white gap-2">
-                        <span
-                            class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">add</span>
-                        Crear Ticket
+                        <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
+                            arrow_forward
+                        </span>
+                        Abrir Biblioteca
                     </a>
                 </div>
             </div>
             {{-- Final Call to Action --}}
-
-
         </div>
     </div>
 
@@ -266,9 +266,9 @@
 @endsection
 
 @push('page-scripts')
-    @vite(['resources/js/admin.js'])
+@vite(['resources/js/admin.js'])
 @endpush
 
 @push('sse-scripts')
-    @vite(['resources/js/api.js'])
+@vite(['resources/js/api.js'])
 @endpush

@@ -15,10 +15,15 @@
             @csrf
 
             <div class="flex flex-col gap-2.5">
-                <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Asunto del Ticket</label>
-                <input name="asunto" value="{{ old('asunto') }}"
-                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all placeholder:text-slate-300 font-medium text-slate-700"
-                    placeholder="Ej: Falla en equipo de cómputo" type="text" required />
+                <div class="flex justify-between items-center ml-1">
+                    <label class="text-sm font-black text-secondary uppercase tracking-widest">Asunto del Ticket</label>
+                    <span id="char-counter" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-400 border border-slate-200 transition-colors">
+                        0/30
+                    </span>
+                </div>
+                <input id="asunto-input" name="asunto" value="{{ old('asunto') }}" maxlength="30"
+                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all placeholder:text-slate-300 !appearance-none !bg-none font-medium text-slate-700"
+                    placeholder="Ej: Falla en mi laptop" type="text" required />
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">

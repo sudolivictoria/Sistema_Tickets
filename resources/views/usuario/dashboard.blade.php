@@ -99,24 +99,25 @@
             {{-- Call to Action --}}
             <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div
-                    class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
-                    <span class="material-symbols-outlined text-primary/30">local_post_office</span>
+                    class="absolute top-0 right-0 w-16 h-16 bg-secondary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-secondary/30">auto_stories</span>
                 </div>
 
                 <div class="relative z-10">
                     <h4
-                        class="text-[12px] font-black uppercase tracking-[0.2em] text-green-950 mb-2 flex items-center gap-2">
-                        <span class="w-1.5 h-4 bg-primary/50 rounded-full"></span>
-                        Bandeja
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-blue-900 mb-2 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-secondary/50 rounded-full"></span>
+                        Recursos
                     </h4>
                     <p class="text-[12px] text-slate-500 font-medium mb-6">
-                        Consulta el estado actual e historial de tus solicitudes.
+                        Explora nuestros recursos disponibles.
                     </p>
-                    <a href="{{ route('usuario.mis-tickets') }}"
-                        class="group w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white gap-2">
-                        <span
-                            class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">segment</span>
-                        Ver Mis Tickets
+                    <a href="https://anyflip.com/bookcase/ghert" target="_blank"
+                        class="group w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white gap-2">
+                        <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
+                            arrow_forward
+                        </span>
+                        Abrir Biblioteca
                     </a>
                 </div>
             </div>

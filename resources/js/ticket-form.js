@@ -1,4 +1,4 @@
-//--Inmediately Invoked Function Expression 
+//--Inmediately Invoked Function Expression
 (function () {
     window.filtrarTipos = function (categoriaId) {
         const selectTipo = document.querySelector(
@@ -48,6 +48,40 @@
             }
         }
     };
+
+    //-----caracteres asunto
+    const inputAsunto = document.getElementById("asunto-input");
+    const contador = document.getElementById("char-counter");
+
+    inputAsunto.addEventListener("input", () => {
+        const longitud = inputAsunto.value.length;
+        contador.textContent = `${longitud}/30`;
+
+        //----badge caracteres
+        if ((longitud > 0 && longitud < 5) || longitud >= 30) {
+            contador.classList.remove(
+                "bg-slate-100",
+                "text-slate-400",
+                "border-slate-200",
+            );
+            contador.classList.add(
+                "bg-red-50",
+                "text-red-500",
+                "border-red-200",
+            );
+        } else {
+            contador.classList.remove(
+                "bg-red-50",
+                "text-red-500",
+                "border-red-200",
+            );
+            contador.classList.add(
+                "bg-slate-100",
+                "text-slate-400",
+                "border-slate-200",
+            );
+        }
+    });
 
     //--escuchas universales
     document.addEventListener("DOMContentLoaded", () => {
