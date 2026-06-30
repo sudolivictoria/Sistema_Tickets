@@ -55,10 +55,10 @@
 
     inputAsunto.addEventListener("input", () => {
         const longitud = inputAsunto.value.length;
-        contador.textContent = `${longitud}/30`;
+        contador.textContent = `${longitud}/50`;
 
         //----badge caracteres
-        if ((longitud > 0 && longitud < 5) || longitud >= 30) {
+        if ((longitud > 0 && longitud < 5) || longitud >= 50) {
             contador.classList.remove(
                 "bg-slate-100",
                 "text-slate-400",

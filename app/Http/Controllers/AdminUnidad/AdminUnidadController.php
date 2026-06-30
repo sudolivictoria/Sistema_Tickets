@@ -140,14 +140,14 @@ class AdminUnidadController extends Controller
 
         //-----validacion datos
         $request->validate([
-            'asunto' => 'required|string|min:5|max:30',
+            'asunto' => 'required|string|min:5|max:50',
             'categoria_id' => 'required|exists:categorias,id',
             'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
             'descripcion' => 'required|string',
             'prioridad_id' => 'required|exists:prioridades,id',
 
         ], [
-            'asunto.max' => 'El asunto es demasiado largo. Resume el problema en menos de 30 caracteres.',
+            'asunto.max' => 'El asunto es demasiado largo. Resume el problema en menos de 50 caracteres.',
             'asunto.min' => 'El asunto es demasiado corto. Debe tener al menos 5 caracteres.',
         ]);
 

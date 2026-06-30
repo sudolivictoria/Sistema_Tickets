@@ -6,13 +6,16 @@
             class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-primary">
             <div class="p-8">
                 <div class="flex justify-between items-start mb-6">
-                    <h3 id="modalTitulo" class="text-xl font-black text-green-950 uppercase">---</h3>
+                    <h3 id="modalTitulo"
+                        class="text-xl font-black text-green-950 uppercase max-w-full break-words whitespace-normal">---
+                    </h3>
                 </div>
                 <div class="space-y-5">
                     <div>
                         <div class="flex items-center gap-1.5 mb-2">
                             <span class="material-symbols-outlined text-[16px] text-primary">category</span>
-                            <label class="text-[11px] font-black uppercase tracking-widest text-green-950">Tipo de Solicitud</label>
+                            <label class="text-[11px] font-black uppercase tracking-widest text-green-950">Tipo de
+                                Solicitud</label>
                         </div>
                         <div id="modalTipoSolicitud"
                             class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line">
@@ -23,11 +26,11 @@
                     <div>
                         <div class="flex items-center gap-1.5 mb-2">
                             <span class="material-symbols-outlined text-[16px] text-primary">description</span>
-                            <label class="text-[11px] font-black uppercase tracking-widest text-green-950">Descripción de la
-                                solicitud</label>
+                            <label class="text-[11px] font-black uppercase tracking-widest text-green-950">Descripción
+                                de la solicitud</label>
                         </div>
                         <div id="modalDescripcion"
-                            class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line max-h-[200px] overflow-y-auto custom-scrollbar">
+                            class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-line max-h-[200px] overflow-y-auto custom-scrollbar break-words">
                             ---
                         </div>
                     </div>
