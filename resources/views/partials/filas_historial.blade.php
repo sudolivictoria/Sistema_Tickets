@@ -11,12 +11,12 @@
         <td class="px-2 py-4">
             <div class="flex flex-col">
                 <button type="button" onclick="verUsuario(
-                                '{{ $ticket->user->name }}', 
-                                '{{ $ticket->user->email }}', 
-                                '{{ $ticket->user->unidad->nombre_unidad }}', 
-                                '{{ $ticket->user->cargo }}', 
-                                '{{ $ticket->user->telefono ?? '----' }}'
-                            )"
+                                    '{{ $ticket->user->name }}', 
+                                    '{{ $ticket->user->email }}', 
+                                    '{{ $ticket->user->unidad->nombre_unidad }}', 
+                                    '{{ $ticket->user->cargo }}', 
+                                    '{{ $ticket->user->telefono ?? '----' }}'
+                                )"
                     class="font-black hover:text-primary transition-all text-left flex items-center gap-1 group">
                     {{ $ticket->user->name }}
                     <span
@@ -86,7 +86,8 @@
                     class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center"
                     data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                     data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud ?? 'N/A' }}"
-                    data-fecha="{{ $ticket->created_at->format('d/m/Y') }}">
+                    data-fecha="{{ $ticket->created_at->format('d/m/Y') }}"
+                    data-drive="{{ $ticket->drive_link }}">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                 </button>
             </div>

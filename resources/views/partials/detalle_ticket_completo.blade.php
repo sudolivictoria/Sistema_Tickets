@@ -48,6 +48,22 @@
                             ---
                         </div>
                     </div>
+
+                    <div id="wrapperDriveLink" class="hidden">
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <span class="material-symbols-outlined text-[16px] text-primary">link</span>
+                            <label class="text-[11px] font-black uppercase tracking-widest text-green-950">Evidencia
+                                Adjunta</label>
+                        </div>
+                        <a id="modalDriveLink" href="#" target="_blank"
+                            class="flex items-center justify-between p-4 bg-green-50 border border-green-100 rounded-2xl text-green-700 text-sm font-bold hover:bg-green-100 transition-all">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined">open_in_new</span>
+                                Ver Evidencia del Reporte
+                            </span>
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </div>  
                 </div>
 
                 <div class="mt-6 pt-4 border-t border-slate-100">

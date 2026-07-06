@@ -39,24 +39,28 @@ window.inicializarHistorialDataTable = function () {
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
-    $("#tablaHistorial").off("click", ".btn-ver-detalle").on("click", ".btn-ver-detalle", function () {
-        const asunto = $(this).data("asunto");
-        const descripcion = $(this).data("descripcion");
-        const tipo = $(this).data("tipo");
-        const fecha = $(this).data("fecha");
-        verDetalle(asunto, descripcion, tipo, fecha);
-    });
-    $("#tablaHistorial").off("click", ".btn-ver-usuario").on("click", ".btn-ver-usuario", function () {
-        const nombre = $(this).data("nombre");
-        const email = $(this).data("email");
-        const unidad = $(this).data("unidad");
-        const cargo = $(this).data("cargo");
-        const telefono = $(this).data("telefono");
-        verUsuario(nombre, email, unidad, cargo, telefono);
-    });
+    $("#tablaHistorial")
+        .off("click", ".btn-ver-detalle")
+        .on("click", ".btn-ver-detalle", function () {
+            const asunto = $(this).data("asunto");
+            const descripcion = $(this).data("descripcion");
+            const tipo = $(this).data("tipo");
+            const fecha = $(this).data("fecha");
+            const drive = $(this).data("drive");
+            verDetalle(asunto, descripcion, tipo, fecha, drive);
+        });
+    $("#tablaHistorial")
+        .off("click", ".btn-ver-usuario")
+        .on("click", ".btn-ver-usuario", function () {
+            const nombre = $(this).data("nombre");
+            const email = $(this).data("email");
+            const unidad = $(this).data("unidad");
+            const cargo = $(this).data("cargo");
+            const telefono = $(this).data("telefono");
+            verUsuario(nombre, email, unidad, cargo, telefono);
+        });
     tableHistorial.draw();
 };
-
 
 window.aplicarFiltrosHistorial = function () {
     if (!tableHistorial) return;
@@ -64,10 +68,13 @@ window.aplicarFiltrosHistorial = function () {
     const fechaInicio = document.getElementById("filtroFechaInicio").value;
     const fechaFin = document.getElementById("filtroFechaFin").value;
     const estado = document.getElementById("filtroEstado").value;
-    const categoria = document.getElementById("filtroCategoria") ? document.getElementById("filtroCategoria").value : "todos";
+    const categoria = document.getElementById("filtroCategoria")
+        ? document.getElementById("filtroCategoria").value
+        : "todos";
 
     //------validar si todos los parámetros están en su estado vacío por defecto
-    if (!textoBuscar && !fechaInicio && !fechaFin && estado === "todos" && categoria === "todos") {
+    if (!textoBuscar && !fechaInicio && !fechaFin && estado === "todos" && categoria === "todos"
+    ) {
         Swal.fire({
             title: "¡Búsqueda demasiado amplia!",
             text: "Para proteger el rendimiento del sistema, debe seleccionar al menos un filtro específico (Estado, Categoría, Rango de fechas o escribir un término de búsqueda).",
@@ -75,19 +82,31 @@ window.aplicarFiltrosHistorial = function () {
             confirmButtonText: "Entendido",
             confirmButtonColor: "#04003B",
         });
-        return; 
+        return;
     }
 
     //------rango de fechas, complete ambos campos
-    if ((fechaInicio && !fechaFin) || (!fechaInicio &&  fechaFin)) {
+    if ((fechaInicio && !fechaFin) || (!fechaInicio && fechaFin)) {
         Swal.fire({
             title: "Rango de fechas incompleto",
             text: "Por favor, especifique tanto la 'Fecha Inicio' como la 'Fecha Fin' para procesar el filtro de tiempo correctamente.",
-            icon: "info",
+            icon: "warning",
             confirmButtonText: "Completar rango",
             confirmButtonColor: "#04003B",
         });
-        return; 
+        return;
+    }
+
+     //------rango de fechas, complete ambos campos
+    if (fechaInicio > fechaFin) {
+        Swal.fire({
+            title: "Rango de fechas incorrecto",
+            text: "La 'Fecha Inicio' no puede ser posterior a la 'Fecha Fin'. Por favor, corrija las fechas para procesar el filtro de tiempo correctamente.",
+            icon: "warning",
+            confirmButtonText: "Completar rango",
+            confirmButtonColor: "#04003B",
+        });
+        return;
     }
 
     filtrosAplicados = true;
@@ -126,7 +145,7 @@ window.exportarHistorial = function (formato) {
             text: "Por favor, aplique los filtros primero antes de exportar un reporte.",
             icon: "warning",
             confirmButtonText: "Entendido",
-            confirmButtonColor: "#04003B", 
+            confirmButtonColor: "#04003B",
         });
         return;
     }
@@ -135,7 +154,9 @@ window.exportarHistorial = function (formato) {
     const fechaInicio = document.getElementById("filtroFechaInicio").value;
     const fechaFin = document.getElementById("filtroFechaFin").value;
     const estado = document.getElementById("filtroEstado").value;
-    const categoria = document.getElementById("filtroCategoria") ? document.getElementById("filtroCategoria").value : "todos";
+    const categoria = document.getElementById("filtroCategoria")
+        ? document.getElementById("filtroCategoria").value
+        : "todos";
 
     const params = new URLSearchParams({
         tipo: formato,
@@ -150,11 +171,22 @@ window.exportarHistorial = function (formato) {
 };
 
 //--------ver detalle del ticket historial--------//
-window.verDetalle = function (asunto, descripcion, tipoNombre) {
+window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura, drive) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
+    const wrapper = document.getElementById("wrapperDriveLink");
+    const linkAnchor = document.getElementById("modalDriveLink");
+
+    if (drive && drive.trim() !== "" && drive !== "null") {
+        linkAnchor.href = drive;
+        wrapper.classList.remove("hidden");
+    } else {
+        linkAnchor.href = "#";
+        wrapper.classList.add("hidden");
+    }
+
     if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;
         desc.innerText = descripcion;
@@ -213,11 +245,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaHistorial")) {
         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             if (settings.nTable.id !== "tablaHistorial") return true;
-            
+
             if (!filtrosAplicados) {
                 return false;
             }
-            
+
             const filaTr = settings.aoData[dataIndex].nTr;
             const fechaFilaRaw = filaTr.getAttribute("data-fecha");
             const estadoFilaId = filaTr.getAttribute("data-estado-id");

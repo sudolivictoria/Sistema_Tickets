@@ -15,6 +15,7 @@ class Ticket extends Model
         'estado_id',
         'asunto',
         'descripcion',
+        'drive_link',
         'fecha_cierre',
     ];
 

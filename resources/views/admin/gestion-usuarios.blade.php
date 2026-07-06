@@ -85,7 +85,7 @@
 
                                         <button type="submit" @disabled($user->id === auth()->id())
                                             class="p-2 rounded-xl {{ $user->activo ? 'bg-red-50 text-red-600 hover:bg-red-100 hover:scale-105 transition-transform' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-200 hover:scale-105 transition-transform' }} 
-                                                                                    {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
+                                                                                            {{ $user->id === auth()->id() ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 transition-transform' }}">
                                             <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
                                         </button>
                                     </form>
@@ -118,7 +118,8 @@
                 </div>
                 <div class="relative">
                     <label class="text-[12px] font-black uppercase text-secondary">Contraseña</label>
-                    <input type="password" name="password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
+                    <input type="password" name="password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
+                        minlength="6" required>
                     <button type="button" class="toggle-password"
                         style="position: absolute; top: 38px; right: 12px; background: transparent; border: none; cursor: pointer; padding: 0;">
                         <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#64748b"
@@ -159,7 +160,8 @@
 
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Telefono</label>
-                    <input type="text" name="telefono" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl">
+                    <input type="text" name="telefono" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl "
+                        maxlength="15">
                 </div>
 
 
@@ -200,7 +202,8 @@
                 <div class="relative">
                     <label class="text-[12px] font-black uppercase text-secondary">Contraseña (Dejar vacío para no
                         cambiar)</label>
-                    <input type="password" name="password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl">
+                    <input type="password" name="password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl "
+                        minlength="6">
 
                     <button type="button" class="toggle-password"
                         style="position: absolute; top: 38px; right: 12px; background: transparent; border: none; cursor: pointer; padding: 0;">
@@ -246,7 +249,7 @@
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Telefono</label>
                     <input type="text" name="telefono" id="edit_telefono"
-                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl">
+                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" maxlength="15">
                 </div>
 
                 <button type="submit"
@@ -277,13 +280,14 @@
     @if ($errors->any())
         <script>
             document.addEventListener("DOMContentLoaded", () => {
+                let errores = {!! json_encode(implode("<br>", $errors->all())) !!};
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: 'Por favor verifique los datos ingresados.',
+                    title: 'No se pudo guardar',
+                    html: `<div class="text-center font-sans text-sm">${errores}</div>`,
                     confirmButtonColor: '#dc2626',
                 });
-            });
+            })
         </script>
     @endif
 @endpush

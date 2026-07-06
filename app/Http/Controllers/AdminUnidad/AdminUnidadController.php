@@ -146,15 +146,13 @@ class AdminUnidadController extends Controller
             'descripcion' => 'required|string',
             'prioridad_id' => 'required|exists:prioridades,id',
 
-        ], [
-            'asunto.max' => 'El asunto es demasiado largo. Resume el problema en menos de 50 caracteres.',
-            'asunto.min' => 'El asunto es demasiado corto. Debe tener al menos 5 caracteres.',
         ]);
 
         //--crear ticket
         $nuevoTicket = Ticket::create([
             'asunto' => $request->asunto,
             'descripcion' => $request->descripcion,
+            'drive_link' => $request->drive_link,
             'categoria_id' => $request->categoria_id,
             'tipo_solicitud_id' => $request->tipo_solicitud_id,
             'user_id' => Auth::id(), //----asignar el ticket al usuario autenticado

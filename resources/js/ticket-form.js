@@ -1,13 +1,12 @@
 //--Inmediately Invoked Function Expression
 (function () {
+    //--filtrar subcategorias
     window.filtrarTipos = function (categoriaId) {
-        const selectTipo = document.querySelector(
-            'select[name="tipo_solicitud_id"]',
-        );
+        const selectTipo = document.querySelector('select[name="tipo_solicitud_id"]');
         if (!selectTipo) return;
+        
         //--reiniciar opciones
-        selectTipo.innerHTML =
-            '<option value="" disabled selected>Seleccione</option>';
+        selectTipo.innerHTML = '<option value="" disabled selected>Seleccione</option>';
 
         //--validacion existencia datos
         if (!window.todosLosTipos || window.todosLosTipos.length === 0) return;
@@ -24,81 +23,78 @@
         });
     };
 
-    //--funcion inicializacion del formulario
+    //--función de inicialización del formulario 
     const initForm = () => {
-        const categoriaSelect = document.querySelector(
-            'select[name="categoria_id"]',
-        );
-        const tipoSelect = document.querySelector(
-            'select[name="tipo_solicitud_id"]',
-        );
+        const categoriaSelect = document.querySelector('select[name="categoria_id"]');
+        const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
 
-        if (!categoriaSelect) return;
+        if (!categoriaSelect || !tipoSelect) return;
 
-        //--si viene una categoria seleccionada
         if (categoriaSelect.value) {
+            //---options del select
             window.filtrarTipos(categoriaSelect.value);
-
-            //--restaurar tipo seleccionado
-            if (tipoSelect && tipoSelect.value) {
-                tipoSelect.value =
-                    tipoSelect.getAttribute("value") || tipoSelect.value;
-                //--mostrar descripcion
+            const idTipoViejo = tipoSelect.getAttribute('value');
+            if (idTipoViejo) {
+                tipoSelect.value = idTipoViejo;
+                //---cuadro azul informativo
                 tipoSelect.dispatchEvent(new Event("change"));
             }
         }
     };
 
-    //-----caracteres asunto
-    const inputAsunto = document.getElementById("asunto-input");
-    const contador = document.getElementById("char-counter");
-
-    inputAsunto.addEventListener("input", () => {
-        const longitud = inputAsunto.value.length;
-        contador.textContent = `${longitud}/50`;
-
-        //----badge caracteres
-        if ((longitud > 0 && longitud < 5) || longitud >= 50) {
-            contador.classList.remove(
-                "bg-slate-100",
-                "text-slate-400",
-                "border-slate-200",
-            );
-            contador.classList.add(
-                "bg-red-50",
-                "text-red-500",
-                "border-red-200",
-            );
-        } else {
-            contador.classList.remove(
-                "bg-red-50",
-                "text-red-500",
-                "border-red-200",
-            );
-            contador.classList.add(
-                "bg-slate-100",
-                "text-slate-400",
-                "border-slate-200",
-            );
-        }
-    });
-
-    //--escuchas universales
+    //-- Escuchas universales seguras bajo la carga del DOM
     document.addEventListener("DOMContentLoaded", () => {
-        //--inicializar formulario
-        initForm();
+        const inputAsunto = document.getElementById("asunto-input");
+        const contador = document.getElementById("char-counter");
+        const categoriaSelect = document.querySelector('select[name="categoria_id"]');
+        const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
+        const formulario = document.querySelector("form");
+        const btnEnviar = document.getElementById("btn-enviar");
 
-        //--evento de categoria
-        document
-            .querySelector('select[name="categoria_id"]')
-            .addEventListener("change", function () {
+        //----retraso controlado para garantizar que Blade cargó window.todosLosTipos----
+        setTimeout(() => {
+            initForm();
+        }, 150);
+
+        //----CONTADOR INFORMATIVO (Solo cuenta caracteres)----
+        if (inputAsunto && contador) {
+            const lenInicial = inputAsunto.value.length;
+            contador.textContent = `${lenInicial}/50`;
+
+            inputAsunto.addEventListener("input", () => {
+                const longitud = inputAsunto.value.length;
+                contador.textContent = `${longitud}/50`;
+
+                //---badge informativa roja numero de caracteres
+                if (longitud < 5 || longitud >= 50) {
+                    contador.classList.remove("bg-slate-100", "text-slate-400", "border-slate-200");
+                    contador.classList.add("bg-red-50", "text-red-500", "border-red-200");
+                } else {
+                    contador.classList.remove("bg-red-50", "text-red-500", "border-red-200");
+                    contador.classList.add("bg-slate-100", "text-slate-400", "border-slate-200");
+                }
+            });
+        }
+
+        // ----PREVENCIÓN DE DOBLE ENVÍO REAL----
+        if (formulario && btnEnviar) {
+            formulario.addEventListener("submit", function () {
+                //---al no haber preventDefault, el formulario viaja normalmente, pero congelamos el botón
+                btnEnviar.disabled = true;
+                btnEnviar.innerHTML = `<span>Enviando...</span> <span class="animate-spin material-symbols-outlined text-lg">sync</span>`;
+            });
+        }
+
+        //--evento de cambio de categoría
+        if (categoriaSelect) {
+            categoriaSelect.addEventListener("change", function () {
                 window.filtrarTipos(this.value);
             });
+        }
 
-        //--evento de tipo solicitud para mostrar descripcion
-        document
-            .querySelector('select[name="tipo_solicitud_id"]')
-            .addEventListener("change", function () {
+        //--evento de tipo solicitud para mostrar descripción informativa (Cuadro azul)
+        if (tipoSelect) {
+            tipoSelect.addEventListener("change", function () {
                 const infoDiv = document.getElementById("info-extra");
                 const tipoSeleccionado = window.todosLosTipos?.find(
                     (t) => t.id == this.value,
@@ -106,13 +102,13 @@
 
                 if (infoDiv) {
                     if (tipoSeleccionado?.descripcion_solicitud) {
-                        document.getElementById("texto-ayuda").textContent =
-                            tipoSeleccionado.descripcion_solicitud;
+                        document.getElementById("texto-ayuda").textContent = tipoSeleccionado.descripcion_solicitud;
                         infoDiv.classList.remove("hidden");
                     } else {
                         infoDiv.classList.add("hidden");
                     }
                 }
             });
+        }
     });
 })();

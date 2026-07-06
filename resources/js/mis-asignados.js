@@ -72,8 +72,9 @@ $(document).ready(function () {
             const descripcion = $(this).data("descripcion");
             const tipo = $(this).data("tipo");
             const fecha = $(this).data("fecha");
+            const drive = $(this).data("drive");
 
-            window.verDetalle(asunto, descripcion, tipo, fecha);
+            window.verDetalle(asunto, descripcion, tipo, fecha, drive);
         });
 
     $(document)
@@ -97,17 +98,34 @@ $(document).ready(function () {
 /**
  * Gestión de Modal de detalles
  */
-window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura) {
+window.verDetalle = function (
+    asunto,
+    descripcion,
+    tipoNombre,
+    fechaApertura,
+    drive,
+) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
     const fecha = document.getElementById("modalFechaApertura");
+    const wrapper = document.getElementById("wrapperDriveLink");
+    const linkAnchor = document.getElementById("modalDriveLink");
+
+    if (drive && drive.trim() !== "" && drive !== "null") {
+        linkAnchor.href = drive;
+        wrapper.classList.remove("hidden");
+    } else {
+        linkAnchor.href = "#";
+        wrapper.classList.add("hidden");
+    }
+
     if (modal && titulo && desc && tipo && fecha) {
-        titulo.innerText = asunto;
-        desc.innerText = descripcion;
-        tipo.innerText = tipoNombre;
-        fecha.innerText = fechaApertura;
+        titulo.textContent = asunto;
+        desc.textContent = descripcion;
+        tipo.textContent = tipoNombre;
+        fecha.textContent = fechaApertura;
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }

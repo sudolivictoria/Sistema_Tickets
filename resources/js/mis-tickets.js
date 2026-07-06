@@ -71,8 +71,9 @@ $(document).ready(function () {
             const asunto = $(this).data("asunto");
             const descripcion = $(this).data("descripcion");
             const tipo = $(this).data("tipo");
+            const drive = $(this).data("drive");
 
-            window.verDetalle(asunto, descripcion, tipo);
+            window.verDetalle(asunto, descripcion, tipo, drive);
         });
 
     //------------------AUTO REFRESCO-----------------
@@ -104,16 +105,26 @@ window.filtrarEstado = function (estado, btn) {
 /**
  * Gestión de Modal de detalles
  */
-window.verDetalle = function (asunto, descripcion, tipoSolicitud) {
+window.verDetalle = function (asunto, descripcion, tipoSolicitud, drive) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
+    const wrapper = document.getElementById("wrapperDriveLink");
+    const linkAnchor = document.getElementById("modalDriveLink");
+
+    if (drive && drive.trim() !== "" && drive !== "null") {
+        linkAnchor.href = drive;
+        wrapper.classList.remove("hidden");
+    } else {
+        linkAnchor.href = "#";
+        wrapper.classList.add("hidden");
+    }
 
     if (modal && titulo && desc && tipo) {
-        titulo.innerText = asunto;
-        desc.innerText = descripcion;
-        tipo.innerText = tipoSolicitud;
+        titulo.textContent = asunto;
+        desc.textContent = descripcion;
+        tipo.textContent = tipoSolicitud;
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }

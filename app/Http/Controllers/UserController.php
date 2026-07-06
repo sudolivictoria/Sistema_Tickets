@@ -6,6 +6,7 @@ use App\Models\Rol;
 use App\Models\Unidad;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -15,6 +16,11 @@ class UserController extends Controller
 
         //---busca el usuario por su ID
         $user = User::findOrFail($id);
+
+        if ($user->id === Auth::id()) {
+            return redirect()->route('admin.gestion-usuarios')->with('error', 'No puedes desactivar tu propia cuenta.');
+        }
+
         //---cambia el estado del usuario (activo/inactivo)
         $user->activo = !$user->activo;
 
@@ -36,14 +42,25 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+            'password' => 'required|string|min:6',
             'rol_id' => 'required|exists:roles,id',
             'unidad_id' => 'required|exists:unidades,id',
             'cargo' => 'required|string|max:255',
             'telefono' => 'nullable|string|max:15',
+        ], [
+            'name.required' => 'El nombre completo es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo no es válido.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'rol_id.required' => 'Debe seleccionar un rol válido.',
+            'unidad_id.required' => 'Debe seleccionar una unidad válida.',
+            'cargo.required' => 'El cargo es obligatorio.',
+            'telefono.max' => 'El teléfono no puede tener más de 15 caracteres.',
         ]);
 
-        $validated['password'] = bcrypt($request->password);
+        $validated['password'] = Hash::make($request->password);
         $validated['activo'] = 1;
 
         User::create($validated);
@@ -60,11 +77,22 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
-            'password' => 'nullable|min:6',
+            'password' => 'nullable|string|min:6',
             'rol_id' => 'required|exists:roles,id',
             'unidad_id' => 'required|exists:unidades,id',
             'cargo' => 'required|string|max:255',
             'telefono' => 'nullable|string|max:15',
+        ], [
+            'name.required' => 'El nombre completo es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El formato del correo no es válido.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'rol_id.required' => 'Debe seleccionar un rol válido.',
+            'unidad_id.required' => 'Debe seleccionar una unidad válida.',
+            'cargo.required' => 'El cargo es obligatorio.',
+            'telefono.max' => 'El teléfono no puede tener más de 15 caracteres.',
         ]);
 
         if ($request->filled('password')) {
