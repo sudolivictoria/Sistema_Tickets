@@ -22,7 +22,7 @@
                     </span>
                 </div>
                 <input id="asunto-input" name="asunto" value="{{ old('asunto') }}" maxlength="50" minlength="5"
-                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all placeholder:text-slate-300 !appearance-none !bg-none font-medium text-slate-700"
+                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-300 !appearance-none !bg-none font-medium text-slate-700"
                     placeholder="Ej: Falla en mi laptop" type="text" required />
             </div>
 
@@ -52,7 +52,7 @@
                     <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Tipo de Solicitud</label>
                     <div class="relative">
                         <select name="tipo_solicitud_id" value="{{ old('tipo_solicitud_id') }}"
-                            class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-secondary/10 focus:border-secondary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
+                            class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all cursor-pointer appearance-none !bg-none font-medium text-slate-700"
                             required>
                             <option value="" disabled selected>Seleccione</option>
                         </select>
@@ -77,7 +77,7 @@
             <div class="flex flex-col gap-2.5">
                 <label class="text-sm font-black text-secondary uppercase tracking-widest ml-1">Descripción Detallada</label>
                 <textarea name="descripcion"
-                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none font-medium text-slate-700"
+                    class="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none placeholder:text-slate-300 font-medium text-slate-700"
                     rows="5" placeholder="Explique brevemente el problema..." required>{{ old('descripcion') }}</textarea>
             </div>
 
@@ -91,7 +91,7 @@
                             <div
                                 class="py-3 px-2 md:px-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-500 font-bold text-center text-xs md:text-sm transition-all 
                                         peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary peer-checked:shadow-sm
-                                        hover:border-slate-200">
+                                        hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-sm">
                                 {{ $prio->nombre_prioridad }}
                             </div>
                         </label>
