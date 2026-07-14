@@ -66,13 +66,14 @@ $(document).ready(function () {
             const asunto = $(this).data("asunto");
             const descripcion = $(this).data("descripcion");
             const tipo = $(this).data("tipo");
+            const drive = $(this).data("drive");
 
-            window.verDetalle(asunto, descripcion, tipo);
+            window.verDetalle(asunto, descripcion, tipo, drive);
         });
 });
 
 //---funciones para ver detalles de los tickets
-window.verDetalle = function (asunto, descripcion, solicitud) {
+window.verDetalle = function (asunto, descripcion, solicitud, drive) {
     const modal = document.getElementById("modalTicket");
     const modalTitulo = document.getElementById("modalTitulo");
     const modalDescripcion = document.getElementById("modalDescripcion");
