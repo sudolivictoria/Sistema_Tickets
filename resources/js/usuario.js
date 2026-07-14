@@ -77,6 +77,16 @@ window.verDetalle = function (asunto, descripcion, solicitud) {
     const modalTitulo = document.getElementById("modalTitulo");
     const modalDescripcion = document.getElementById("modalDescripcion");
     const modalTipoSolicitud = document.getElementById("modalTipoSolicitud");
+    const wrapper = document.getElementById("wrapperDriveLink");
+    const linkAnchor = document.getElementById("modalDriveLink");
+
+    if (drive && drive.trim() !== "" && drive !== "null") {
+        linkAnchor.href = drive;
+        wrapper.classList.remove("hidden");
+    } else {
+        linkAnchor.href = "#";
+        wrapper.classList.add("hidden");
+    }
 
     if (modal && modalTitulo && modalDescripcion && modalTipoSolicitud) {
         modalTitulo.innerText = asunto;
