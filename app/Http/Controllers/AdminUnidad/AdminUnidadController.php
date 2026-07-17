@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -148,17 +149,42 @@ class AdminUnidadController extends Controller
 
         ]);
 
+        //----SLA
+        $categoria = Categoria::find($request->categoria_id);
+        $unidadId = $categoria ? $categoria->unidad_id : null;
+
+        $horasSla = 24;
+
+        if ($unidadId) {
+            $sla = DB::table('prioridad_unidad')
+                ->where('unidad_id', $unidadId)
+                ->where('prioridad_id', $request->prioridad_id)
+                ->first();
+
+            if ($sla && isset($sla->horas_sla)) {
+                $horasSla = (int)$sla->horas_sla;
+            }
+        }
+        $fechaVencimiento = Carbon::now()->addHours($horasSla);
+
+        $rutaEvidencia = null;
+        if ($request->hasFile('evidencia')) {
+            $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
+        }
+
         //--crear ticket
         $nuevoTicket = Ticket::create([
             'asunto' => $request->asunto,
             'descripcion' => $request->descripcion,
-            'drive_link' => $request->drive_link,
+            'drive_link' => $rutaEvidencia,
             'categoria_id' => $request->categoria_id,
             'tipo_solicitud_id' => $request->tipo_solicitud_id,
             'user_id' => Auth::id(), //----asignar el ticket al usuario autenticado
             'estado_id' => 1, //---abierto
             'prioridad_id' => $request->prioridad_id,
             'tecnico_id' => null, //---vacio inicial 
+            'fecha_vencimiento_sla' => $fechaVencimiento,
+            'estado_sla' => 'pendiente',
         ]);
 
         //---cargar relaciones para el correo
@@ -255,19 +281,37 @@ class AdminUnidadController extends Controller
     public function actualizarPrioridad(Request $request, Ticket $ticket)
     {
         $urlOrigen = request()->headers->get('referer');
-
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
-
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return redirect()->to($urlOrigen)->with('sweet_error', 'No se puede modificar la prioridad este ticket ha sido resuelto o cerrado.');
+            return redirect()->to($urlOrigen)->with('sweet_error', 'No se puede modificar la prioridad. Este ticket ha sido resuelto o cerrado.');
         }
+        //--Cambio de prioridad
+        $nuevaPrioridadId = $request->prioridad_id;
+        if ($ticket->prioridad_id != $nuevaPrioridadId) {
+            //---categoria y uidad
+            $categoria = Categoria::find($ticket->categoria_id);
+            $unidadId = $categoria ? $categoria->unidad_id : null;
+            $horasSla = 24;
+            if ($unidadId) {
+                $sla = DB::table('prioridad_unidad')
+                    ->where('unidad_id', $unidadId)
+                    ->where('prioridad_id', $nuevaPrioridadId)
+                    ->first();
 
-        $ticket->update(['prioridad_id' => $request->prioridad_id]);
+                if ($sla && isset($sla->horas_sla)) {
+                    $horasSla = (int)$sla->horas_sla;
+                }
+            }
+            //---calcualr nueva fecha
+            $ticket->fecha_vencimiento_sla = $ticket->created_at->addHours($horasSla);
+        }
+        //----guardar nueva prioridad y fecha de vencimiento
+        $ticket->prioridad_id = $nuevaPrioridadId;
+        $ticket->save();
 
         broadcast(new TicketActualizado());
-
         return redirect()->to($urlOrigen)
-            ->with('sweet_success', 'Prioridad actualizada correctamente');
+            ->with('sweet_success', 'Prioridad y SLA actualizados correctamente');
     }
 
     //---Actualizar Técnico---

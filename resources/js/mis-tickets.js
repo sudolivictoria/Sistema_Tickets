@@ -110,18 +110,36 @@ window.verDetalle = function (asunto, descripcion, tipoSolicitud, drive) {
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
+
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
+    const imgPreview = document.getElementById("modalEvidenciaImg");
 
     if (drive && drive.trim() !== "" && drive !== "null") {
-        linkAnchor.href = drive;
+        const urlImagen = `/storage/${drive}`;
+        if (imgPreview) {
+            imgPreview.src = urlImagen;
+        }
+        if (linkAnchor) {
+            linkAnchor.href = urlImagen;
+        }
         wrapper.classList.remove("hidden");
     } else {
-        linkAnchor.href = "#";
+        if (imgPreview) {
+            imgPreview.src = "";
+        }
+        if (linkAnchor) {
+            linkAnchor.href = "#";
+        }
         wrapper.classList.add("hidden");
     }
+    
 
     if (modal && titulo && desc && tipo) {
+          if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+
         titulo.textContent = asunto;
         desc.textContent = descripcion;
         tipo.textContent = tipoSolicitud;
@@ -134,6 +152,6 @@ window.cerrarModal = function () {
     const modal = document.getElementById("modalTicket");
     if (modal) {
         modal.classList.add("hidden");
-        document.body.style.overflow = "auto";
+        document.body.style.overflow = "";
     }
 };

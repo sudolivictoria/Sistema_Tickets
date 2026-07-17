@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Reporte Operativo de Tickets</title>
@@ -19,10 +20,10 @@
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
         .logo-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #0f172a;
             letter-spacing: -0.8px;
@@ -44,12 +45,12 @@
             text-transform: uppercase;
             letter-spacing: 0.8px;
             border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
         .stats-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
         .stat-card {
             border-radius: 6px;
@@ -104,10 +105,9 @@
             margin-bottom: 4px;
         }
         .stat-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
         }
-
         /* --------- TARJETAS DE TICKETS ----------- */
         .ticket-card {
             border-radius: 6px;
@@ -118,7 +118,6 @@
             border-right: 1px solid #e2e8f0;
             border-bottom: 1px solid #e2e8f0;
         }
-
         /* ---------SECCION SUPERIOR CARD----------- */
         .card-header {
             width: 100%;
@@ -126,7 +125,7 @@
             border-bottom: 1px solid #e2e8f0;
         }
         .card-header td {
-            padding: 14px 16px;
+            padding: 8px 12px;
             vertical-align: middle;
         }
         .col-id {
@@ -146,13 +145,13 @@
             width: 50%;
         }
         .user-name {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: bold;
             color: #0f172a;
             margin-bottom: 3px;
         }
         .user-unit {
-            font-size: 10px;
+            font-size: 8px;
             color: #64748b;
             font-weight: bold;
         }
@@ -166,10 +165,9 @@
             text-align: right;
             white-space: nowrap;
         }
-
         /*******************BADGES****************/
         .badge {
-            padding: 5px 12px;
+            padding: 3px 8px;
             border-radius: 4px;
             font-size: 9px;
             font-weight: bold;
@@ -179,7 +177,6 @@
             white-space: nowrap;
             *
         }
-
         /*SECCION MEDIA CARD CAJON INFO*/
         .card-body {
             width: 100%;
@@ -206,7 +203,6 @@
             overflow-wrap: break-word;
             display: block;
         }
-
         /*SECCION INFERIOR DESCRIPCION Y FECHAS*/
         .card-footer-container {
             padding: 0 16px 16px 16px;
@@ -256,9 +252,28 @@
             text-transform: uppercase;
             margin-right: 4px;
         }
+        .card-sla-cumplido {
+            background-color: #f0fdfa;
+            border-left: 4px solid #0d9488;
+        }
+        .card-sla-cumplido .stat-label {
+            color: #0f766e;
+        }
+        .card-sla-cumplido .stat-value {
+            color: #0d9488;
+        }
+        .card-sla-vencido {
+            background-color: #fef2f2;
+            border-left: 4px solid #dc2626;
+        }
+        .card-sla-vencido .stat-label {
+            color: #b91c1c;
+        }
+        .card-sla-vencido .stat-value {
+            color: #dc2626;
+        }
     </style>
 </head>
-
 <body>
 
     <table class="header-table">
@@ -275,32 +290,57 @@
 
     <table class="stats-table">
         <tr>
-            <td width="23%">
-                <div class="stat-card card-abierto"><span class="stat-label">Abiertos</span><span
+            <td width="14%">
+                <div class="stat-card card-abierto">
+                    <span class="stat-label">Abiertos</span>
+                    <span
                         class="stat-value">{{ $tickets->filter(fn($t) => Str::contains(Str::lower($t->estado->nombre_estado ?? ''), 'abierto'))->count() }}</span>
                 </div>
             </td>
-            <td width="2.6%"></td>
-            <td width="23%">
-                <div class="stat-card card-proceso"><span class="stat-label">En Proceso</span><span
+            <td width="2%"></td>
+
+            <td width="14%">
+                <div class="stat-card card-proceso">
+                    <span class="stat-label">En Proceso</span>
+                    <span
                         class="stat-value">{{ $tickets->filter(fn($t) => Str::contains(Str::lower($t->estado->nombre_estado ?? ''), 'procesando'))->count() }}</span>
                 </div>
             </td>
-            <td width="2.6%"></td>
-            <td width="23%">
-                <div class="stat-card card-cerrado"><span class="stat-label">Cerrados</span><span
+            <td width="2%"></td>
+
+            <td width="14%">
+                <div class="stat-card card-cerrado">
+                    <span class="stat-label">Cerrados</span>
+                    <span
                         class="stat-value">{{ $tickets->filter(fn($t) => Str::contains(Str::lower($t->estado->nombre_estado ?? ''), ['equivocado', 'resuelto', 'no corresponde']))->count() }}</span>
                 </div>
             </td>
-            <td width="2.6%"></td>
-            <td width="23%">
-                <div class="stat-card card-total"><span class="stat-label">Total Reporte</span><span
-                        class="stat-value">{{ $tickets->count() }}</span></div>
+            <td width="2%"></td>
+
+            <td width="14%">
+                <div class="stat-card card-sla-cumplido">
+                    <span class="stat-label">Cumplido</span>
+                    <span class="stat-value">{{ $tickets->where('estado_sla', 'cumplido')->count() }}</span>
+                </div>
+            </td>
+            <td width="2%"></td>
+
+            <td width="14%">
+                <div class="stat-card card-sla-vencido">
+                    <span class="stat-label">Vencido</span>
+                    <span class="stat-value">{{ $tickets->where('estado_sla', 'vencido')->count() }}</span>
+                </div>
+            </td>
+            <td width="2%"></td>
+
+            <td width="14%">
+                <div class="stat-card card-total">
+                    <span class="stat-label">Total</span>
+                    <span class="stat-value">{{ $tickets->count() }}</span>
+                </div>
             </td>
         </tr>
     </table>
-
-    <div class="titulo-reporte" style="font-size: 11px; margin-top: 10px;">Registros Detallados de Incidentes</div>
 
     @foreach($tickets as $ticket)
         @php
@@ -409,13 +449,17 @@
 
                     <table class="dates-table">
                         <tr>
-                            <td width="50%">
+                            <td width="33%">
                                 <span class="dates-label">APERTURA:</span>
                                 {{ $ticket->created_at->format('d/m/Y') }}
                             </td>
-                            <td width="50%">
+                            <td width="33%">
                                 <span class="dates-label">CIERRE:</span>
                                 {{ $ticket->fecha_cierre ? date('d/m/Y', strtotime($ticket->fecha_cierre)) : '-------' }}
+                            </td>
+                            <td width="33%">
+                                <span class="dates-label">TIEMPO DE RESPUESTA:</span>
+                                <span class="info-value">{{ $ticket->tiempo_respuesta }} s</span>
                             </td>
                         </tr>
                     </table>
@@ -425,4 +469,5 @@
         </div>
     @endforeach
 </body>
+
 </html>

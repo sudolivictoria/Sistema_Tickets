@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-
             $table->string('asunto');
             $table->text('descripcion');
-
+            $table->integer('tiempo_respuesta')->nullable();
+            $table->timestamp('fecha_vencimiento_sla')->nullable();
+            $table->string('estado_sla')->default('pendiente');
+            $table->timestamp('fecha_cierre')->nullable();
+          
             //---quien genera el ticket
             $table->foreignId('user_id')->constrained('users');
 
@@ -31,6 +34,7 @@ return new class extends Migration
 
             //--relacion con prioridad
             $table->foreignId('prioridad_id')->constrained('prioridades');
+
 
 
             //--tecnico asignado

@@ -74,7 +74,20 @@ $(document).ready(function () {
             const fecha = $(this).data("fecha");
             const drive = $(this).data("drive");
 
-            window.verDetalle(asunto, descripcion, tipo, fecha, drive);
+            const datosSLA = {
+                estado: $(this).data("estado"),
+                fechaLimite: $(this).data("fecha-limite"),
+                tiempoRespuesta: $(this).data("tiempo-respuesta"),
+            };
+
+            window.verDetalle(
+                asunto,
+                descripcion,
+                tipo,
+                fecha,
+                drive,
+                datosSLA,
+            );
         });
 
     $(document)
@@ -95,31 +108,164 @@ $(document).ready(function () {
     }
 });
 
+//------------------------TIMER SLA-------------------------------------
+let timerSLA = null;
+function iniciarContadorSLA(datosSLA) {
+    if (timerSLA) clearInterval(timerSLA);
+
+    const wrapper = document.getElementById("wrapperCountdown");
+    const display = document.getElementById("modalCountdown");
+    if (!wrapper || !display) return;
+
+    const { estado, fechaLimite, tiempoRespuesta, tiempo_respuesta } = datosSLA;
+    const segundosTranscurridos = tiempoRespuesta || tiempo_respuesta;
+
+    const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
+    if (estadosCerrados.includes(estado) || segundosTranscurridos) {
+        wrapper.classList.remove("hidden");
+
+        wrapper.className =
+            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-blue-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+
+        let segundosFinales = segundosTranscurridos;
+        if (
+            !segundosFinales &&
+            datosSLA.fechaCierre &&
+            datosSLA.fechaCreacion
+        ) {
+            const creacion = new Date(datosSLA.fechaCreacion).getTime();
+            const cierre = new Date(datosSLA.fechaCierre).getTime();
+            segundosFinales = Math.max(
+                0,
+                Math.floor((cierre - creacion) / 1000),
+            );
+        }
+        if (!segundosFinales) {
+            display.textContent = "Finalizado";
+            return;
+        }
+
+        const dias = Math.floor(segundosFinales / (3600 * 24));
+        const horas = Math.floor((segundosFinales % (3600 * 24)) / 3600);
+        const minutos = Math.floor((segundosFinales % 3600) / 60);
+        const segundos = segundosFinales % 60;
+
+        let tiempoTexto = "";
+        if (dias > 0) {
+            tiempoTexto = `${dias} d ${horas}h ${minutos} m`;
+        } else if (horas > 0) {
+            tiempoTexto = `${horas} h ${minutos} m`;
+        } else if (minutos > 0) {
+            tiempoTexto = `${minutos} m ${segundos} s`;
+        } else {
+            tiempoTexto = `${segundos} s`;
+        }
+
+        display.textContent = `Respuesta: ${tiempoTexto}`;
+        return;
+    }
+
+    if (!fechaLimite) {
+        wrapper.classList.add("hidden");
+        return;
+    }
+
+    wrapper.classList.remove("hidden");
+    const limite = new Date(fechaLimite).getTime();
+
+    const tick = () => {
+        const restante = limite - new Date().getTime();
+
+        if (restante <= 0) {
+            clearInterval(timerSLA);
+            display.textContent = "Vencido";
+            wrapper.classList.remove(
+                "bg-green-50",
+                "border-green-100",
+                "text-green-600",
+            );
+            wrapper.classList.add(
+                "bg-red-50",
+                "border-red-200",
+                "text-red-600",
+                "animate-pulse",
+            );
+            return;
+        }
+
+        wrapper.classList.remove(
+            "bg-red-50",
+            "border-red-200",
+            "text-red-600",
+            "animate-pulse",
+        );
+        wrapper.classList.add(
+            "bg-green-50",
+            "border-green-100",
+            "text-green-600",
+        );
+
+        const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
+        const horas = Math.floor(
+            (restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
+        const minutos = Math.floor((restante % (1000 * 60 * 60)) / (1000 * 60));
+        const segundos = Math.floor((restante % (1000 * 60)) / 1000);
+        const pad = (num) => String(num).padStart(2, "0");
+
+        if (dias > 0) {
+            display.textContent = `${dias}d ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+        } else {
+            display.textContent = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+        }
+    };
+
+    tick();
+    timerSLA = setInterval(tick, 1000);
+}
+
 /**
  * Gestión de Modal de detalles
  */
+let ticketIdActual = null;
 window.verDetalle = function (
     asunto,
     descripcion,
     tipoNombre,
     fechaApertura,
     drive,
+    datosSLA = {},
 ) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
     const fecha = document.getElementById("modalFechaApertura");
+
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
+    const imgPreview = document.getElementById("modalEvidenciaImg");
 
     if (drive && drive.trim() !== "" && drive !== "null") {
-        linkAnchor.href = drive;
+        const urlImagen = `/storage/${drive}`;
+        if (imgPreview) {
+            imgPreview.src = urlImagen;
+        }
+        if (linkAnchor) {
+            linkAnchor.href = urlImagen;
+        }
         wrapper.classList.remove("hidden");
     } else {
-        linkAnchor.href = "#";
+        if (imgPreview) {
+            imgPreview.src = "";
+        }
+        if (linkAnchor) {
+            linkAnchor.href = "#";
+        }
         wrapper.classList.add("hidden");
     }
+
+    iniciarContadorSLA(datosSLA);
 
     if (modal && titulo && desc && tipo && fecha) {
         titulo.textContent = asunto;
@@ -129,7 +275,73 @@ window.verDetalle = function (
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
+
+    ticketIdActual = parseInt(asunto.match(/\d+/)) || null;
+
+    //----Cargar comentarios anteriores
+    $("#contenido-comentario").val("");
+    if ($("#es_privado").length) $("#es_privado").prop("checked", false);
+
+    const $lista = $("#modalListaComentarios");
+    $lista.html(
+        '<p class="text-center text-slate-400 py-2">Cargando comentarios...</p>',
+    );
+
+    if (ticketIdActual) {
+        $.get(`/tickets/${ticketIdActual}/comentarios`, function (comentarios) {
+            $lista.empty();
+            if (comentarios.length === 0) {
+                $lista.html(
+                    '<p class="text-center text-slate-400 py-2">No hay comentarios todavía.</p>',
+                );
+                return;
+            }
+            comentarios.forEach((com) => {
+                const bg = com.es_privado
+                    ? "bg-amber-50 border-amber-100"
+                    : "bg-white border-slate-100";
+                const tag = com.es_privado
+                    ? '<span class="text-amber-700 font-bold">[Interno]</span> '
+                    : "";
+                $lista.append(`
+                    <div class="p-2 rounded-xl border ${bg}">
+                        <div class="flex justify-between font-bold text-green-950 mb-0.5">
+                            <span>${tag}${com.user.name}</span>
+                            <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible}</span>
+                        </div>
+                        <p class="text-slate-600 font-medium">${com.contenido}</p>
+                    </div>
+                `);
+            });
+            $lista.scrollTop($lista[0].scrollHeight);
+        });
+    }
 };
+
+//----------funcion para COMMENTS
+$(document).on("submit", "#form-comentario-modal", function (e) {
+    e.preventDefault();
+    if (!ticketIdActual) return;
+
+    const contenido = $("#contenido-comentario").val();
+    const esPrivado = $("#es_privado").is(":checked");
+
+    $.ajax({
+        url: `/tickets/${ticketIdActual}/comentarios`,
+        method: "POST",
+        data: {
+            _token: $('input[name="_token"]').val(),
+            contenido: contenido,
+            es_privado: esPrivado ? 1 : 0,
+        },
+        success: function (response) {
+            if (response.success) {
+                $(".btn-ver-detalle:focus").click() ||
+                    alert("Comentario guardado con éxito");
+            }
+        },
+    });
+});
 
 /**
  * Cerrar modal

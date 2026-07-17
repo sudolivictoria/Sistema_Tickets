@@ -74,7 +74,7 @@
     </div>
 
     {{-- Detalle ticket --}}
-    @include('partials.detalle_ticket')
+    @include('partials.detalle_ticket_usuario')
 @endsection
 
 @push('page-scripts')

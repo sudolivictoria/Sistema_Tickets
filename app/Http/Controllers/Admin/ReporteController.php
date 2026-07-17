@@ -52,7 +52,7 @@ class ReporteController extends Controller
             $tickets = $query->latest()->get();
             $formato = $request->input('tipo', 'excel');
 
-            //------------------------------EXCEL-----------------------------------------------------
+            //------------------------------EXCEL / CSV-----------------------------------------------------
             if ($formato === 'excel') {
                 $headers = [
                     "Content-type"        => "text/csv; charset=UTF-8",
@@ -74,7 +74,8 @@ class ReporteController extends Controller
                     'Descripción',
                     'Técnico',
                     'Apertura',
-                    'Cierre'
+                    'Cierre',
+                    'Tiempo de Respuesta', 
                 ];
 
                 $callback = function () use ($tickets, $columnas) {
@@ -89,6 +90,28 @@ class ReporteController extends Controller
                         $asuntoClean = str_replace(["\r", "\n", ";"], [" ", " ", " "], $ticket->asunto ?? '');
                         $descClean = str_replace(["\r", "\n", ";"], [" ", " ", " "], $ticket->descripcion ?? '');
 
+                        $tiempoRespuestaFormateado = '-------';
+                        
+                        if ($ticket->tiempo_respuesta !== null && $ticket->tiempo_respuesta !== '') {
+                            $totalSegundos = (int)$ticket->tiempo_respuesta;
+                            
+                            $dias = floor($totalSegundos / 86400);
+                            $horas = floor(($totalSegundos % 86400) / 3600);
+                            $minutos = floor(($totalSegundos % 3600) / 60);
+                            $segundos = $totalSegundos % 60;
+
+                            $piezas = [];
+                            if ($dias > 0) $piezas[] = "{$dias}d";
+                            if ($horas > 0) $piezas[] = "{$horas}h";
+                            if ($minutos > 0) $piezas[] = "{$minutos}m";
+                            
+                            if (empty($piezas)) {
+                                $piezas[] = "{$segundos}s";
+                            }
+
+                            $tiempoRespuestaFormateado = implode(' ', $piezas);
+                        }
+
                         fputcsv($file, [
                             'TK' . str_pad($ticket->id, 5, '0', STR_PAD_LEFT),
                             $ticket->user->name ?? '',
@@ -102,6 +125,7 @@ class ReporteController extends Controller
                             $ticket->tecnico->name ?? 'No asignado',
                             $ticket->created_at->format('d/m/Y'),
                             $ticket->fecha_cierre ? date('d/m/Y', strtotime($ticket->fecha_cierre)) : '-------',
+                            $tiempoRespuestaFormateado 
                         ], ';');
                     }
                     fclose($file);
@@ -114,7 +138,7 @@ class ReporteController extends Controller
             if ($formato === 'pdf') {
                 $pdf = Pdf::loadView('admin.reportes.pdf_historial', compact('tickets'))
                     ->setPaper('letter', 'landscape');
-                return $pdf->download('reporte_historial_' . date('d-m-Y_His') . '.pdf');
+                return $pdf->stream('reporte_historial_' . date('d-m-Y_His') . '.pdf');
             }
         } catch (\Exception $e) {
             return redirect()->route('admin.historial')

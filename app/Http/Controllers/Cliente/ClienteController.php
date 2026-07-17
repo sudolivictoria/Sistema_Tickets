@@ -14,8 +14,10 @@ use App\Models\Ticket;
 use App\Models\TipoSolicitud;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -70,16 +72,16 @@ class ClienteController extends Controller
     }
 
     //---metodo para procesar el formulario de creacion de ticket
+    //---metodo para crear ticket
     public function store(Request $request)
     {
         $userId = Auth::id();
         $checkSum = md5($userId . trim($request->asunto));
         $cacheKey = 'submit_lock_' . $checkSum;
         if (!Cache::add($cacheKey, true, 20)) {
-            return redirect()->route('usuario.crear-ticket')
+            return redirect()->route('admin.crear-ticket')
                 ->with('success', '¡Recibido! Tu solicitud ya se está procesando.');
         }
-
         //-----validacion datos
         $request->validate([
             'asunto' => 'required|string|min:5|max:50',
@@ -90,17 +92,43 @@ class ClienteController extends Controller
 
         ]);
 
+        //----SLA
+        $categoria = Categoria::find($request->categoria_id);
+        $unidadId = $categoria ? $categoria->unidad_id : null;
+
+        $horasSla = 24;
+
+        if ($unidadId) {
+            $sla = DB::table('prioridad_unidad')
+                ->where('unidad_id', $unidadId)
+                ->where('prioridad_id', $request->prioridad_id)
+                ->first();
+
+            if ($sla && isset($sla->horas_sla)) {
+                $horasSla = (int)$sla->horas_sla;
+            }
+        }
+        $fechaVencimiento = Carbon::now()->addHours($horasSla);
+
+        $rutaEvidencia = null;
+        if ($request->hasFile('evidencia')) {
+            $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
+        }
+
         //--crear ticket
         $nuevoTicket = Ticket::create([
             'asunto' => $request->asunto,
             'descripcion' => $request->descripcion,
-            'drive_link' => $request->drive_link,
+            'drive_link' => $rutaEvidencia,
             'categoria_id' => $request->categoria_id,
             'tipo_solicitud_id' => $request->tipo_solicitud_id,
-            'user_id' => Auth::id(), //----asignar el ticket al usuario autenticado
+            'user_id' => Auth::id() ?? 1, //----asignar el ticket al usuario autenticado
             'estado_id' => 1, //---abierto
             'prioridad_id' => $request->prioridad_id,
             'tecnico_id' => null, //---vacio inicial 
+            'fecha_vencimiento_sla' => $fechaVencimiento,
+            'estado-sla' => 'pendiente',
+
         ]);
 
         //---cargar relaciones para el correo

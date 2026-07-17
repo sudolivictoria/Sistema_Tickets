@@ -224,7 +224,7 @@
     </div>
 
     {{-- detalle ticket --}}
-    @include('partials.detalle_ticket')
+    @include('partials.detalle_ticket_usuario')
 @endsection
 
 {{-- SCRIPTS --}}

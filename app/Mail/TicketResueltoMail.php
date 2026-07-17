@@ -15,10 +15,20 @@ class TicketResueltoMail extends Mailable
     use Queueable, SerializesModels;
 
     public $ticket;
+    public $comentarioTexto;
 
-    public function __construct(Ticket $ticket)
+    /**
+     * Create a new message instance.
+     *
+     * @param Ticket $ticket
+     * @param string|null $comentarioTexto
+     */
+    public function __construct(Ticket $ticket, $comentarioTexto = null)
     {
         $this->ticket = $ticket;
+
+        $this->comentarioTexto = $comentarioTexto ?? 'El ticket ha sido marcado como cerrado satisfactoriamente.';
+
     }
 
     public function build()

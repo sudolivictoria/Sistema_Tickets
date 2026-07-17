@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre_tipo_solicitud');
             $table->string('descripcion_solicitud')->nullable();
+            $table->string('ruta_manual')->nullable();
             $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
             $table->timestamps();
         });
@@ -25,6 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tipo_solicitudes');
+        Schema::table('tipo_solicitudes', function (Blueprint $table) {
+            $table->dropColumn(['ruta_manual']);
+        });
     }
 };

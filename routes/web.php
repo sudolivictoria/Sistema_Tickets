@@ -11,9 +11,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CategoriaManualController;
 use App\Http\Controllers\Cliente\ClienteController;
+use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\ManualController;
 use App\Http\Controllers\TicketController;
-use App\Models\Ticket;  
+use App\Models\Ticket;
 
 //----------login 
 Route::get('/', [LoginController::class, 'showLoginForm']);
@@ -24,6 +25,11 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
 Route::middleware(['auth'])->group(function () {
+
+    //---obtener comentarios
+    Route::get('/tickets/{ticket}/comentarios', [ComentarioController::class, 'obtenerComentarios']);
+    //--Comentarios
+    Route::post('/tickets/{ticket}/comentarios', [ComentarioController::class, 'store'])->name('comentarios.store');
 
     //---api para refresco automatico
     Route::get('/api/refresh', [ApiTableController::class, 'refresh'])->name('api.table.refresh');

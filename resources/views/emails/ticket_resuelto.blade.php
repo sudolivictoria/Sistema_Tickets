@@ -66,7 +66,6 @@
             margin-bottom: 5px;
         }
 
-
         .divider-green {
             height: 3px;
             width: 50px;
@@ -107,6 +106,16 @@
             font-weight: 600;
         }
 
+        .comment-title {
+            font-weight: bold;
+            color: #04003B;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 25px;
+            margin-bottom: 5px;
+        }
+
         .description-box {
             background-color: #f8fafc;
             border: 1.5px dashed #84cc16;
@@ -114,7 +123,8 @@
             border-radius: 8px;
             color: #475569;
             font-style: italic;
-            margin-top: 10px;
+            margin-top: 5px;
+            font-size: 14px;
         }
 
         .footer {
@@ -137,7 +147,7 @@
         <div class="container">
             <div class="header">
                 <div class="logo-container">
-                    <img src="{{ $message->embed(public_path('images/logo_istu.png')) }}" alt="Logo ISTU">
+                    <img src="{{ $message->embed(public_path('images/logo_istu.png')) }}" alt="Logo">
                 </div>
                 <h2>Ticket Resuelto</h2>
             </div>
@@ -166,9 +176,37 @@
                             {{ $ticket->fecha_cierre->format('H:i') }}</span>
                     </div>
                     <div class="info-row">
+                        <span class="label">Tiempo de Respuesta:</span><br>
+                        <span class="value">
+                            @php
+                                if ($ticket->tiempo_respuesta >= 86400) {
+                                    $valor = round($ticket->tiempo_respuesta / 86400, 1);
+                                    $unidad = $valor == 1 ? 'día' : 'días';
+                                } elseif ($ticket->tiempo_respuesta >= 3600) {
+                                    $valor = round($ticket->tiempo_respuesta / 3600, 1);
+                                    $unidad = $valor == 1 ? 'hora' : 'horas';
+                                } elseif ($ticket->tiempo_respuesta >= 60) {
+                                    $valor = round($ticket->tiempo_respuesta / 60, 1);
+                                    $unidad = $valor == 1 ? 'minuto' : 'minutos';
+                                } else {
+                                    $valor = $ticket->tiempo_respuesta;
+                                    $unidad = $valor == 1 ? 'segundo' : 'segundos';
+                                }
+                            @endphp
+
+                            <span class="value">{{ $valor }} {{ $unidad }}</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
                         <span class="label">Técnico Responsable:</span><br>
                         <span class="value">{{ $ticket->tecnico->name ?? 'N/A' }}</span>
                     </div>
+                </div>
+
+                <!--comentario final-->
+                <div class="comment-title">Resolución del Técnico:</div>
+                <div class="description-box">
+                    "{{ $comentarioTexto }}"
                 </div>
             </div>
 

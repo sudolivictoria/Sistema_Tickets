@@ -98,7 +98,13 @@
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
                 data-fecha="{{ $ticket->created_at->format('d/m/Y') }}"
-                data-drive="{{ $ticket->drive_link }}">
+                data-drive="{{ $ticket->drive_link }}"
+                
+                {{-- Datos para el temporizador de SLA --}} 
+                data-estado="{{ $ticket->estado->nombre_estado ?? 'Pendiente' }}"
+                data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('Y-m-d H:i:s') : '' }}"
+                data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}"
+                >
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

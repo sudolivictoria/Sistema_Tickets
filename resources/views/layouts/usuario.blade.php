@@ -68,7 +68,7 @@
         </div>
     </div>
     <header
-        class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
+        id="headerUsuario" class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
 
         <div class="flex items-center gap-3 lg:gap-4 min-w-0">
             <button id="menu-toggle"

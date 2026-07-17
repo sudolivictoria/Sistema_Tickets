@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
@@ -113,14 +114,11 @@ class AdminController extends Controller
             ];
         }
 
-
-        $estadosCerrados = [3, 4, 5]; 
+        $estadosCerrados = [3, 4, 5];
         $queryPrioridades = Ticket::whereNotIn('estado_id', $estadosCerrados);
-
         if ($miUnidadId) {
             $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
         }
-
         $prioridades = [
             'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
             'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
@@ -164,19 +162,44 @@ class AdminController extends Controller
 
         ]);
 
+        //----SLA
+        $categoria = Categoria::find($request->categoria_id);
+        $unidadId = $categoria ? $categoria->unidad_id : null;
+
+        $horasSla = 24;
+
+        if ($unidadId) {
+            $sla = DB::table('prioridad_unidad')
+                ->where('unidad_id', $unidadId)
+                ->where('prioridad_id', $request->prioridad_id)
+                ->first();
+
+            if ($sla && isset($sla->horas_sla)) {
+                $horasSla = (int)$sla->horas_sla;
+            }
+        }
+        $fechaVencimiento = Carbon::now()->addHours($horasSla);
+
+        $rutaEvidencia = null;
+        if ($request->hasFile('evidencia')) {
+            $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
+        }
+
         //--crear ticket
         $nuevoTicket = Ticket::create([
             'asunto' => $request->asunto,
             'descripcion' => $request->descripcion,
-            'drive_link' => $request->drive_link,
+            'drive_link' => $rutaEvidencia,
             'categoria_id' => $request->categoria_id,
             'tipo_solicitud_id' => $request->tipo_solicitud_id,
             'user_id' => Auth::id() ?? 1, //----asignar el ticket al usuario autenticado
             'estado_id' => 1, //---abierto
             'prioridad_id' => $request->prioridad_id,
             'tecnico_id' => null, //---vacio inicial 
-        ]);
+            'fecha_vencimiento_sla' => $fechaVencimiento,
+            'estado-sla' => 'pendiente',
 
+        ]);
 
         //---cargar relaciones para el correo
         $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
@@ -268,25 +291,7 @@ class AdminController extends Controller
 
         return view('admin.asignar-tickets', compact('tickets', 'tecnicos'));
     }
-
-    //---Actualizar Prioridad---
-    public function actualizarPrioridad(Request $request, Ticket $ticket)
-    {
-        $urlOrigen = request()->headers->get('referer');
-
-        $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
-        if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return redirect()->to($urlOrigen)->with('sweet_error', 'No se puede modificar la prioridad este ticket ha sido resuelto o cerrado.');
-        }
-        $ticket->update(['prioridad_id' => $request->prioridad_id]);
-
-        broadcast(new TicketActualizado());
-
-        return redirect()->to($urlOrigen)
-            ->with('sweet_success', 'Prioridad actualizada correctamente');
-    }
-
-    //---Actualizar Técnico---
+//---Actualizar Técnico---
     public function actualizarTecnico(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -304,19 +309,22 @@ class AdminController extends Controller
             ]
         ]);
 
-        $urlOrigen = request()->headers->get('referer');
-
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return redirect()->to($urlOrigen)->with('sweet_error', '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.');
+            $errorMsg = '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
         }
 
         if (!$request->filled('tecnico_id') && $ticket->tecnico_id === null) {
-            return redirect()->to($urlOrigen)
-                ->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
+            $errorMsg = 'El ticket ya se encontraba en la cola de pendientes.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
         }
 
-
-        //---actualizar datos
         $ticket->update([
             'tecnico_id' => $request->tecnico_id,
             'estado_id'  => $request->tecnico_id ? 2 : 1
@@ -328,7 +336,37 @@ class AdminController extends Controller
 
         broadcast(new TicketActualizado());
 
-        return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $mensaje]);
+        }
+
+        return back()->with('sweet_success', $mensaje);
+    }
+
+    //---Actualizar Prioridad---
+    public function actualizarPrioridad(Request $request, Ticket $ticket)
+    {
+        $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
+        
+        if (in_array($ticket->estado_id, [3, 4, 5])) {
+            $errorMsg = 'No se puede modificar la prioridad, este ticket ha sido resuelto o cerrado.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
+        }
+
+        $ticket->update(['prioridad_id' => $request->prioridad_id]);
+
+        broadcast(new TicketActualizado());
+
+        $mensajeExito = 'Prioridad actualizada correctamente';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $mensajeExito]);
+        }
+
+        return back()->with('sweet_success', $mensajeExito);
     }
 
     //---metodo para mostrar los tickets asignados al tecnico autenticado
@@ -376,14 +414,12 @@ class AdminController extends Controller
         $cargaTrabajo = $tickets->filter(function ($ticket) {
             return Carbon::parse($ticket->created_at)->isToday();
         })->count();
-
         //---tickets resueltos en las ultimas 24 horas
         $resueltos24h = $tickets->whereIn('estado_id', [3, 4, 5])
             ->filter(function ($ticket) {
                 return $ticket->fecha_cierre && Carbon::parse($ticket->fecha_cierre)->gte(now()->subDay());
             })
             ->count();
-
         //-----tasa cierre mensual
         $ticketsDelMes = $tickets->filter(function ($ticket) {
             return Carbon::parse($ticket->created_at)->isCurrentMonth();

@@ -96,7 +96,13 @@
                 class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
-                data-drive="{{ $ticket->drive_link }}"> 
+                data-drive="{{ $ticket->drive_link }}"
+                
+                {{-- Datos para el temporizador de SLA --}} 
+                data-estado="{{ $ticket->estado->nombre_estado ?? 'Pendiente' }}"
+                data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('Y-m-d H:i:s') : '' }}"
+                data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}"
+                > 
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

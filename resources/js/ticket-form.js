@@ -2,11 +2,14 @@
 (function () {
     //--filtrar subcategorias
     window.filtrarTipos = function (categoriaId) {
-        const selectTipo = document.querySelector('select[name="tipo_solicitud_id"]');
+        const selectTipo = document.querySelector(
+            'select[name="tipo_solicitud_id"]',
+        );
         if (!selectTipo) return;
-        
+
         //--reiniciar opciones
-        selectTipo.innerHTML = '<option value="" disabled selected>Seleccione</option>';
+        selectTipo.innerHTML =
+            '<option value="" disabled selected>Seleccione</option>';
 
         //--validacion existencia datos
         if (!window.todosLosTipos || window.todosLosTipos.length === 0) return;
@@ -23,17 +26,21 @@
         });
     };
 
-    //--función de inicialización del formulario 
+    //--función de inicialización del formulario
     const initForm = () => {
-        const categoriaSelect = document.querySelector('select[name="categoria_id"]');
-        const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
+        const categoriaSelect = document.querySelector(
+            'select[name="categoria_id"]',
+        );
+        const tipoSelect = document.querySelector(
+            'select[name="tipo_solicitud_id"]',
+        );
 
         if (!categoriaSelect || !tipoSelect) return;
 
         if (categoriaSelect.value) {
             //---options del select
             window.filtrarTipos(categoriaSelect.value);
-            const idTipoViejo = tipoSelect.getAttribute('value');
+            const idTipoViejo = tipoSelect.getAttribute("value");
             if (idTipoViejo) {
                 tipoSelect.value = idTipoViejo;
                 //---cuadro azul informativo
@@ -46,10 +53,17 @@
     document.addEventListener("DOMContentLoaded", () => {
         const inputAsunto = document.getElementById("asunto-input");
         const contador = document.getElementById("char-counter");
-        const categoriaSelect = document.querySelector('select[name="categoria_id"]');
-        const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
+        const categoriaSelect = document.querySelector(
+            'select[name="categoria_id"]',
+        );
+        const tipoSelect = document.querySelector(
+            'select[name="tipo_solicitud_id"]',
+        );
         const formulario = document.querySelector("form");
         const btnEnviar = document.getElementById("btn-enviar");
+
+        const contenedorPdf = document.getElementById("contenedor-pdf"); 
+        const btnDescargarPdf = document.getElementById("btn-descargar-pdf"); 
 
         //----retraso controlado para garantizar que Blade cargó window.todosLosTipos----
         setTimeout(() => {
@@ -67,11 +81,27 @@
 
                 //---badge informativa roja numero de caracteres
                 if (longitud < 5 || longitud >= 50) {
-                    contador.classList.remove("bg-slate-100", "text-slate-400", "border-slate-200");
-                    contador.classList.add("bg-red-50", "text-red-500", "border-red-200");
+                    contador.classList.remove(
+                        "bg-slate-100",
+                        "text-slate-400",
+                        "border-slate-200",
+                    );
+                    contador.classList.add(
+                        "bg-red-50",
+                        "text-red-500",
+                        "border-red-200",
+                    );
                 } else {
-                    contador.classList.remove("bg-red-50", "text-red-500", "border-red-200");
-                    contador.classList.add("bg-slate-100", "text-slate-400", "border-slate-200");
+                    contador.classList.remove(
+                        "bg-red-50",
+                        "text-red-500",
+                        "border-red-200",
+                    );
+                    contador.classList.add(
+                        "bg-slate-100",
+                        "text-slate-400",
+                        "border-slate-200",
+                    );
                 }
             });
         }
@@ -99,12 +129,46 @@
                 const tipoSeleccionado = window.todosLosTipos?.find(
                     (t) => t.id == this.value,
                 );
-
                 if (infoDiv) {
-                    if (tipoSeleccionado?.descripcion_solicitud) {
-                        document.getElementById("texto-ayuda").textContent = tipoSeleccionado.descripcion_solicitud;
+                    const tieneDescripcion =
+                        !!tipoSeleccionado?.descripcion_solicitud;
+                    const tieneManual = !!(
+                        tipoSeleccionado?.ruta_manual &&
+                        tipoSeleccionado.ruta_manual.trim() !== ""
+                    );
+                    if (tieneDescripcion || tieneManual) {
+                        //---contenedor informativo
                         infoDiv.classList.remove("hidden");
+
+                        //---texto descriptivo
+                        const textoAyuda =
+                            document.getElementById("texto-ayuda");
+                        if (textoAyuda) {
+                            textoAyuda.textContent =
+                                tipoSeleccionado?.descripcion_solicitud || "";
+
+                            const bloqueTexto = textoAyuda.closest(".flex");
+                            if (bloqueTexto) {
+                                tieneDescripcion
+                                    ? bloqueTexto.classList.remove("hidden")
+                                    : bloqueTexto.classList.add("hidden");
+                            }
+                        }
+                        //---botón de descarga de manual
+                        if (contenedorPdf && btnDescargarPdf) {
+                            if (tieneManual) {
+                                //----Si tiene manual, habilitamos el botón y le asignamos la ruta
+                                btnDescargarPdf.setAttribute(
+                                    "href",
+                                    `/storage/${tipoSeleccionado.ruta_manual}`,
+                                );
+                                contenedorPdf.classList.remove("hidden");
+                            } else {
+                                contenedorPdf.classList.add("hidden");
+                            }
+                        }
                     } else {
+                        //--si no tiene manual ni descripción, ocultamos el cuadro azul
                         infoDiv.classList.add("hidden");
                     }
                 }

@@ -47,7 +47,14 @@ window.inicializarHistorialDataTable = function () {
             const tipo = $(this).data("tipo");
             const fecha = $(this).data("fecha");
             const drive = $(this).data("drive");
-            verDetalle(asunto, descripcion, tipo, fecha, drive);
+
+             const datosSLA = {
+                estado: $(this).data("estado"),
+                fechaLimite: $(this).data("fecha-limite"),
+                tiempoRespuesta: $(this).data("tiempo-respuesta"),
+            };
+
+            verDetalle(asunto, descripcion, tipo, fecha, drive, datosSLA);
         });
     $("#tablaHistorial")
         .off("click", ".btn-ver-usuario")
@@ -73,7 +80,12 @@ window.aplicarFiltrosHistorial = function () {
         : "todos";
 
     //------validar si todos los parámetros están en su estado vacío por defecto
-    if (!textoBuscar && !fechaInicio && !fechaFin && estado === "todos" && categoria === "todos"
+    if (
+        !textoBuscar &&
+        !fechaInicio &&
+        !fechaFin &&
+        estado === "todos" &&
+        categoria === "todos"
     ) {
         Swal.fire({
             title: "¡Búsqueda demasiado amplia!",
@@ -97,7 +109,7 @@ window.aplicarFiltrosHistorial = function () {
         return;
     }
 
-     //------rango de fechas, complete ambos campos
+    //------rango de fechas, complete ambos campos
     if (fechaInicio > fechaFin) {
         Swal.fire({
             title: "Rango de fechas incorrecto",
@@ -167,25 +179,164 @@ window.exportarHistorial = function (formato) {
         categoria: categoria,
     });
 
-    window.location.href = `/admin/reportes/exportar?${params.toString()}`;
+    const urlFinal  = `/admin/reportes/exportar?${params.toString()}`;
+
+    if (formato === 'pdf') {
+        window.open(urlFinal, '_blank');
+    } else {
+        window.location.href = urlFinal;
+    }
 };
 
+//------------------------TIMER SLA-------------------------------------
+let timerSLA = null;
+function iniciarContadorSLA(datosSLA) {
+    if (timerSLA) clearInterval(timerSLA);
+
+    const wrapper = document.getElementById("wrapperCountdown");
+    const display = document.getElementById("modalCountdown");
+    if (!wrapper || !display) return;
+
+    const { estado, fechaLimite, tiempoRespuesta, tiempo_respuesta } = datosSLA;
+    const segundosTranscurridos = tiempoRespuesta || tiempo_respuesta;
+    
+    const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
+    if (estadosCerrados.includes(estado) || segundosTranscurridos) {
+        wrapper.classList.remove("hidden");
+
+        wrapper.className =
+            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-blue-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+
+        let segundosFinales = segundosTranscurridos;
+        if (
+            !segundosFinales &&
+            datosSLA.fechaCierre &&
+            datosSLA.fechaCreacion
+        ) {
+            const creacion = new Date(datosSLA.fechaCreacion).getTime();
+            const cierre = new Date(datosSLA.fechaCierre).getTime();
+            segundosFinales = Math.max(
+                0,
+                Math.floor((cierre - creacion) / 1000),
+            );
+        }
+        if (!segundosFinales) {
+            display.textContent = "Finalizado";
+            return;
+        }
+
+        const dias = Math.floor(segundosFinales / (3600 * 24));
+        const horas = Math.floor((segundosFinales % (3600 * 24)) / 3600);
+        const minutos = Math.floor((segundosFinales % 3600) / 60);
+        const segundos = segundosFinales % 60;
+        let tiempoTexto = "";
+        if (dias > 0) {
+            tiempoTexto = `${dias} d ${horas}h ${minutos} m`;
+        } else if (horas > 0) {
+            tiempoTexto = `${horas} h ${minutos} m`;
+        } else if (minutos > 0) {
+            tiempoTexto = `${minutos} m ${segundos} s`;
+        } else {
+            tiempoTexto = `${segundos} s`;
+        }
+        display.textContent = `Respuesta: ${tiempoTexto}`;
+        return;
+    }
+    if (!fechaLimite) {
+        wrapper.classList.add("hidden");
+        return;
+    }
+
+    wrapper.classList.remove("hidden");
+    const limite = new Date(fechaLimite).getTime();
+
+    const tick = () => {
+        const restante = limite - new Date().getTime();
+        if (restante <= 0) {
+            clearInterval(timerSLA);
+            display.textContent = "Vencido";
+            wrapper.classList.remove(
+                "bg-green-50",
+                "border-green-100",
+                "text-green-600",
+            );
+            wrapper.classList.add(
+                "bg-red-50",
+                "border-red-200",
+                "text-red-600",
+                "animate-pulse",
+            );
+            return;
+        }
+        wrapper.classList.remove(
+            "bg-red-50",
+            "border-red-200",
+            "text-red-600",
+            "animate-pulse",
+        );
+        wrapper.classList.add(
+            "bg-green-50",
+            "border-green-100",
+            "text-green-600",
+        );
+
+        const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
+        const horas = Math.floor(
+            (restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
+        const minutos = Math.floor((restante % (1000 * 60 * 60)) / (1000 * 60));
+        const segundos = Math.floor((restante % (1000 * 60)) / 1000);
+        const pad = (num) => String(num).padStart(2, "0");
+
+        if (dias > 0) {
+            display.textContent = `${dias}d ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+        } else {
+            display.textContent = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+        }
+    };
+    tick();
+    timerSLA = setInterval(tick, 1000);
+}
+
 //--------ver detalle del ticket historial--------//
-window.verDetalle = function (asunto, descripcion, tipoNombre, fechaApertura, drive) {
+window.verDetalle = function (
+    asunto,
+    descripcion,
+    tipoNombre,
+    fechaApertura,
+    drive,
+    datosSLA = {},
+) {
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
+
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
+    const imgPreview = document.getElementById("modalEvidenciaImg");
 
     if (drive && drive.trim() !== "" && drive !== "null") {
-        linkAnchor.href = drive;
+        const pathLimpio = drive.startsWith("/") ? drive.substring(1) : drive;
+        const urlImagen = `${window.location.origin}/storage/${pathLimpio}`;
+        if (imgPreview) {
+            imgPreview.src = urlImagen;
+        }
+        if (linkAnchor) {
+            linkAnchor.href = urlImagen;
+        }
         wrapper.classList.remove("hidden");
     } else {
-        linkAnchor.href = "#";
+        if (imgPreview) {
+            imgPreview.src = "";
+        }
+        if (linkAnchor) {
+            linkAnchor.href = "#";
+        }
         wrapper.classList.add("hidden");
     }
+
+    iniciarContadorSLA(datosSLA);
 
     if (modal && titulo && desc && tipo) {
         titulo.innerText = asunto;

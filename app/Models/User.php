@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Unidad::class, 'unidad_id');
     }
+
+    public function tieneRol($rolNombre)
+    {
+        return $this->rol && $this->rol->nombre_rol === $rolNombre;
+    }
 }

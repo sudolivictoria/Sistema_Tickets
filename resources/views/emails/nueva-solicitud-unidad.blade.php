@@ -160,6 +160,10 @@
                         <span class="value">{{ $ticket->user->name }}</span>
                     </div>
                     <div class="info-row">
+                        <span class="label">Unidad:</span><br>
+                        <span class="value">{{ $ticket->categoria->unidad->nombre_unidad }}</span>
+                    </div>
+                    <div class="info-row">
                         <span class="label">Asunto:</span><br>
                         <span class="value">{{ $ticket->asunto }}</span>
                     </div>
