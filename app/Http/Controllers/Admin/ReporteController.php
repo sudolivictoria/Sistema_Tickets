@@ -75,7 +75,7 @@ class ReporteController extends Controller
                     'Técnico',
                     'Apertura',
                     'Cierre',
-                    'Tiempo de Respuesta', 
+                    'Tiempo de Respuesta',
                 ];
 
                 $callback = function () use ($tickets, $columnas) {
@@ -91,25 +91,32 @@ class ReporteController extends Controller
                         $descClean = str_replace(["\r", "\n", ";"], [" ", " ", " "], $ticket->descripcion ?? '');
 
                         $tiempoRespuestaFormateado = '-------';
-                        
+
                         if ($ticket->tiempo_respuesta !== null && $ticket->tiempo_respuesta !== '') {
-                            $totalSegundos = (int)$ticket->tiempo_respuesta;
-                            
-                            $dias = floor($totalSegundos / 86400);
-                            $horas = floor(($totalSegundos % 86400) / 3600);
-                            $minutos = floor(($totalSegundos % 3600) / 60);
-                            $segundos = $totalSegundos % 60;
+                            $totalSegundos = (int) $ticket->tiempo_respuesta;
 
-                            $piezas = [];
-                            if ($dias > 0) $piezas[] = "{$dias}d";
-                            if ($horas > 0) $piezas[] = "{$horas}h";
-                            if ($minutos > 0) $piezas[] = "{$minutos}m";
-                            
-                            if (empty($piezas)) {
-                                $piezas[] = "{$segundos}s";
+                            $dias = intdiv($totalSegundos, 86400);
+                            $restoSegundos = $totalSegundos % 86400;
+
+                            $horas = intdiv($restoSegundos, 3600);
+                            $restoSegundos %= 3600;
+
+                            $minutos = intdiv($restoSegundos, 60);
+                            $segundos = $restoSegundos % 60;
+
+                            $pad = fn($num) => sprintf('%02d', $num);
+
+                             $pad = fn($num) => sprintf('%02d', $num);
+
+                            if ($dias > 0) {
+                                $tiempoRespuestaFormateado = "{$dias}d {$pad($horas)}h {$pad($minutos)}m {$pad($segundos)}s";
+                            } elseif ($horas > 0) {
+                                $tiempoRespuestaFormateado = "{$pad($horas)}h {$pad($minutos)}m {$pad($segundos)}s";
+                            } elseif($minutos > 0){
+                                $tiempoRespuestaFormateado = "{$pad($minutos)}m {$pad($segundos)}s";
+                            } else {
+                                $tiempoRespuestaFormateado = "{$pad($segundos)}s";
                             }
-
-                            $tiempoRespuestaFormateado = implode(' ', $piezas);
                         }
 
                         fputcsv($file, [
@@ -125,7 +132,7 @@ class ReporteController extends Controller
                             $ticket->tecnico->name ?? 'No asignado',
                             $ticket->created_at->format('d/m/Y'),
                             $ticket->fecha_cierre ? date('d/m/Y', strtotime($ticket->fecha_cierre)) : '-------',
-                            $tiempoRespuestaFormateado 
+                            $tiempoRespuestaFormateado
                         ], ';');
                     }
                     fclose($file);

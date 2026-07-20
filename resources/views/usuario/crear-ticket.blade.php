@@ -169,7 +169,13 @@
                                 title: 'Archivo muy pesado',
                                 text: 'La imagen supera el límite permitido de 2MB.',
                                 icon: 'warning',
-                                confirmButtonColor: '#04003B'
+                                iconColor: "#84cc16",
+                                confirmButtonColor: '#04003B',
+                                customClass: {
+                                    popup: "rounded-3xl p-6", 
+                                    confirmButton: "rounded-xl px-5 py-2.5 font-bold",
+                                    cancelButton: "rounded-xl px-5 py-2.5 font-bold",
+                                },
                             });
                             inputFile.value = ""; 
                             textoBoton.innerText = "Seleccionar imagen desde tu dispositivo (JPG o PNG)";

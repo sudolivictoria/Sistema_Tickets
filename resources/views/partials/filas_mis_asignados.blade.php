@@ -99,8 +99,8 @@
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
                 data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" data-drive="{{ $ticket->drive_link }}"
-                data-state="{{ $ticket->estado_id }}"
                 {{-- Datos para el temporizador de SLA --}} 
+                data-state="{{ $ticket->estado_id }}"
                 data-estado="{{ $ticket->estado->nombre_estado ?? 'Pendiente' }}"
                 data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('Y-m-d H:i:s') : '' }}"
                 data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}"
@@ -125,7 +125,7 @@
                 <form action="{{ route($rutaResolver, $ticket->id) }}" method="POST" class="form-resolver m-0">
                     @csrf
                     @method('PATCH')
-                    <button type="button" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarResolver(this)' }}
+                    <button type="button" data-id="{{ $ticket->id }}" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarResolver(this)' }}
                         class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
                             {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-green-50 text-green-600 border-green-100 hover:bg-green-600 hover:text-white' }}" title="Marcar como Resuelto">
                         <span class="material-symbols-outlined text-[16px]">check_circle</span>
@@ -136,7 +136,7 @@
                 <form action="{{ route($rutaEquivocacion, $ticket->id) }}" method="POST" class="form-equivocacion m-0">
                     @csrf
                     @method('PATCH')
-                    <button type="button" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarEquivocado(this)' }}
+                    <button type="button" data-id="{{ $ticket->id }}" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarEquivocado(this)' }}
                         class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
                             {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-600 hover:text-white' }}"
                         title="Marcar como Equivocado">
@@ -148,7 +148,7 @@
                 <form action="{{ route($rutaNoCorresponde, $ticket->id) }}" method="POST" class="form-no-corresponde m-0">
                     @csrf
                     @method('PATCH')
-                    <button type="button" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarNoCorresponde(this)' }}
+                    <button type="button" data-id="{{ $ticket->id }}" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarNoCorresponde(this)' }}
                         class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
                             {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100 hover:bg-yellow-600 hover:text-white' }}"
                         title="Marcar como No Corresponde">

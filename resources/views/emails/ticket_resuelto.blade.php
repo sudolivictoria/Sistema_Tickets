@@ -177,34 +177,40 @@
                     </div>
                     <div class="info-row">
                         <span class="label">Tiempo de Respuesta:</span><br>
-                        <span class="value">
-                            @php
-                                if ($ticket->tiempo_respuesta >= 86400) {
-                                    $valor = round($ticket->tiempo_respuesta / 86400, 1);
-                                    $unidad = $valor == 1 ? 'día' : 'días';
-                                } elseif ($ticket->tiempo_respuesta >= 3600) {
-                                    $valor = round($ticket->tiempo_respuesta / 3600, 1);
-                                    $unidad = $valor == 1 ? 'hora' : 'horas';
-                                } elseif ($ticket->tiempo_respuesta >= 60) {
-                                    $valor = round($ticket->tiempo_respuesta / 60, 1);
-                                    $unidad = $valor == 1 ? 'minuto' : 'minutos';
-                                } else {
-                                    $valor = $ticket->tiempo_respuesta;
-                                    $unidad = $valor == 1 ? 'segundo' : 'segundos';
-                                }
-                            @endphp
+                        @php
+                            $totalSegundos = (int) ($ticket->tiempo_respuesta ?? 0);
 
-                            <span class="value">{{ $valor }} {{ $unidad }}</span>
-                        </span>
+                            $dias = intdiv($totalSegundos, 86400);
+                            $restoSegundos = $totalSegundos % 86400;
+
+                            $horas = intdiv($restoSegundos, 3600);
+                            $restoSegundos %= 3600;
+
+                            $minutos = intdiv($restoSegundos, 60);
+                            $segundos = $restoSegundos % 60;
+
+                            $pad = fn($num) => sprintf('%02d', $num);
+
+                            if ($dias > 0) {
+                                $tiempoFormateado = "{$dias}d {$pad($horas)}h {$pad($minutos)}m {$pad($segundos)}s";
+                            } elseif ($horas > 0) {
+                                $tiempoFormateado = "{$pad($horas)}h {$pad($minutos)}m {$pad($segundos)}s";
+                            } elseif($minutos > 0){
+                                $tiempoFormateado = "{$pad($minutos)}m {$pad($segundos)}s";
+                            } else {
+                                $tiempoFormateado = "{$pad($segundos)}s";
+                            }
+                        @endphp
+                        <span class="value">{{ $tiempoFormateado }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Técnico Responsable:</span><br>
+                        <span class="label">Responsable:</span><br>
                         <span class="value">{{ $ticket->tecnico->name ?? 'N/A' }}</span>
                     </div>
                 </div>
 
                 <!--comentario final-->
-                <div class="comment-title">Resolución del Técnico:</div>
+                <div class="comment-title">Comentario:</div>
                 <div class="description-box">
                     "{{ $comentarioTexto }}"
                 </div>

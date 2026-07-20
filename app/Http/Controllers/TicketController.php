@@ -8,6 +8,7 @@ use App\Models\Comentario;
 use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -30,20 +31,22 @@ class TicketController extends Controller
             'estado_sla' => $estadoSla,
         ]);
 
+        //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
+        if ($request->filled('comentario_cierre')) {
+            Comentario::create([
+                'ticket_id'  => $ticket->id,
+                'user_id'    => Auth::id() ?? $ticket->tecnico_id,
+                'contenido'  => '[Solución]: ' . trim($request->comentario_cierre),
+                'es_privado' => false,
+            ]);
+        }
 
         broadcast(new TicketActualizado());
 
         $mensaje = 'Ticket marcado como resuelto el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
-        //---ENVIAR EL CORREO---
+        //--- ENVIAR EL CORREO ---
         try {
-            $ultimoComentario = Comentario::where('ticket_id', $ticket->id)
-                ->where('es_privado', false)
-                ->latest()
-                ->first();
-
-            $comentarioTexto = $ultimoComentario ? $ultimoComentario->contenido : null;
-
             Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket));
         } catch (\Exception $e) {
             Log::error("Error enviando correo de ticket resuelto: " . $e->getMessage());
@@ -53,9 +56,7 @@ class TicketController extends Controller
             return response()->json(['success' => true, 'message' => $mensaje]);
         }
 
-
         $urlOrigen = request()->headers->get('referer');
-
         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 
@@ -71,35 +72,33 @@ class TicketController extends Controller
             'estado_sla' => 'no aplica',
         ]);
 
+        //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
+        if ($request->filled('comentario_cierre')) {
+            Comentario::create([
+                'ticket_id'  => $ticket->id,
+                'user_id'    => Auth::id() ?? $ticket->tecnico_id,
+                'contenido'  => '[Cierre - Equivocado]: ' . trim($request->comentario_cierre),
+                'es_privado' => false,
+            ]);
+        }
+
         broadcast(new TicketActualizado());
 
         $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
-        //---ENVIAR EL CORREO---
         try {
-             $ultimoComentario = Comentario::where('ticket_id', $ticket->id)
-                ->where('es_privado', false)
-                ->latest()
-                ->first();
-
-            $comentarioTexto = $ultimoComentario ? $ultimoComentario->contenido : null;
-
             Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket));
         } catch (\Exception $e) {
             Log::error("Error enviando correo de ticket cerrado: " . $e->getMessage());
         }
-
-        broadcast(new TicketActualizado());
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => $mensaje]);
         }
 
         $urlOrigen = request()->headers->get('referer');
-
         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
-
 
     public function nocorresponde(Request $request, $id)
     {
@@ -113,19 +112,21 @@ class TicketController extends Controller
             'estado_sla' => 'no aplica',
         ]);
 
+        //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
+        if ($request->filled('comentario_cierre')) {
+            Comentario::create([
+                'ticket_id'  => $ticket->id,
+                'user_id'    => Auth::id() ?? $ticket->tecnico_id,
+                'contenido'  => '[Cierre - No Corresponde]: ' . trim($request->comentario_cierre),
+                'es_privado' => false,
+            ]);
+        }
+
         broadcast(new TicketActualizado());
 
         $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
-        //---ENVIAR EL CORREO---
         try {
-             $ultimoComentario = Comentario::where('ticket_id', $ticket->id)
-                ->where('es_privado', false)
-                ->latest()
-                ->first();
-
-            $comentarioTexto = $ultimoComentario ? $ultimoComentario->contenido : null;
-            
             Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket));
         } catch (\Exception $e) {
             Log::error("Error enviando correo de ticket cerrado: " . $e->getMessage());
@@ -136,7 +137,6 @@ class TicketController extends Controller
         }
 
         $urlOrigen = request()->headers->get('referer');
-
         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 }

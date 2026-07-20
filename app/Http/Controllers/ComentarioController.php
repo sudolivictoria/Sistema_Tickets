@@ -78,27 +78,27 @@ class ComentarioController extends Controller
 
                 //**************************COMMENT CLIENTE**************************************/
                 if ($user->id == $ticket->user_id) {
-                    
+
                     //---tiene un tecnico asignado
                     if ($ticket->tecnico && $ticket->tecnico->id != $user->id) {
-                        
-                        Mail::to($ticket->tecnico->email)->send(new NotificacionTicketMail(
-                            "Actualización Ticket {$ticketCodigo} - {$asuntoContexto}", 
-                            "Nuevo Comentario",
-                            "El cliente ha agregado información sobre la solicitud.", 
+
+                        Mail::to($ticket->tecnico->email)->queue(new NotificacionTicketMail(
+                            "Novedad en Ticket {$ticketCodigo}",
+                            "Nuevo Mensaje del Solitante",
+                            "El usuario {$nombreUsuario} ha agregado un nuevo comentario o información adicional a esta solicitud.",
                             $ticketCodigo,
                             $comentario->contenido,
                             false,
-                            $asuntoContexto, 
-                            $nombreUsuario,  
-                            $nombreUnidad    
+                            $asuntoContexto,
+                            $nombreUsuario,
+                            $nombreUnidad
                         ));
                         logger("Correo enviado al técnico asignado: " . $ticket->tecnico->email);
-                    } 
-                    
+                    }
+
                     //---tecnico no asignado
                     elseif (!$ticket->tecnico) {
-                        
+
                         if ($ticket->categoria) {
                             $unidadId = $ticket->categoria->unidad_id;
                             $destinatariosUnidad = User::where('unidad_id', $unidadId)
@@ -108,38 +108,52 @@ class ComentarioController extends Controller
 
                             if (!empty($destinatariosUnidad)) {
                                 Mail::bcc($destinatariosUnidad)->queue(new NotificacionTicketMail(
-                                    "Ticket sin asignar actualizado {$ticketCodigo}",
-                                    "Nuevo Comentario",
-                                    "Se ha comentado en un ticket de tu unidad que aún está pendiente.",
+                                    "Atención Requerida! nuevo comentario en Ticket #{$ticketCodigo} (Sin Asignar)",
+                                    "Ticket Pendiente con Actividad",
+                                    "El solicitante ha comentado en una solicitud pendiente de atención asignada a tu área.",
                                     $ticketCodigo,
                                     $comentario->contenido,
                                     false,
-                                    $asuntoContexto, 
-                                    $nombreUsuario,  
-                                    $nombreUnidad    
+                                    $asuntoContexto,
+                                    $nombreUsuario,
+                                    $nombreUnidad
                                 ));
                                 logger("Ticket sin asignar. Notificación enviada a unidad: " . $unidadId);
                             }
                         }
                     }
-                } 
-                
+                }
+
                 //**********************COMMENT ADMIN O TECNICO********************************/
-                else {
-                    if ($ticket->user && $ticket->user->id != $user->id && !empty($ticket->user->email)) {
-                        Mail::to($ticket->user->email)->send(new NotificacionTicketMail(
-                            "Respuesta de Ticket {$ticketCodigo}",
-                            "Nuevo Comentario",
-                            "Se ha comentado en tu solicitud.",
+                if ($ticket->user && $ticket->user->id != $user->id && !empty($ticket->user->email)) {
+
+                    //------------depende si tiene un tecnico asignado
+                    if ($ticket->tecnico) {
+                        Mail::to($ticket->user->email)->queue(new NotificacionTicketMail(
+                            "Respuesta a tu Ticket {$ticketCodigo}",
+                            "Respuesta a tu Solicitud",
+                            "El técnico asignado ha registrado una respuesta a tu ticket.",
                             $ticketCodigo,
                             $comentario->contenido,
                             false,
-                            $asuntoContexto, 
-                            $nombreUsuario,  
-                            $nombreUnidad    
+                            $asuntoContexto,
+                            $nombreUsuario,
+                            $nombreUnidad
                         ));
-                        logger("Correo enviado al cliente: " . $ticket->user->email);
+                    } else {
+                        Mail::to($ticket->user->email)->queue(new NotificacionTicketMail(
+                            "Respuesta a tu Ticket {$ticketCodigo}",
+                            "Respuesta a tu Solicitud",
+                            "Se ha registrado una nueva respuesta a tu solicitud.",
+                            $ticketCodigo,
+                            $comentario->contenido,
+                            false,
+                            $asuntoContexto,
+                            $nombreUsuario,
+                            $nombreUnidad
+                        ));
                     }
+                    logger("Correo de respuesta enviado al cliente: " . $ticket->user->email);
                 }
             }
         } catch (\Exception $e) {

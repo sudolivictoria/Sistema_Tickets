@@ -154,22 +154,6 @@
     @include('partials.detalle_usuario')
 @endsection
 
-@push('scripts')
-    @if (session('error'))
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                Swal.fire({
-                    title: '¡Atención!',
-                    text: '{!! session('error') !!}',
-                    icon: 'error',
-                    confirmButtonText: 'Cerrar',
-                    confirmButtonColor: '#04003B'
-                });
-            });
-        </script>
-    @endif
-@endpush
-
 @push('page-scripts')
     @vite(['resources/js/historial.js'])
 @endpush

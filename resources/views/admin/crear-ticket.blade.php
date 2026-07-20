@@ -169,7 +169,13 @@
                                 title: 'Archivo muy pesado',
                                 text: 'La imagen supera el límite permitido de 2MB.',
                                 icon: 'warning',
-                                confirmButtonColor: '#04003B'
+                                iconColor: "#84cc16",
+                                confirmButtonColor: '#04003B',
+                                customClass: {
+                                    popup: "rounded-3xl p-6", 
+                                    confirmButton: "rounded-xl px-5 py-2.5 font-bold",
+                                    cancelButton: "rounded-xl px-5 py-2.5 font-bold",
+                                },
                             });
                             inputFile.value = ""; 
                             textoBoton.innerText = "Seleccionar imagen desde tu dispositivo (JPG o PNG)";
@@ -183,47 +189,17 @@
         });
     </script>
 
+    
     <script>
         window.todosLosTipos = @json($tipos ?? []);
     </script>
 
-    @if (session('success'))
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                Swal.fire({
-                    title: '¡Excelente!',
-                    text: "{{ session('success') }}",
-                    icon: 'success',
-                    confirmButtonColor: '#04003B',
-                    confirmButtonText: 'Entendido',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
-                    }
-                }).then(() => {
-                    window.location.href = "{{ route('admin.dashboard') }}";
-                });
-            });
-        </script>
-    @endif
-
-    @if ($errors->any())
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                Swal.fire({
-                    title: 'No se pudo enviar',
-                    html: '{!! implode('<br>', $errors->all()) !!}',
-                    icon: 'error',
-                    confirmButtonColor: '#dc2626',
-                    confirmButtonText: 'Corregir',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
-                    }
-                });
-            });
-        </script>
-    @endif
+    <script>
+        window.__flashMessages = window.__flashMessages || {};
+        window.__flashMessages.successTitle = '¡Ticket creado!';
+        window.__flashMessages.validationTitle = 'No se pudo enviar';
+        window.__flashMessages.redirectTo = "{{ route('usuario.dashboard') }}";
+    </script>
 @endpush
 
 @push('page-scripts')

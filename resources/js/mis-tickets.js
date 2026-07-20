@@ -72,9 +72,10 @@ $(document).ready(function () {
             const asunto = $(this).data("asunto");
             const descripcion = $(this).data("descripcion");
             const tipo = $(this).data("tipo");
+            const state = $(this).data("estado");
             const drive = $(this).data("drive");
-
-            window.verDetalle(idTicket, asunto, descripcion, tipo, drive);
+           
+            window.verDetalle(idTicket, asunto, descripcion, tipo, state, drive);
         });
 
     //------------------AUTO REFRESCO-----------------
@@ -103,51 +104,39 @@ window.filtrarEstado = function (estado, btn) {
     }
 };
 
-/**
- * Gestión de Modal de detalles
- */
+// =====================================================================
+//                      FUNCIONES MODALES
+// =====================================================================
 let ticketIdActual = null;
-window.cargarComentariosDelTicket = function (idTicket, state = null) {
+let ticketEstadoActual = null;
+window.cargarComentariosDelTicket = function (idTicket, state) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
     const $formularioComentario = $("#form-comentario-modal");
-    const modal = document.getElementById("modalTicket");
-
     if (!idTicket) return;
+    
+    const estadosCerradosIds = [3, 4, 5];
+    const estadosCerradosTextos = ["resuelto","equivocado","no corresponde","cerrado",];
 
-    if (!document.getElementById("preloaderGlobalModal") && modal) {
-        const preloaderHTML = `
-            <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl">
-                <div class="w-12 h-12 border-4 border-slate-200 border-t-secondary rounded-full animate-spin mb-3"></div>
-                <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
-            </div>`;
+    const estadoStr = String(state).toLowerCase().trim();
+    const esCerradoPorId = estadosCerradosIds.includes(Number(state));
+    const esCerradoPorTexto = estadosCerradosTextos.includes(estadoStr);
 
-        const contenedorInterno = modal.querySelector(".bg-white") || modal;
-        if (contenedorInterno) {
-            contenedorInterno.style.position = "relative";
-            $(contenedorInterno).prepend(preloaderHTML);
-        }
-    } else {
-        $("#preloaderGlobalModal").removeClass("hidden");
-    }
-
-    const stateNum = Number(state);
-    if (stateNum === 3 || stateNum === 4 || stateNum === 5) {
+    if (esCerradoPorId || esCerradoPorTexto) {
         $formularioComentario.hide();
     } else {
-        $formularioComentario.show();
+        $formularioComentario.show(); //----muestra la caja si está activo/en proceso
     }
-
     $.get(`/tickets/${idTicket}/comentarios`, function (comentarios) {
         $lista.empty();
 
         if (!comentarios || comentarios.length === 0) {
             $seccionHistorico.hide();
+            //----Ocultar preloader global si no hay comentarios
             $("#preloaderGlobalModal").addClass("hidden");
             return;
         }
         $seccionHistorico.show();
-
         comentarios.forEach((com) => {
             const bg = com.es_privado
                 ? "bg-green-50 border-green-100"
@@ -166,42 +155,41 @@ window.cargarComentariosDelTicket = function (idTicket, state = null) {
             `);
         });
         $lista.scrollTop($lista[0].scrollHeight);
+        //----preloader global
         $("#preloaderGlobalModal").addClass("hidden");
     }).fail(function () {
         $("#preloaderGlobalModal").addClass("hidden");
     });
 };
 
-window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, drive) {
+window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, state, drive) {
     ticketIdActual = idTicket;
+    ticketEstadoActual = state;
 
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
     const tipo = document.getElementById("modalTipoSolicitud");
-
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
     const imgPreview = document.getElementById("modalEvidenciaImg");
 
-    if (drive && drive.trim() !== "" && drive !== "null") {
-        const urlImagen = `/storage/${drive}`;
-        if (imgPreview) {
-            imgPreview.src = urlImagen;
+    //**********PRELOADER GLOBAL*******************/
+    if (!document.getElementById("preloaderGlobalModal") && modal) {
+        const preloaderHTML = `
+            <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl">
+                <div class="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-3"></div>
+                <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
+            </div>`;
+        const contenedorInterno = modal.querySelector(".bg-white") || modal;
+        if (contenedorInterno) {
+            contenedorInterno.style.position = "relative"; //----POSICIONAMIENTO
+            $(contenedorInterno).prepend(preloaderHTML);
         }
-        if (linkAnchor) {
-            linkAnchor.href = urlImagen;
-        }
-        wrapper.classList.remove("hidden");
     } else {
-        if (imgPreview) {
-            imgPreview.src = "";
-        }
-        if (linkAnchor) {
-            linkAnchor.href = "#";
-        }
-        wrapper.classList.add("hidden");
+        $("#preloaderGlobalModal").removeClass("hidden");
     }
+    //************************************************/
 
     if (modal && titulo && desc && tipo) {
         if (modal.parentElement !== document.body) {
@@ -215,12 +203,25 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, driv
         document.body.style.overflow = "hidden";
     }
 
+    //----IMAGEN DE EVIDENCIA
+    if (drive && drive.trim() !== "" && drive !== "null") {
+        const pathLimpio = drive.startsWith("/") ? drive.substring(1) : drive;
+        const urlImagen = `${window.location.origin}/storage/${pathLimpio}`;
+
+        if (linkAnchor) linkAnchor.href = urlImagen;
+        if (wrapper) wrapper.classList.remove("hidden");
+    } else {
+        if (linkAnchor) linkAnchor.href = "#";
+        if (wrapper) wrapper.classList.add("hidden");
+    }
+
     $("#contenido-comentario").val("");
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
     $("#modalListaComentarios").html(
         '<p class="text-center text-slate-400 py-2">Cargando comentarios...</p>',
     );
-    window.cargarComentariosDelTicket(ticketIdActual);
+    
+    window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
 };
 
 $(document).on("submit", "#form-comentario-modal", function (e) {

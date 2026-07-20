@@ -44,13 +44,13 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #04003B;
+            background: #84cc16;
             border-radius: 10px;
             border: 2px solid #f1f5f9;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #84cc16;
+            background: #04003B;
         }
     </style>
 
@@ -67,8 +67,8 @@
             </p>
         </div>
     </div>
-    <header
-        id="headerUsuario" class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
+    <header id="headerUsuario"
+        class="fixed top-0 left-0 right-0 z-[60] bg-white border-b border-slate-100 px-4 lg:px-8 py-3 flex items-center justify-between shadow-sm">
 
         <div class="flex items-center gap-3 lg:gap-4 min-w-0">
             <button id="menu-toggle"
@@ -176,6 +176,20 @@
         document.addEventListener('DOMContentLoaded', function () {
             iniciarReloj();
         });
+    </script>
+
+    @php
+        $flashSuccess = session('sweet_success') ?: session('success');
+        $flashError = session('sweet_error') ?: session('error');
+        $validationErrors = $errors->any() ? $errors->all() : [];
+    @endphp
+
+    <script>
+        window.__flashMessages = {
+            success: @json($flashSuccess),
+            error: @json($flashError),
+            validationErrors: @json($validationErrors)
+        };
     </script>
 
     @stack('scripts')

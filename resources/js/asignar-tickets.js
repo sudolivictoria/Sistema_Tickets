@@ -1,4 +1,8 @@
 var table;
+let timerSLA = null;
+let ticketIdActual = null;
+let ticketEstadoActual = null;
+
 window.inicializarTablaTickets = function (
     selectorId,
     columnaOrden = 0,
@@ -6,10 +10,12 @@ window.inicializarTablaTickets = function (
 ) {
     const tableElement = $(selectorId);
     if (!tableElement.length) return;
+
     //---destruir instancia previa si existe para evitar conflictos
     if ($.fn.DataTable.isDataTable(selectorId)) {
         $(selectorId).DataTable().destroy();
     }
+
     //--configuración de idioma y opciones de DataTables
     $.fn.dataTable.ext.pager.numbers_length = 1;
     table = tableElement.DataTable({
@@ -42,7 +48,7 @@ window.inicializarTablaTickets = function (
         responsive: false,
         autoWidth: false,
         pageLength: 5,
-        order: [[0, "asc"]],
+        order: [[columnaOrden, sentido]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
@@ -56,41 +62,50 @@ window.inicializarTablaTickets = function (
     //---ajuste tamaño de tabla
     const $wrapper = $(tableElement).closest(".dataTables_wrapper");
     $wrapper.addClass("relative w-full");
-    $(tableElement)
-        .addClass("w-full")
-        .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
+    
+    //--evita duplicar wrappers si la función se vuelve a invocar
+    if (!$(tableElement).parent().hasClass("overflow-x-auto")) {
+        $(tableElement)
+            .addClass("w-full")
+            .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
+    }
 };
 
 // =====================================================================
-//                         DETALLES E INICIALIZACION
+//                       DETALLES E INICIALIZACION
 // =====================================================================
 $(document).ready(function () {
     $(document)
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
-            const idTicket = $(this).data("id");
-            const asunto = $(this).data("asunto");
-            const descripcion = $(this).data("descripcion");
-            const tipo = $(this).data("tipo");
-            const drive = $(this).data("drive");
+            const $btn = $(this);
+            const idTicket = $btn.data("id");
+            const asunto = $btn.data("asunto");
+            const descripcion = $btn.data("descripcion");
+            const tipo = $btn.data("tipo");
+            const drive = $btn.data("drive");
+            const estadoNombre = $btn.data("estado"); 
+            const estadoSLA = $btn.data("state");    
 
             const datosSLA = {
-                estado: $(this).data("estado"),
-                fechaLimite: $(this).data("fecha-limite"),
-                tiempoRespuesta: $(this).data("tiempo-respuesta"),
+                estadoNombre: estadoNombre,
+                estadoSLA: estadoSLA,
+                fechaLimite: $btn.data("fecha-limite"),         
+                tiempoRespuesta: $btn.data("tiempo-respuesta"), 
             };
 
-            window.verDetalle(idTicket, asunto, descripcion, tipo, drive, datosSLA);
+            window.verDetalle(idTicket, asunto, descripcion, tipo, drive, estadoNombre, estadoSLA, datosSLA);
         });
 
     $(document)
         .off("click", ".btn-ver-usuario")
         .on("click", ".btn-ver-usuario", function () {
-            const nombre = $(this).data("nombre");
-            const email = $(this).data("email");
-            const unidad = $(this).data("unidad");
-            const cargo = $(this).data("cargo");
-            const telefono = $(this).data("telefono");
+            const $btn = $(this);
+            const nombre = $btn.data("nombre");
+            const email = $btn.data("email");
+            const unidad = $btn.data("unidad");
+            const cargo = $btn.data("cargo");
+            const telefono = $btn.data("telefono");
 
             window.verUsuario(nombre, email, unidad, cargo, telefono);
         });
@@ -103,7 +118,6 @@ $(document).ready(function () {
 });
 
 //------------------------TIMER SLA-------------------------------------
-let timerSLA = null;
 function iniciarContadorSLA(datosSLA) {
     if (timerSLA) clearInterval(timerSLA);
 
@@ -111,79 +125,63 @@ function iniciarContadorSLA(datosSLA) {
     const display = document.getElementById("modalCountdown");
     if (!wrapper || !display) return;
 
-    const { estado, fechaLimite, tiempoRespuesta, tiempo_respuesta } = datosSLA;
-    const segundosTranscurridos = tiempoRespuesta || tiempo_respuesta;
-
+    const { estadoSLA, estadoNombre, fechaLimite, tiempoRespuesta } = datosSLA;
+    const segundosTranscurridos = Number(tiempoRespuesta) || 0;
+    
+    const estadoCheck = String(estadoNombre || "").toLowerCase().trim();
     const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
-    if (estadosCerrados.includes(estado) || segundosTranscurridos) {
+
+    //-----ticket resuelto
+    if (estadosCerrados.includes(estadoCheck) || segundosTranscurridos > 0) {
         wrapper.classList.remove("hidden");
-        wrapper.className =
-            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-blue-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
-        let segundosFinales = segundosTranscurridos;
-        if (
-            !segundosFinales &&
-            datosSLA.fechaCierre &&
-            datosSLA.fechaCreacion
-        ) {
-            const creacion = new Date(datosSLA.fechaCreacion).getTime();
-            const cierre = new Date(datosSLA.fechaCierre).getTime();
-            segundosFinales = Math.max(
-                0,
-                Math.floor((cierre - creacion) / 1000),
-            );
-        }
-        if (!segundosFinales) {
+        wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+
+        if (segundosTranscurridos === 0) {
             display.textContent = "Finalizado";
             return;
         }
-        const dias = Math.floor(segundosFinales / (3600 * 24));
-        const horas = Math.floor((segundosFinales % (3600 * 24)) / 3600);
-        const minutos = Math.floor((segundosFinales % 3600) / 60);
-        const segundos = segundosFinales % 60;
 
-        let tiempoTexto = "";
-        if (dias > 0) {
-            tiempoTexto = `${dias} d ${horas}h ${minutos} m`;
-        } else if (horas > 0) {
-            tiempoTexto = `${horas} h ${minutos} m`;
-        } else if (minutos > 0) {
-            tiempoTexto = `${minutos} m ${segundos} s`;
-        } else {
-            tiempoTexto = `${segundos} s`;
-        }
-        display.textContent = `Respuesta: ${tiempoTexto}`;
+        const dias = Math.floor(segundosTranscurridos / 86400);
+        const horas = Math.floor((segundosTranscurridos % 86400) / 3600);
+        const minutos = Math.floor((segundosTranscurridos % 3600) / 60);
+        const segundos = segundosTranscurridos % 60;
+
+        if (dias > 0) display.textContent = `Respuesta: ${dias}d ${horas}h ${minutos}m`;
+        else if (horas > 0) display.textContent = `Respuesta: ${horas}h ${minutos}m`;
+        else if (minutos > 0) display.textContent = `Respuesta: ${minutos}m ${segundos}s`;
+        else display.textContent = `Respuesta: ${segundos}s`;
+
         return;
     }
 
+    //---sin fecha limite configurada
     if (!fechaLimite) {
         wrapper.classList.add("hidden");
         return;
     }
 
+    //----conteo regresivo
     wrapper.classList.remove("hidden");
     const limite = new Date(fechaLimite).getTime();
+
     const tick = () => {
-        const restante = limite - new Date().getTime();
+        const restante = limite - Date.now();
+
+        //------vencido porque paso el tiempo correspondiente
         if (restante <= 0) {
             clearInterval(timerSLA);
             display.textContent = "Vencido";
-            wrapper.classList.remove("bg-green-50","border-green-100","text-green-600",
-            );
-            wrapper.classList.add("bg-red-50","border-red-200","text-red-600","animate-pulse",
-            );
+            wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
             return;
         }
-        wrapper.classList.remove("bg-red-50","border-red-200","text-red-600","animate-pulse",
-        );
-        wrapper.classList.add("bg-green-50","border-green-100","text-green-600",
-        );
+
+        wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
 
         const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
-        const horas = Math.floor(
-            (restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-        );
+        const horas = Math.floor((restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutos = Math.floor((restante % (1000 * 60 * 60)) / (1000 * 60));
         const segundos = Math.floor((restante % (1000 * 60)) / 1000);
+
         const pad = (num) => String(num).padStart(2, "0");
 
         if (dias > 0) {
@@ -197,25 +195,90 @@ function iniciarContadorSLA(datosSLA) {
     timerSLA = setInterval(tick, 1000);
 }
 
-/**
- * Gestión de Modal de detalles
- */
-let ticketIdActual = null;
-window.cargarComentariosDelTicket = function (idTicket, state = null) {
+// =====================================================================
+//                       FUNCIONES MODALES
+// =====================================================================
+window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
     const $formularioComentario = $("#form-comentario-modal");
-    const modal = document.getElementById("modalTicket");
 
     if (!idTicket) return;
 
-    if (!document.getElementById("preloaderGlobalModal") && modal) {
+    const estadosCerradosTextos = ["resuelto", "equivocado", "no corresponde", "cerrado"];
+    const estadoStr = String(estadoNombre || "").toLowerCase().trim();
+    const esCerradoPorTexto = estadosCerradosTextos.includes(estadoStr);
+
+    if (esCerradoPorTexto) {
+        $formularioComentario.hide();
+    } else {
+        $formularioComentario.show();
+    }
+
+    $.get(`/tickets/${idTicket}/comentarios`)
+        .done(function (comentarios) {
+            $lista.empty();
+
+            if (!comentarios || comentarios.length === 0) {
+                $seccionHistorico.hide();
+                $("#preloaderGlobalModal").addClass("hidden");
+                return;
+            }
+
+            $seccionHistorico.show();
+
+            const fragment = document.createDocumentFragment();
+
+            comentarios.forEach((com) => {
+                const bg = com.es_privado
+                    ? "bg-green-50 border-green-100"
+                    : "bg-white border-slate-100";
+                const tag = com.es_privado
+                    ? '<span class="text-green-700 font-bold">[Interno]</span> '
+                    : "";
+                const nombreUsuario = com.user ? com.user.name : "Usuario";
+
+                const item = document.createElement("div");
+                item.className = `p-2 rounded-xl border ${bg}`;
+                item.innerHTML = `
+                    <div class="flex justify-between font-bold text-green-950 mb-0.5">
+                        <span>${tag}${nombreUsuario}</span>
+                        <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible || ""}</span>
+                    </div>
+                    <p class="text-slate-600 font-medium">${com.contenido}</p>
+                `;
+                fragment.appendChild(item);
+            });
+
+            $lista[0].appendChild(fragment);
+            $lista.scrollTop($lista[0].scrollHeight);
+        })
+        .fail(function (err) {
+            console.error("Error al obtener comentarios:", err);
+        })
+        .always(function () {
+            $("#preloaderGlobalModal").addClass("hidden");
+        });
+};
+
+window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaApertura, drive, estadoNombre, estadoSLA, datosSLA = {}) {
+    ticketIdActual = idTicket;
+    ticketEstadoActual = estadoNombre;
+
+    const modal = document.getElementById("modalTicket");
+    const titulo = document.getElementById("modalTitulo");
+    const desc = document.getElementById("modalDescripcion");
+    const tipo = document.getElementById("modalTipoSolicitud");
+    const wrapper = document.getElementById("wrapperDriveLink");
+    const linkAnchor = document.getElementById("modalDriveLink");
+
+    //********** PRELOADER GLOBAL *******************/
+    if (modal && !document.getElementById("preloaderGlobalModal")) {
         const preloaderHTML = `
             <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl">
-                <div class="w-12 h-12 border-4 border-slate-200 border-t-secondary rounded-full animate-spin mb-3"></div>
+                <div class="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-3"></div>
                 <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
             </div>`;
-
         const contenedorInterno = modal.querySelector(".bg-white") || modal;
         if (contenedorInterno) {
             contenedorInterno.style.position = "relative";
@@ -224,134 +287,78 @@ window.cargarComentariosDelTicket = function (idTicket, state = null) {
     } else {
         $("#preloaderGlobalModal").removeClass("hidden");
     }
-
-    const stateNum = Number(state);
-    if (stateNum === 3 || stateNum === 4 || stateNum === 5) {
-        $formularioComentario.hide();
-    } else {
-        $formularioComentario.show();
-    }
-
-    $.get(`/tickets/${idTicket}/comentarios`, function (comentarios) {
-        $lista.empty();
-
-        if (!comentarios || comentarios.length === 0) {
-            $seccionHistorico.hide();
-            $("#preloaderGlobalModal").addClass("hidden");
-            return;
-        }
-        $seccionHistorico.show();
-
-        comentarios.forEach((com) => {
-            const bg = com.es_privado
-                ? "bg-amber-50 border-amber-100"
-                : "bg-white border-slate-100";
-            const tag = com.es_privado
-                ? '<span class="text-amber-700 font-bold">[Interno]</span> '
-                : "";
-            $lista.append(`
-                <div class="p-2 rounded-xl border ${bg}">
-                    <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                        <span>${tag}${com.user.name}</span>
-                        <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible}</span>
-                    </div>
-                    <p class="text-slate-600 font-medium">${com.contenido}</p>
-                </div>
-            `);
-        });
-        $lista.scrollTop($lista[0].scrollHeight);
-        $("#preloaderGlobalModal").addClass("hidden");
-    }).fail(function () {
-        $("#preloaderGlobalModal").addClass("hidden");
-    });
-};
-
-window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, drive, datosSLA = {}) {
-    ticketIdActual = idTicket;
-
-    const modal = document.getElementById("modalTicket");
-    const titulo = document.getElementById("modalTitulo");
-    const desc = document.getElementById("modalDescripcion");
-    const tipo = document.getElementById("modalTipoSolicitud");
-
-    const wrapper = document.getElementById("wrapperDriveLink");
-    const linkAnchor = document.getElementById("modalDriveLink");
-    const imgPreview = document.getElementById("modalEvidenciaImg");
-
-    if (drive && drive.trim() !== "" && drive !== "null") {
-        const urlImagen = `/storage/${drive}`;
-        if (imgPreview) {
-            imgPreview.src = urlImagen;
-        }
-        if (linkAnchor) {
-            linkAnchor.href = urlImagen;
-        }
-        wrapper.classList.remove("hidden");
-    } else {
-        if (imgPreview) {
-            imgPreview.src = "";
-        }
-        if (linkAnchor) {
-            linkAnchor.href = "#";
-        }
-        wrapper.classList.add("hidden");
-    }
-
-    iniciarContadorSLA(datosSLA);
+    //***************************************************/
 
     if (modal && titulo && desc && tipo) {
-        titulo.textContent = asunto;
-        desc.textContent = descripcion;
-        tipo.textContent = tipoNombre;
+        titulo.textContent = asunto || "";
+        desc.textContent = descripcion || "";
+        tipo.textContent = tipoNombre || "";
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
 
+    //----------------IMAGEN DE EVIDENCIA--------------
+    if (drive && String(drive).trim() !== "" && drive !== "null") {
+        const pathLimpio = String(drive).startsWith("/") ? String(drive).substring(1) : drive;
+        const urlImagen = `${window.location.origin}/storage/${pathLimpio}`;
+
+        if (linkAnchor) linkAnchor.href = urlImagen;
+        if (wrapper) wrapper.classList.remove("hidden");
+    } else {
+        if (linkAnchor) linkAnchor.href = "#";
+        if (wrapper) wrapper.classList.add("hidden");
+    }
+
     $("#contenido-comentario").val("");
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-    $("#modalListaComentarios").html(
-        '<p class="text-center text-slate-400 py-2">Cargando comentarios...</p>',
-    );
-    window.cargarComentariosDelTicket(ticketIdActual);
+
+    window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
+    
+    iniciarContadorSLA(datosSLA);
 };
 
-$(document).on("submit", "#form-comentario-modal", function (e) {
-    e.preventDefault();
-    if (!ticketIdActual) return;
+//-------------SECCION COMENTARIO-------------------
+$(document)
+    .off("submit", "#form-comentario-modal").on("submit", "#form-comentario-modal", function (e) {
+        e.preventDefault();
+        if (!ticketIdActual) return;
 
-    const contenido = $("#contenido-comentario").val().trim();
-    if (contenido === "") return;
+        const $inputContenido = $("#contenido-comentario");
+        const contenido = $inputContenido.val().trim();
+        if (contenido === "") return;
 
-    const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
-    const $btnSubmit = $(this).find('button[type="submit"]');
-    const textoOriginal = $btnSubmit.html();
+        const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
+        const $btnSubmit = $(this).find('button[type="submit"]');
+        const textoOriginal = $btnSubmit.html();
 
-    $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
-    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
+        $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
 
-    $.ajax({
-        url: `/tickets/${ticketIdActual}/comentarios`,
-        method: "POST",
-        data: {
-            _token: $('input[name="_token"]').val(),
-            contenido: contenido,
-            es_privado: esPrivado,
-        },
-        success: function (response) {
-            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
+        const loaderText = esPrivado === 1 ? "Guardando comentario..." : "Enviando comentario...";
+        $btnSubmit.html(`<span class="inline-block animate-spin mr-2">⏳</span> ${loaderText}`);
 
-            if (response.success) {
-                $("#contenido-comentario").val("");
-                if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-                window.cargarComentariosDelTicket(ticketIdActual);
-            }
-        },
-        error: function (err) {
-            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
-            console.error("Error al guardar comentario:", err);
-        },
+        $.ajax({
+            url: `/tickets/${ticketIdActual}/comentarios`,
+            method: "POST",
+            data: {
+                _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content'),
+                contenido: contenido,
+                es_privado: esPrivado,
+            },
+        })
+            .done(function (response) {
+                if (response.success) {
+                    $inputContenido.val("");
+                    if ($("#es_privado").length) $("#es_privado").prop("checked", false);
+                    window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
+                }
+            })
+            .fail(function (err) {
+                console.error("Error al guardar comentario:", err);
+            })
+            .always(function () {
+                $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
+            });
     });
-});
 
 /**
  * Cerrar modal
@@ -361,6 +368,7 @@ window.cerrarModal = function () {
     if (modal) {
         modal.classList.add("hidden");
         document.body.style.overflow = "auto";
+        if (timerSLA) clearInterval(timerSLA);
     }
 };
 
@@ -373,19 +381,17 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const puesto = document.getElementById("userCargo");
     const contacto = document.getElementById("userTelefono");
 
-    //----------------envio de correos directo----------------
     const elLinkCorreo = document.getElementById("linkCorreo");
     if (nombre && correo && departamento && puesto && contacto && modal) {
-        nombre.textContent = name;
-        correo.textContent = email;
-        departamento.textContent = unidad;
-        puesto.textContent = cargo;
-        contacto.textContent = telefono;
+        nombre.textContent = name || "---";
+        correo.textContent = email || "---";
+        departamento.textContent = unidad || "---";
+        puesto.textContent = cargo || "---";
+        contacto.textContent = telefono || "---";
 
         //-----------------GMAIL--------------
         if (email && email !== "---") {
-            //----abre gmail directamente para su redaccion
-            elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=Consulta sobre su Ticket&body=Hola ${name},`;
+            elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent("Consulta sobre su Ticket")}&body=${encodeURIComponent(`Hola ${name || ""},`)}`;
             elLinkCorreo.classList.remove("opacity-50", "pointer-events-none");
         } else {
             elLinkCorreo.href = "javascript:void(0)";
@@ -404,5 +410,3 @@ window.cerrarModalUsuario = function () {
         document.body.style.overflow = "auto";
     }
 };
-
-

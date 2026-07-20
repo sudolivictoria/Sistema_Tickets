@@ -211,8 +211,9 @@
             </div>
 
             <div class="footer">
-                Este es un mensaje automático generado por el <strong>Help Desk ISTU</strong>. Por favor, no responda
-                directamente a este correo.
+                <strong>HELP DESK ISTU</strong><br>
+                Instituto Salvadoreño de Turismo<br>
+                &copy; {{ date('Y') }} Todos los derechos reservados.
             </div>
         </div>
     </div>
