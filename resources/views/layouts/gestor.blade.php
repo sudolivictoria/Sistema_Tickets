@@ -67,11 +67,14 @@
                 <div class="size-9 bg-primary rounded-lg flex items-center justify-center text-secondary shadow-sm">
                     <span class="material-symbols-outlined font-bold text-2xl">support_agent</span>
                 </div>
-                <h2 class="text-xl font-bold text-secondary tracking-tight">Help Desk Istu <span
-                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Admin Unidad' }}</span>
+                <h2 class="text-xl font-bold text-secondary tracking-tight">
+                    Help Desk Istu
+                    <span
+                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">
+                        {{ auth()->user()->unidad->nombre_unidad ?? 'Gestor' }}
+                    </span>
                 </h2>
             </div>
-
             <div
                 class="hidden md:flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
                 <span class="material-symbols-outlined text-slate-400 text-[18px] animate-pulse">schedule</span>
@@ -151,7 +154,7 @@
     </div>
 
     <script>
-        window.addEventListener('load', function () {
+        window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -162,7 +165,7 @@
         });
 
         //-----reloj 
-        window.iniciarReloj = function () {
+        window.iniciarReloj = function() {
             const contenedorReloj = document.getElementById('relojSistema');
             if (!contenedorReloj) return;
 
@@ -184,9 +187,22 @@
             setInterval(actualizarHora, 1000);
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             iniciarReloj();
         });
+    </script>
+
+    @php
+        $flashSuccess = session('sweet_success') ?: session('success');
+        $flashError = session('sweet_error') ?: session('error');
+        $validationErrors = $errors->any() ? $errors->all() : [];
+    @endphp
+
+    <script>
+        window.__flashMessages = window.__flashMessages || {};
+        window.__flashMessages.success = @json($flashSuccess);
+        window.__flashMessages.error = @json($flashError);
+        window.__flashMessages.validationErrors = @json($validationErrors);
     </script>
 
     @stack('scripts')

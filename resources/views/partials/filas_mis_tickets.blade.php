@@ -71,6 +71,7 @@
         <td class="px-4 py-4 text-center">
             <button type="button"
                 class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
+                data-id="{{ $ticket->id }}"
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}" 
                 data-drive="{{ $ticket->drive_link }}">

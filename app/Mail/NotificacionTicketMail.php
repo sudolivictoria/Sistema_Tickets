@@ -4,63 +4,48 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class NotificacionTicketMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    // Declaramos las propiedades explícitas que usará la vista
-    public $subjectEmail;
+    public $asuntoCorreo;
     public $titulo;
     public $subtitulo;
     public $ticketCodigo;
     public $contenido;
     public $esResolucion;
+    
+    public $ticketAsunto;
+    public $nombreUsuario;
+    public $nombreUnidad;
 
-    /**
-     * Pasamos los campos directos en lugar de un arreglo genérico
-     */
     public function __construct(
-        string $subjectEmail, 
-        string $titulo, 
-        string $subtitulo, 
-        string $ticketCodigo, 
-        string $contenido, 
-        bool $esResolucion = false
+        $asuntoCorreo, 
+        $titulo, 
+        $subtitulo, 
+        $ticketCodigo, 
+        $contenido, 
+        $esResolucion = false, 
+        $ticketAsunto = null,
+        $nombreUsuario = null,
+        $nombreUnidad = null
     ) {
-        $this->subjectEmail = $subjectEmail;
+        $this->asuntoCorreo = $asuntoCorreo;
         $this->titulo = $titulo;
         $this->subtitulo = $subtitulo;
         $this->ticketCodigo = $ticketCodigo;
         $this->contenido = $contenido;
         $this->esResolucion = $esResolucion;
+        $this->ticketAsunto = $ticketAsunto;
+        $this->nombreUsuario = $nombreUsuario;
+        $this->nombreUnidad = $nombreUnidad;
     }
 
-    /**
-     * El sobre del correo
-     */
-    public function envelope(): Envelope
+    public function build()
     {
-        return new Envelope(
-            subject: $this->subjectEmail,
-        );
-    }
-
-    /**
-     * Definición del contenido
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.notificacion-ticket',
-        );
-    }
-
-    public function attachments(): array
-    {
-        return [];
+        return $this->subject($this->asuntoCorreo)
+                    ->view('emails.notificacion-ticket');
     }
 }

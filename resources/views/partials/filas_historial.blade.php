@@ -10,7 +10,8 @@
         <!--datos del usuario-->
         <td class="px-2 py-4">
             <div class="flex flex-col">
-                <button type="button" onclick="verUsuario(
+                <button type="button"
+                    onclick="verUsuario(
                                     '{{ $ticket->user->name }}', 
                                     '{{ $ticket->user->email }}', 
                                     '{{ $ticket->user->unidad->nombre_unidad }}', 
@@ -79,20 +80,19 @@
             {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
         </td>
         {{-- Acciones --}}
-         {{--descripcion del ticket--}}
+        {{-- descripcion del ticket --}}
         <td class="px-2 py-4 text-center">
             <button type="button"
                 class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
-                data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
+                data-id="{{ $ticket->id }}" data-asunto="{{ $ticket->asunto }}"
+                data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
                 data-drive="{{ $ticket->drive_link }}"
-                 
-                {{-- Datos para el temporizador de SLA --}} 
+                data-state="{{ $ticket->estado_id }}" {{-- Datos para el temporizador de SLA --}}
                 data-estado="{{ $ticket->estado->nombre_estado ?? 'Pendiente' }}"
                 data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('Y-m-d H:i:s') : '' }}"
-                data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}"
-                >
-                
+                data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}">
+
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

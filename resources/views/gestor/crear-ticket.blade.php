@@ -190,43 +190,12 @@
         window.todosLosTipos = @json($tipos ?? []);
     </script>
 
-    @if (session('success'))
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                Swal.fire({
-                    title: '¡Excelente!',
-                    text: "{{ session('success') }}",
-                    icon: 'success',
-                    confirmButtonColor: '#04003B',
-                    confirmButtonText: 'Entendido',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
-                    }
-                }).then(() => {
-                    window.location.href = "{{ route('gestor.dashboard') }}";
-                });
-            });
-        </script>
-    @endif
-
-    @if ($errors->any())
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                Swal.fire({
-                    title: 'No se pudo enviar',
-                    html: '{!! implode('<br>', $errors->all()) !!}',
-                    icon: 'error',
-                    confirmButtonColor: '#dc2626',
-                    confirmButtonText: 'Corregir',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
-                    }
-                });
-            });
-        </script>
-    @endif
+    <script>
+        window.__flashMessages = window.__flashMessages || {};
+        window.__flashMessages.successTitle = '¡Ticket creado!';
+        window.__flashMessages.validationTitle = 'No se pudo enviar';
+        window.__flashMessages.redirectTo = "{{ route('gestor.dashboard') }}";
+    </script>
 @endpush
 
 @push('page-scripts')

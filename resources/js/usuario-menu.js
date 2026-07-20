@@ -48,23 +48,3 @@ if (document.readyState === "loading") {
 }
 
 
-//-------OBSERVER
-const observarModalTicket = () => {
-    const modal = document.getElementById("modalTicket");
-    const header = document.getElementById("headerUsuario"); 
-
-    if (!modal || !header) return;
-    const observer = new MutationObserver(() => {
-        if (modal.classList.contains("hidden")) {
-            header.classList.remove("hidden");
-        } else {
-            header.classList.add("hidden");    
-        }
-    });
-    observer.observe(modal, { attributes: true, attributeFilter: ["class"] });
-};
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", observarModalTicket);
-} else {
-    observarModalTicket();
-}

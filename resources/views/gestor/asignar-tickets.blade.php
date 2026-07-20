@@ -56,63 +56,6 @@
     @include('partials.detalle_usuario')
 @endsection
 @push('page-scripts')
-    @if ($errors->any())
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                Swal.fire({
-                    title: 'No se pudo actualizar',
-                    html: '{!! implode('<br>', $errors->all()) !!}',
-                    icon: 'error',
-                    confirmButtonColor: '#dc2626',
-                    confirmButtonText: 'Corregir',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
-                    }
-                });
-            });
-        </script>
-    @endif
-
-    @if (session('sweet_error'))
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                Swal.fire({
-                    title: 'Operación denegada',
-                    html: `{!! session('sweet_error') !!}`,
-                    icon: 'error',
-                    confirmButtonColor: '#dc2626',
-                    confirmButtonText: 'Entendido',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
-                    }
-                });
-            });
-        </script>
-    @endif
-
-    @if (session('sweet_success'))
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                Swal.fire({
-                    title: '¡Acción Exitosa!',
-                    text: "{{ session('sweet_success') }}",
-                    icon: 'success',
-                    iconColor: '#84cc16',
-                    timer: 3000,
-                    showConfirmButton: false,
-                    customClass: {
-                        popup: 'rounded-3xl'
-                    }
-                });
-            });
-        </script>
-    @endif
-@endpush
-
-
-@push('page-scripts')
     @vite(['resources/js/asignar-tickets.js'])
 @endpush
 

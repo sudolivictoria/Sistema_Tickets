@@ -68,6 +68,7 @@ $(document).ready(function () {
     $(document)
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
+            const idTicket = $(this).data("id");
             const asunto = $(this).data("asunto");
             const descripcion = $(this).data("descripcion");
             const tipo = $(this).data("tipo");
@@ -81,6 +82,7 @@ $(document).ready(function () {
             };
 
             window.verDetalle(
+                idTicket,
                 asunto,
                 descripcion,
                 tipo,
@@ -228,7 +230,73 @@ function iniciarContadorSLA(datosSLA) {
  * Gestión de Modal de detalles
  */
 let ticketIdActual = null;
+window.cargarComentariosDelTicket = function (idTicket, state = null) {
+    const $lista = $("#modalListaComentarios");
+    const $seccionHistorico = $("#seccion-historico-comentarios");
+    const $formularioComentario = $("#form-comentario-modal");
+    const modal = document.getElementById("modalTicket");
+
+    if (!idTicket) return;
+
+    if (!document.getElementById("preloaderGlobalModal") && modal) {
+        const preloaderHTML = `
+            <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl">
+                <div class="w-12 h-12 border-4 border-slate-200 border-t-secondary rounded-full animate-spin mb-3"></div>
+                <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
+            </div>`;
+
+        const contenedorInterno = modal.querySelector(".bg-white") || modal;
+        if (contenedorInterno) {
+            contenedorInterno.style.position = "relative";
+            $(contenedorInterno).prepend(preloaderHTML);
+        }
+    } else {
+        $("#preloaderGlobalModal").removeClass("hidden");
+    }
+
+    const stateNum = Number(state);
+    if (stateNum === 3 || stateNum === 4 || stateNum === 5) {
+        $formularioComentario.hide();
+    } else {
+        $formularioComentario.show();
+    }
+
+    $.get(`/tickets/${idTicket}/comentarios`, function (comentarios) {
+        $lista.empty();
+
+        if (!comentarios || comentarios.length === 0) {
+            $seccionHistorico.hide();
+            $("#preloaderGlobalModal").addClass("hidden");
+            return;
+        }
+        $seccionHistorico.show();
+
+        comentarios.forEach((com) => {
+            const bg = com.es_privado
+                ? "bg-amber-50 border-amber-100"
+                : "bg-white border-slate-100";
+            const tag = com.es_privado
+                ? '<span class="text-amber-700 font-bold">[Interno]</span> '
+                : "";
+            $lista.append(`
+                <div class="p-2 rounded-xl border ${bg}">
+                    <div class="flex justify-between font-bold text-green-950 mb-0.5">
+                        <span>${tag}${com.user.name}</span>
+                        <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible}</span>
+                    </div>
+                    <p class="text-slate-600 font-medium">${com.contenido}</p>
+                </div>
+            `);
+        });
+        $lista.scrollTop($lista[0].scrollHeight);
+        $("#preloaderGlobalModal").addClass("hidden");
+    }).fail(function () {
+        $("#preloaderGlobalModal").addClass("hidden");
+    });
+};
+
 window.verDetalle = function (
+    idTicket,
     asunto,
     descripcion,
     tipoNombre,
@@ -236,6 +304,8 @@ window.verDetalle = function (
     drive,
     datosSLA = {},
 ) {
+    ticketIdActual = idTicket;
+
     const modal = document.getElementById("modalTicket");
     const titulo = document.getElementById("modalTitulo");
     const desc = document.getElementById("modalDescripcion");
@@ -267,18 +337,17 @@ window.verDetalle = function (
 
     iniciarContadorSLA(datosSLA);
 
-    if (modal && titulo && desc && tipo && fecha) {
+    if (modal && titulo && desc && tipo) {
         titulo.textContent = asunto;
         desc.textContent = descripcion;
         tipo.textContent = tipoNombre;
-        fecha.textContent = fechaApertura;
+        if (fecha) {
+            fecha.textContent = fechaApertura;
+        }
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
 
-    ticketIdActual = parseInt(asunto.match(/\d+/)) || null;
-
-    //----Cargar comentarios anteriores
     $("#contenido-comentario").val("");
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
 
@@ -287,44 +356,22 @@ window.verDetalle = function (
         '<p class="text-center text-slate-400 py-2">Cargando comentarios...</p>',
     );
 
-    if (ticketIdActual) {
-        $.get(`/tickets/${ticketIdActual}/comentarios`, function (comentarios) {
-            $lista.empty();
-            if (comentarios.length === 0) {
-                $lista.html(
-                    '<p class="text-center text-slate-400 py-2">No hay comentarios todavía.</p>',
-                );
-                return;
-            }
-            comentarios.forEach((com) => {
-                const bg = com.es_privado
-                    ? "bg-amber-50 border-amber-100"
-                    : "bg-white border-slate-100";
-                const tag = com.es_privado
-                    ? '<span class="text-amber-700 font-bold">[Interno]</span> '
-                    : "";
-                $lista.append(`
-                    <div class="p-2 rounded-xl border ${bg}">
-                        <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                            <span>${tag}${com.user.name}</span>
-                            <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible}</span>
-                        </div>
-                        <p class="text-slate-600 font-medium">${com.contenido}</p>
-                    </div>
-                `);
-            });
-            $lista.scrollTop($lista[0].scrollHeight);
-        });
-    }
+    window.cargarComentariosDelTicket(ticketIdActual);
 };
 
-//----------funcion para COMMENTS
 $(document).on("submit", "#form-comentario-modal", function (e) {
     e.preventDefault();
     if (!ticketIdActual) return;
 
-    const contenido = $("#contenido-comentario").val();
-    const esPrivado = $("#es_privado").is(":checked");
+    const contenido = $("#contenido-comentario").val().trim();
+    if (contenido === "") return;
+
+    const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
+    const $btnSubmit = $(this).find('button[type="submit"]');
+    const textoOriginal = $btnSubmit.html();
+
+    $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
+    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
 
     $.ajax({
         url: `/tickets/${ticketIdActual}/comentarios`,
@@ -332,13 +379,20 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
         data: {
             _token: $('input[name="_token"]').val(),
             contenido: contenido,
-            es_privado: esPrivado ? 1 : 0,
+            es_privado: esPrivado,
         },
         success: function (response) {
+            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
+
             if (response.success) {
-                $(".btn-ver-detalle:focus").click() ||
-                    alert("Comentario guardado con éxito");
+                $("#contenido-comentario").val("");
+                if ($("#es_privado").length) $("#es_privado").prop("checked", false);
+                window.cargarComentariosDelTicket(ticketIdActual);
             }
+        },
+        error: function (err) {
+            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
+            console.error("Error al guardar comentario:", err);
         },
     });
 });

@@ -95,11 +95,11 @@
         <td class="px-2 py-4 text-center">
             <button type="button"
                 class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
+                data-id="{{ $ticket->id }}"
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
-                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}"
-                data-drive="{{ $ticket->drive_link }}"
-                
+                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" data-drive="{{ $ticket->drive_link }}"
+                data-state="{{ $ticket->estado_id }}"
                 {{-- Datos para el temporizador de SLA --}} 
                 data-estado="{{ $ticket->estado->nombre_estado ?? 'Pendiente' }}"
                 data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('Y-m-d H:i:s') : '' }}"

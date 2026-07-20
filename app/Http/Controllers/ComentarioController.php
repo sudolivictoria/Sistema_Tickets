@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Mail;
 
 class ComentarioController extends Controller
 {
-    /**
-     * Obtiene comentarios filtrados por rol para el modal
-     */
     public function obtenerComentarios($ticketId)
     {
         $ticket = Ticket::findOrFail($ticketId);
@@ -42,9 +39,6 @@ class ComentarioController extends Controller
         return response()->json($comentarios);
     }
 
-    /**
-     * Guarda el comentario y envía el correo correspondiente
-     */
     public function store(Request $request, $ticketId)
     {
         $request->validate([
@@ -52,7 +46,6 @@ class ComentarioController extends Controller
             'es_privado' => 'boolean',
         ]);
 
-        // Si no hacemos esto, $ticket->tecnico->email da un error fatal "Property of non-object".
         $ticket = Ticket::with(['user', 'tecnico', 'estado', 'categoria'])->findOrFail($ticketId);
 
         /** @var User $user */
@@ -70,7 +63,7 @@ class ComentarioController extends Controller
             'es_privado' => $esPrivado,
         ]);
 
-      //********** LÓGICA DE CORREOS ADAPTADA A TU SISTEMA DE UNIDADES **************
+        //********** LÓGICA DE CORREOS **************
         try {
             $estaResuelto = (
                 $ticket->estado_id == 3 ||
@@ -79,20 +72,26 @@ class ComentarioController extends Controller
 
             if (!$esPrivado && !$estaResuelto) {
                 $ticketCodigo = "#TK" . str_pad($ticket->id, 5, '0', STR_PAD_LEFT);
+                $asuntoContexto = $ticket->asunto ?? $ticket->descripcion ?? 'Sin descripción especificada';
+                $nombreUsuario = $user->name;
+                $nombreUnidad = $user->unidad?->nombre_unidad ?? 'Unidad no especificada';
 
-                //--cliente agrega comentario
+                //**************************COMMENT CLIENTE**************************************/
                 if ($user->id == $ticket->user_id) {
                     
                     //---tiene un tecnico asignado
                     if ($ticket->tecnico && $ticket->tecnico->id != $user->id) {
                         
                         Mail::to($ticket->tecnico->email)->send(new NotificacionTicketMail(
-                            "Actualización en Ticket {$ticketCodigo}",
+                            "Actualización Ticket {$ticketCodigo} - {$asuntoContexto}", 
                             "Nuevo Comentario",
-                            "El usuario {$user->name} ha agregado información o dudas sobre el caso que tienes asignado.",
+                            "El cliente ha agregado información sobre la solicitud.", 
                             $ticketCodigo,
                             $comentario->contenido,
-                            false
+                            false,
+                            $asuntoContexto, 
+                            $nombreUsuario,  
+                            $nombreUnidad    
                         ));
                         logger("Correo enviado al técnico asignado: " . $ticket->tecnico->email);
                     } 
@@ -110,37 +109,41 @@ class ComentarioController extends Controller
                             if (!empty($destinatariosUnidad)) {
                                 Mail::bcc($destinatariosUnidad)->queue(new NotificacionTicketMail(
                                     "Ticket sin asignar actualizado {$ticketCodigo}",
-                                    "Comentario en Ticket Pendiente",
-                                    "El cliente {$user->name} ha comentado en un ticket de tu unidad que aún está pendiente de asignación.",
+                                    "Nuevo Comentario",
+                                    "Se ha comentado en un ticket de tu unidad que aún está pendiente.",
                                     $ticketCodigo,
                                     $comentario->contenido,
-                                    false
+                                    false,
+                                    $asuntoContexto, 
+                                    $nombreUsuario,  
+                                    $nombreUnidad    
                                 ));
-                                logger("Ticket sin asignar. Notificación en cola enviada a la unidad ID: " . $unidadId);
+                                logger("Ticket sin asignar. Notificación enviada a unidad: " . $unidadId);
                             }
-                        } else {
-                            logger("Advertencia: El ticket no tiene una categoría asociada para identificar la unidad.");
                         }
                     }
                 } 
                 
-                //---admin para cliente
+                //**********************COMMENT ADMIN O TECNICO********************************/
                 else {
                     if ($ticket->user && $ticket->user->id != $user->id && !empty($ticket->user->email)) {
                         Mail::to($ticket->user->email)->send(new NotificacionTicketMail(
-                            "Actualización de Ticket {$ticketCodigo} - Help Desk ISTU",
+                            "Respuesta de Ticket {$ticketCodigo}",
                             "Nuevo Comentario",
-                            "Se ha agregado una respuesta de seguimiento a su solicitud.",
+                            "Se ha comentado en tu solicitud.",
                             $ticketCodigo,
                             $comentario->contenido,
-                            false
+                            false,
+                            $asuntoContexto, 
+                            $nombreUsuario,  
+                            $nombreUnidad    
                         ));
                         logger("Correo enviado al cliente: " . $ticket->user->email);
                     }
                 }
             }
         } catch (\Exception $e) {
-            logger("Error al enviar correo en flujo de unidades: " . $e->getMessage());
+            logger("Error al enviar correo: " . $e->getMessage());
         }
 
         return response()->json(['success' => true, 'comentario' => $comentario]);

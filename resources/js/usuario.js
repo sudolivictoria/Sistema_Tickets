@@ -63,12 +63,13 @@ $(document).ready(function () {
     $(document)
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
+            const idTicket = $(this).data("id");
             const asunto = $(this).data("asunto");
             const descripcion = $(this).data("descripcion");
             const tipo = $(this).data("tipo");
             const drive = $(this).data("drive");
 
-            window.verDetalle(asunto, descripcion, tipo, drive);
+            window.verDetalle(idTicket, asunto, descripcion, tipo, drive);
         });
 });
 
@@ -76,14 +77,35 @@ let ticketIdActual = null;
 window.cargarComentariosDelTicket = function (idTicket) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
+    const $formularioComentario = $("#form-comentario-modal");
+    const modal = document.getElementById("modalTicket");
 
     if (!idTicket) return;
+
+    if (!document.getElementById("preloaderGlobalModal") && modal) {
+        const preloaderHTML = `
+            <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl">
+                <div class="w-12 h-12 border-4 border-slate-200 border-t-secondary rounded-full animate-spin mb-3"></div>
+                <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
+            </div>`;
+
+        const contenedorInterno = modal.querySelector(".bg-white") || modal;
+        if (contenedorInterno) {
+            contenedorInterno.style.position = "relative";
+            $(contenedorInterno).prepend(preloaderHTML);
+        }
+    } else {
+        $("#preloaderGlobalModal").removeClass("hidden");
+    }
+
+    $formularioComentario.show();
 
     $.get(`/tickets/${idTicket}/comentarios`, function (comentarios) {
         $lista.empty();
 
         if (!comentarios || comentarios.length === 0) {
             $seccionHistorico.hide();
+            $("#preloaderGlobalModal").addClass("hidden");
             return;
         }
         $seccionHistorico.show();
@@ -106,11 +128,16 @@ window.cargarComentariosDelTicket = function (idTicket) {
             `);
         });
         $lista.scrollTop($lista[0].scrollHeight);
+        $("#preloaderGlobalModal").addClass("hidden");
+    }).fail(function () {
+        $("#preloaderGlobalModal").addClass("hidden");
     });
 };
 
 //---funciones para ver detalles de los tickets
-window.verDetalle = function (asunto, descripcion, solicitud, drive) {
+window.verDetalle = function (idTicket, asunto, descripcion, solicitud, drive) {
+    ticketIdActual = idTicket;
+
     const modal = document.getElementById("modalTicket");
     const modalTitulo = document.getElementById("modalTitulo");
     const modalDescripcion = document.getElementById("modalDescripcion");
@@ -139,10 +166,8 @@ window.verDetalle = function (asunto, descripcion, solicitud, drive) {
         modalDescripcion.textContent = descripcion;
         modalTipoSolicitud.textContent = solicitud;
         modal.classList.remove("hidden");
-        document.body.style.overflow = "hidden"; 
+        document.body.style.overflow = "hidden";
     }
-
-    ticketIdActual = idTicket;
 
     $("#contenido-comentario").val("");
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
@@ -157,8 +182,15 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
     e.preventDefault();
     if (!ticketIdActual) return;
 
-    const contenido = $("#contenido-comentario").val();
-    const esPrivado = $("#es_privado").is(":checked");
+    const contenido = $("#contenido-comentario").val().trim();
+    if (contenido === "") return;
+
+    const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
+    const $btnSubmit = $(this).find('button[type="submit"]');
+    const textoOriginal = $btnSubmit.html();
+
+    $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
+    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
 
     $.ajax({
         url: `/tickets/${ticketIdActual}/comentarios`,
@@ -166,16 +198,19 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
         data: {
             _token: $('input[name="_token"]').val(),
             contenido: contenido,
-            es_privado: esPrivado ? 1 : 0,
+            es_privado: esPrivado,
         },
         success: function (response) {
+            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
+
             if (response.success) {
                 $("#contenido-comentario").val("");
                 if ($("#es_privado").length) $("#es_privado").prop("checked", false);
                 window.cargarComentariosDelTicket(ticketIdActual);
             }
         },
-        error: function(err) {
+        error: function (err) {
+            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
             console.error("Error al guardar comentario:", err);
         }
     });

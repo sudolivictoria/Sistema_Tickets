@@ -1,9 +1,9 @@
 <div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
     aria-modal="true">
-    <div class="flex items-center justify-center min-h-screen px-4">
+    <div class="flex items-start justify-center min-h-screen px-4 py-24 sm:py-28 pb-8">
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModal()"></div>
         <div
-            class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all border-t-8 border-primary">
+            class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[calc(100vh-7rem)] overflow-y-auto transform transition-all border-t-8 border-primary">
             <!--contador-->
             <div class="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-100 rounded-full text-green-600 font-black text-xs uppercase tracking-wider shadow-sm animate-pulse"
                 id="wrapperCountdown">

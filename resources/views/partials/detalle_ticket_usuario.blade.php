@@ -1,4 +1,4 @@
-<div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+<div id="modalTicket" class="fixed inset-0 z-[70] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
     aria-modal="true">
     <div class="flex items-center justify-center min-h-screen px-4">
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModal()"></div>
@@ -79,7 +79,7 @@
                     <form id="form-comentario-modal" class="space-y-2">
                         @csrf
                         <textarea id="contenido-comentario" required
-                            placeholder="Escribe un comentario o nota interna..."
+                            placeholder="Escribe un comentario..."
                             class="w-full p-2.5 text-xs border border-slate-200 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary resize-none h-12 bg-slate-50 placeholder:text-slate-400"></textarea>
 
                         <div class="flex items-center justify-between gap-2">

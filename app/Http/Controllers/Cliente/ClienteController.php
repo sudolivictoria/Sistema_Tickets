@@ -176,7 +176,7 @@ class ClienteController extends Controller
         broadcast(new TicketActualizado());
 
         //--redireccionar con mensaje de exito o error en el correo
-        return redirect()->route('usuario.crear-ticket')
+        return redirect()->route('usuario.dashboard')
             ->with('success', $mensajeFlash);
     }
 
