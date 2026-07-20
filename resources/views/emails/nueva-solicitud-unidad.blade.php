@@ -139,7 +139,7 @@
                 <div class="logo-container">
                     <img src="{{ $message->embed(public_path('images/logo_istu.png')) }}" alt="Logo ISTU">
                 </div>
-                <h2>Nueva Solicitud Pendiente</h2>
+                <h2>Nueva Solicitud</h2>
             </div>
 
             <div class="content">
