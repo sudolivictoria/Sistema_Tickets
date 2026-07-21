@@ -73,14 +73,15 @@ $(document).ready(function () {
     $(document)
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
-            const idTicket = $(this).data("id");
-            const asunto = $(this).data("asunto");
-            const descripcion = $(this).data("descripcion");
-            const tipo = $(this).data("tipo");
-            const fecha = $(this).data("fecha");
-             const drive = $btn.data("drive");
+            const $btn = $(this);
+            const idTicket = $btn.data("id");
+            const asunto = $btn.data("asunto");
+            const descripcion = $btn.data("descripcion");
+            const tipo = $btn.data("tipo");
+            const fecha = $btn.data("fecha");
+            const drive = $btn.data("drive");
             const estadoNombre = $btn.data("estado"); 
-            const estadoSLA = $btn.data("state");    
+            const estadoSLA = $btn.data("state");   
 
             const datosSLA = {
                 estadoNombre: estadoNombre,

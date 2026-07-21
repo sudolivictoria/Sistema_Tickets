@@ -77,7 +77,8 @@
                 data-id="{{ $ticket->id }}"
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
-                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" data-drive="{{ $ticket->drive_link }}"
+                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" 
+                data-drive="{{ $ticket->drive_link }}"
                 {{-- Datos para el temporizador de SLA --}} 
                 data-estado="{{ $ticket->estado->nombre_estado }}"
                 data-state="{{ $ticket->estado_sla }}"

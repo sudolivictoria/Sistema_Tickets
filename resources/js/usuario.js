@@ -1,5 +1,7 @@
 //----variable global para almacenar la instancia de la tabla
 var table;
+let ticketIdActual = null;
+let ticketEstadoActual = null;
 
 /**
  * Inicializa DataTables de forma avanzada con estilos Tailwind
@@ -69,71 +71,79 @@ $(document).ready(function () {
             const tipo = $(this).data("tipo");
             const state = $(this).data("estado");
             const drive = $(this).data("drive");
+            const estadoNombre = $(this).data("estado"); 
 
-            window.verDetalle(idTicket, asunto, descripcion, tipo, state, drive);
+            window.verDetalle(idTicket, asunto, descripcion, tipo, state, drive, estadoNombre);
         });
 });
 
-// =====================================================================
-//                      FUNCIONES MODALES
-// =====================================================================
-let ticketIdActual = null;
-let ticketEstadoActual = null;
-window.cargarComentariosDelTicket = function (idTicket, state) {
+//=====================================================================
+//                     FUNCIONES MODALES
+//=====================================================================
+window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
     const $formularioComentario = $("#form-comentario-modal");
-    if (!idTicket) return;
-    
-    const estadosCerradosIds = [3, 4, 5];
-    const estadosCerradosTextos = ["resuelto","equivocado","no corresponde","cerrado",];
 
-    const estadoStr = String(state).toLowerCase().trim();
-    const esCerradoPorId = estadosCerradosIds.includes(Number(state));
+    if (!idTicket) return;
+
+    const estadosCerradosTextos = ["resuelto", "equivocado", "no corresponde", "cerrado"];
+    const estadoStr = String(estadoNombre || "").toLowerCase().trim();
     const esCerradoPorTexto = estadosCerradosTextos.includes(estadoStr);
 
-    if (esCerradoPorId || esCerradoPorTexto) {
+    if (esCerradoPorTexto) {
         $formularioComentario.hide();
     } else {
-        $formularioComentario.show(); //----muestra la caja si está activo/en proceso
+        $formularioComentario.show();
     }
-    $.get(`/tickets/${idTicket}/comentarios`, function (comentarios) {
-        $lista.empty();
 
-        if (!comentarios || comentarios.length === 0) {
-            $seccionHistorico.hide();
-            //----Ocultar preloader global si no hay comentarios
-            $("#preloaderGlobalModal").addClass("hidden");
-            return;
-        }
-        $seccionHistorico.show();
-        comentarios.forEach((com) => {
-            const bg = com.es_privado
-                ? "bg-green-50 border-green-100"
-                : "bg-white border-slate-100";
-            const tag = com.es_privado
-                ? '<span class="text-green-700 font-bold">[Interno]</span> '
-                : "";
-            $lista.append(`
-                <div class="p-2 rounded-xl border ${bg}">
+    $.get(`/tickets/${idTicket}/comentarios`)
+        .done(function (comentarios) {
+            $lista.empty();
+
+            if (!comentarios || comentarios.length === 0) {
+                $seccionHistorico.hide();
+                $("#preloaderGlobalModal").addClass("hidden");
+                return;
+            }
+
+            $seccionHistorico.show();
+
+            const fragment = document.createDocumentFragment();
+
+            comentarios.forEach((com) => {
+                const bg = com.es_privado
+                    ? "bg-green-50 border-green-100"
+                    : "bg-white border-slate-100";
+                const tag = com.es_privado
+                    ? '<span class="text-green-700 font-bold">[Interno]</span> '
+                    : "";
+
+                const item = document.createElement("div");
+                item.className = `p-2 rounded-xl border ${bg}`;
+                item.innerHTML = `
                     <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                        <span>${tag}${com.user.name}</span>
-                        <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible}</span>
+                        <span>${tag}${com.user ? com.user.name : "Usuario"}</span>
+                        <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible || ""}</span>
                     </div>
                     <p class="text-slate-600 font-medium">${com.contenido}</p>
-                </div>
-            `);
+                `;
+                fragment.appendChild(item);
+            });
+
+            $lista[0].appendChild(fragment);
+            $lista.scrollTop($lista[0].scrollHeight);
+        })
+        .fail(function (err) {
+            console.error("Error al obtener comentarios:", err);
+        })
+        .always(function () {
+            $("#preloaderGlobalModal").addClass("hidden");
         });
-        $lista.scrollTop($lista[0].scrollHeight);
-        //----preloader global
-        $("#preloaderGlobalModal").addClass("hidden");
-    }).fail(function () {
-        $("#preloaderGlobalModal").addClass("hidden");
-    });
 };
 
 //---funciones para ver detalles de los tickets
-window.verDetalle = function (idTicket, asunto, descripcion, solicitud, state, drive) {
+window.verDetalle = function (idTicket, asunto, descripcion, solicitud, state, drive, estadoNombre) {
     ticketIdActual = idTicket;
     ticketEstadoActual = state;
     
@@ -143,7 +153,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, solicitud, state, d
     const modalTipoSolicitud = document.getElementById("modalTipoSolicitud");
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
-    const imgPreview = document.getElementById("modalEvidenciaImg");
 
      //**********PRELOADER GLOBAL*******************/
     if (!document.getElementById("preloaderGlobalModal") && modal) {
@@ -173,7 +182,7 @@ window.verDetalle = function (idTicket, asunto, descripcion, solicitud, state, d
         document.body.style.overflow = "hidden";
     }
 
-     //----IMAGEN DE EVIDENCIA
+     //----IMAGEN DE EVIDENCIA------
     if (drive && drive.trim() !== "" && drive !== "null") {
         const pathLimpio = drive.startsWith("/") ? drive.substring(1) : drive;
         const urlImagen = `${window.location.origin}/storage/${pathLimpio}`;

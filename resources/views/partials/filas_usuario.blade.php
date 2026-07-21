@@ -55,7 +55,9 @@
                 data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}" 
                 data-state="{{ $ticket->estado_id }}"
-                data-drive="{{ $ticket->drive_link }}">
+                data-drive="{{ $ticket->drive_link }}"
+                data-estado="{{ $ticket->estado->nombre_estado ?? 'Pendiente' }}"
+                >
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>
