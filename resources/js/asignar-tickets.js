@@ -140,7 +140,6 @@ function iniciarContadorSLA(datosSLA) {
             display.textContent = "Finalizado";
             return;
         }
-
         const dias = Math.floor(segundosTranscurridos / 86400);
         const horas = Math.floor((segundosTranscurridos % 86400) / 3600);
         const minutos = Math.floor((segundosTranscurridos % 3600) / 60);
@@ -153,13 +152,11 @@ function iniciarContadorSLA(datosSLA) {
 
         return;
     }
-
     //---sin fecha limite configurada
     if (!fechaLimite) {
         wrapper.classList.add("hidden");
         return;
     }
-
     //----conteo regresivo
     wrapper.classList.remove("hidden");
     const limite = new Date(fechaLimite).getTime();
@@ -174,7 +171,6 @@ function iniciarContadorSLA(datosSLA) {
             wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
             return;
         }
-
         wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
 
         const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
@@ -190,14 +186,13 @@ function iniciarContadorSLA(datosSLA) {
             display.textContent = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
         }
     };
-
     tick();
     timerSLA = setInterval(tick, 1000);
 }
 
-// =====================================================================
-//                       FUNCIONES MODALES
-// =====================================================================
+//=====================================================================
+//                     FUNCIONES MODALES
+//=====================================================================
 window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
@@ -231,18 +226,17 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
             comentarios.forEach((com) => {
                 const bg = com.es_privado
-                    ? "bg-green-50 border-green-100"
-                    : "bg-white border-slate-100";
+                    ? "bg-lime-50/80 border-lime-300"
+                    : "bg-white border-slate-200";
                 const tag = com.es_privado
-                    ? '<span class="text-green-700 font-bold">[Interno]</span> '
+                    ? '<span class="text-green-700 font-bold">[Nota Interna]</span> '
                     : "";
-                const nombreUsuario = com.user ? com.user.name : "Usuario";
 
                 const item = document.createElement("div");
                 item.className = `p-2 rounded-xl border ${bg}`;
                 item.innerHTML = `
                     <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                        <span>${tag}${nombreUsuario}</span>
+                        <span>${tag}${com.user ? com.user.name : "Usuario"}</span>
                         <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible || ""}</span>
                     </div>
                     <p class="text-slate-600 font-medium">${com.contenido}</p>
@@ -261,6 +255,42 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
         });
 };
 
+//---------------------------AGREGAR COMENTARIOS DINAMICAMENTE---------------------------
+window.agregarComentarioAlModal = function (comentario) {
+    const $lista = $("#modalListaComentarios");
+    const $seccionHistorico = $("#seccion-historico-comentarios");
+
+    if (!$lista.length) return;
+
+    if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
+        return;
+    }
+
+    $seccionHistorico.show();
+
+    const bg = comentario.es_privado
+        ? "bg-lime-50 border-lime-200"
+        : "bg-white border-slate-200";
+        
+    const tag = comentario.es_privado
+        ? '<span class="text-green-900 font-bold">[Nota Interna]</span> '
+        : "";
+
+    const elComentario = `
+        <div class="p-2 rounded-xl border ${bg} transition-all duration-300">
+            <div class="flex justify-between font-bold text-green-950 mb-0.5">
+                <span>${tag}${comentario.user ? comentario.user.name : "Usuario"}</span>
+                <span class="text-[10px] text-slate-400 font-normal">${comentario.tiempo_legible || "Ahora mismo"}</span>
+            </div>
+            <p class="text-slate-600 font-medium">${comentario.contenido}</p>
+        </div>
+    `;
+
+    $lista.append(elComentario);
+    $lista.scrollTop($lista[0].scrollHeight);
+};
+
+//-------------------TICKET------------------
 window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaApertura, drive, estadoNombre, estadoSLA, datosSLA = {}) {
     ticketIdActual = idTicket;
     ticketEstadoActual = estadoNombre;
@@ -317,48 +347,48 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     iniciarContadorSLA(datosSLA);
 };
 
-//-------------SECCION COMENTARIO-------------------
-$(document)
-    .off("submit", "#form-comentario-modal").on("submit", "#form-comentario-modal", function (e) {
-        e.preventDefault();
-        if (!ticketIdActual) return;
+//--------------NUEVO COMENTARIO---------------------
+$(document).on("submit", "#form-comentario-modal", function (e) {
+    e.preventDefault();
+    if (!ticketIdActual) return;
 
-        const $inputContenido = $("#contenido-comentario");
-        const contenido = $inputContenido.val().trim();
-        if (contenido === "") return;
+    const $inputContenido = $("#contenido-comentario");
+    const contenido = $inputContenido.val().trim();
+    if (contenido === "") return;
 
-        const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
-        const $btnSubmit = $(this).find('button[type="submit"]');
-        const textoOriginal = $btnSubmit.html();
+    const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
+    const $btnSubmit = $(this).find('button[type="submit"]');
+    const textoOriginal = $btnSubmit.html();
 
-        $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
+    $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
+    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
 
-        const loaderText = esPrivado === 1 ? "Guardando comentario..." : "Enviando comentario...";
-        $btnSubmit.html(`<span class="inline-block animate-spin mr-2">⏳</span> ${loaderText}`);
+    $.ajax({
+        url: `/tickets/${ticketIdActual}/comentarios`,
+        method: "POST",
+        data: {
+            _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content'),
+            contenido: contenido,
+            es_privado: esPrivado,
+        },
+    })
+        .done(function (response) {
+            if (response.success || response.comentario) {
+                $inputContenido.val(""); 
+                if ($("#es_privado").length) $("#es_privado").prop("checked", false);
 
-        $.ajax({
-            url: `/tickets/${ticketIdActual}/comentarios`,
-            method: "POST",
-            data: {
-                _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content'),
-                contenido: contenido,
-                es_privado: esPrivado,
-            },
+                const comentarioData = response.comentario || response;
+                window.agregarComentarioAlModal(comentarioData);
+            }
         })
-            .done(function (response) {
-                if (response.success) {
-                    $inputContenido.val("");
-                    if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-                    window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
-                }
-            })
-            .fail(function (err) {
-                console.error("Error al guardar comentario:", err);
-            })
-            .always(function () {
-                $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
-            });
-    });
+        .fail(function (err) {
+            console.error("Error al guardar comentario:", err);
+            alert("Ocurrió un error al intentar publicar el comentario.");
+        })
+        .always(function () {
+            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
+        });
+});
 
 /**
  * Cerrar modal
@@ -369,6 +399,7 @@ window.cerrarModal = function () {
         modal.classList.add("hidden");
         document.body.style.overflow = "auto";
         if (timerSLA) clearInterval(timerSLA);
+        ticketIdAcual = null;
     }
 };
 

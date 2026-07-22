@@ -113,10 +113,10 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
             comentarios.forEach((com) => {
                 const bg = com.es_privado
-                    ? "bg-green-50 border-green-100"
-                    : "bg-white border-slate-100";
+                    ? "bg-lime-50/80 border-lime-300"
+                    : "bg-white border-slate-200";
                 const tag = com.es_privado
-                    ? '<span class="text-green-700 font-bold">[Interno]</span> '
+                    ? '<span class="text-green-700 font-bold">[Nota Interna]</span> '
                     : "";
 
                 const item = document.createElement("div");
@@ -140,6 +140,41 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
         .always(function () {
             $("#preloaderGlobalModal").addClass("hidden");
         });
+};
+
+//---------------------------AGREGAR COMENTARIOS DINAMICAMENTE---------------------------
+window.agregarComentarioAlModal = function (comentario) {
+    const $lista = $("#modalListaComentarios");
+    const $seccionHistorico = $("#seccion-historico-comentarios");
+
+    if (!$lista.length) return;
+
+    if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
+        return;
+    }
+
+    $seccionHistorico.show();
+
+    const bg = comentario.es_privado
+        ? "bg-lime-50 border-lime-200"
+        : "bg-white border-slate-200";
+        
+    const tag = comentario.es_privado
+        ? '<span class="text-green-900 font-bold">[Nota Interna]</span> '
+        : "";
+
+    const elComentario = `
+        <div class="p-2 rounded-xl border ${bg} transition-all duration-300">
+            <div class="flex justify-between font-bold text-green-950 mb-0.5">
+                <span>${tag}${comentario.user ? comentario.user.name : "Usuario"}</span>
+                <span class="text-[10px] text-slate-400 font-normal">${comentario.tiempo_legible || "Ahora mismo"}</span>
+            </div>
+            <p class="text-slate-600 font-medium">${comentario.contenido}</p>
+        </div>
+    `;
+
+    $lista.append(elComentario);
+    $lista.scrollTop($lista[0].scrollHeight);
 };
 
 //---funciones para ver detalles de los tickets
@@ -207,7 +242,8 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
     e.preventDefault();
     if (!ticketIdActual) return;
 
-    const contenido = $("#contenido-comentario").val().trim();
+    const $inputContenido = $("#contenido-comentario");
+    const contenido = $inputContenido.val().trim();
     if (contenido === "") return;
 
     const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
@@ -221,24 +257,26 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
         url: `/tickets/${ticketIdActual}/comentarios`,
         method: "POST",
         data: {
-            _token: $('input[name="_token"]').val(),
+            _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content'),
             contenido: contenido,
             es_privado: esPrivado,
         },
-        success: function (response) {
-            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
-
-            if (response.success) {
-                $("#contenido-comentario").val("");
+    })
+        .done(function (response) {
+            if (response.success || response.comentario) {
+                $inputContenido.val("");
                 if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-                window.cargarComentariosDelTicket(ticketIdActual);
+                const comentarioData = response.comentario || response;
+                window.agregarComentarioAlModal(comentarioData);
             }
-        },
-        error: function (err) {
-            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
+        })
+        .fail(function (err) {
             console.error("Error al guardar comentario:", err);
-        }
-    });
+            alert("Ocurrió un error al intentar publicar el comentario.");
+        })
+        .always(function () {
+            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
+        });
 });
 
 window.cerrarModal = function () {
@@ -246,5 +284,6 @@ window.cerrarModal = function () {
     if (modal) {
         modal.classList.add("hidden");
         document.body.style.overflow = "";
+        ticketIdActual = null;
     }
 };

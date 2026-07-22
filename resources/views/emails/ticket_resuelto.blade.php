@@ -210,10 +210,12 @@
                 </div>
 
                 <!--comentario final-->
+                @if(!empty($comentarioTexto) && trim($comentarioTexto) != '')
                 <div class="comment-title">Comentario:</div>
                 <div class="description-box">
                     "{{ $comentarioTexto }}"
                 </div>
+                @endif
             </div>
 
             <div class="footer">

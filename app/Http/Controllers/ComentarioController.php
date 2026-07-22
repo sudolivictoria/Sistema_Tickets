@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ComentarioCreado;
 use App\Models\Comentario;
 use App\Http\Controllers\Controller;
 use App\Mail\NotificacionTicketMail;
@@ -62,6 +63,8 @@ class ComentarioController extends Controller
             'contenido' => $request->contenido,
             'es_privado' => $esPrivado,
         ]);
+
+        broadcast(new ComentarioCreado($comentario))->toOthers();
 
         //********** LÓGICA DE CORREOS **************
         try {

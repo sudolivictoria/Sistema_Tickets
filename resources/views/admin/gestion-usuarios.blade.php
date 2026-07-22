@@ -202,7 +202,7 @@
                 <div class="relative">
                     <label class="text-[12px] font-black uppercase text-secondary">Contraseña (Dejar vacío para no
                         cambiar)</label>
-                    <input type="password" name="password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl "
+                    <input type="password" name="password" id="edit_password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl "
                         minlength="6">
 
                     <button type="button" class="toggle-password"

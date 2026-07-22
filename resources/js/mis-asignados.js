@@ -89,7 +89,6 @@ $(document).ready(function () {
                 fechaLimite: $btn.data("fecha-limite"),         
                 tiempoRespuesta: $btn.data("tiempo-respuesta"), 
             };
-
             window.verDetalle(idTicket, asunto, descripcion, tipo, fecha, drive, estadoNombre, estadoSLA, datosSLA);
         });
 
@@ -108,7 +107,6 @@ $(document).ready(function () {
         window.inicializarTablaTickets(selectorTabla);
     }
 });
-
 //------------------------TIMER SLA-------------------------------------
 function iniciarContadorSLA(datosSLA) {
     if (timerSLA) clearInterval(timerSLA);
@@ -122,7 +120,6 @@ function iniciarContadorSLA(datosSLA) {
     
     const estadoCheck = String(estadoNombre || "").toLowerCase().trim();
     const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
-
     //-----ticket resuelto
     if (estadosCerrados.includes(estadoCheck) || segundosTranscurridos > 0) {
         wrapper.classList.remove("hidden");
@@ -132,7 +129,6 @@ function iniciarContadorSLA(datosSLA) {
             display.textContent = "Finalizado";
             return;
         }
-
         const dias = Math.floor(segundosTranscurridos / 86400);
         const horas = Math.floor((segundosTranscurridos % 86400) / 3600);
         const minutos = Math.floor((segundosTranscurridos % 3600) / 60);
@@ -142,7 +138,6 @@ function iniciarContadorSLA(datosSLA) {
         else if (horas > 0) display.textContent = `Respuesta: ${horas}h ${minutos}m`;
         else if (minutos > 0) display.textContent = `Respuesta: ${minutos}m ${segundos}s`;
         else display.textContent = `Respuesta: ${segundos}s`;
-
         return;
     }
 
@@ -223,10 +218,10 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
             comentarios.forEach((com) => {
                 const bg = com.es_privado
-                    ? "bg-green-50 border-green-100"
-                    : "bg-white border-slate-100";
+                    ? "bg-lime-50/80 border-lime-300"
+                    : "bg-white border-slate-200";
                 const tag = com.es_privado
-                    ? '<span class="text-green-700 font-bold">[Interno]</span> '
+                    ? '<span class="text-green-700 font-bold">[Nota Interna]</span> '
                     : "";
 
                 const item = document.createElement("div");
@@ -252,6 +247,37 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
         });
 };
 
+//---------------------------AGREGAR COMENTARIOS DINAMICAMENTE---------------------------
+window.agregarComentarioAlModal = function (comentario) {
+    const $lista = $("#modalListaComentarios");
+    const $seccionHistorico = $("#seccion-historico-comentarios");
+    if (!$lista.length) return;
+
+    if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
+        return;
+    }
+    $seccionHistorico.show();
+    const bg = comentario.es_privado
+        ? "bg-lime-50 border-lime-200"
+        : "bg-white border-slate-200";
+        
+    const tag = comentario.es_privado
+        ? '<span class="text-green-900 font-bold">[Nota Interna]</span> '
+        : "";
+    const elComentario = `
+        <div class="p-2 rounded-xl border ${bg} transition-all duration-300">
+            <div class="flex justify-between font-bold text-green-950 mb-0.5">
+                <span>${tag}${comentario.user ? comentario.user.name : "Usuario"}</span>
+                <span class="text-[10px] text-slate-400 font-normal">${comentario.tiempo_legible || "Ahora mismo"}</span>
+            </div>
+            <p class="text-slate-600 font-medium">${comentario.contenido}</p>
+        </div>
+    `;
+    $lista.append(elComentario);
+    $lista.scrollTop($lista[0].scrollHeight);
+};
+
+//-------------------TICKET------------------
 window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaApertura, drive, estadoNombre, estadoSLA, datosSLA = {}) {
     ticketIdActual = idTicket;
     ticketEstadoActual = estadoNombre;
@@ -263,7 +289,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     const fecha = document.getElementById("modalFechaApertura");
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
-
     //************PRELOADER GLOBAL*****************/
     if (modal && !document.getElementById("preloaderGlobalModal")) {
         const preloaderHTML = `
@@ -278,7 +303,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
         $("#preloaderGlobalModal").removeClass("hidden");
     }
     //***************************************************/
-
     if (modal && titulo && desc && tipo && fecha) {
         if (modal.parentElement !== document.body) {
             document.body.appendChild(modal);
@@ -290,7 +314,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
-
     //-----------IMAGEN DE EVIDENCIA-------
     if (drive && String(drive).trim() !== "" && drive !== "null") {
         const pathLimpio = String(drive).startsWith("/") ? String(drive).substring(1) : drive;
@@ -310,9 +333,8 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     
     iniciarContadorSLA(datosSLA);
 };
-
 //--------------NUEVO COMENTARIO---------------------
-$(document).off("submit", "#form-comentario-modal").on("submit", "#form-comentario-modal", function (e) {
+$(document).on("submit", "#form-comentario-modal", function (e) {
     e.preventDefault();
     if (!ticketIdActual) return;
 
@@ -325,9 +347,7 @@ $(document).off("submit", "#form-comentario-modal").on("submit", "#form-comentar
     const textoOriginal = $btnSubmit.html();
 
     $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
-
-    const loaderText = esPrivado === 1 ? "Guardando comentario..." : "Enviando comentario...";
-    $btnSubmit.html(`<span class="inline-block animate-spin mr-2">⏳</span> ${loaderText}`);
+    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
 
     $.ajax({
         url: `/tickets/${ticketIdActual}/comentarios`,
@@ -339,15 +359,17 @@ $(document).off("submit", "#form-comentario-modal").on("submit", "#form-comentar
         },
     })
         .done(function (response) {
-            if (response.success) {
-                $inputContenido.val("");
+            if (response.success || response.comentario) {
+                $inputContenido.val(""); 
                 if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-                window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
+
+                const comentarioData = response.comentario || response;
+                window.agregarComentarioAlModal(comentarioData);
             }
         })
         .fail(function (err) {
             console.error("Error al guardar comentario:", err);
-            window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
+            alert("Ocurrió un error al intentar publicar el comentario.");
         })
         .always(function () {
             $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
@@ -363,6 +385,7 @@ window.cerrarModal = function () {
         modal.classList.add("hidden");
         document.body.style.overflow = "auto";
         if (timerSLA) clearInterval(timerSLA);
+        ticketIdActual = null;
     }
 };
 //------------------DETALLES USUARIOS-----------------
@@ -408,7 +431,6 @@ window.cerrarModalUsuario = function () {
 function procesarAccionTicket(btn, config) {
     const form = btn.closest("form");
     const idTicket = ticketIdActual || $(btn).data("id") || $(form).data("id");
-
     Swal.fire({
         title: config.tituloConfirmacion,
         text: "Puedes agregar un comentario (opcional):",
@@ -436,28 +458,17 @@ function procesarAccionTicket(btn, config) {
             cancelButton: "px-6 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-transform active:scale-95",
         },
         buttonsStyling: true,
-        preConfirm: (comentarioTexto) => {
-            const textoLimpio = comentarioTexto ? comentarioTexto.trim() : "";
-
-            if (textoLimpio !== "" && idTicket) {
-                const csrfToken = $('meta[name="csrf-token"]').attr('content') || $('input[name="_token"]').val();
-
-                return $.ajax({
-                    url: `/tickets/${idTicket}/comentarios`,
-                    method: "POST",
-                    data: {
-                        _token: csrfToken,
-                        contenido: textoLimpio,
-                        es_privado: 0 
-                    }
-                }).catch(error => {
-                    Swal.showValidationMessage(`Error al guardar el comentario: ${error.statusText}`);
-                });
-            }
-        },
-        allowOutsideClick: () => !Swal.isLoading()
-    }).then((result) => {
+       }).then((result) => {
         if (result.isConfirmed) {
+            const comentarioTexto = result.value ? result.value.trim() : "";
+            let inputComentario = form.querySelector('input[name="comentario_cierre"], textarea[name="comentario_cierre"]');
+            if (!inputComentario) {
+                inputComentario = document.createElement("input");
+                inputComentario.type = "hidden";
+                inputComentario.name = "comentario_cierre";
+                form.appendChild(inputComentario);
+            }
+            inputComentario.value = comentarioTexto;
             form.submit();
         }
     });
@@ -466,7 +477,6 @@ function procesarAccionTicket(btn, config) {
 // =====================================================================
 // BOTONES HTML (RESOLVER, MARCAR COMO EQUÍVOCADO, MARCAR COMO NO CORRESPONDE)
 // =====================================================================
-
 window.confirmarResolver = function (btn) {
     procesarAccionTicket(btn, {
         tituloConfirmacion: "¿Marcar como Resuelto?",

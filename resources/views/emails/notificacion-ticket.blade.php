@@ -59,7 +59,7 @@
         }
 
         .welcome-text {
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
             color: #04003B;
             margin-bottom: 5px;
@@ -163,7 +163,7 @@
             </div>
 
             <div class="content">
-                <div class="welcome-text">{{ $subtitulo }}</div>
+                <p class="welcome-text">{{ $subtitulo }}</p>
                 <div class="divider-green"></div>
 
                 <div class="info-card">

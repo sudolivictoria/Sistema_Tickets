@@ -106,6 +106,13 @@ window.abrirModal = function (tipo, data = null) {
         $("#edit_rol").val(data.rol_id);
         $("#edit_unidad").val(data.unidad_id);
         $("#edit_telefono").val(data.telefono);
+
+        $("#edit_password").val(""); 
+        
+        //---resetear ojito por si acaso
+        $("#edit_password").attr("type", "password");
+        $("#modalEditar .eye-open").show();
+        $("#modalEditar .eye-closed").hide();
     }
     $("body").addClass("overflow-hidden");
 };

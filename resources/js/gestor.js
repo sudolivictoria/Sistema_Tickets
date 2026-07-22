@@ -1,6 +1,6 @@
 //------variable global-------
 var table;
-window.currentStreamFilter = "todos";
+window.filtroSseActual = "todos";
 let timerSLA = null;
 let ticketIdActual = null;
 let ticketEstadoActual = null;
@@ -156,20 +156,17 @@ function iniciarContadorSLA(datosSLA) {
 
         return;
     }
-
     //---sin fecha limite configurada
     if (!fechaLimite) {
         wrapper.classList.add("hidden");
         return;
     }
-
     //----conteo regresivo
     wrapper.classList.remove("hidden");
     const limite = new Date(fechaLimite).getTime();
 
     const tick = () => {
         const restante = limite - Date.now();
-
         //------vencido porque paso el tiempo correspondiente
         if (restante <= 0) {
             clearInterval(timerSLA);
@@ -177,7 +174,6 @@ function iniciarContadorSLA(datosSLA) {
             wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
             return;
         }
-
         wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
 
         const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
@@ -193,7 +189,6 @@ function iniciarContadorSLA(datosSLA) {
             display.textContent = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
         }
     };
-
     tick();
     timerSLA = setInterval(tick, 1000);
 }
@@ -234,10 +229,10 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
             comentarios.forEach((com) => {
                 const bg = com.es_privado
-                    ? "bg-green-50 border-green-100"
-                    : "bg-white border-slate-100";
+                    ? "bg-lime-50/80 border-lime-300"
+                    : "bg-white border-slate-200";
                 const tag = com.es_privado
-                    ? '<span class="text-green-700 font-bold">[Interno]</span> '
+                    ? '<span class="text-green-700 font-bold">[Nota Interna]</span> '
                     : "";
 
                 const item = document.createElement("div");
@@ -263,6 +258,42 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
         });
 };
 
+//---------------------------AGREGAR COMENTARIOS DINAMICAMENTE---------------------------
+window.agregarComentarioAlModal = function (comentario) {
+    const $lista = $("#modalListaComentarios");
+    const $seccionHistorico = $("#seccion-historico-comentarios");
+
+    if (!$lista.length) return;
+
+    if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
+        return;
+    }
+
+    $seccionHistorico.show();
+
+    const bg = comentario.es_privado
+        ? "bg-lime-50 border-lime-200"
+        : "bg-white border-slate-200";
+        
+    const tag = comentario.es_privado
+        ? '<span class="text-green-900 font-bold">[Nota Interna]</span> '
+        : "";
+
+    const elComentario = `
+        <div class="p-2 rounded-xl border ${bg} transition-all duration-300">
+            <div class="flex justify-between font-bold text-green-950 mb-0.5">
+                <span>${tag}${comentario.user ? comentario.user.name : "Usuario"}</span>
+                <span class="text-[10px] text-slate-400 font-normal">${comentario.tiempo_legible || "Ahora mismo"}</span>
+            </div>
+            <p class="text-slate-600 font-medium">${comentario.contenido}</p>
+        </div>
+    `;
+
+    $lista.append(elComentario);
+    $lista.scrollTop($lista[0].scrollHeight);
+};
+
+//-------------------TICKET------------------
 window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaApertura, drive, estadoNombre, estadoSLA, datosSLA = {}) {
     ticketIdActual = idTicket;
     ticketEstadoActual = estadoNombre;
@@ -329,7 +360,7 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
 };
 
 //--------------NUEVO COMENTARIO---------------------
-$(document).off("submit", "#form-comentario-modal").on("submit", "#form-comentario-modal", function (e) {
+$(document).on("submit", "#form-comentario-modal", function (e) {
     e.preventDefault();
     if (!ticketIdActual) return;
 
@@ -342,9 +373,7 @@ $(document).off("submit", "#form-comentario-modal").on("submit", "#form-comentar
     const textoOriginal = $btnSubmit.html();
 
     $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
-
-    const loaderText = esPrivado === 1 ? "Guardando comentario..." : "Enviando comentario...";
-    $btnSubmit.html(`<span class="inline-block animate-spin mr-2">⏳</span> ${loaderText}`);
+    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
 
     $.ajax({
         url: `/tickets/${ticketIdActual}/comentarios`,
@@ -356,15 +385,17 @@ $(document).off("submit", "#form-comentario-modal").on("submit", "#form-comentar
         },
     })
         .done(function (response) {
-            if (response.success) {
-                $inputContenido.val("");
+            if (response.success || response.comentario) {
+                $inputContenido.val(""); 
                 if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-                window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
+
+                const comentarioData = response.comentario || response;
+                window.agregarComentarioAlModal(comentarioData);
             }
         })
         .fail(function (err) {
             console.error("Error al guardar comentario:", err);
-            window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
+            alert("Ocurrió un error al intentar publicar el comentario.");
         })
         .always(function () {
             $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
@@ -378,9 +409,11 @@ window.cerrarModal = function () {
         modal.classList.add("hidden");
         document.body.style.overflow = "auto";
         if (timerSLA) clearInterval(timerSLA);
+        ticketIdActual = null;
     }
 };
 
+//----------------------------PERFIL USUARIO--------------------------
 window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const modal = document.getElementById("modalUsuario");
     const nombre = document.getElementById("userNombre");

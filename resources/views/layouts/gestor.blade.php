@@ -154,6 +154,7 @@
     </div>
 
     <script>
+        //------------preloader--------------
         window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
@@ -163,12 +164,10 @@
                 preloader.style.display = 'none';
             }, 1000);
         });
-
-        //-----reloj 
+        //-----reloj-------
         window.iniciarReloj = function() {
             const contenedorReloj = document.getElementById('relojSistema');
             if (!contenedorReloj) return;
-
             //---actualizar hora cada segundo
             const actualizarHora = () => {
                 const ahora = new Date();
@@ -179,14 +178,11 @@
                     hour12: true
                 });
             };
-
             //-----sin delay
             actualizarHora();
-
             //-----corre cada segundo
             setInterval(actualizarHora, 1000);
         }
-
         document.addEventListener('DOMContentLoaded', function() {
             iniciarReloj();
         });
@@ -211,5 +207,4 @@
 
     @stack('sse-scripts')
 </body>
-
 </html>

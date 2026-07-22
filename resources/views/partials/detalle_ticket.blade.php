@@ -103,7 +103,7 @@
                                 class="inline-flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-green-900 uppercase tracking-wider select-none">
                                 <input type="checkbox" id="es_privado"
                                     class="rounded text-primary focus:ring-primary border-slate-300 w-3.5 h-3.5">
-                                <span>Observación Interna</span>
+                                <span>Nota Interna</span>
                             </label>
                         <button type="submit"
                             class="ml-auto px-3.5 py-1.5 bg-green-900 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-opacity-90 transition-all flex items-center gap-1 shadow-sm">

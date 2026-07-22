@@ -26,14 +26,16 @@ class TicketResueltoMail extends Mailable
     public function __construct(Ticket $ticket, $comentarioTexto = null)
     {
         $this->ticket = $ticket;
-
-        $this->comentarioTexto = $comentarioTexto ?? 'El ticket ha sido marcado como cerrado satisfactoriamente.';
-
+        $this->comentarioTexto = $comentarioTexto;
     }
 
     public function build()
     {
-          $id = '#TK' . str_pad($this->ticket->id, 5, '0', STR_PAD_LEFT);
+        $id = '#TK' . str_pad($this->ticket->id, 5, '0', STR_PAD_LEFT);
+
+        if (empty($this->comentarioTexto)) {
+            $this->comentarioTexto = 'El ticket ha sido marcado como cerrado sin comentarios adicionales.';
+        }
 
         return $this->subject($id . ' - Su ticket ha sido cerrado')
             ->view('emails.ticket_resuelto');
