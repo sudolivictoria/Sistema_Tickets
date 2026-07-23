@@ -24,6 +24,28 @@ use Illuminate\Support\Facades\Mail;
 
 class AdminUnidadController extends Controller
 {
+    /**
+     * Helper privado para calcular la fecha limite SLA segun Categoria y Prioridad
+     */
+    private function calcularFechaVencimientoSla($categoriaId, $prioridadId)
+    {
+        $categoria = Categoria::find($categoriaId);
+        $unidadId = $categoria ? $categoria->unidad_id : null;
+        $horasSla = 24; //--valor por defecto
+
+        if ($unidadId) {
+            $sla = DB::table('prioridad_unidad')
+                ->where('unidad_id', $unidadId)
+                ->where('prioridad_id', $prioridadId)
+                ->first();
+
+            if ($sla && isset($sla->horas_sla)) {
+                $horasSla = (int)$sla->horas_sla;
+            }
+        }
+        return Carbon::now()->addHours($horasSla);
+    }
+
     public function index()
     {
         //--unidad del admin autenticado
@@ -149,23 +171,8 @@ class AdminUnidadController extends Controller
 
         ]);
 
-        //----SLA
-        $categoria = Categoria::find($request->categoria_id);
-        $unidadId = $categoria ? $categoria->unidad_id : null;
-
-        $horasSla = 24;
-
-        if ($unidadId) {
-            $sla = DB::table('prioridad_unidad')
-                ->where('unidad_id', $unidadId)
-                ->where('prioridad_id', $request->prioridad_id)
-                ->first();
-
-            if ($sla && isset($sla->horas_sla)) {
-                $horasSla = (int)$sla->horas_sla;
-            }
-        }
-        $fechaVencimiento = Carbon::now()->addHours($horasSla);
+        //----SLA utilizando la función privada
+        $fechaVencimiento = $this->calcularFechaVencimientoSla($request->categoria_id, $request->prioridad_id);
 
         $rutaEvidencia = null;
         if ($request->hasFile('evidencia')) {
@@ -277,44 +284,39 @@ class AdminUnidadController extends Controller
         return view('gestor.asignar-tickets', compact('tickets', 'tecnicos'));
     }
 
-    //---Actualizar Prioridad---
+    //---Actualizar Prioridad----------------------------------------------------->
     public function actualizarPrioridad(Request $request, Ticket $ticket)
     {
-        $urlOrigen = request()->headers->get('referer');
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
-        if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return redirect()->to($urlOrigen)->with('sweet_error', 'No se puede modificar la prioridad. Este ticket ha sido resuelto o cerrado.');
-        }
-        //--Cambio de prioridad
-        $nuevaPrioridadId = $request->prioridad_id;
-        if ($ticket->prioridad_id != $nuevaPrioridadId) {
-            //---categoria y uidad
-            $categoria = Categoria::find($ticket->categoria_id);
-            $unidadId = $categoria ? $categoria->unidad_id : null;
-            $horasSla = 24;
-            if ($unidadId) {
-                $sla = DB::table('prioridad_unidad')
-                    ->where('unidad_id', $unidadId)
-                    ->where('prioridad_id', $nuevaPrioridadId)
-                    ->first();
 
-                if ($sla && isset($sla->horas_sla)) {
-                    $horasSla = (int)$sla->horas_sla;
-                }
+        if (in_array($ticket->estado_id, [3, 4, 5])) {
+            $errorMsg = 'No se puede modificar la prioridad, este ticket ha sido resuelto o cerrado.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
             }
-            //---calcualr nueva fecha
-            $ticket->fecha_vencimiento_sla = $ticket->created_at->addHours($horasSla);
+            return back()->with('sweet_error', $errorMsg);
         }
-        //----guardar nueva prioridad y fecha de vencimiento
-        $ticket->prioridad_id = $nuevaPrioridadId;
-        $ticket->save();
+
+        //---recalcular SLA
+        $nuevaFechaVencimiento = $this->calcularFechaVencimientoSla($ticket->categoria_id, $request->prioridad_id);
+
+        $ticket->update([
+            'prioridad_id' => $request->prioridad_id,
+            'fecha_vencimiento_sla' => $nuevaFechaVencimiento
+        ]);
 
         broadcast(new TicketActualizado());
-        return redirect()->to($urlOrigen)
-            ->with('sweet_success', 'Prioridad y SLA actualizados correctamente');
+
+        $mensajeExito = 'Prioridad y tiempo SLA actualizados correctamente';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $mensajeExito]);
+        }
+
+        return back()->with('sweet_success', $mensajeExito);
     }
 
-    //---Actualizar Técnico---
+    //---Actualizar Técnico--------------------------------------------------->
     public function actualizarTecnico(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -332,16 +334,22 @@ class AdminUnidadController extends Controller
             ]
         ]);
 
-        $urlOrigen = request()->headers->get('referer');
-
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            return redirect()->to($urlOrigen)->with('sweet_error', '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.');
+            $errorMsg = '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
         }
+
         if (!$request->filled('tecnico_id') && $ticket->tecnico_id === null) {
-            return redirect()->to($urlOrigen)
-                ->with('sweet_error', 'El ticket ya se encontraba en la cola de pendientes.');
+            $errorMsg = 'El ticket ya se encontraba en la cola de pendientes.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
         }
-        //---actualizar datos
+
         $ticket->update([
             'tecnico_id' => $request->tecnico_id,
             'estado_id'  => $request->tecnico_id ? 2 : 1
@@ -353,7 +361,11 @@ class AdminUnidadController extends Controller
 
         broadcast(new TicketActualizado());
 
-        return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $mensaje]);
+        }
+
+        return back()->with('sweet_success', $mensaje);
     }
 
     public function misAsignados()

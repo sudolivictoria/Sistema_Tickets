@@ -64,7 +64,12 @@ class ComentarioController extends Controller
             'es_privado' => $esPrivado,
         ]);
 
-        broadcast(new ComentarioCreado($comentario))->toOthers();
+        $comentario->load('user');
+        $comentario->tiempo_legible = $comentario->created_at->diffForHumans();
+
+        if (!$esPrivado) {
+            broadcast(new ComentarioCreado($comentario))->toOthers();
+        }
 
         //********** LÓGICA DE CORREOS **************
         try {

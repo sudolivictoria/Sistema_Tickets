@@ -270,5 +270,5 @@
 @endpush
 
 @push('sse-scripts')
-@vite(['resources/js/api.js'])
+@vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

@@ -13,6 +13,10 @@ class Comentario extends Model
         'es_privado',
     ];
 
+    protected $casts = [
+        'es_privado' => 'boolean', 
+    ];
+
     public function ticket()
     {
         return $this->belongsTo(Ticket::class);

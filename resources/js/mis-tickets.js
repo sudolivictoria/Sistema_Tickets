@@ -2,6 +2,8 @@ var table;
 window.filtroSseActual = "todos";
 let ticketIdActual = null;
 let ticketEstadoActual = null;
+//----echo
+let canalEchoActual = null;
 
 /**
  * Inicializa DataTables
@@ -48,20 +50,43 @@ window.inicializarTablaTickets = function (selectorId) {
         order: [[0, "desc"]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 w-full"<"hidden md:block text-sm text-slate-500 w-full md:w-1/2 text-left"i><"w-full md:w-1/2 flex justify-center md:justify-end"p>>',
     });
-
     //---buscador
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
-
     //---ajuste tamaño de tabla
     const $wrapper = $(tableElement).closest(".dataTables_wrapper");
     $wrapper.addClass("relative w-full");
     $(tableElement)
         .addClass("w-full")
         .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
+};
+
+//--------------------------LARAVEL ECHO REVERB------------------------
+window.escucharComentariosWebSocket = function (idTicket) {
+    if (typeof Echo === "undefined") {
+        console.warn("[Reverb] Echo no está inicializado globalmente.");
+        return;
+    }
+    window.desconectarComentariosWebSocket();
+    canalEchoActual = idTicket;
+    //---conexion dinamica del ticket
+    Echo.channel(`ticket.${idTicket}`)
+        .listen('.comentario.creado', (e) => { //--punto inicial
+            if (e && e.comentario) {
+                const esPrivado = e.comentario.es_privado == 1 || e.comentario.es_privado === true || e.comentario.es_privado === "true";
+                if (esPrivado) return;
+                window.agregarComentarioAlModal(e.comentario);
+            }
+        });
+};
+window.desconectarComentariosWebSocket = function () {
+    if (typeof Echo !== "undefined" && canalEchoActual) {
+        Echo.leaveChannel(`ticket.${canalEchoActual}`);
+        canalEchoActual = null;
+    }
 };
 
 // =====================================================================
@@ -81,14 +106,12 @@ $(document).ready(function () {
            
             window.verDetalle(idTicket, asunto, descripcion, tipo, state, drive, estadoNombre);
         });
-
     //------------------AUTO REFRESCO-----------------
     const selectorTabla = "#tablaMisTickets";
     if ($(selectorTabla).length) {
         window.inicializarTablaTickets(selectorTabla);
     }
 });
-
 /****************** FILTROS ******************/
 window.filtrarEstado = function (estado, btn) {
     //--actualizar estilos de botones
@@ -125,12 +148,15 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
     } else {
         $formularioComentario.show();
     }
-
     $.get(`/tickets/${idTicket}/comentarios`)
         .done(function (comentarios) {
             $lista.empty();
 
-            if (!comentarios || comentarios.length === 0) {
+            const comentariosVisibles = (comentarios || []).filter(
+                (com) => !com.es_privado && com.es_privado != 1
+            );
+
+            if (comentariosVisibles.length === 0) {
                 $seccionHistorico.hide();
                 $("#preloaderGlobalModal").addClass("hidden");
                 return;
@@ -140,19 +166,15 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
             const fragment = document.createDocumentFragment();
 
-            comentarios.forEach((com) => {
-                const bg = com.es_privado
-                    ? "bg-lime-50/80 border-lime-300"
-                    : "bg-white border-slate-200";
-                const tag = com.es_privado
-                    ? '<span class="text-green-700 font-bold">[Nota Interna]</span> '
-                    : "";
-
+            comentariosVisibles.forEach((com) => {
                 const item = document.createElement("div");
-                item.className = `p-2 rounded-xl border ${bg}`;
+                item.className = "p-2 rounded-xl border bg-white border-slate-200";
+
+                if (com.id) item.setAttribute("data-comentario-id", com.id);
+
                 item.innerHTML = `
                     <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                        <span>${tag}${com.user ? com.user.name : "Usuario"}</span>
+                        <span>${com.user ? com.user.name : "Usuario"}</span>
                         <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible || ""}</span>
                     </div>
                     <p class="text-slate-600 font-medium">${com.contenido}</p>
@@ -177,25 +199,21 @@ window.agregarComentarioAlModal = function (comentario) {
     const $seccionHistorico = $("#seccion-historico-comentarios");
 
     if (!$lista.length) return;
-
+    //----prevenir notas privadas
+    const esPrivado = comentario.es_privado == 1 || comentario.es_privado === true || comentario.es_privado === "true";
+    if (esPrivado) return;
+    //----prevenir duplicados
     if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
         return;
     }
-
     $seccionHistorico.show();
 
-    const bg = comentario.es_privado
-        ? "bg-lime-50 border-lime-200"
-        : "bg-white border-slate-200";
-        
-    const tag = comentario.es_privado
-        ? '<span class="text-green-900 font-bold">[Nota Interna]</span> '
-        : "";
+    const dataAttr = comentario.id ? `data-comentario-id="${comentario.id}"` : "";
 
     const elComentario = `
-        <div class="p-2 rounded-xl border ${bg} transition-all duration-300">
+        <div ${dataAttr} class="p-2 rounded-xl border bg-white border-slate-200 transition-all duration-300">
             <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                <span>${tag}${comentario.user ? comentario.user.name : "Usuario"}</span>
+                <span>${comentario.user ? comentario.user.name : "Usuario"}</span>
                 <span class="text-[10px] text-slate-400 font-normal">${comentario.tiempo_legible || "Ahora mismo"}</span>
             </div>
             <p class="text-slate-600 font-medium">${comentario.contenido}</p>
@@ -239,7 +257,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, stat
         if (modal.parentElement !== document.body) {
             document.body.appendChild(modal);
         }
-
         titulo.textContent = asunto;
         desc.textContent = descripcion;
         tipo.textContent = tipoSolicitud;
@@ -266,6 +283,11 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, stat
     );
     
     window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
+
+     //----conectar al canal en tiempo real
+    if (typeof window.escucharComentariosWebSocket === "function") {
+        window.escucharComentariosWebSocket(ticketIdActual);
+    }
 };
 
 //--------------NUEVO COMENTARIO---------------------
@@ -299,6 +321,9 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
                 if ($("#es_privado").length) $("#es_privado").prop("checked", false);
 
                 const comentarioData = response.comentario || response;
+                //---nota privada evitar que salgan para el usuario
+               const esPrivado = comentarioData.es_privado == 1 || comentarioData.es_privado === true || comentarioData.es_privado === "true";
+               if (esPrivado) return;
                 window.agregarComentarioAlModal(comentarioData);
             }
         })
@@ -318,5 +343,9 @@ window.cerrarModal = function () {
         modal.classList.add("hidden");
         document.body.style.overflow = "";
         ticketIdActual = null;
+         //----desconectar el canal del echo al cerrar
+        if (typeof window.desconectarComentariosWebSocket === "function") {
+            window.desconectarComentariosWebSocket();
+        }
     }
 };

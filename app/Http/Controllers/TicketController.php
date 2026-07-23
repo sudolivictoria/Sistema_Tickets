@@ -36,12 +36,15 @@ class TicketController extends Controller
 
         //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
         if ($request->filled('comentario_cierre')) {
+            $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
             $comentario = Comentario::create([
                 'ticket_id'  => $ticket->id,
                 'user_id'    => Auth::id() ?? $ticket->tecnico_id,
-                'contenido'  => '[Solución]: ' . trim($request->comentario_cierre),
+                'contenido'  => $textoFormateado,
                 'es_privado' => false,
             ]);
+
+            $comentarioCierreTexto = $textoFormateado;
 
             broadcast(new ComentarioCreado($comentario))->toOthers();
         }
@@ -81,12 +84,15 @@ class TicketController extends Controller
 
         //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
         if ($request->filled('comentario_cierre')) {
+            $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
             $comentario = Comentario::create([
                 'ticket_id'  => $ticket->id,
                 'user_id'    => Auth::id() ?? $ticket->tecnico_id,
-                'contenido'  => '[Cierre - Equivocado]: ' . trim($request->comentario_cierre),
+                'contenido'  => $textoFormateado,
                 'es_privado' => false,
             ]);
+
+            $comentarioCierreTexto = $textoFormateado;
 
             broadcast(new ComentarioCreado($comentario))->toOthers();
         }
@@ -125,12 +131,15 @@ class TicketController extends Controller
 
         //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
         if ($request->filled('comentario_cierre')) {
+            $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
             $comentario = Comentario::create([
                 'ticket_id'  => $ticket->id,
                 'user_id'    => Auth::id() ?? $ticket->tecnico_id,
-                'contenido'  => '[Cierre - No Corresponde]: ' . trim($request->comentario_cierre),
+                'contenido'  => $textoFormateado,
                 'es_privado' => false,
             ]);
+
+            $comentarioCierreTexto = $textoFormateado;
 
             broadcast(new ComentarioCreado($comentario))->toOthers();
         }

@@ -3,7 +3,8 @@ var filtrosAplicados = false;
 let timerSLA = null;
 let ticketIdActual = null;
 let ticketEstadoActual = null;
-
+//-------echo
+let canalEchoActual = null;
 window.inicializarHistorialDataTable = function () {
     if ($.fn.DataTable.isDataTable("#tablaHistorial")) {
         $("#tablaHistorial").DataTable().destroy();
@@ -41,7 +42,29 @@ window.inicializarHistorialDataTable = function () {
         order: [[0, "desc"]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
-
+//--------------------------LARAVEL ECHO REVERB------------------------
+window.escucharComentariosWebSocket = function (idTicket) {
+    if (typeof Echo === "undefined") {
+        console.warn("[Reverb] Echo no está inicializado globalmente.");
+        return;
+    }
+    window.desconectarComentariosWebSocket();
+    canalEchoActual = idTicket;
+    //---conexion dinamica del ticket
+    Echo.channel(`ticket.${idTicket}`)
+        .listen('.comentario.creado', (e) => { //--punto inicial
+            if (e && e.comentario) {
+                window.agregarComentarioAlModal(e.comentario);
+            }
+        });
+};
+window.desconectarComentariosWebSocket = function () {
+    if (typeof Echo !== "undefined" && canalEchoActual) {
+        Echo.leaveChannel(`ticket.${canalEchoActual}`);
+        canalEchoActual = null;
+    }
+};
+//---------------------MANEJO DE EVENTOS E INICIALIZACION------------------
     $("#tablaHistorial")
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
@@ -73,7 +96,7 @@ window.inicializarHistorialDataTable = function () {
         });
     tableHistorial.draw();
 };
-
+//----------filtros
 window.aplicarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     const textoBuscar = document.getElementById("filtroBuscar").value.trim();
@@ -139,7 +162,6 @@ window.aplicarFiltrosHistorial = function () {
     tableHistorial.search(textoBuscar);
     tableHistorial.draw();
 };
-
 //--------limpiar filtros historial--------//
 window.limpiarFiltrosHistorial = function () {
     if (!tableHistorial) return;
@@ -161,7 +183,6 @@ window.limpiarFiltrosHistorial = function () {
     if (elCategoria) elCategoria.value = "todos";
     tableHistorial.search("").draw();
 };
-
 //--------exportar historial--------//
 window.exportarHistorial = function (formato) {
     if (!filtrosAplicados) {
@@ -202,7 +223,6 @@ window.exportarHistorial = function (formato) {
         window.location.href = urlFinal;
     }
 };
-
 //------------------------TIMER SLA-------------------------------------
 function iniciarContadorSLA(datosSLA) {
     if (timerSLA) clearInterval(timerSLA);
@@ -224,7 +244,6 @@ function iniciarContadorSLA(datosSLA) {
             display.textContent = "Finalizado";
             return;
         }
-
         const dias = Math.floor(segundosTranscurridos / 86400);
         const horas = Math.floor((segundosTranscurridos % 86400) / 3600);
         const minutos = Math.floor((segundosTranscurridos % 3600) / 60);
@@ -234,7 +253,6 @@ function iniciarContadorSLA(datosSLA) {
         else if (horas > 0) display.textContent = `Respuesta: ${horas}h ${minutos}m`;
         else if (minutos > 0) display.textContent = `Respuesta: ${minutos}m ${segundos}s`;
         else display.textContent = `Respuesta: ${segundos}s`;
-        
         return;
     }
     //---sin fecha limite configurada
@@ -261,15 +279,18 @@ function iniciarContadorSLA(datosSLA) {
         const segundos = Math.floor((restante % (1000 * 60)) / 1000);
         const pad = (num) => String(num).padStart(2, "0");
         if (dias > 0) {
-            display.textContent = `${dias}d ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+            display.textContent = `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
+        } else if (horas > 0) {
+            display.textContent = `${horas}h ${pad(minutos)}m ${pad(segundos)}s`;
+        } else if (minutos > 0) {
+            display.textContent = `${minutos}m ${pad(segundos)}s`;
         } else {
-            display.textContent = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+            display.textContent = `${segundos}s`;
         }
     };
     tick();
     timerSLA = setInterval(tick, 1000);
 }
-
 //=====================================================================
 //                     FUNCIONES MODALES
 //=====================================================================
@@ -288,7 +309,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
     } else {
         $formularioComentario.show();
     }
-   
     $.get(`/tickets/${idTicket}/comentarios`)
         .done(function (comentarios) {
             $lista.empty();
@@ -308,6 +328,9 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
                     : "";
                 const item = document.createElement("div");
                 item.className = `p-2 rounded-xl border ${bg}`;
+
+                if (com.id) item.setAttribute("data-comentario-id", com.id);
+
                 item.innerHTML = `
                     <div class="flex justify-between font-bold text-green-950 mb-0.5">
                         <span>${tag}${com.user ? com.user.name : "Usuario"}</span>
@@ -336,12 +359,17 @@ window.agregarComentarioAlModal = function (comentario) {
         return;
     }
     $seccionHistorico.show();
+
+    const dataAttr = comentario.id ? `data-comentario-id="${comentario.id}"` : "";
+
     const bg = comentario.es_privado
         ? "bg-lime-50 border-lime-200"
         : "bg-white border-slate-200";
+
     const tag = comentario.es_privado
         ? '<span class="text-green-900 font-bold">[Nota Interna]</span> '
         : "";
+
     const elComentario = `
         <div class="p-2 rounded-xl border ${bg} transition-all duration-300">
             <div class="flex justify-between font-bold text-green-950 mb-0.5">
@@ -365,7 +393,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     const fecha = document.getElementById("modalFechaApertura");
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
-    
     //**********PRELOADER GLOBAL*******************/
     if (!document.getElementById("preloaderGlobalModal") && modal) {
         const preloaderHTML = `
@@ -381,7 +408,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     } else {
         $("#preloaderGlobalModal").removeClass("hidden");
     }
-  
     //************************************************/
     if (modal && titulo && desc && tipo) {
         titulo.textContent = asunto;
@@ -405,7 +431,12 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     }
     $("#contenido-comentario").val("");
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
+    
     window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
+    //----conectar al canal en tiempo real
+    if (typeof window.escucharComentariosWebSocket === "function") {
+        window.escucharComentariosWebSocket(ticketIdActual);
+    }
     iniciarContadorSLA(datosSLA);
 };
 //--------------NUEVO COMENTARIO---------------------
@@ -423,7 +454,6 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
 
     $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
     $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
-
     $.ajax({
         url: `/tickets/${ticketIdActual}/comentarios`,
         method: "POST",
@@ -437,7 +467,6 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
             if (response.success || response.comentario) {
                 $inputContenido.val(""); 
                 if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-
                 const comentarioData = response.comentario || response;
                 window.agregarComentarioAlModal(comentarioData);
             }
@@ -450,6 +479,7 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
             $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
         });
 });
+//-----------cerrar
 window.cerrarModal = function () {
     const modal = document.getElementById("modalTicket");
     if (modal) {
@@ -457,6 +487,10 @@ window.cerrarModal = function () {
         document.body.style.overflow = "auto";
         if (timerSLA) clearInterval(timerSLA);
         ticketIdActual = null;
+        //----desconectar el canal del echo al cerrar
+        if (typeof window.desconectarComentariosWebSocket === "function") {
+            window.desconectarComentariosWebSocket();
+        }
     }
 };
 //--------ver detalle del usuario historial--------//

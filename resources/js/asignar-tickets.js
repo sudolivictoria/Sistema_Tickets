@@ -2,6 +2,8 @@ var table;
 let timerSLA = null;
 let ticketIdActual = null;
 let ticketEstadoActual = null;
+//---echo
+let canalEchoActual = null;
 
 window.inicializarTablaTickets = function (
     selectorId,
@@ -71,6 +73,30 @@ window.inicializarTablaTickets = function (
     }
 };
 
+//--------------------------LARAVEL ECHO REVERB------------------------
+window.escucharComentariosWebSocket = function (idTicket) {
+    if (typeof Echo === "undefined") {
+        console.warn("[Reverb] Echo no está inicializado globalmente.");
+        return;
+    }
+    window.desconectarComentariosWebSocket();
+    canalEchoActual = idTicket;
+    //---conexion dinamica del ticket
+    Echo.channel(`ticket.${idTicket}`)
+        .listen('.comentario.creado', (e) => { //--punto inicial
+            if (e && e.comentario) {
+                window.agregarComentarioAlModal(e.comentario);
+            }
+        });
+};
+window.desconectarComentariosWebSocket = function () {
+    if (typeof Echo !== "undefined" && canalEchoActual) {
+        Echo.leaveChannel(`ticket.${canalEchoActual}`);
+        canalEchoActual = null;
+    }
+};
+
+
 // =====================================================================
 //                       DETALLES E INICIALIZACION
 // =====================================================================
@@ -96,7 +122,6 @@ $(document).ready(function () {
 
             window.verDetalle(idTicket, asunto, descripcion, tipo, drive, estadoNombre, estadoSLA, datosSLA);
         });
-
     $(document)
         .off("click", ".btn-ver-usuario")
         .on("click", ".btn-ver-usuario", function () {
@@ -109,7 +134,6 @@ $(document).ready(function () {
 
             window.verUsuario(nombre, email, unidad, cargo, telefono);
         });
-
     //------------------AUTO REFRESCO-----------------
     const selectorTabla = "#tablaAsignarTickets";
     if ($(selectorTabla).length) {
@@ -181,9 +205,13 @@ function iniciarContadorSLA(datosSLA) {
         const pad = (num) => String(num).padStart(2, "0");
 
         if (dias > 0) {
-            display.textContent = `${dias}d ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+            display.textContent = `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
+        } else if (horas > 0) {
+            display.textContent = `${horas}h ${pad(minutos)}m ${pad(segundos)}s`;
+        } else if (minutos > 0) {
+            display.textContent = `${minutos}m ${pad(segundos)}s`;
         } else {
-            display.textContent = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+            display.textContent = `${segundos}s`;
         }
     };
     tick();
@@ -209,7 +237,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
     } else {
         $formularioComentario.show();
     }
-
     $.get(`/tickets/${idTicket}/comentarios`)
         .done(function (comentarios) {
             $lista.empty();
@@ -234,6 +261,9 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
                 const item = document.createElement("div");
                 item.className = `p-2 rounded-xl border ${bg}`;
+
+                if (com.id) item.setAttribute("data-comentario-id", com.id);
+
                 item.innerHTML = `
                     <div class="flex justify-between font-bold text-green-950 mb-0.5">
                         <span>${tag}${com.user ? com.user.name : "Usuario"}</span>
@@ -243,7 +273,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
                 `;
                 fragment.appendChild(item);
             });
-
             $lista[0].appendChild(fragment);
             $lista.scrollTop($lista[0].scrollHeight);
         })
@@ -265,8 +294,8 @@ window.agregarComentarioAlModal = function (comentario) {
     if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
         return;
     }
-
     $seccionHistorico.show();
+    const dataAttr = comentario.id ? `data-comentario-id="${comentario.id}"` : "";
 
     const bg = comentario.es_privado
         ? "bg-lime-50 border-lime-200"
@@ -285,13 +314,12 @@ window.agregarComentarioAlModal = function (comentario) {
             <p class="text-slate-600 font-medium">${comentario.contenido}</p>
         </div>
     `;
-
     $lista.append(elComentario);
     $lista.scrollTop($lista[0].scrollHeight);
 };
 
 //-------------------TICKET------------------
-window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaApertura, drive, estadoNombre, estadoSLA, datosSLA = {}) {
+window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, drive, estadoNombre, estadoSLA, datosSLA = {}) {
     ticketIdActual = idTicket;
     ticketEstadoActual = estadoNombre;
 
@@ -318,7 +346,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
         $("#preloaderGlobalModal").removeClass("hidden");
     }
     //***************************************************/
-
     if (modal && titulo && desc && tipo) {
         titulo.textContent = asunto || "";
         desc.textContent = descripcion || "";
@@ -326,7 +353,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
-
     //----------------IMAGEN DE EVIDENCIA--------------
     if (drive && String(drive).trim() !== "" && drive !== "null") {
         const pathLimpio = String(drive).startsWith("/") ? String(drive).substring(1) : drive;
@@ -338,12 +364,15 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
         if (linkAnchor) linkAnchor.href = "#";
         if (wrapper) wrapper.classList.add("hidden");
     }
-
     $("#contenido-comentario").val("");
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
 
     window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
     
+    //----conectar al canal en tiempo real
+    if (typeof window.escucharComentariosWebSocket === "function") {
+        window.escucharComentariosWebSocket(ticketIdActual);
+    }
     iniciarContadorSLA(datosSLA);
 };
 
@@ -362,7 +391,6 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
 
     $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
     $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
-
     $.ajax({
         url: `/tickets/${ticketIdActual}/comentarios`,
         method: "POST",
@@ -400,6 +428,10 @@ window.cerrarModal = function () {
         document.body.style.overflow = "auto";
         if (timerSLA) clearInterval(timerSLA);
         ticketIdAcual = null;
+        //----desconectar el canal del echo al cerrar
+        if (typeof window.desconectarComentariosWebSocket === "function") {
+            window.desconectarComentariosWebSocket();
+        }
     }
 };
 

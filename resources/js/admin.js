@@ -4,7 +4,8 @@ window.filtroSseActual = "todos";
 let timerSLA = null;
 let ticketIdActual = null;
 let ticketEstadoActual = null;
-
+//---echo
+let canalEchoActual = null;
 /**
  * Inicializa DataTables de forma avanzada con estilos Tailwind
  * @param {string} selectorId
@@ -16,7 +17,6 @@ window.inicializarTablaTickets = function (selectorId) {
     if ($.fn.DataTable.isDataTable(selectorId)) {
         $(selectorId).DataTable().destroy();
     }
-
     const templateNoData = `
         <div class="flex flex-col items-center justify-center h-[300px] bg-slate-50/40 rounded-2xl border-2 border-dashed border-slate-100 my-2 mx-2">
             <span class="material-symbols-outlined text-slate-300 text-4xl mb-2 select-none">folder_off</span>
@@ -24,7 +24,6 @@ window.inicializarTablaTickets = function (selectorId) {
             <p class="text-[11px] text-slate-400 font-medium mt-1">No existen tickets disponibles bajo este estado.</p>
         </div>
     `;
-
     table = tableElement.DataTable({
         paging: false,
         searching: true,
@@ -39,6 +38,28 @@ window.inicializarTablaTickets = function (selectorId) {
             emptyTable: templateNoData,
         },
     });
+};
+//--------------------------LARAVEL ECHO REVERB------------------------
+window.escucharComentariosWebSocket = function (idTicket) {
+    if (typeof Echo === "undefined") {
+        console.warn("[Reverb] Echo no está inicializado globalmente.");
+        return;
+    }
+    window.desconectarComentariosWebSocket();
+    canalEchoActual = idTicket;
+    //---conexion dinamica del ticket
+    Echo.channel(`ticket.${idTicket}`)
+        .listen('.comentario.creado', (e) => { //--punto inicial
+            if (e && e.comentario) {
+                window.agregarComentarioAlModal(e.comentario);
+            }
+        });
+};
+window.desconectarComentariosWebSocket = function () {
+    if (typeof Echo !== "undefined" && canalEchoActual) {
+        Echo.leaveChannel(`ticket.${canalEchoActual}`);
+        canalEchoActual = null;
+    }
 };
 
 //=====================================================================
@@ -66,10 +87,8 @@ $(document).ready(function () {
                 fechaLimite: $btn.data("fecha-limite"),         
                 tiempoRespuesta: $btn.data("tiempo-respuesta"), 
             };
-
             window.verDetalle(idTicket, asunto, descripcion, tipo, fecha, drive, estadoNombre, estadoSLA, datosSLA);
         });
-
     $(document)
         .off("click", ".btn-ver-usuario")
         .on("click", ".btn-ver-usuario", function () {
@@ -82,18 +101,6 @@ $(document).ready(function () {
 
             window.verUsuario(nombre, email, unidad, cargo, telefono);
         });
-
-    //-----ACTUALIZAR COMMENT TIEMPO REAL
-    if (typeof Echo !== "undefined") {
-    Echo.channel('tickets') 
-        .listen('ComentarioCreado', (e) => {
-            //----VERIFICAR SI EL TICKET ESTA ABIERTO
-            if (ticketIdActual && parseInt(e.comentario.ticket_id) === parseInt(ticketIdActual)) {
-                //---INSERTAR NUEVO COMMENT
-                window.agregarComentarioAlModal(e.comentario);
-            }
-        });
-    }
 });
 
 /****************** FILTROS ******************/
@@ -156,7 +163,6 @@ function iniciarContadorSLA(datosSLA) {
 
     const tick = () => {
         const restante = limite - Date.now();
-
         //------vencido porque paso el tiempo correspondiente
         if (restante <= 0) {
             clearInterval(timerSLA);
@@ -164,7 +170,6 @@ function iniciarContadorSLA(datosSLA) {
             wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
             return;
         }
-
         wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
 
         const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
@@ -175,9 +180,13 @@ function iniciarContadorSLA(datosSLA) {
         const pad = (num) => String(num).padStart(2, "0");
 
         if (dias > 0) {
-            display.textContent = `${dias}d ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+            display.textContent = `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
+        } else if (horas > 0) {
+            display.textContent = `${horas}h ${pad(minutos)}m ${pad(segundos)}s`;
+        } else if (minutos > 0) {
+            display.textContent = `${minutos}m ${pad(segundos)}s`;
         } else {
-            display.textContent = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+            display.textContent = `${segundos}s`;
         }
     };
     tick();
@@ -228,6 +237,9 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
                 const item = document.createElement("div");
                 item.className = `p-2 rounded-xl border ${bg}`;
+
+                if (com.id) item.setAttribute("data-comentario-id", com.id);
+                
                 item.innerHTML = `
                     <div class="flex justify-between font-bold text-green-950 mb-0.5">
                         <span>${tag}${com.user ? com.user.name : "Usuario"}</span>
@@ -259,8 +271,9 @@ window.agregarComentarioAlModal = function (comentario) {
     if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
         return;
     }
-
     $seccionHistorico.show();
+
+    const dataAttr = comentario.id ? `data-comentario-id="${comentario.id}"` : "";
 
     const bg = comentario.es_privado
         ? "bg-lime-50 border-lime-200"
@@ -279,7 +292,6 @@ window.agregarComentarioAlModal = function (comentario) {
             <p class="text-slate-600 font-medium">${comentario.contenido}</p>
         </div>
     `;
-
     $lista.append(elComentario);
     $lista.scrollTop($lista[0].scrollHeight);
 };
@@ -341,6 +353,11 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
 
     window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
     
+    //----conectar al canal en tiempo real
+    if (typeof window.escucharComentariosWebSocket === "function") {
+        window.escucharComentariosWebSocket(ticketIdActual);
+    }
+
     iniciarContadorSLA(datosSLA);
 };
 
@@ -396,9 +413,12 @@ window.cerrarModal = function () {
         document.body.style.overflow = "auto";
         if (timerSLA) clearInterval(timerSLA);
         ticketIdActual = null;
+        //----desconectar el canal del echo al cerrar
+        if (typeof window.desconectarComentariosWebSocket === "function") {
+            window.desconectarComentariosWebSocket();
+        }
     }
 };
-
 
 //----------------------PERFIL USUARIO---------------------------------
 window.verUsuario = function (name, email, unidad, cargo, telefono) {
@@ -425,7 +445,6 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
             elLinkCorreo.href = "javascript:void(0)";
             elLinkCorreo.classList.add("opacity-50", "pointer-events-none");
         }
-
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
