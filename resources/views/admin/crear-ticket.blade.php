@@ -198,7 +198,7 @@
         window.__flashMessages = window.__flashMessages || {};
         window.__flashMessages.successTitle = '¡Ticket creado!';
         window.__flashMessages.validationTitle = 'No se pudo enviar';
-        window.__flashMessages.redirectTo = "{{ route('admin.dashboard') }}";
+        window.__flashMessages.redirectTo = "{{ route('admin.crear-ticket') }}";
     </script>
 @endpush
 
