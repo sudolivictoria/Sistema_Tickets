@@ -28,87 +28,84 @@ class ClienteController extends Controller
         $userId = Auth::id();
         $estadosCerrados = [3, 4, 5];
 
-        // --- OPTIMIZACIÓN 1: Reutilización de Base Query para Métricas
-        $baseQuery = Ticket::where('user_id', $userId);
-
-        $abiertos = (clone $baseQuery)
+        //----estadísticas de tickets activos del cliente (Históricos / Sin límite de año)
+        $abiertos = Ticket::where('user_id', $userId)
             ->whereNull('tecnico_id')
             ->whereNotIn('estado_id', $estadosCerrados)
             ->count();
 
-        $enProceso = (clone $baseQuery)
+        $enProceso = Ticket::where('user_id', $userId)
             ->whereNotNull('tecnico_id')
             ->where('estado_id', 2)
             ->count();
 
-        $resueltos = (clone $baseQuery)
+        //----tickets resueltos del cliente (SINCRO CON API: Únicamente del MES Y AÑO ACTUAL)
+        $resueltos = Ticket::where('user_id', $userId)
             ->whereIn('estado_id', $estadosCerrados)
             ->whereMonth('created_at', date('m'))
             ->whereYear('created_at', date('Y'))
             ->count();
 
-        // --- OPTIMIZACIÓN 2: Eager loading especificando solo las columnas requeridas
-        $todosLosTickets = (clone $baseQuery)
-            ->with([
-                'categoria:id,nombre_categoria', 
-                'tipo_solicitud:id,nombre_tipo', 
-                'prioridad:id,nombre_prioridad', 
-                'estado:id,nombre_estado', 
-                'tecnico:id,name'
-            ])
-            ->latest()
+        $todosLosTickets = Ticket::where('user_id', $userId)
+            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
+            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
-        // Carga ligera de catálogos para modales de creación
-        $categorias = Categoria::select('id', 'nombre_categoria', 'unidad_id')->get();
-        $prioridades = Prioridad::select('id', 'nombre_prioridad')->get();
-        $tipos = TipoSolicitud::select('id', 'nombre_tipo')->get();
+        //----Parámetros estáticos para modales de creación
+        $categorias = Categoria::all();
+        $prioridades = Prioridad::all();
+        $tipos = TipoSolicitud::all();
+        //$categoriasManuales = CategoriaManual::orderBy('nombre_categoria_manual')->get();
 
         return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos'));
     }
 
+    //---metodo para mostrar formulario de creacion de ticket
     public function create()
     {
-        $categorias = Categoria::select('id', 'nombre_categoria')->get();
-        $tipos = TipoSolicitud::select('id', 'nombre_tipo')->get();
-        $prioridades = Prioridad::select('id', 'nombre_prioridad')->get();
+        $categorias = Categoria::all();
+        $tipos = TipoSolicitud::all();
+        $prioridades = Prioridad::all();
 
         return view('usuario.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
+    //---metodo para procesar el formulario de creacion de ticket
+    //---metodo para crear ticket
     public function store(Request $request)
     {
         $userId = Auth::id();
         $checkSum = md5($userId . trim($request->asunto));
         $cacheKey = 'submit_lock_' . $checkSum;
-
-        // --- Prevenir envíos dobles o accidentales por 10 segundos
-        if (!Cache::add($cacheKey, true, 10)) {
-            return redirect()->route('usuario.dashboard')
+        if (!Cache::add($cacheKey, true, 20)) {
+            return redirect()->route('admin.crear-ticket')
                 ->with('success', '¡Recibido! Tu solicitud ya se está procesando.');
         }
-
+        //-----validacion datos
         $request->validate([
             'asunto' => 'required|string|min:5|max:50',
             'categoria_id' => 'required|exists:categorias,id',
             'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
             'descripcion' => 'required|string',
             'prioridad_id' => 'required|exists:prioridades,id',
+
         ]);
 
-        // --- OPTIMIZACIÓN 3: Consulta escalar limpia para cálculo de SLA
-        $unidadId = Categoria::where('id', $request->categoria_id)->value('unidad_id');
+        //----SLA
+        $categoria = Categoria::find($request->categoria_id);
+        $unidadId = $categoria ? $categoria->unidad_id : null;
+
         $horasSla = 24;
 
         if ($unidadId) {
-            $horasSlaVal = DB::table('prioridad_unidad')
+            $sla = DB::table('prioridad_unidad')
                 ->where('unidad_id', $unidadId)
                 ->where('prioridad_id', $request->prioridad_id)
-                ->value('horas_sla');
+                ->first();
 
-            if ($horasSlaVal) {
-                $horasSla = (int)$horasSlaVal;
+            if ($sla && isset($sla->horas_sla)) {
+                $horasSla = (int)$sla->horas_sla;
             }
         }
         $fechaVencimiento = Carbon::now()->addHours($horasSla);
@@ -118,69 +115,76 @@ class ClienteController extends Controller
             $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
         }
 
-        // --- Crear ticket (con corrección de sintaxis en estado_sla)
+        //--crear ticket
         $nuevoTicket = Ticket::create([
             'asunto' => $request->asunto,
             'descripcion' => $request->descripcion,
             'drive_link' => $rutaEvidencia,
             'categoria_id' => $request->categoria_id,
             'tipo_solicitud_id' => $request->tipo_solicitud_id,
-            'user_id' => $userId,
-            'estado_id' => 1, // Abierto
+            'user_id' => Auth::id() ?? 1, //----asignar el ticket al usuario autenticado
+            'estado_id' => 1, //---abierto
             'prioridad_id' => $request->prioridad_id,
-            'tecnico_id' => null,
+            'tecnico_id' => null, //---vacio inicial 
             'fecha_vencimiento_sla' => $fechaVencimiento,
-            'estado_sla' => 'pendiente',
+            'estado-sla' => 'pendiente',
+
         ]);
 
-        // --- Envío diferido en colas (Mail Queues)
+        //---cargar relaciones para el correo
+        $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
+
+        //---envio correo capturandolo del usuario autenticado
         try {
+            //---obtenemos el email del usuario autenticado
             $usuario = Auth::user();
-            if (!empty($usuario->email)) {
-                Mail::to($usuario->email)->queue(new TicketCreadoMail($nuevoTicket));
-                $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
-            } else {
+            $destinatario = $usuario->email;
+
+            //---siempre envia el ticket, aunque falle el correo, para no perder la información del ticket creado
+            if (empty($destinatario)) {
                 Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
                 $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
+            } else {
+                Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
+                $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
             }
         } catch (\Exception $e) {
+            //--guardar ticket aunque no se cree el correo
             Log::error("Fallo al enviar correo de Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
             $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
         }
 
-        // --- Notificar a gestores activos de la unidad correspondiente
-        try {
-            if ($unidadId) {
-                $destinatarios = User::where('unidad_id', $unidadId)
-                    ->where('activo', true)
-                    ->pluck('email')
-                    ->toArray();
 
-                if (!empty($destinatarios)) {
-                    Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
-                }
+        //--------notificacion a la unidad correspondiente
+        try {
+            //---identificar unidad por medio de la categoria del ticket
+            $unidadId = $nuevoTicket->categoria->unidad_id;
+
+            //---obtener emails de gestores de la unidad
+            $destinatarios = User::where('unidad_id', $unidadId)
+                ->pluck('email')
+                ->toArray();
+
+            if (!empty($destinatarios)) {
+                //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
+                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
             }
         } catch (\Exception $e) {
-            Log::error("Error avisando a la unidad en Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
+            Log::error("Error avisando a la unidad: " . $e->getMessage());
         }
 
         broadcast(new TicketActualizado());
 
-        return redirect()->route('usuario.dashboard')->with('success', $mensajeFlash);
+        //--redireccionar con mensaje de exito o error en el correo
+        return redirect()->route('usuario.dashboard')
+            ->with('success', $mensajeFlash);
     }
 
     public function misTickets()
     {
-        // --- OPTIMIZACIÓN 4: Carga optimizada de la lista completa del cliente
         $misTickets = Ticket::where('user_id', Auth::id())
-            ->with([
-                'categoria:id,nombre_categoria', 
-                'tipo_solicitud:id,nombre_tipo', 
-                'prioridad:id,nombre_prioridad', 
-                'estado:id,nombre_estado', 
-                'tecnico:id,name'
-            ])
-            ->latest()
+            ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('usuario.mis-tickets', compact('misTickets'));
@@ -189,8 +193,7 @@ class ClienteController extends Controller
     public function recursos()
     {
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
-        $manuales = Manual::with('categoria:id,nombre_categoria_manual')->latest()->get();
-
+        $manuales = Manual::with('categoria')->latest()->get();
         return view('usuario.recursos', compact('categorias', 'manuales'));
     }
 }

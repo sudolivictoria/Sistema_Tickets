@@ -24,20 +24,23 @@ use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
+    /**
+     * Helper privado para calcular la fecha limite SLA segun Categoria y Prioridad
+     */
     private function calcularFechaVencimientoSla($categoriaId, $prioridadId)
     {
-        $categoria = Categoria::select('id', 'unidad_id')->find($categoriaId);
+        $categoria = Categoria::find($categoriaId);
         $unidadId = $categoria ? $categoria->unidad_id : null;
-        $horasSla = 24;
+        $horasSla = 24; //--valor por defecto
 
         if ($unidadId) {
             $sla = DB::table('prioridad_unidad')
                 ->where('unidad_id', $unidadId)
                 ->where('prioridad_id', $prioridadId)
-                ->value('horas_sla');
+                ->first();
 
-            if ($sla) {
-                $horasSla = (int)$sla;
+            if ($sla && isset($sla->horas_sla)) {
+                $horasSla = (int)$sla->horas_sla;
             }
         }
         return Carbon::now()->addHours($horasSla);
@@ -45,34 +48,44 @@ class AdminController extends Controller
 
     public function index()
     {
+        //--unidad del admin autenticado
         $miUnidadId = Auth::user()->unidad_id;
+        //---estados cerrados
         $estadosCerrados = [3, 4, 5];
 
-        // --- OPTIMIZACIÓN 1: Contadores directos en BD mediante SQL rápido
-        $baseQuery = Ticket::query();
+        //--tickets asignados por unidad del admin autenticado
+        $queryAbiertos = Ticket::whereNull('tecnico_id')
+            ->whereNotIn('estado_id', $estadosCerrados);
+
+        //--tickets pendientes por unidad del admin autenticado
+        $queryProceso = Ticket::whereNotNull('tecnico_id')
+            ->where('estado_id', 2);
+
+        //--tickets resueltos por unidad del admin autenticado (mes)
+        $queryResueltos = Ticket::whereIn('estado_id', $estadosCerrados)
+            ->whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'));
+
+        //------FILTRO POR UNIDAD DE CATEGORÍA------
         if ($miUnidadId) {
-            $baseQuery->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
+            $queryAbiertos->whereHas('categoria', $filterUnidad);
+            $queryProceso->whereHas('categoria', $filterUnidad);
+            $queryResueltos->whereHas('categoria', $filterUnidad);
         }
 
-        $noAsignados = (clone $baseQuery)->whereNull('tecnico_id')->whereNotIn('estado_id', $estadosCerrados)->count();
-        $pendientes  = (clone $baseQuery)->whereNotNull('tecnico_id')->where('estado_id', 2)->count();
-        $resueltos   = (clone $baseQuery)->whereIn('estado_id', $estadosCerrados)
-            ->whereMonth('created_at', date('m'))
-            ->whereYear('created_at', date('Y'))
-            ->count();
+        //--------EJECUTAR CONTADORES----------
+        $noAsignados = $queryAbiertos->count();
+        $pendientes  = $queryProceso->count();
+        $resueltos   = $queryResueltos->count();
 
+        //--captura el filtrado
         $estadoBoton = request()->query('estado', 'todos');
 
-        // --- OPTIMIZACIÓN 2: Carga de Tabla Principal
-        $queryTabla = Ticket::with([
-            'user:id,name,email', 
-            'categoria:id,nombre_categoria', 
-            'estado:id,nombre_estado', 
-            'tecnico:id,name', 
-            'prioridad:id,nombre_prioridad', 
-            'tipo_solicitud:id,nombre_tipo'
-        ]);
+        //-----tickets
+        $queryTabla = Ticket::with(['user', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
 
+        //----filtrado por estado
         if ($estadoBoton === 'resuelto,equivocado,no corresponde' || $estadoBoton === 'cerrado') {
             $queryTabla->whereIn('estado_id', $estadosCerrados)
                 ->whereMonth('created_at', date('m'))
@@ -85,60 +98,63 @@ class AdminController extends Controller
             $queryTabla->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
         }
 
-        // Limitar a los últimos 100 tickets para no saturar memoria RAM
-        $todosLosTickets = $queryTabla->latest()->take(100)->get();
+        $todosLosTickets = $queryTabla->latest()->get();
 
+        //--tickets asignados al admin autenticado
         $ticketsAsignados = Ticket::where('tecnico_id', Auth::id())
             ->where('estado_id', 2)
             ->count();
 
-        // --- OPTIMIZACIÓN 3: Caché para el gráfico estadístico (Se refresca cada 10 minutos)
-        $cacheKeyStats = 'dashboard_stats_' . ($miUnidadId ?? 'global') . '_' . date('Y-m');
-        $mesesGrafico = Cache::remember($cacheKeyStats, 600, function () use ($miUnidadId, $estadosCerrados) {
-            $añoActual = date('Y');
-            $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-            
-            $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
-                ->whereYear('created_at', $añoActual)
-                ->when($miUnidadId, function($q) use ($miUnidadId) {
-                    $q->whereHas('categoria', fn($cat) => $cat->where('unidad_id', $miUnidadId));
-                })
-                ->groupBy('mes', 'estado_id')
-                ->get();
+        //----Estadísticas mensuales filtradas por Unidad de Categoría----
+        $añoActual = date('Y');
+        $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+        $mesesGrafico = [];
 
-            $grafico = [];
-            for ($i = 1; $i <= 12; $i++) {
-                $res = $statsMensuales->where('mes', $i)->whereIn('estado_id', $estadosCerrados)->sum('total');
-                $pen = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', $estadosCerrados)->sum('total');
-                $total = $res + $pen;
+        //---agrupa tickets por mes y estado
+        $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
+            ->whereYear('created_at', $añoActual)
+            ->whereHas('categoria', function ($q) use ($miUnidadId) {
+                $q->where('unidad_id', $miUnidadId);
+            })
+            ->groupBy('mes', 'estado_id')
+            ->get();
 
-                $grafico[] = [
-                    'nombre' => $nombresMeses[$i - 1],
-                    'resueltos_pct' => $total > 0 ? round(($res / $total) * 100) : 0,
-                    'pendientes_pct' => $total > 0 ? round(($pen / $total) * 100) : 0,
-                    'total' => $total
-                ];
-            }
-            return $grafico;
-        });
+        for ($i = 1; $i <= 12; $i++) {
+            //---tickets resueltos
+            $res = $statsMensuales->where('mes', $i)->whereIn('estado_id', $estadosCerrados)->sum('total');
 
-        // --- OPTIMIZACIÓN 4: Contar prioridades en 1 Sola Consulta SQL
-        $rawPrioridades = (clone $baseQuery)
-            ->whereNotIn('estado_id', $estadosCerrados)
-            ->selectRaw('prioridad_id, COUNT(*) as total')
-            ->groupBy('prioridad_id')
-            ->pluck('total', 'prioridad_id');
+            //--sumamos los pendientes   
+            $pen = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', $estadosCerrados)->sum('total');
 
+            $total = $res + $pen;
+
+            $mesesGrafico[] = [
+                'nombre' => $nombresMeses[$i - 1],
+                'resueltos_pct' => $total > 0 ? round(($res / $total) * 100) : 0,
+                'pendientes_pct' => $total > 0 ? round(($pen / $total) * 100) : 0,
+                'total' => $total
+            ];
+        }
+
+        $estadosCerrados = [3, 4, 5];
+        $queryPrioridades = Ticket::whereNotIn('estado_id', $estadosCerrados);
+        if ($miUnidadId) {
+            $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+        }
         $prioridades = [
-            'critica' => $rawPrioridades[1] ?? 0,
-            'alta'    => $rawPrioridades[2] ?? 0,
-            'media'   => $rawPrioridades[3] ?? 0,
-            'baja'    => $rawPrioridades[4] ?? 0,
+            'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
+            'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
+            'media'   => (clone $queryPrioridades)->where('prioridad_id', 3)->count(),
+            'baja'    => (clone $queryPrioridades)->where('prioridad_id', 4)->count(),
         ];
 
+        //----manuales
+        //$categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
+        //$manuales = Manual::with('categoria')->latest()->get();
         return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'ticketsAsignados', 'prioridades'));
     }
 
+    //-------------------------CLIENTE----------------------------
     public function create()
     {
         $categorias = Categoria::all();
@@ -148,25 +164,27 @@ class AdminController extends Controller
         return view('admin.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
+    //---metodo para crear ticket
     public function store(Request $request)
     {
         $userId = Auth::id();
         $checkSum = md5($userId . trim($request->asunto));
         $cacheKey = 'submit_lock_' . $checkSum;
-        
-        if (!Cache::add($cacheKey, true, 10)) {
+        if (!Cache::add($cacheKey, true, 20)) {
             return redirect()->route('admin.crear-ticket')
                 ->with('success', '¡Recibido! Tu solicitud ya se está procesando.');
         }
-
+        //-----validacion datos
         $request->validate([
             'asunto' => 'required|string|min:5|max:50',
             'categoria_id' => 'required|exists:categorias,id',
             'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
             'descripcion' => 'required|string',
             'prioridad_id' => 'required|exists:prioridades,id',
+
         ]);
 
+        //----SLA utilizando la función privada
         $fechaVencimiento = $this->calcularFechaVencimientoSla($request->categoria_id, $request->prioridad_id);
 
         $rutaEvidencia = null;
@@ -174,65 +192,84 @@ class AdminController extends Controller
             $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
         }
 
+        //--crear ticket
         $nuevoTicket = Ticket::create([
             'asunto' => $request->asunto,
             'descripcion' => $request->descripcion,
             'drive_link' => $rutaEvidencia,
             'categoria_id' => $request->categoria_id,
             'tipo_solicitud_id' => $request->tipo_solicitud_id,
-            'user_id' => $userId,
-            'estado_id' => 1,
+            'user_id' => Auth::id() ?? 1, //----asignar el ticket al usuario autenticado
+            'estado_id' => 1, //---abierto
             'prioridad_id' => $request->prioridad_id,
-            'tecnico_id' => null,
+            'tecnico_id' => null, //---vacio inicial 
             'fecha_vencimiento_sla' => $fechaVencimiento,
-            'estado_sla' => 'pendiente', // Corregido: estado_sla
+            'estado-sla' => 'pendiente',
+
         ]);
 
-        // Envío de correo en segundo plano
+        //---cargar relaciones para el correo
+        $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
+
+        //---envio correo capturandolo del usuario autenticado
         try {
+            //---obtenemos el email del usuario autenticado
             $usuario = Auth::user();
-            if (!empty($usuario->email)) {
-                Mail::to($usuario->email)->queue(new TicketCreadoMail($nuevoTicket));
-                $mensajeFlash = '¡Ticket creado con éxito!';
+            $destinatario = $usuario->email;
+
+            //---siempre envia el ticket, aunque falle el correo, para no perder la información del ticket creado
+            if (empty($destinatario)) {
+                Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
+                $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
             } else {
-                $mensajeFlash = 'Ticket creado sin correo de confirmación.';
+                Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
+                $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
             }
         } catch (\Exception $e) {
-            Log::error("Fallo correo Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
-            $mensajeFlash = 'Ticket creado, fallo en servidor de correo.';
+            //--guardar ticket aunque no se cree el correo
+            Log::error("Fallo al enviar correo de Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
+            $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
         }
 
+        //--------notificacion a la unidad correspondiente
         try {
-            $unidadId = Categoria::where('id', $nuevoTicket->categoria_id)->value('unidad_id');
-            if ($unidadId) {
-                $destinatarios = User::where('unidad_id', $unidadId)
-                    ->where('activo', true)
-                    ->pluck('email')
-                    ->toArray();
+            //---identificar unidad por medio de la categoria del ticket
+            $unidadId = $nuevoTicket->categoria->unidad_id;
 
-                if (!empty($destinatarios)) {
-                    Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
-                }
+            //---obtener emails de gestores de la unidad
+            $destinatarios = User::where('unidad_id', $unidadId)
+                ->where('activo', true)
+                ->pluck('email')
+                ->toArray();
+
+            if (!empty($destinatarios)) {
+                //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
+                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
             }
         } catch (\Exception $e) {
             Log::error("Error avisando a la unidad: " . $e->getMessage());
         }
 
+        //---websocket
         broadcast(new TicketActualizado());
 
-        return redirect()->route('admin.crear-ticket')->with('success', $mensajeFlash);
+        //--redireccionar con mensaje de exito o error en el correo
+        return redirect()->route('admin.crear-ticket')
+            ->with('success', $mensajeFlash);
     }
 
+    //---metodos para cliente---
     public function misTickets()
     {
         $misTickets = Ticket::where('user_id', Auth::id())
             ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
-            ->latest()
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('admin.mis-tickets', compact('misTickets'));
     }
 
+    //----metodo para mostrar recursos
     public function recursos()
     {
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
@@ -240,21 +277,28 @@ class AdminController extends Controller
         return view('admin.recursos', compact('categorias', 'manuales'));
     }
 
+    //------------------------------metodos para administracion---------------------------------------------
     public function asignarTickets()
     {
-        $miUnidadId = Auth::user()->unidad_id;
+        $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
 
+        //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
         $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
-            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
-            ->where('estado_id', 1)
+            ->whereHas('categoria', function ($q) use ($miUnidadId) {
+                $q->where('unidad_id', $miUnidadId);
+            })
+            ->where('estado_id', 1) //---solo tickets sin asignar
             ->latest()
             ->get();
 
-        $tecnicos = User::where('unidad_id', $miUnidadId)->where('activo', true)->get();
+        //---obtener tecnicos
+        $tecnicos = User::where('unidad_id', $miUnidadId)
+            ->where('activo', true)
+            ->get();
 
         return view('admin.asignar-tickets', compact('tickets', 'tecnicos'));
     }
-
+    //---Actualizar Técnico------------------------------------------->
     public function actualizarTecnico(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -262,18 +306,30 @@ class AdminController extends Controller
                 'nullable',
                 'exists:users,id',
                 function ($attribute, $value, $fail) {
-                    if ($value && !User::where('id', $value)->where('activo', true)->exists()) {
-                        $fail('El técnico seleccionado no está activo.');
+                    if ($value) {
+                        $user = User::find($value);
+                        if ($user && !$user->activo) {
+                            $fail('El técnico seleccionado no está activo.');
+                        }
                     }
                 },
             ]
         ]);
 
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            $errorMsg = '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario.';
-            return $request->expectsJson() 
-                ? response()->json(['success' => false, 'message' => $errorMsg], 422)
-                : back()->with('sweet_error', $errorMsg);
+            $errorMsg = '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
+        }
+
+        if (!$request->filled('tecnico_id') && $ticket->tecnico_id === null) {
+            $errorMsg = 'El ticket ya se encontraba en la cola de pendientes.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
         }
 
         $ticket->update([
@@ -281,26 +337,33 @@ class AdminController extends Controller
             'estado_id'  => $request->tecnico_id ? 2 : 1
         ]);
 
+        $mensaje = $request->tecnico_id
+            ? 'Técnico asignado correctamente.'
+            : 'Ticket devuelto a la cola de pendientes.';
+
         broadcast(new TicketActualizado());
 
-        $mensaje = $request->tecnico_id ? 'Técnico asignado correctamente.' : 'Ticket devuelto a la cola.';
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $mensaje]);
+        }
 
-        return $request->expectsJson()
-            ? response()->json(['success' => true, 'message' => $mensaje])
-            : back()->with('sweet_success', $mensaje);
+        return back()->with('sweet_success', $mensaje);
     }
 
+    //---Actualizar Prioridad----------------------------------------------------->
     public function actualizarPrioridad(Request $request, Ticket $ticket)
     {
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
 
         if (in_array($ticket->estado_id, [3, 4, 5])) {
-            $errorMsg = 'No se puede modificar la prioridad, el ticket está cerrado.';
-            return $request->expectsJson() 
-                ? response()->json(['success' => false, 'message' => $errorMsg], 422)
-                : back()->with('sweet_error', $errorMsg);
+            $errorMsg = 'No se puede modificar la prioridad, este ticket ha sido resuelto o cerrado.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
         }
 
+        //---recalcular SLA
         $nuevaFechaVencimiento = $this->calcularFechaVencimientoSla($ticket->categoria_id, $request->prioridad_id);
 
         $ticket->update([
@@ -310,63 +373,75 @@ class AdminController extends Controller
 
         broadcast(new TicketActualizado());
 
-        $mensajeExito = 'Prioridad y SLA actualizados correctamente';
+        $mensajeExito = 'Prioridad y tiempo SLA actualizados correctamente';
 
-        return $request->expectsJson()
-            ? response()->json(['success' => true, 'message' => $mensajeExito])
-            : back()->with('sweet_success', $mensajeExito);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $mensajeExito]);
+        }
+
+        return back()->with('sweet_success', $mensajeExito);
     }
 
+    //---metodo para mostrar los tickets asignados al tecnico autenticado
     public function misAsignados()
     {
         $user = Auth::user();
         $tickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tipo_solicitud', 'categoria'])
             ->where('tecnico_id', $user->id)
-            ->where('estado_id', 2)
+            ->where('estado_id', 2) //---solo pendientes asignados
             ->latest()
             ->get();
 
         $prioridades = Prioridad::all();
-        $tecnicos = User::where('unidad_id', $user->unidad_id)->where('activo', true)->get();
+        $tecnicos = User::where('unidad_id', $user->unidad_id)
+            ->where('activo', true)
+            ->get();
 
         return view('admin.mis_asignados', compact('tickets', 'tecnicos', 'prioridades'));
     }
 
+    //---metodo para mostrar gestion de usuarios
     public function gestionUsuarios()
     {
-        $usuarios = User::select('id', 'name', 'email', 'unidad_id', 'activo')->get();
+        $usuarios = User::all();
         return view('admin.gestion-usuarios', compact('usuarios'));
     }
+    //---metodo para mostrar gestion de recursos
+    /*public function gestionRecursos()
+    {
+        $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
+        $manuales = Manual::with('categoria')->latest()->get();
+        return view('admin.gestion-recursos', compact('categorias', 'manuales'));
+    }*/
 
-    // --- OPTIMIZACIÓN 5: Historial impulsado por SQL en vez de Filtros en Memoria
+    //---metodo para mostrar historial de tickets con filtros y métricas
     public function historial()
     {
-        $miUnidadId = Auth::user()->unidad_id;
+        //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
+        $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
+            ->whereYear('created_at', date('Y'))
+            ->latest()
+            ->get();
 
-        $queryHistorial = Ticket::with(['user:id,name', 'categoria:id,nombre_categoria', 'estado:id,nombre_estado', 'tecnico:id,name'])
-            ->whereYear('created_at', date('Y'));
-
-        if ($miUnidadId) {
-            $queryHistorial->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
-        }
-
-        $tickets = $queryHistorial->latest()->take(300)->get();
-
-        // Consultas directas a BD para métricas
-        $cargaTrabajo = Ticket::whereDate('created_at', Carbon::today())->count();
-        
-        $resueltos24h = Ticket::whereIn('estado_id', [3, 4, 5])
-            ->where('fecha_cierre', '>=', Carbon::now()->subDay())
+        //----metricas
+        $cargaTrabajo = $tickets->filter(function ($ticket) {
+            return Carbon::parse($ticket->created_at)->isToday();
+        })->count();
+        //---tickets resueltos en las ultimas 24 horas
+        $resueltos24h = $tickets->whereIn('estado_id', [3, 4, 5])
+            ->filter(function ($ticket) {
+                return $ticket->fecha_cierre && Carbon::parse($ticket->fecha_cierre)->gte(now()->subDay());
+            })
             ->count();
-
-        $totalTicketsMes = Ticket::whereMonth('created_at', Carbon::now()->month)->count();
-        $cerradosTicketsMes = Ticket::whereMonth('created_at', Carbon::now()->month)->whereIn('estado_id', [3, 4, 5])->count();
-        
-        $tasaCierre = $totalTicketsMes > 0 ? round(($cerradosTicketsMes / $totalTicketsMes) * 100) : 0;
-
+        //-----tasa cierre mensual
+        $ticketsDelMes = $tickets->filter(function ($ticket) {
+            return Carbon::parse($ticket->created_at)->isCurrentMonth();
+        });
+        $totalTickets = $ticketsDelMes->count();
+        $cerradosTickets = $ticketsDelMes->whereIn('estado_id', [3, 4, 5])->count();
+        $tasaCierre = $totalTickets > 0 ? round(($cerradosTickets / $totalTickets) * 100) : 0;
         $estados = Estado::all();
         $categorias = Categoria::all();
-
         return view('admin.historial', compact('tickets', 'cargaTrabajo', 'resueltos24h', 'tasaCierre', 'estados', 'categorias'));
     }
 }

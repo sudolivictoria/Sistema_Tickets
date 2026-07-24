@@ -330,8 +330,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
 
-    iniciarContadorSLA(datosSLA);
-
     //**********PRELOADER GLOBAL*******************/
     if (!document.getElementById("preloaderGlobalModal") && modal) {
         const preloaderHTML = `
@@ -387,7 +385,9 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
 };
 
 //--------------NUEVO COMENTARIO---------------------
-$(document).on("submit", "#form-comentario-modal", function (e) {
+$(document)
+    .off("submit", "#form-comentario-modal")
+    .on("submit", "#form-comentario-modal", function (e) {
     e.preventDefault();
     if (!ticketIdActual) return;
 
@@ -455,16 +455,16 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const contacto = document.getElementById("userTelefono");
     const elLinkCorreo = document.getElementById("linkCorreo");
 
-    if (nombre && correo && departamento && puesto && contacto && modal) {
+      if (nombre && correo && departamento && puesto && contacto && modal) {
         nombre.textContent = name || "---";
         correo.textContent = email || "---";
         departamento.textContent = unidad || "---";
         puesto.textContent = cargo || "---";
         contacto.textContent = telefono || "---";
 
-        //-----------------GMAIL--------------
+        //---------------------GMAIL-------------------
         if (email && email !== "---") {
-            elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=Consulta sobre su Ticket&body=Hola ${name},`;
+            elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent("Consulta sobre su Ticket")}&body=${encodeURIComponent(`Hola ${name || ""},`)}`;
             elLinkCorreo.classList.remove("opacity-50", "pointer-events-none");
         } else {
             elLinkCorreo.href = "javascript:void(0)";

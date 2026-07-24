@@ -362,11 +362,13 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
 };
 
 //--------------NUEVO COMENTARIO---------------------
-$(document).on("submit", "#form-comentario-modal", function (e) {
+$(document)
+    .off("submit", "#form-comentario-modal")
+    .on("submit", "#form-comentario-modal", function (e) {
     e.preventDefault();
     if (!ticketIdActual) return;
 
-    // 1. Declarar correctamente la referencia al input
+    //---declarar correctamente la referencia al input
     const $inputContenido = $("#contenido-comentario");
     const contenido = $inputContenido.val().trim();
     if (contenido === "") return;

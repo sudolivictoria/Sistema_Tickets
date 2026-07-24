@@ -9,8 +9,6 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -27,8 +25,7 @@ class ApiTableController extends Controller
         if (!$user) {
             return response()->json(['error' => 'No autenticado.'], 401);
         }
-
-        // Cierre temprano de sesión para evitar bloqueos por peticiones concurrentes AJAX
+        //----evitar sesiones concurrentes
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_write_close();
         }
@@ -37,7 +34,7 @@ class ApiTableController extends Controller
         if (!in_array($tipo, self::TIPOS_VALIDOS, true) && !in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
             return response()->json(['error' => 'Tipo no válido.'], 422);
         }
-
+        //---------obtener la unidad del usaurio
         $miUnidadId = $user->unidad_id;
 
         if (in_array($tipo, self::TIPOS_SOLO_CONTENIDO, true)) {
@@ -51,48 +48,48 @@ class ApiTableController extends Controller
         try {
             $estadoFiltro = strtolower(trim((string) $request->query('estado', 'todos')));
 
-            // =========================================================
-            //    QUERY OPTIMIZADA CON SELECCIÓN DE COLUMNAS PUNTUALES
-            // =========================================================
-            $queryTickets = Ticket::with([
-                'user:id,name,email,unidad_id', 
-                'user.unidad:id,nombre_unidad',
-                'estado:id,nombre_estado', 
-                'prioridad:id,nombre_prioridad', 
-                'tecnico:id,name', 
-                'tipo_solicitud:id,nombre_tipo', 
-                'categoria:id,nombre_categoria,unidad_id'
-            ]);
+            // =================================
+            //    QUERY EXACTA PARA LA TABLA
+            // =================================
+            $queryTickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tecnico', 'tipo_solicitud', 'categoria']);
 
             $this->aplicarFiltrosTabla($queryTickets, $user, $tipo, $miUnidadId, $estadoFiltro);
 
-            // Paginación segura para proteger memoria
-            $limit = ($tipo === 'usuario') ? 5 : 150;
-            $ticketsResult = $queryTickets->latest()->take($limit)->get();
+            $limit = ($tipo === 'usuario') ? 5 : null;
+            $ticketsResult = $limit
+                ? $queryTickets->latest()->take($limit)->get()
+                : $queryTickets->latest()->get();
 
             // =========================================================
-            //     CONTADORES Y MÉTRICAS BÁSICAS
+            //     CONTADORES SUPERIORES (MÉTRICAS DE TARJETAS)
             // =========================================================
             $contadores = $this->calcularContadores($user, $tipo, $miUnidadId);
 
             // =========================================================
-            //    GRÁFICOS, MÉTRICAS EXTRA Y PRIORIDADES EN 1 SOLO QUERY
+            //    GRÁFICOS Y MÉTRICAS EXTRA (SÓLO SI CORRESPONDE)
             // =========================================================
             $añoActual = (int) date('Y');
-            $graficoHtml = ($user->rol_id != 2 && $tipo === 'dashboard') 
-                ? $this->generarGrafico($miUnidadId, $añoActual) 
-                : null;
-
-            $contadorMisAsignados = Ticket::where('tecnico_id', $user->id)
-                ->where('estado_id', 2)
-                ->count();
+            $graficoHtml = ($user->rol_id != 2 && $tipo === 'dashboard') ? $this->generarGrafico($miUnidadId, $añoActual) : null;
+            $contadorMisAsignados = Ticket::where('tecnico_id', $user->id)->where('estado_id', 2)->count();
 
             [$cargaTrabajo, $resueltos24h, $tasaCierre] = ($tipo === 'historial')
                 ? $this->calcularMetricasHistorial($user, $miUnidadId, $añoActual)
                 : [0, 0, 0];
 
-            // Optimización: Agrupación en una sola consulta SQL para prioridades
-            $prioridades = $this->obtenerConteoPrioridades($miUnidadId);
+            $estadosCerrados = [3, 4, 5];
+            $queryPrioridades = Ticket::whereNotIn('estado_id', $estadosCerrados);
+
+            if ($miUnidadId) {
+                $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            }
+
+            $prioridades = [
+                'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
+                'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
+                'media'   => (clone $queryPrioridades)->where('prioridad_id', 3)->count(),
+                'baja'    => (clone $queryPrioridades)->where('prioridad_id', 4)->count(),
+            ];
+
 
             return response()->json([
                 'html'              => $this->renderizarVista($tipo, $ticketsResult, $miUnidadId),
@@ -110,10 +107,14 @@ class ApiTableController extends Controller
         }
     }
 
+    /**
+     * Filtros de tablas extraídos fielmente de la estructura de tus controladores
+     */
     private function aplicarFiltrosTabla($query, $user, string $tipo, $miUnidadId, string $estadoFiltro): void
     {
+        //-------El cliente solo observa lo que le corresponde
         if ($tipo === 'usuario' || $tipo === 'mis_tickets') {
-            $query->where('user_id', $user->id);
+            $query->where('user_id', $user->id); //-----encapsula la consulta al usuario autenticado (Cliente, Admin o Gestor por igual)
 
             if ($estadoFiltro === 'todos' || $estadoFiltro === '') {
                 return;
@@ -132,7 +133,7 @@ class ApiTableController extends Controller
             }
             return;
         }
-
+        //-----------tipos de tablas
         switch ($tipo) {
             case 'dashboard':
                 if ($estadoFiltro === 'resuelto,equivocado,no corresponde' || $estadoFiltro === 'cerrado') {
@@ -149,6 +150,7 @@ class ApiTableController extends Controller
                     }
                 }
 
+                //----solo filtra lo de cada unidad
                 if ($miUnidadId) {
                     $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
                 }
@@ -156,9 +158,7 @@ class ApiTableController extends Controller
 
             case 'asignar':
                 $query->where('estado_id', 1);
-                if ($miUnidadId) {
-                    $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
-                }
+                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
                 break;
 
             case 'mis_asignados':
@@ -167,6 +167,7 @@ class ApiTableController extends Controller
 
             case 'historial':
                 $query->whereYear('created_at', date('Y'));
+                //---Admin controller global y admin unidad contraller solo lo de su unidad
                 if ($user->rol_id == 3 && $miUnidadId) {
                     $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
                 }
@@ -174,120 +175,108 @@ class ApiTableController extends Controller
         }
     }
 
+    /**
+     * Sincronización de contadores del cuadro estadístico superior del dashboard
+     */
     private function calcularContadores($user, string $tipo, $miUnidadId): array
     {
         if ($user->rol_id == 2 || $tipo === 'usuario' || $tipo === 'mis_tickets') {
-            $baseUserQuery = Ticket::where('user_id', $user->id);
-
             return [
-                'abiertos'  => (clone $baseUserQuery)->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
-                'proceso'   => (clone $baseUserQuery)->whereNotNull('tecnico_id')->where('estado_id', 2)->count(),
-                'resueltos' => (clone $baseUserQuery)->whereIn('estado_id', self::ESTADOS_CERRADOS)
+                'abiertos'  => Ticket::where('user_id', $user->id)
+                    ->whereNull('tecnico_id')
+                    ->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
+                'proceso'   => Ticket::where('user_id', $user->id)
+                    ->whereNotNull('tecnico_id')
+                    ->where('estado_id', 2)->count(),
+                'resueltos' => Ticket::where('user_id', $user->id)
+                    ->whereIn('estado_id', self::ESTADOS_CERRADOS)
                     ->whereMonth('created_at', date('m'))
                     ->whereYear('created_at', date('Y'))->count(),
             ];
         }
 
-        $baseStaffQuery = Ticket::query();
+        $queryAbiertos = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
+        $queryProceso = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
+        $queryResueltos = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
+            ->whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'));
+
+        //--------restringe contadores por unidad
         if ($miUnidadId) {
-            $baseStaffQuery->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
+            $queryAbiertos->whereHas('categoria', $filterUnidad);
+            $queryProceso->whereHas('categoria', $filterUnidad);
+            $queryResueltos->whereHas('categoria', $filterUnidad);
         }
 
         return [
-            'abiertos'  => (clone $baseStaffQuery)->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
-            'proceso'   => (clone $baseStaffQuery)->whereNotNull('tecnico_id')->where('estado_id', 2)->count(),
-            'resueltos' => (clone $baseStaffQuery)->whereIn('estado_id', self::ESTADOS_CERRADOS)
-                ->whereMonth('created_at', date('m'))
-                ->whereYear('created_at', date('Y'))->count(),
+            'abiertos'  => $queryAbiertos->count(),
+            'proceso'   => $queryProceso->count(),
+            'resueltos' => $queryResueltos->count(),
         ];
     }
 
+    /**
+     * Renderizador del gráfico mensual basado en index() de tus controladores staff
+     */
     private function generarGrafico($miUnidadId, int $año): ?string
     {
-        $cacheKey = 'grafico_html_' . ($miUnidadId ?? 'global') . '_' . $año . '_' . date('m');
+        $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 
-        return Cache::remember($cacheKey, 600, function () use ($miUnidadId, $año) {
-            $nombresMeses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+        //----ambos controladores agrupan la gráfica obligatoriamente pasando la variable de unidad del usuario autenticado
+        $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
+            ->whereYear('created_at', $año)
+            ->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId))
+            ->groupBy('mes', 'estado_id')
+            ->get();
 
-            $statsMensuales = Ticket::selectRaw('MONTH(created_at) as mes, estado_id, COUNT(*) as total')
-                ->whereYear('created_at', $año)
-                ->when($miUnidadId, fn($q) => $q->whereHas('categoria', fn($cat) => $cat->where('unidad_id', $miUnidadId)))
-                ->groupBy('mes', 'estado_id')
-                ->get();
+        $mesesGrafico = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $res   = $statsMensuales->where('mes', $i)->whereIn('estado_id', self::ESTADOS_CERRADOS)->sum('total');
+            $pen   = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->sum('total');
+            $total = $res + $pen;
 
-            $mesesGrafico = [];
-            for ($i = 1; $i <= 12; $i++) {
-                $res   = $statsMensuales->where('mes', $i)->whereIn('estado_id', self::ESTADOS_CERRADOS)->sum('total');
-                $pen   = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->sum('total');
-                $total = $res + $pen;
-
-                $mesesGrafico[] = [
-                    'nombre'         => $nombresMeses[$i - 1],
-                    'resueltos_pct'  => $total > 0 ? (int) round(($res / $total) * 100) : 0,
-                    'pendientes_pct' => $total > 0 ? (int) round(($pen / $total) * 100) : 0,
-                    'total'          => $total,
-                ];
-            }
-            return view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
-        });
+            $mesesGrafico[] = [
+                'nombre'         => $nombresMeses[$i - 1],
+                'resueltos_pct'  => $total > 0 ? (int) round(($res / $total) * 100) : 0,
+                'pendientes_pct' => $total > 0 ? (int) round(($pen / $total) * 100) : 0,
+                'total'          => $total,
+            ];
+        }
+        return view('partials.grafico_rendimiento', compact('mesesGrafico'))->render();
     }
 
+    /**
+     * Métricas del historial alineadas con la visibilidad del rol
+     */
     private function calcularMetricasHistorial($user, $miUnidadId, int $año): array
     {
-        $filterUnidad = fn($q) => $q->when($user->rol_id == 3 && $miUnidadId, function($sub) use ($miUnidadId) {
-            $sub->whereHas('categoria', fn($cat) => $cat->where('unidad_id', $miUnidadId));
-        });
+        $query = Ticket::whereYear('created_at', $año);
 
-        // Carga de trabajo del día
-        $cargaTrabajo = Ticket::whereYear('created_at', $año)
-            ->whereDate('created_at', Carbon::today())
-            ->tap($filterUnidad)
+        //----Gestor solo observa metricas de su unidad y admin a nivel global
+        if ($user->rol_id == 3 && $miUnidadId) {
+            $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+        }
+        $tickets = $query->get(['id', 'estado_id', 'created_at', 'fecha_cierre']);
+
+        $cargaTrabajo = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isToday())->count();
+        $resueltos24h = $tickets->whereIn('estado_id', self::ESTADOS_CERRADOS)
+            ->filter(fn($t) => $t->fecha_cierre && Carbon::parse($t->fecha_cierre)->gte(now()->subDay()))
             ->count();
-
-        // Resueltos en las últimas 24 horas
-        $resueltos24h = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
-            ->where('fecha_cierre', '>=', Carbon::now()->subDay())
-            ->tap($filterUnidad)
-            ->count();
-
-        // Métricas del mes actual para Tasa de Cierre
-        $totalMes = Ticket::whereYear('created_at', $año)
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->tap($filterUnidad)
-            ->count();
-
-        $cerradosMes = Ticket::whereYear('created_at', $año)
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->whereIn('estado_id', self::ESTADOS_CERRADOS)
-            ->tap($filterUnidad)
-            ->count();
-
-        $tasaCierre = $totalMes > 0 ? (int) round(($cerradosMes / $totalMes) * 100) : 0;
+        $delMes     = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isCurrentMonth());
+        $total      = $delMes->count();
+        $cerrados   = $delMes->whereIn('estado_id', self::ESTADOS_CERRADOS)->count();
+        $tasaCierre = $total > 0 ? (int) round(($cerrados / $total) * 100) : 0;
 
         return [$cargaTrabajo, $resueltos24h, $tasaCierre];
     }
 
-    private function obtenerConteoPrioridades($miUnidadId): array
-    {
-        $prioridadesQuery = Ticket::selectRaw('prioridad_id, COUNT(*) as total')
-            ->whereNotIn('estado_id', self::ESTADOS_CERRADOS)
-            ->when($miUnidadId, fn($q) => $q->whereHas('categoria', fn($cat) => $cat->where('unidad_id', $miUnidadId)))
-            ->groupBy('prioridad_id')
-            ->pluck('total', 'prioridad_id');
-
-        return [
-            'critica' => (int) ($prioridadesQuery[1] ?? 0),
-            'alta'    => (int) ($prioridadesQuery[2] ?? 0),
-            'media'   => (int) ($prioridadesQuery[3] ?? 0),
-            'baja'    => (int) ($prioridadesQuery[4] ?? 0),
-        ];
-    }
-
+    //----------OBTIENE TODAS LAS VISTAS
     private function renderizarVista(string $tipo, $ticketsResult, $miUnidadId): string
     {
         $tecnicos = [];
         if (in_array($tipo, ['asignar', 'mis_asignados']) && $miUnidadId) {
-            $tecnicos = User::select('id', 'name')->where('unidad_id', $miUnidadId)->where('activo', true)->get();
+            $tecnicos = User::where('unidad_id', $miUnidadId)->where('activo', true)->get();
         }
 
         return match ($tipo) {
