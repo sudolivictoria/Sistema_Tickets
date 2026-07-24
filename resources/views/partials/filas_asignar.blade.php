@@ -49,40 +49,30 @@
                 class="status-label px-2 py-1 rounded-full border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
         </td>
 
-        {{--Prioridad--}}
+        {{-- Prioridad --}}
         <td class="px-4 py-4" data-search="{{ $ticket->prioridad->nombre_prioridad }}">
-            @php
-                $rutaPrioridad = Auth::user()->rol_id == 1 ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad';
-            @endphp
-            <form action="{{ route($rutaPrioridad, $ticket->id) }}" method="POST">
-                @csrf @method('PATCH')
-                <select name="prioridad_id" onchange="this.form.submit()"
-                    class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer">
-                    <option value="1" {{ $ticket->prioridad_id == 1 ? 'selected' : '' }}>Critica</option>
-                    <option value="2" {{ $ticket->prioridad_id == 2 ? 'selected' : '' }}>Alta</option>
-                    <option value="3" {{ $ticket->prioridad_id == 3 ? 'selected' : '' }}>Media</option>
-                    <option value="4" {{ $ticket->prioridad_id == 4 ? 'selected' : '' }}>Baja</option>
-                </select>
-            </form>
+            <select data-id="{{ $ticket->id }}"
+                data-url="{{ route(request()->is('admin*') ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad', $ticket->id) }}"
+                class="select-prioridad-ajax bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer">
+                <option value="1" {{ $ticket->prioridad_id == 1 ? 'selected' : '' }}>Critica</option>
+                <option value="2" {{ $ticket->prioridad_id == 2 ? 'selected' : '' }}>Alta</option>
+                <option value="3" {{ $ticket->prioridad_id == 3 ? 'selected' : '' }}>Media</option>
+                <option value="4" {{ $ticket->prioridad_id == 4 ? 'selected' : '' }}>Baja</option>
+            </select>
         </td>
 
-        {{--Técnico--}}
+        {{-- Técnico --}}
         <td class="px-4 py-4">
-            @php
-                $rutaTecnico = Auth::user()->rol_id == 1 ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico';
-            @endphp
-            <form action="{{ route($rutaTecnico, $ticket->id) }}" method="POST">
-                @csrf @method('PATCH')
-                <select name="tecnico_id" onchange="this.form.submit()"
-                    class="bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer w-32">
-                    <option class="font-black" value="">Pendiente</option>
-                    @foreach($tecnicos as $tecnico)
-                        <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
-                            👤 {{ $tecnico->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
+            <select data-id="{{ $ticket->id }}"
+                data-url="{{ route(request()->is('admin*') ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico', $ticket->id) }}"
+                class="select-tecnico-ajax bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer w-32">
+                <option class="font-black" value="">Pendiente</option>
+                @foreach($tecnicos as $tecnico)
+                    <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
+                        👤 {{ $tecnico->name }}
+                    </option>
+                @endforeach
+            </select>
         </td>
 
         {{--Fechas--}}
@@ -97,14 +87,11 @@
                 data-id="{{ $ticket->id }}" data-asunto="{{ $ticket->asunto }}"
                 data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
-                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" 
-                data-drive="{{ $ticket->drive_link }}" {{-- Datos
-                para el temporizador de SLA --}} 
-                data-estado="{{ $ticket->estado->nombre_estado }}"
+                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" data-drive="{{ $ticket->drive_link }}" {{-- Datos
+                para el temporizador de SLA --}} data-estado="{{ $ticket->estado->nombre_estado }}"
                 data-state="{{ $ticket->estado_sla }}"
                 data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('Y-m-d H:i:s') : '' }}"
-                data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}"
-                >
+                data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>

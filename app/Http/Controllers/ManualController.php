@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ManualController extends Controller
 {
+
+//-----------NO ESTA EN USO----------------------------------
     //--metodo para mostrar la vista de gestion de manuales
     public function index()
     {

@@ -1,23 +1,17 @@
-//--Inmediately Invoked Function Expression
+//---------------Immediately Invoked Function Expression
 (function () {
-    //--filtrar subcategorias
+    //--------------Filtrar subcategorías (Global para poder invocarse desde Blade si es necesario)
     window.filtrarTipos = function (categoriaId) {
-        const selectTipo = document.querySelector(
-            'select[name="tipo_solicitud_id"]',
-        );
+        const selectTipo = document.querySelector('select[name="tipo_solicitud_id"]');
         if (!selectTipo) return;
-
-        //--reiniciar opciones
-        selectTipo.innerHTML =
-            '<option value="" disabled selected>Seleccione</option>';
-
-        //--validacion existencia datos
+        //--------------------------Reiniciar opciones
+        selectTipo.innerHTML = '<option value="" disabled selected>Seleccione</option>';
+        //------------------Validación existencia de datos
         if (!window.todosLosTipos || window.todosLosTipos.length === 0) return;
 
         const filtrados = window.todosLosTipos.filter(
-            (tipo) => tipo.categoria_id == categoriaId,
+            (tipo) => tipo.categoria_id == categoriaId
         );
-
         filtrados.forEach((tipo) => {
             const option = document.createElement("option");
             option.value = tipo.id;
@@ -25,52 +19,38 @@
             selectTipo.appendChild(option);
         });
     };
-
-    //--función de inicialización del formulario
+    //---------------------Función de inicialización del formulario------------------
     const initForm = () => {
-        const categoriaSelect = document.querySelector(
-            'select[name="categoria_id"]',
-        );
-        const tipoSelect = document.querySelector(
-            'select[name="tipo_solicitud_id"]',
-        );
+        const categoriaSelect = document.querySelector('select[name="categoria_id"]');
+        const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
 
         if (!categoriaSelect || !tipoSelect) return;
 
         if (categoriaSelect.value) {
-            //---options del select
             window.filtrarTipos(categoriaSelect.value);
             const idTipoViejo = tipoSelect.getAttribute("value");
             if (idTipoViejo) {
                 tipoSelect.value = idTipoViejo;
-                //---cuadro azul informativo
                 tipoSelect.dispatchEvent(new Event("change"));
             }
         }
     };
-
-    //-- Escuchas universales seguras bajo la carga del DOM
+    //-------------Escuchas universales seguras bajo la carga del DOM--------------
     document.addEventListener("DOMContentLoaded", () => {
         const inputAsunto = document.getElementById("asunto-input");
         const contador = document.getElementById("char-counter");
-        const categoriaSelect = document.querySelector(
-            'select[name="categoria_id"]',
-        );
-        const tipoSelect = document.querySelector(
-            'select[name="tipo_solicitud_id"]',
-        );
-        const formulario = document.querySelector("form");
+        const categoriaSelect = document.querySelector('select[name="categoria_id"]');
+        const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
+        const formulario = document.querySelector("form"); // Ajustar ID si tienes más de un form
         const btnEnviar = document.getElementById("btn-enviar");
 
         const contenedorPdf = document.getElementById("contenedor-pdf"); 
         const btnDescargarPdf = document.getElementById("btn-descargar-pdf"); 
-
-        //----retraso controlado para garantizar que Blade cargó window.todosLosTipos----
+        //-----Retraso controlado para garantizar que Blade cargó window.todosLosTipos-----
         setTimeout(() => {
             initForm();
         }, 150);
-
-        //----CONTADOR INFORMATIVO (Solo cuenta caracteres)----
+        //--------------------------CONTADOR INFORMATIVO ASUNTO--------------------------
         if (inputAsunto && contador) {
             const lenInicial = inputAsunto.value.length;
             contador.textContent = `${lenInicial}/50`;
@@ -79,74 +59,98 @@
                 const longitud = inputAsunto.value.length;
                 contador.textContent = `${longitud}/50`;
 
-                //---badge informativa roja numero de caracteres
                 if (longitud < 5 || longitud >= 50) {
-                    contador.classList.remove(
-                        "bg-slate-100",
-                        "text-slate-400",
-                        "border-slate-200",
-                    );
-                    contador.classList.add(
-                        "bg-red-50",
-                        "text-red-500",
-                        "border-red-200",
-                    );
+                    contador.classList.remove("bg-slate-100", "text-slate-400", "border-slate-200");
+                    contador.classList.add("bg-red-50", "text-red-500", "border-red-200");
                 } else {
-                    contador.classList.remove(
-                        "bg-red-50",
-                        "text-red-500",
-                        "border-red-200",
-                    );
-                    contador.classList.add(
-                        "bg-slate-100",
-                        "text-slate-400",
-                        "border-slate-200",
-                    );
+                    contador.classList.remove("bg-red-50", "text-red-500", "border-red-200");
+                    contador.classList.add("bg-slate-100", "text-slate-400", "border-slate-200");
                 }
             });
         }
-
-        // ----PREVENCIÓN DE DOBLE ENVÍO REAL----
+        // ---------------MANEJO DE ENVÍO AJAX + PREVENCIÓN DE DOBLE CLIC------------------------
         if (formulario && btnEnviar) {
-            formulario.addEventListener("submit", function () {
-                //---al no haber preventDefault, el formulario viaja normalmente, pero congelamos el botón
+            formulario.addEventListener("submit", function (e) {
+                e.preventDefault(); // Previene el refresco estándar
+
+                const $form = $(this);
+                const contenidoOriginal = btnEnviar.innerHTML;
+
+                //--------------Estado de carga: Deshabilitar botón y mostrar animación------------
                 btnEnviar.disabled = true;
-                btnEnviar.innerHTML = `<span>Enviando...</span> <span class="animate-spin material-symbols-outlined text-lg">sync</span>`;
+                btnEnviar.classList.add("opacity-75", "cursor-not-allowed");
+                btnEnviar.innerHTML = `
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="animate-spin material-symbols-outlined text-lg">sync</span>
+                        <span>Enviando...</span>
+                    </div>
+                `;
+                //--------Envío AJAX usando FormData (Soporta archivos e inputs normales)------------
+                $.ajax({
+                    url: $form.attr("action"),
+                    method: $form.attr("method") || "POST",
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: function (responseHtml) {
+                        const $html = $(responseHtml);
+                        //-----Extraemos las variables window.__flashMessages devueltas por el Controller
+                        const flashDataString = $html.find("#flash-data").html();
+                        if (flashDataString) {
+                            eval(flashDataString);
+                            //---------Ejecutamos la función de app.js (Maneja redirección o SweetAlert)
+                            window.mostrarFlashMessages();
+                        }
+                    },
+                    error: function (xhr) {
+                        //---------------------Captura de errores de validación de Laravel (HTTP 422)
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            const errores = Object.values(xhr.responseJSON.errors).flat();
+                            window.mostrarFlashMessages({
+                                validationTitle: 'Verifique los campos',
+                                validationErrors: errores
+                            });
+                        } else {
+                            window.mostrarFlashMessages({
+                                errorTitle: 'Ocurrió un error',
+                                error: 'No se pudo enviar la solicitud. Intente nuevamente.'
+                            });
+                        }
+                    },
+                    complete: function () {
+                        //-----------------Restaurar botón al finalizar la petición (Éxito o Error)
+                        btnEnviar.disabled = false;
+                        btnEnviar.classList.remove("opacity-75", "cursor-not-allowed");
+                        btnEnviar.innerHTML = contenidoOriginal;
+                    }
+                });
             });
         }
-
-        //--evento de cambio de categoría
+        //-- Evento de cambio de categoría
         if (categoriaSelect) {
             categoriaSelect.addEventListener("change", function () {
                 window.filtrarTipos(this.value);
             });
         }
-
-        //--evento de tipo solicitud para mostrar descripción informativa (Cuadro azul)
+        //-----------------EVENTO PARA MOSTRAR LA DESCRIPCION DE TIPO DE SOLICITUD
         if (tipoSelect) {
             tipoSelect.addEventListener("change", function () {
                 const infoDiv = document.getElementById("info-extra");
                 const tipoSeleccionado = window.todosLosTipos?.find(
-                    (t) => t.id == this.value,
+                    (t) => t.id == this.value
                 );
                 if (infoDiv) {
-                    const tieneDescripcion =
-                        !!tipoSeleccionado?.descripcion_solicitud;
+                    const tieneDescripcion = !!tipoSeleccionado?.descripcion_solicitud;
                     const tieneManual = !!(
                         tipoSeleccionado?.ruta_manual &&
                         tipoSeleccionado.ruta_manual.trim() !== ""
-                    );
+                    );    
                     if (tieneDescripcion || tieneManual) {
-                        //---contenedor informativo
                         infoDiv.classList.remove("hidden");
 
-                        //---texto descriptivo
-                        const textoAyuda =
-                            document.getElementById("texto-ayuda");
+                        const textoAyuda = document.getElementById("texto-ayuda");
                         if (textoAyuda) {
-                            textoAyuda.textContent =
-                                tipoSeleccionado?.descripcion_solicitud || "";
-
+                            textoAyuda.textContent = tipoSeleccionado?.descripcion_solicitud || "";
                             const bloqueTexto = textoAyuda.closest(".flex");
                             if (bloqueTexto) {
                                 tieneDescripcion
@@ -154,13 +158,11 @@
                                     : bloqueTexto.classList.add("hidden");
                             }
                         }
-                        //---botón de descarga de manual
                         if (contenedorPdf && btnDescargarPdf) {
                             if (tieneManual) {
-                                //----Si tiene manual, habilitamos el botón y le asignamos la ruta
                                 btnDescargarPdf.setAttribute(
                                     "href",
-                                    `/storage/${tipoSeleccionado.ruta_manual}`,
+                                    `/storage/${tipoSeleccionado.ruta_manual}`
                                 );
                                 contenedorPdf.classList.remove("hidden");
                             } else {
@@ -168,7 +170,6 @@
                             }
                         }
                     } else {
-                        //--si no tiene manual ni descripción, ocultamos el cuadro azul
                         infoDiv.classList.add("hidden");
                     }
                 }

@@ -23,6 +23,28 @@ use Illuminate\Support\Facades\Mail;
 
 class ClienteController extends Controller
 {
+    /**
+     * Helper privado para calcular la fecha limite SLA segun Categoria y Prioridad
+     */
+    private function calcularFechaVencimientoSla($categoriaId, $prioridadId)
+    {
+        $categoria = Categoria::find($categoriaId);
+        $unidadId = $categoria ? $categoria->unidad_id : null;
+        $horasSla = 24; //--valor por defecto
+
+        if ($unidadId) {
+            $sla = DB::table('prioridad_unidad')
+                ->where('unidad_id', $unidadId)
+                ->where('prioridad_id', $prioridadId)
+                ->first();
+
+            if ($sla && isset($sla->horas_sla)) {
+                $horasSla = (int)$sla->horas_sla;
+            }
+        }
+        return Carbon::now()->addHours($horasSla);
+    }
+    //-----------------------------------------------------------------
     public function index()
     {
         $userId = Auth::id();
@@ -71,8 +93,7 @@ class ClienteController extends Controller
         return view('usuario.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
-    //---metodo para procesar el formulario de creacion de ticket
-    //---metodo para crear ticket
+    //---metodo para guardar ticket
     public function store(Request $request)
     {
         $userId = Auth::id();
@@ -92,24 +113,9 @@ class ClienteController extends Controller
 
         ]);
 
-        //----SLA
-        $categoria = Categoria::find($request->categoria_id);
-        $unidadId = $categoria ? $categoria->unidad_id : null;
-
-        $horasSla = 24;
-
-        if ($unidadId) {
-            $sla = DB::table('prioridad_unidad')
-                ->where('unidad_id', $unidadId)
-                ->where('prioridad_id', $request->prioridad_id)
-                ->first();
-
-            if ($sla && isset($sla->horas_sla)) {
-                $horasSla = (int)$sla->horas_sla;
-            }
-        }
-        $fechaVencimiento = Carbon::now()->addHours($horasSla);
-
+        //----SLA utilizando la función privada
+        $fechaVencimiento = $this->calcularFechaVencimientoSla($request->categoria_id, $request->prioridad_id);
+        //----almacener imagenes de evidencia
         $rutaEvidencia = null;
         if ($request->hasFile('evidencia')) {
             $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
@@ -134,7 +140,9 @@ class ClienteController extends Controller
         //---cargar relaciones para el correo
         $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
 
-        //---envio correo capturandolo del usuario autenticado
+        //**************************************************************************************/
+        //-----------------------CORREO CONFIRMACION CLIENTE----------------------------------
+        //**************************************************************************************/
         try {
             //---obtenemos el email del usuario autenticado
             $usuario = Auth::user();
@@ -155,7 +163,9 @@ class ClienteController extends Controller
         }
 
 
-        //--------notificacion a la unidad correspondiente
+        //********************************************************************************/
+        //----------------------------NOTIFICACION UNIDAD----------------------------------
+        //********************************************************************************/
         try {
             //---identificar unidad por medio de la categoria del ticket
             $unidadId = $nuevoTicket->categoria->unidad_id;
@@ -180,6 +190,7 @@ class ClienteController extends Controller
             ->with('success', $mensajeFlash);
     }
 
+    //----metodo para ver mis tickets
     public function misTickets()
     {
         $misTickets = Ticket::where('user_id', Auth::id())
@@ -189,7 +200,7 @@ class ClienteController extends Controller
 
         return view('usuario.mis-tickets', compact('misTickets'));
     }
-
+    //--metodo para mostrar recursos (SIN USO)
     public function recursos()
     {
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();

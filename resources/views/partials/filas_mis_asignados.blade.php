@@ -2,29 +2,28 @@
     <tr class="hover:bg-slate-50 transition-colors">
         <td class="px-4 py-4 whitespace-nowrap">
             <div class="flex items-center">
-                {{-- Prefijo con estilo sutil --}}
                 <span class="text-secondary font-black text-[12px]">#</span>
                 <span class="text-secondary font-black text-[12px] tracking-tighter">TK</span>
-
-                {{-- Número principal destacado --}}
                 <span class="text-secondary font-black tracking-tight text-[12px]">
                     {{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
                 </span>
             </div>
         </td>
+
         {{-- Usuario --}}
         <td class="px-4 py-4">
             <div class="flex flex-col">
                 <button type="button"
                     class="btn-ver-usuario font-black hover:text-primary transition-all text-left flex items-center gap-2 group"
-                    data-nombre="{{ $ticket->user->name }}" data-email="{{ $ticket->user->email }}"
-                    data-unidad="{{ $ticket->user->unidad->nombre_unidad }}" data-cargo="{{ $ticket->user->cargo }}"
+                    data-nombre="{{ $ticket->user->name }}" 
+                    data-email="{{ $ticket->user->email }}"
+                    data-unidad="{{ $ticket->user->unidad->nombre_unidad }}" 
+                    data-cargo="{{ $ticket->user->cargo }}"
                     data-telefono="{{ $ticket->user->telefono ?? '----' }}">
 
                     {{ $ticket->user->name }}
 
-                    <span
-                        class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                         visibility
                     </span>
                 </button>
@@ -44,121 +43,113 @@
                     default => 'bg-slate-100 text-slate-600 border-slate-200',
                 };
             @endphp
-            <span
-                class="status-label px-2 py-1 rounded-full border font-black text-[10px] uppercase {{ $claseEstado }}">{{ ucfirst($estado) }}</span>
+            <span class="status-label px-2 py-1 rounded-full border font-black text-[10px] uppercase {{ $claseEstado }}">
+                {{ ucfirst($estado) }}
+            </span>
         </td>
-        {{-- Prioridad --}}
+
+        {{-- Prioridad (AJAX) --}}
         <td class="px-4 py-4" data-search="{{ $ticket->prioridad->nombre_prioridad }}">
             @php
-                $rutaPrioridad =
-                    Auth::user()->rol_id == 1 ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad';
+                $rutaPrioridad = route(request()->is('admin*') ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad', $ticket->id);
                 $estaCerrado = in_array($ticket->estado_id, [3, 4, 5]);
             @endphp
-            <form action="{{ route($rutaPrioridad, $ticket->id) }}" method="POST">
-                @csrf @method('PATCH')
-                <select name="prioridad_id" onchange="this.form.submit()" {{ $estaCerrado ? 'disabled' : '' }} class="bg-transparent font-black text-[12px] border-none focus:ring-0 
-                                {{ $estaCerrado ? 'text-slate-400' : 'text-secondary cursor-pointer' }}">
-                    <option value="1" {{ $ticket->prioridad_id == 1 ? 'selected' : '' }}>Critica</option>
-                    <option value="2" {{ $ticket->prioridad_id == 2 ? 'selected' : '' }}>Alta</option>
-                    <option value="3" {{ $ticket->prioridad_id == 3 ? 'selected' : '' }}>Media</option>
-                    <option value="4" {{ $ticket->prioridad_id == 4 ? 'selected' : '' }}>Baja</option>
-                </select>
-            </form>
+            <select data-id="{{ $ticket->id }}"
+                    data-url="{{ $rutaPrioridad }}"
+                    {{ $estaCerrado ? 'disabled' : '' }} 
+                    class="select-prioridad-ajax bg-transparent font-black text-[12px] border-none focus:ring-0 
+                           {{ $estaCerrado ? 'text-slate-400' : 'text-secondary cursor-pointer' }}">
+                <option value="1" {{ $ticket->prioridad_id == 1 ? 'selected' : '' }}>Critica</option>
+                <option value="2" {{ $ticket->prioridad_id == 2 ? 'selected' : '' }}>Alta</option>
+                <option value="3" {{ $ticket->prioridad_id == 3 ? 'selected' : '' }}>Media</option>
+                <option value="4" {{ $ticket->prioridad_id == 4 ? 'selected' : '' }}>Baja</option>
+            </select>
         </td>
 
-        {{-- Reasignar o Devolver --}}
+        {{-- Reasignar o Devolver (AJAX) --}}
         <td class="px-4 py-4">
             @php
-                $rutaTecnico = Auth::user()->rol_id == 1 ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico';
+                $rutaTecnico = route(request()->is('admin*') ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico', $ticket->id);
             @endphp
+            <select data-id="{{ $ticket->id }}"
+                    data-url="{{ $rutaTecnico }}"
+                    {{ $estaCerrado ? 'disabled' : '' }} 
+                    class="select-tecnico-ajax bg-transparent font-black text-[12px] border-none focus:ring-0 w-full
+                           {{ $estaCerrado ? 'text-slate-400' : 'text-secondary cursor-pointer' }}">
+                <option value="" {{ is_null($ticket->tecnico_id) ? 'selected' : '' }} class="text-red-600 font-bold">
+                    ❌ Devolver a Pendientes
+                </option>
 
-            <form action="{{ route($rutaTecnico, $ticket->id) }}" method="POST">
-                @csrf @method('PATCH')
-                <select name="tecnico_id" onchange="this.form.submit()" {{ $estaCerrado ? 'disabled' : '' }} class="bg-transparent font-black text-[12px] border-none focus:ring-0 w-full
-                                {{ $estaCerrado ? 'text-slate-400' : 'text-secondary cursor-pointer' }}">
-                    <option value="" {{ is_null($ticket->tecnico_id) ? 'selected' : '' }} class="text-red-600 font-bold">
-                        ❌ Devolver a Pendientes
-                    </option>
-
-                    <optgroup label="Reasignar a:">
-                        @foreach ($tecnicos as $tecnico)
-                            <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
-                                👤 {{ $tecnico->name }}
-                            </option>
-                        @endforeach
-                    </optgroup>
-                </select>
-            </form>
+                <optgroup label="Reasignar a:">
+                    @foreach ($tecnicos as $tecnico)
+                        <option value="{{ $tecnico->id }}" {{ $ticket->tecnico_id == $tecnico->id ? 'selected' : '' }}>
+                            👤 {{ $tecnico->name }}
+                        </option>
+                    @endforeach
+                </optgroup>
+            </select>
         </td>
 
-        {{--descripcion del ticket--}}
+        {{-- Detalle del Ticket --}}
         <td class="px-2 py-4 text-center">
             <button type="button"
                 class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
-                data-id="{{ $ticket->id }}"
-                data-asunto="{{ $ticket->asunto }}" data-descripcion="{{ $ticket->descripcion }}"
+                data-id="{{ $ticket->id }}" data-asunto="{{ $ticket->asunto }}"
+                data-descripcion="{{ $ticket->descripcion }}"
                 data-tipo="{{ $ticket->tipo_solicitud->nombre_tipo_solicitud }}"
-                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" 
-                data-drive="{{ $ticket->drive_link }}"
-                {{-- Datos para el temporizador de SLA --}} 
-                data-state="{{ $ticket->estado_id }}"
-                data-estado="{{ $ticket->estado->nombre_estado ?? 'Pendiente' }}"
+                data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" data-drive="{{ $ticket->drive_link }}" {{-- Datos
+                para el temporizador de SLA --}} data-estado="{{ $ticket->estado->nombre_estado }}"
+                data-state="{{ $ticket->estado_sla }}"
                 data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('Y-m-d H:i:s') : '' }}"
-                data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}"
-                >
+                data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>
 
-        {{-- Acciones --}}
+        {{-- Acciones (AJAX) --}}
         <td class="px-4 py-4">
             @php
-                $prefix = Auth::user()->rol_id == 1 ? 'admin' : 'gestor';
-                $rutaResolver = $prefix . '.tickets.resolver';
-                $rutaEquivocacion = $prefix . '.tickets.equivocacion';
-                $rutaNoCorresponde = $prefix . '.tickets.no-corresponde';
+                $prefix = request()->is('admin*') ? 'admin' : 'gestor';
+                $rutaResolver = route($prefix . '.tickets.resolver', $ticket->id);
+                $rutaEquivocacion = route($prefix . '.tickets.equivocacion', $ticket->id);
+                $rutaNoCorresponde = route($prefix . '.tickets.no-corresponde', $ticket->id);
                 $estaCerrado = in_array($ticket->estado_id, [3, 4, 5]);
             @endphp
 
             <div class="flex items-center justify-center gap-2">
-
                 {{-- Botón Resolver --}}
-                <form action="{{ route($rutaResolver, $ticket->id) }}" method="POST" class="form-resolver m-0">
-                    @csrf
-                    @method('PATCH')
-                    <button type="button" data-id="{{ $ticket->id }}" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarResolver(this)' }}
-                        class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
-                            {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-green-50 text-green-600 border-green-100 hover:bg-green-600 hover:text-white' }}" title="Marcar como Resuelto">
-                        <span class="material-symbols-outlined text-[16px]">check_circle</span>
-                    </button>
-                </form>
+                <button type="button" 
+                    data-id="{{ $ticket->id }}" 
+                    data-url="{{ $rutaResolver }}"
+                    {{ $estaCerrado ? 'disabled' : 'onclick=confirmarResolver(this)' }}
+                    class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
+                        {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-green-50 text-green-600 border-green-100 hover:bg-green-600 hover:text-white' }}" 
+                    title="Marcar como Resuelto">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
+                </button>
 
                 {{-- Botón Equivocado --}}
-                <form action="{{ route($rutaEquivocacion, $ticket->id) }}" method="POST" class="form-equivocacion m-0">
-                    @csrf
-                    @method('PATCH')
-                    <button type="button" data-id="{{ $ticket->id }}" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarEquivocado(this)' }}
-                        class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
-                            {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-600 hover:text-white' }}"
-                        title="Marcar como Equivocado">
-                        <span class="material-symbols-outlined text-[16px]">do_not_touch</span>
-                    </button>
-                </form>
+                <button type="button" 
+                    data-id="{{ $ticket->id }}" 
+                    data-url="{{ $rutaEquivocacion }}"
+                    {{ $estaCerrado ? 'disabled' : 'onclick=confirmarEquivocado(this)' }}
+                    class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
+                        {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-600 hover:text-white' }}"
+                    title="Marcar como Equivocado">
+                    <span class="material-symbols-outlined text-[16px]">do_not_touch</span>
+                </button>
 
                 {{-- Botón No Corresponde --}}
-                <form action="{{ route($rutaNoCorresponde, $ticket->id) }}" method="POST" class="form-no-corresponde m-0">
-                    @csrf
-                    @method('PATCH')
-                    <button type="button" data-id="{{ $ticket->id }}" {{ $estaCerrado ? 'disabled' : 'onclick=confirmarNoCorresponde(this)' }}
-                        class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
-                            {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100 hover:bg-yellow-600 hover:text-white' }}"
-                        title="Marcar como No Corresponde">
-                        <span class="material-symbols-outlined text-[16px]">thumb_down</span>
-                    </button>
-                </form>
-
+                <button type="button" 
+                    data-id="{{ $ticket->id }}" 
+                    data-url="{{ $rutaNoCorresponde }}"
+                    {{ $estaCerrado ? 'disabled' : 'onclick=confirmarNoCorresponde(this)' }}
+                    class="p-2 font-black rounded-xl transition-all shadow-sm border flex items-center justify-center
+                        {{ $estaCerrado ? 'bg-slate-50 text-slate-300 border-slate-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100 hover:bg-yellow-600 hover:text-white' }}"
+                    title="Marcar como No Corresponde">
+                    <span class="material-symbols-outlined text-[16px]">thumb_down</span>
+                </button>
             </div>
         </td>
-
     </tr>
 @endforeach

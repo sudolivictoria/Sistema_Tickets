@@ -4,7 +4,7 @@ const initSidebar = () => {
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("sidebar-overlay");
 
-    //---precaucion para no rompel el codigo
+    //---precaucion para no rompe el codigo
     if (!menuToggle || !sidebar || !overlay) return;
 
     //--funciones para abrir y cerrar el menu

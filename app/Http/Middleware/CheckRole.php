@@ -23,6 +23,7 @@ class CheckRole
         //----obtiene el usuario autenticado
         $user = Auth::user();
 
+        //------------DICCIONARIO DE ROLES------------------------
         $roles = [
             'Admin'   => 1,
             'Usuario' => 2,

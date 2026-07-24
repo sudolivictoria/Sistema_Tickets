@@ -3,7 +3,7 @@ import './bootstrap';
 // 1. Importar jQuery
 import jQuery from 'jquery';
 
-// 2. Hacerlo global de forma súper compatible
+//------global
 window.$ = jQuery;
 window.jQuery = jQuery;
 globalThis.$ = jQuery;
@@ -12,16 +12,22 @@ globalThis.jQuery = jQuery;
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 
-function mostrarFlashMessages() {
-    const flash = window.__flashMessages || {};
+//------------------envio de alertas--------------------------------
+function mostrarFlashMessages(customFlash = null) {
+    //---si viene con un objeto  ajax
+    const flash = customFlash || window.__flashMessages || {};
+    
     const validationTitle = flash.validationTitle || 'No se pudo actualizar';
     const errorTitle = flash.errorTitle || 'Operación denegada';
     const successTitle = flash.successTitle || '¡Acción Exitosa!';
 
+    //---manejo de errores de validacion
     if (flash.validationErrors && flash.validationErrors.length) {
         Swal.fire({
             title: validationTitle,
-            html: flash.validationErrors.join('<br>'),
+            html: Array.isArray(flash.validationErrors) 
+                ? flash.validationErrors.join('<br>') 
+                : flash.validationErrors,
             icon: 'error',
             confirmButtonColor: '#dc2626',
             confirmButtonText: 'Corregir',
@@ -33,6 +39,7 @@ function mostrarFlashMessages() {
         return;
     }
 
+    //---manejo de errores generales
     if (flash.error) {
         Swal.fire({
             title: errorTitle,
@@ -42,12 +49,13 @@ function mostrarFlashMessages() {
             confirmButtonText: 'Entendido',
             customClass: {
                 popup: 'rounded-3xl',
-                confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs'
+                confirmButton: 'px-10 py-3.5 rounded-2xl font-black uppercase tracking-widest text-md'
             }
         });
         return;
     }
 
+    //----manejo de exito
     if (flash.success) {
         const popup = Swal.fire({
             title: successTitle,
@@ -69,6 +77,7 @@ function mostrarFlashMessages() {
     }
 }
 
+//------------------------cargar los mensajes--------------------
 window.mostrarFlashMessages = mostrarFlashMessages;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -76,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.Swal) {
             mostrarFlashMessages();
         }
-    }, 150);
+    }, 100);
 });
 
 import DataTable from 'datatables.net';

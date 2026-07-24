@@ -9,6 +9,36 @@ use Illuminate\Http\Request;
 
 class ReporteController extends Controller
 {
+
+    //----------------------------metodo para formatear tiempo de respuesta
+    private function formatearTiempoRespuesta($tiempoRespuesta): string
+    {
+        if ($tiempoRespuesta === null || $tiempoRespuesta === '') {
+            return '-------';
+        }
+        $totalSegundos = (int) $tiempoRespuesta;
+
+        $dias = intdiv($totalSegundos, 86400);
+        $restoSegundos = $totalSegundos % 86400;
+
+        $horas = intdiv($restoSegundos, 3600);
+        $restoSegundos %= 3600;
+
+        $minutos = intdiv($restoSegundos, 60);
+        $segundos = $restoSegundos % 60;
+
+        $pad = fn($num) => sprintf('%02d', $num);
+
+        if ($dias > 0) {
+            return "{$dias}d {$pad($horas)}h {$pad($minutos)}m {$pad($segundos)}s";
+        } elseif ($horas > 0) {
+            return "{$pad($horas)}h {$pad($minutos)}m {$pad($segundos)}s";
+        } elseif ($minutos > 0) {
+            return "{$pad($minutos)}m {$pad($segundos)}s";
+        }
+        return "{$pad($segundos)}s";
+    }
+
     public function exportar(Request $request)
     {
         try {
@@ -90,34 +120,7 @@ class ReporteController extends Controller
                         $asuntoClean = str_replace(["\r", "\n", ";"], [" ", " ", " "], $ticket->asunto ?? '');
                         $descClean = str_replace(["\r", "\n", ";"], [" ", " ", " "], $ticket->descripcion ?? '');
 
-                        $tiempoRespuestaFormateado = '-------';
-
-                        if ($ticket->tiempo_respuesta !== null && $ticket->tiempo_respuesta !== '') {
-                            $totalSegundos = (int) $ticket->tiempo_respuesta;
-
-                            $dias = intdiv($totalSegundos, 86400);
-                            $restoSegundos = $totalSegundos % 86400;
-
-                            $horas = intdiv($restoSegundos, 3600);
-                            $restoSegundos %= 3600;
-
-                            $minutos = intdiv($restoSegundos, 60);
-                            $segundos = $restoSegundos % 60;
-
-                            $pad = fn($num) => sprintf('%02d', $num);
-
-                             $pad = fn($num) => sprintf('%02d', $num);
-
-                            if ($dias > 0) {
-                                $tiempoRespuestaFormateado = "{$dias}d {$pad($horas)}h {$pad($minutos)}m {$pad($segundos)}s";
-                            } elseif ($horas > 0) {
-                                $tiempoRespuestaFormateado = "{$pad($horas)}h {$pad($minutos)}m {$pad($segundos)}s";
-                            } elseif($minutos > 0){
-                                $tiempoRespuestaFormateado = "{$pad($minutos)}m {$pad($segundos)}s";
-                            } else {
-                                $tiempoRespuestaFormateado = "{$pad($segundos)}s";
-                            }
-                        }
+                        $tiempoRespuestaFormateado = $this->formatearTiempoRespuesta($ticket->tiempo_respuesta);
 
                         fputcsv($file, [
                             'TK' . str_pad($ticket->id, 5, '0', STR_PAD_LEFT),
@@ -143,6 +146,10 @@ class ReporteController extends Controller
 
             //-------PDF
             if ($formato === 'pdf') {
+                $tickets->each(function ($ticket) {
+                    $ticket->tiempo_respuesta_formateado = $this->formatearTiempoRespuesta($ticket->tiempo_respuesta);
+                });
+
                 $pdf = Pdf::loadView('admin.reportes.pdf_historial', compact('tickets'))
                     ->setPaper('letter', 'landscape');
                 return $pdf->stream('reporte_historial_' . date('d-m-Y_His') . '.pdf');

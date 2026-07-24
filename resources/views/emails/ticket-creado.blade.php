@@ -20,7 +20,7 @@
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: #ffffff;
+            background: #cadef1;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);

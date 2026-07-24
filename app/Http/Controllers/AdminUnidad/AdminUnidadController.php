@@ -45,7 +45,7 @@ class AdminUnidadController extends Controller
         }
         return Carbon::now()->addHours($horasSla);
     }
-
+    //-----------------------------------------------------------------
     public function index()
     {
         //--unidad del admin autenticado
@@ -141,7 +141,11 @@ class AdminUnidadController extends Controller
     }
 
 
-    //-------------------------CLIENTE----------------------------
+    //---------------------------------------------------------------------------------//
+    //-------------------------------CLIENTE-------------------------------------------//
+    //---------------------------------------------------------------------------------//
+
+    //--metodo para crear ticket
     public function create()
     {
         $categorias = Categoria::all();
@@ -151,6 +155,7 @@ class AdminUnidadController extends Controller
         return view('gestor.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
+    //---metodo para guardar ticket
     public function store(Request $request)
     {
         $userId = Auth::id();
@@ -173,7 +178,7 @@ class AdminUnidadController extends Controller
 
         //----SLA utilizando la función privada
         $fechaVencimiento = $this->calcularFechaVencimientoSla($request->categoria_id, $request->prioridad_id);
-
+        //----almacener imagenes de evidencia
         $rutaEvidencia = null;
         if ($request->hasFile('evidencia')) {
             $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
@@ -195,12 +200,11 @@ class AdminUnidadController extends Controller
         ]);
 
         //---cargar relaciones para el correo
-        $nuevoTicket->load(['user', 'categoria', 'prioridad', 'tipo_solicitud']);
-
-        //---cargar relaciones para el correo
         $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
 
-        //---envio correo capturandolo del usuario autenticado
+        //************************************************************************************/
+        //-----------------------CORREO CONFIRMACION CLIENTE----------------------------------
+        //***********************************************************************************/
         try {
             //---obtenemos el email del usuario autenticado
             $usuario = Auth::user();
@@ -220,7 +224,9 @@ class AdminUnidadController extends Controller
             $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
         }
 
-        //--------notificacion a la unidad correspondiente
+        //********************************************************************************/
+        //----------------------------NOTIFICACION UNIDAD-----------------------------------
+        //********************************************************************************/
         try {
             //---identificar unidad por medio de la categoria del ticket
             $unidadId = $nuevoTicket->categoria->unidad_id;
@@ -245,7 +251,7 @@ class AdminUnidadController extends Controller
             ->with('success', $mensajeFlash);
     }
 
-    //--metodos lado del cliente
+    //--metodo para ver mis tickets 
     public function misTickets()
     {
         $misTickets = Ticket::where('user_id', Auth::id())
@@ -256,14 +262,18 @@ class AdminUnidadController extends Controller
         return view('gestor.mis-tickets', compact('misTickets'));
     }
 
+    //----metodo para mostrar recursos (SIN USO)
     public function recursos()
     {
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
         $manuales = Manual::with('categoria')->latest()->get();
         return view('gestor.recursos', compact('categorias', 'manuales'));
     }
+    //---------------------------------------------------------------------------------------//
+    //-------------------------------ADMINISTRACION------------------------------------------//
+    //---------------------------------------------------------------------------------------//
 
-    //------------------------------metodos del lado del administrador---------------------------------------------
+    //-----metodo para asignar tickets
     public function asignarTickets()
     {
         $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
@@ -282,6 +292,58 @@ class AdminUnidadController extends Controller
             ->get();
 
         return view('gestor.asignar-tickets', compact('tickets', 'tecnicos'));
+    }
+
+    //--------------------METODOS PARA ASIGNAR Y MIS ASIGNADOS-----------------------------------
+
+    //---Actualizar Técnico------------------------------------------->
+    public function actualizarTecnico(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'tecnico_id' => [
+                'nullable',
+                'exists:users,id',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $user = User::find($value);
+                        if ($user && !$user->activo) {
+                            $fail('El técnico seleccionado no está activo.');
+                        }
+                    }
+                },
+            ]
+        ]);
+        //-----validacion que no este cerrado
+        if (in_array($ticket->estado_id, [3, 4, 5])) {
+            $errorMsg = '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
+        }
+        //------validacion cola de pendientes
+        if (!$request->filled('tecnico_id') && $ticket->tecnico_id === null) {
+            $errorMsg = 'El ticket ya se encontraba en la cola de pendientes.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('sweet_error', $errorMsg);
+        }
+        //----------cambio de estado o tecnico
+        $ticket->update([
+            'tecnico_id' => $request->tecnico_id,
+            'estado_id'  => $request->tecnico_id ? 2 : 1
+        ]);
+        $mensaje = $request->tecnico_id
+            ? 'Técnico asignado correctamente.'
+            : 'Ticket devuelto a la cola de pendientes.';
+
+        broadcast(new TicketActualizado()); //-------------tiempo real
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $mensaje]);
+        }
+        return back()->with('sweet_success', $mensaje);
     }
 
     //---Actualizar Prioridad----------------------------------------------------->
@@ -316,58 +378,8 @@ class AdminUnidadController extends Controller
         return back()->with('sweet_success', $mensajeExito);
     }
 
-    //---Actualizar Técnico--------------------------------------------------->
-    public function actualizarTecnico(Request $request, Ticket $ticket)
-    {
-        $request->validate([
-            'tecnico_id' => [
-                'nullable',
-                'exists:users,id',
-                function ($attribute, $value, $fail) {
-                    if ($value) {
-                        $user = User::find($value);
-                        if ($user && !$user->activo) {
-                            $fail('El técnico seleccionado no está activo.');
-                        }
-                    }
-                },
-            ]
-        ]);
 
-        if (in_array($ticket->estado_id, [3, 4, 5])) {
-            $errorMsg = '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.';
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => $errorMsg], 422);
-            }
-            return back()->with('sweet_error', $errorMsg);
-        }
-
-        if (!$request->filled('tecnico_id') && $ticket->tecnico_id === null) {
-            $errorMsg = 'El ticket ya se encontraba en la cola de pendientes.';
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => $errorMsg], 422);
-            }
-            return back()->with('sweet_error', $errorMsg);
-        }
-
-        $ticket->update([
-            'tecnico_id' => $request->tecnico_id,
-            'estado_id'  => $request->tecnico_id ? 2 : 1
-        ]);
-
-        $mensaje = $request->tecnico_id
-            ? 'Técnico asignado correctamente.'
-            : 'Ticket devuelto a la cola de pendientes.';
-
-        broadcast(new TicketActualizado());
-
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['success' => true, 'message' => $mensaje]);
-        }
-
-        return back()->with('sweet_success', $mensaje);
-    }
-
+    //------metodo para mostrar los tickets asignados al tecnico autenticado
     public function misAsignados()
     {
         $user = Auth::user();
@@ -383,7 +395,7 @@ class AdminUnidadController extends Controller
             ->get();
         return view('gestor.mis_asignados', compact('tickets', 'tecnicos', 'prioridades'));
     }
-
+    //---metodo para mostrar historial de tickets con filtros y metricas
     public function historial()
     {
         $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado

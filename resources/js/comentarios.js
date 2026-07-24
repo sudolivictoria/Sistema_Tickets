@@ -1,9 +1,7 @@
 // =====================================================================
 //                 GESTIÓN DE COMENTARIOS EN TIEMPO REAL
 // =====================================================================
-
 let canalEchoActual = null;
-
 /**
  * Escucha eventos en tiempo real (Reverb) para el ticket activo
  */
@@ -12,12 +10,9 @@ window.escucharComentariosWebSocket = function (idTicket) {
         console.warn("[Reverb] Echo no está inicializado globalmente.");
         return;
     }
-
     //---limpiar escucha previa si la hubiera
     window.desconectarComentariosWebSocket();
-
     canalEchoActual = idTicket;
-
     //----escuchar el canal público del ticket (new Channel('ticket.' . $id))
     window.Echo.channel(`ticket.${idTicket}`)
         .listen('.comentario.creado', (data) => {
@@ -26,7 +21,6 @@ window.escucharComentariosWebSocket = function (idTicket) {
             }
         });
 };
-
 /**
  * Abandona el canal al cerrar el modal o cambiar de ticket
  */
@@ -36,7 +30,6 @@ window.desconectarComentariosWebSocket = function () {
         canalEchoActual = null;
     }
 };
-
 /**
  * Carga inicial de comentarios vía HTTP
  */
@@ -56,17 +49,14 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
     } else {
         $formularioComentario.show();
     }
-
     $.get(`/tickets/${idTicket}/comentarios`)
         .done(function (comentarios) {
             $lista.empty();
-
             if (!comentarios || comentarios.length === 0) {
                 $seccionHistorico.hide();
                 $("#preloaderGlobalModal").addClass("hidden");
                 return;
             }
-
             $seccionHistorico.show();
 
             const fragment = document.createDocumentFragment();
@@ -78,7 +68,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
                 const tag = com.es_privado
                     ? '<span class="text-green-700 font-bold">[Nota Interna]</span> '
                     : "";
-
                 const item = document.createElement("div");
                 item.className = `p-2 rounded-xl border ${bg}`;
                 if (com.id) item.setAttribute("data-comentario-id", com.id);
@@ -92,7 +81,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
                 `;
                 fragment.appendChild(item);
             });
-
             $lista[0].appendChild(fragment);
             $lista.scrollTop($lista[0].scrollHeight);
         })
@@ -103,7 +91,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
             $("#preloaderGlobalModal").addClass("hidden");
         });
 };
-
 /**
  * Agrega dinámicamente un comentario al contenedor con animación y control de duplicados
  */
@@ -111,12 +98,10 @@ window.agregarComentarioAlModal = function (comentario) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
     if (!$lista.length) return;
-
     //----evitar duplicados
     if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
         return;
     }
-
     $seccionHistorico.show();
 
     const bg = comentario.es_privado
@@ -138,7 +123,6 @@ window.agregarComentarioAlModal = function (comentario) {
             <p class="text-slate-600 font-medium">${comentario.contenido}</p>
         </div>
     `;
-
     $lista.append(elComentario);
     $lista.scrollTop($lista[0].scrollHeight);
 };

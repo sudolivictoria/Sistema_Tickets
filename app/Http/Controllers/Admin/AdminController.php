@@ -45,6 +45,7 @@ class AdminController extends Controller
         }
         return Carbon::now()->addHours($horasSla);
     }
+    //------------------------------------------------------------------------------
 
     public function index()
     {
@@ -127,7 +128,7 @@ class AdminController extends Controller
             $pen = $statsMensuales->where('mes', $i)->whereNotIn('estado_id', $estadosCerrados)->sum('total');
 
             $total = $res + $pen;
-
+            //-------grafico------------
             $mesesGrafico[] = [
                 'nombre' => $nombresMeses[$i - 1],
                 'resueltos_pct' => $total > 0 ? round(($res / $total) * 100) : 0,
@@ -141,6 +142,7 @@ class AdminController extends Controller
         if ($miUnidadId) {
             $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
         }
+        //------------------prioridades----------------------
         $prioridades = [
             'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
             'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
@@ -154,7 +156,11 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'ticketsAsignados', 'prioridades'));
     }
 
-    //-------------------------CLIENTE----------------------------
+    //---------------------------------------------------------------------------------//
+    //-------------------------------CLIENTE-------------------------------------------//
+    //---------------------------------------------------------------------------------//
+
+    //--metodo para crear ticket
     public function create()
     {
         $categorias = Categoria::all();
@@ -164,7 +170,7 @@ class AdminController extends Controller
         return view('admin.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
-    //---metodo para crear ticket
+    //---metodo para guardar ticket
     public function store(Request $request)
     {
         $userId = Auth::id();
@@ -186,7 +192,7 @@ class AdminController extends Controller
 
         //----SLA utilizando la función privada
         $fechaVencimiento = $this->calcularFechaVencimientoSla($request->categoria_id, $request->prioridad_id);
-
+        //----almacenar imagenes de evidencia 
         $rutaEvidencia = null;
         if ($request->hasFile('evidencia')) {
             $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
@@ -211,7 +217,9 @@ class AdminController extends Controller
         //---cargar relaciones para el correo
         $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
 
-        //---envio correo capturandolo del usuario autenticado
+        //************************************************************************************/
+        //-----------------------CORREO CONFIRMACION CLIENTE----------------------------------
+        //***********************************************************************************/
         try {
             //---obtenemos el email del usuario autenticado
             $usuario = Auth::user();
@@ -231,7 +239,10 @@ class AdminController extends Controller
             $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
         }
 
-        //--------notificacion a la unidad correspondiente
+        //********************************************************************************/
+        //----------------------------NOTIFICACION UNIDAD-----------------------------------
+        //********************************************************************************/
+
         try {
             //---identificar unidad por medio de la categoria del ticket
             $unidadId = $nuevoTicket->categoria->unidad_id;
@@ -258,7 +269,7 @@ class AdminController extends Controller
             ->with('success', $mensajeFlash);
     }
 
-    //---metodos para cliente---
+    //----metodo para ver mis tickets
     public function misTickets()
     {
         $misTickets = Ticket::where('user_id', Auth::id())
@@ -269,7 +280,7 @@ class AdminController extends Controller
         return view('admin.mis-tickets', compact('misTickets'));
     }
 
-    //----metodo para mostrar recursos
+    //----metodo para mostrar recursos (SIN USO)
     public function recursos()
     {
         $categorias = CategoriaManual::orderBy('nombre_categoria_manual', 'asc')->get();
@@ -277,7 +288,11 @@ class AdminController extends Controller
         return view('admin.recursos', compact('categorias', 'manuales'));
     }
 
-    //------------------------------metodos para administracion---------------------------------------------
+    //---------------------------------------------------------------------------------------//
+    //-------------------------------ADMINISTRACION------------------------------------------//
+    //---------------------------------------------------------------------------------------//
+
+    //---------metodo para asignar tickets
     public function asignarTickets()
     {
         $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
@@ -298,6 +313,9 @@ class AdminController extends Controller
 
         return view('admin.asignar-tickets', compact('tickets', 'tecnicos'));
     }
+
+    //---------------------------METODOS PARA ASIGNAR Y MIS ASIGNADOS------------------------>
+
     //---Actualizar Técnico------------------------------------------->
     public function actualizarTecnico(Request $request, Ticket $ticket)
     {
@@ -315,7 +333,7 @@ class AdminController extends Controller
                 },
             ]
         ]);
-
+        //-----validacion que no este cerrado
         if (in_array($ticket->estado_id, [3, 4, 5])) {
             $errorMsg = '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.';
             if ($request->ajax() || $request->wantsJson()) {
@@ -323,7 +341,7 @@ class AdminController extends Controller
             }
             return back()->with('sweet_error', $errorMsg);
         }
-
+        //------validacion cola de pendientes
         if (!$request->filled('tecnico_id') && $ticket->tecnico_id === null) {
             $errorMsg = 'El ticket ya se encontraba en la cola de pendientes.';
             if ($request->ajax() || $request->wantsJson()) {
@@ -331,22 +349,20 @@ class AdminController extends Controller
             }
             return back()->with('sweet_error', $errorMsg);
         }
-
+        //----------cambio de estado o tecnico
         $ticket->update([
             'tecnico_id' => $request->tecnico_id,
             'estado_id'  => $request->tecnico_id ? 2 : 1
         ]);
-
         $mensaje = $request->tecnico_id
             ? 'Técnico asignado correctamente.'
             : 'Ticket devuelto a la cola de pendientes.';
 
-        broadcast(new TicketActualizado());
+        broadcast(new TicketActualizado()); //-------------tiempo real
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json(['success' => true, 'message' => $mensaje]);
         }
-
         return back()->with('sweet_success', $mensaje);
     }
 

@@ -17,6 +17,7 @@ class TicketActualizado implements ShouldBroadcastNow
 
     public function __construct() {}
 
+    //----channel for tickets
     public function broadcastOn(): array
     {
         return [

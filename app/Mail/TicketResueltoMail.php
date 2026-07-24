@@ -23,12 +23,14 @@ class TicketResueltoMail extends Mailable
      * @param Ticket $ticket
      * @param string|null $comentarioTexto
      */
+
+    //-----------------inicializacion
     public function __construct(Ticket $ticket, $comentarioTexto = null)
     {
         $this->ticket = $ticket;
         $this->comentarioTexto = $comentarioTexto;
     }
-
+    //----------------envelope
     public function build()
     {
         $id = '#TK' . str_pad($this->ticket->id, 5, '0', STR_PAD_LEFT);

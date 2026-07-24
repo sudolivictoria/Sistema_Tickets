@@ -18,8 +18,9 @@ class TicketCreadoMail extends Mailable
      * Create a new message instance.
      */
 
+    //----------------declaracion variable
     public $ticket;
-
+    //------------------inicializacion
     public function __construct(Ticket $ticket)
     {
         $this->ticket = $ticket;

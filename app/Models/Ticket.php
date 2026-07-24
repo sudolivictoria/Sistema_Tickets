@@ -22,13 +22,14 @@ class Ticket extends Model
         'tiempo_respuesta',
     ];
 
+    //---------clean fechas
     protected $casts = [
         'fecha_cierre' => 'datetime',
         'fecha_vencimiento_sla' => 'datetime',
     ];
 
    
-    //---que sea legible
+    //---metodo para obtener el SLA legible
     public function getSlaLegibleAttribute()
     {
         if (!$this->fecha_vencimiento_sla) {
@@ -38,6 +39,7 @@ class Ticket extends Model
         $ahora = now();
         $vencimiento = $this->fecha_vencimiento_sla;
 
+        //------calculo para saber si el ticket esta vencido
         if ($ahora->greaterThan($vencimiento)) {
             return 'Vencido';
         }
@@ -58,6 +60,7 @@ class Ticket extends Model
         return "{$dias} " . ($dias == 1 ? 'día' : 'días') . " y {$horasSobrantes} horas";
     }
 
+    //------------relaciones con otras tablas--------------------
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -86,5 +89,10 @@ class Ticket extends Model
     public function estado()
     {
         return $this->belongsTo(Estado::class);
+    }
+
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class);
     }
 }

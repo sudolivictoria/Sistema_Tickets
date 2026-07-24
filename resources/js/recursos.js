@@ -1,16 +1,12 @@
 /**
- * Manuales y Recursos 
+ * Manuales y Recursos  (NO ESTA EN USO)
  */
-
 window.categoriaActivaActual = "all"; //---------guarda de forma global qué filtro tiene el usuario
-
-
 document.addEventListener("DOMContentLoaded", function () {
     const modalVisor = document.getElementById("modalVisor");
     if (modalVisor) {
         document.body.appendChild(modalVisor);
     }
-
     //---Obtener el filtrado desde la URL al cargar---
     const params = new URLSearchParams(window.location.search);
     const catId = params.get("categoria");
@@ -21,7 +17,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 100);
     }
 });
-
 window.filtrar = function (catId, event) {
     window.categoriaActivaActual = catId; //---------Actualiza la categoría activa
     const tarjetas = document.querySelectorAll(".manual-card");
@@ -37,7 +32,6 @@ window.filtrar = function (catId, event) {
             tarjeta.style.display = "none";
         }
     });
-
     //---estilos de botones
     const botones = document.querySelectorAll(".filter-btn");
     botones.forEach((btn) => {
@@ -54,16 +48,13 @@ window.filtrar = function (catId, event) {
             "hover:text-[#04003B]",
         );
     });
-
     let botonActivo;
-
     //---Filtrado desde evento o url-----
     if (event && event.currentTarget) {
         botonActivo = event.currentTarget;
     } else {
         botonActivo = document.querySelector(`.filter-btn[data-id="${catId}"]`);
     }
-
     if (botonActivo) {
         botonActivo.classList.remove(
             "bg-white",
@@ -79,14 +70,12 @@ window.filtrar = function (catId, event) {
         );
     }
 };
-
 //----------------------Visor de manuales-------------------------
 window.abrirVisor = function (url, titulo = "Recurso") {
     const ext = url.split(".").pop().toLowerCase();
     const visor = document.getElementById("contenedor-visor");
     const tituloVisor = document.getElementById("visor-titulo");
     const iconoVisor = document.getElementById("visor-icono");
-
     //--detectar tipo de dispositivo
     const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -94,11 +83,9 @@ window.abrirVisor = function (url, titulo = "Recurso") {
     if (!visor) return;
 
     visor.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#04003B]"></div>`;
-
     //--cargar contenido----------
     if (ext === "pdf") {
         if (iconoVisor) iconoVisor.innerText = "picture_as_pdf";
-
         //--si es movil abre en pestaña nueva para evitar bloqueos
         if (esMovil) {
             window.open(url, "_blank");
@@ -129,7 +116,6 @@ window.abrirVisor = function (url, titulo = "Recurso") {
         document.body.style.overflow = "hidden"; //---bloquear el scroll de fondo
     }
 };
-
 window.cerrarVisor = function () {
     const modal = document.getElementById("modalVisor");
     const contenedor = document.getElementById("contenedor-visor");
@@ -146,7 +132,6 @@ window.cerrarVisor = function () {
         contenedor.innerHTML = "";
     }
 };
-
 //----Cerrar también presionando la tecla Escape por comodidad del usuario ---
 document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {

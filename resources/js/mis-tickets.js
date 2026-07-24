@@ -4,7 +4,6 @@ let ticketIdActual = null;
 let ticketEstadoActual = null;
 //----echo
 let canalEchoActual = null;
-
 /**
  * Inicializa DataTables
  * @param {string} selectorId
@@ -16,7 +15,6 @@ window.inicializarTablaTickets = function (selectorId) {
     if ($.fn.DataTable.isDataTable(selectorId)) {
         $(selectorId).DataTable().destroy();
     }
-
     $.fn.dataTable.ext.pager.numbers_length = 1;
     table = tableElement.DataTable({
         stateSave: false,
@@ -63,7 +61,6 @@ window.inicializarTablaTickets = function (selectorId) {
         .addClass("w-full")
         .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
 };
-
 //--------------------------LARAVEL ECHO REVERB------------------------
 window.escucharComentariosWebSocket = function (idTicket) {
     if (typeof Echo === "undefined") {
@@ -73,14 +70,17 @@ window.escucharComentariosWebSocket = function (idTicket) {
     window.desconectarComentariosWebSocket();
     canalEchoActual = idTicket;
     //---conexion dinamica del ticket
-    Echo.channel(`ticket.${idTicket}`)
-        .listen('.comentario.creado', (e) => { //--punto inicial
-            if (e && e.comentario) {
-                const esPrivado = e.comentario.es_privado == 1 || e.comentario.es_privado === true || e.comentario.es_privado === "true";
-                if (esPrivado) return;
-                window.agregarComentarioAlModal(e.comentario);
-            }
-        });
+    Echo.channel(`ticket.${idTicket}`).listen(".comentario.creado", (e) => {
+        //--punto inicial
+        if (e && e.comentario) {
+            const esPrivado =
+                e.comentario.es_privado == 1 ||
+                e.comentario.es_privado === true ||
+                e.comentario.es_privado === "true";
+            if (esPrivado) return;
+            window.agregarComentarioAlModal(e.comentario);
+        }
+    });
 };
 window.desconectarComentariosWebSocket = function () {
     if (typeof Echo !== "undefined" && canalEchoActual) {
@@ -88,7 +88,6 @@ window.desconectarComentariosWebSocket = function () {
         canalEchoActual = null;
     }
 };
-
 // =====================================================================
 //                         DETALLES E INICIALIZACION
 // =====================================================================
@@ -102,15 +101,83 @@ $(document).ready(function () {
             const tipo = $(this).data("tipo");
             const state = $(this).data("estado");
             const drive = $(this).data("drive");
-            const estadoNombre = $(this).data("estado"); 
-           
-            window.verDetalle(idTicket, asunto, descripcion, tipo, state, drive, estadoNombre);
+            const estadoNombre = $(this).data("estado");
+
+            window.verDetalle(
+                idTicket,
+                asunto,
+                descripcion,
+                tipo,
+                state,
+                drive,
+                estadoNombre,
+            );
         });
     //------------------AUTO REFRESCO-----------------
     const selectorTabla = "#tablaMisTickets";
     if ($(selectorTabla).length) {
         window.inicializarTablaTickets(selectorTabla);
     }
+    //-----evento Guardar Comentario (con .off() para prevenir peticiones dobles) NUEVO COMENTARIO----------
+    $(document)
+        .off("submit", "#form-comentario-modal")
+        .on("submit", "#form-comentario-modal", function (e) {
+            e.preventDefault();
+            if (!ticketIdActual) return;
+
+            const $inputContenido = $("#contenido-comentario");
+            const contenido = $inputContenido.val().trim();
+            if (contenido === "") return;
+
+            const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
+            const $btnSubmit = $(this).find('button[type="submit"]');
+            const textoOriginal = $btnSubmit.html();
+
+            $btnSubmit
+                .prop("disabled", true)
+                .addClass("opacity-75 cursor-not-allowed");
+            $btnSubmit.html(
+                '<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...',
+            );
+            $.ajax({
+                url: `/tickets/${ticketIdActual}/comentarios`,
+                method: "POST",
+                data: {
+                    _token:
+                        $('input[name="_token"]').val() ||
+                        $('meta[name="csrf-token"]').attr("content"),
+                    contenido: contenido,
+                    es_privado: esPrivado,
+                },
+            })
+                .done(function (response) {
+                    if (response.success || response.comentario) {
+                        $inputContenido.val("");
+                        if ($("#es_privado").length)
+                            $("#es_privado").prop("checked", false);
+                        const comentarioData = response.comentario || response;
+                        //---nota privada evitar que salgan para el usuario
+                        const esPrivado =
+                            comentarioData.es_privado == 1 ||
+                            comentarioData.es_privado === true ||
+                            comentarioData.es_privado === "true";
+                        if (esPrivado) return;
+                        window.agregarComentarioAlModal(comentarioData);
+                    }
+                })
+                .fail(function (err) {
+                    console.error("Error al guardar comentario:", err);
+                    alert(
+                        "Ocurrió un error al intentar publicar el comentario.",
+                    );
+                })
+                .always(function () {
+                    $btnSubmit
+                        .prop("disabled", false)
+                        .removeClass("opacity-75 cursor-not-allowed")
+                        .html(textoOriginal);
+                });
+        });
 });
 /****************** FILTROS ******************/
 window.filtrarEstado = function (estado, btn) {
@@ -128,7 +195,6 @@ window.filtrarEstado = function (estado, btn) {
         window.AutoRefresco.forzarRefresco();
     }
 };
-
 //=====================================================================
 //                     FUNCIONES MODALES
 //=====================================================================
@@ -139,8 +205,15 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
     if (!idTicket) return;
 
-    const estadosCerradosTextos = ["resuelto", "equivocado", "no corresponde", "cerrado"];
-    const estadoStr = String(estadoNombre || "").toLowerCase().trim();
+    const estadosCerradosTextos = [
+        "resuelto",
+        "equivocado",
+        "no corresponde",
+        "cerrado",
+    ];
+    const estadoStr = String(estadoNombre || "")
+        .toLowerCase()
+        .trim();
     const esCerradoPorTexto = estadosCerradosTextos.includes(estadoStr);
 
     if (esCerradoPorTexto) {
@@ -153,7 +226,7 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
             $lista.empty();
 
             const comentariosVisibles = (comentarios || []).filter(
-                (com) => !com.es_privado && com.es_privado != 1
+                (com) => !com.es_privado && com.es_privado != 1,
             );
 
             if (comentariosVisibles.length === 0) {
@@ -161,14 +234,14 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
                 $("#preloaderGlobalModal").addClass("hidden");
                 return;
             }
-
             $seccionHistorico.show();
 
             const fragment = document.createDocumentFragment();
 
             comentariosVisibles.forEach((com) => {
                 const item = document.createElement("div");
-                item.className = "p-2 rounded-xl border bg-white border-slate-200";
+                item.className =
+                    "p-2 rounded-xl border bg-white border-slate-200";
 
                 if (com.id) item.setAttribute("data-comentario-id", com.id);
 
@@ -181,7 +254,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
                 `;
                 fragment.appendChild(item);
             });
-
             $lista[0].appendChild(fragment);
             $lista.scrollTop($lista[0].scrollHeight);
         })
@@ -192,7 +264,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
             $("#preloaderGlobalModal").addClass("hidden");
         });
 };
-
 //---------------------------AGREGAR COMENTARIOS DINAMICAMENTE---------------------------
 window.agregarComentarioAlModal = function (comentario) {
     const $lista = $("#modalListaComentarios");
@@ -200,15 +271,23 @@ window.agregarComentarioAlModal = function (comentario) {
 
     if (!$lista.length) return;
     //----prevenir notas privadas
-    const esPrivado = comentario.es_privado == 1 || comentario.es_privado === true || comentario.es_privado === "true";
+    const esPrivado =
+        comentario.es_privado == 1 ||
+        comentario.es_privado === true ||
+        comentario.es_privado === "true";
     if (esPrivado) return;
     //----prevenir duplicados
-    if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
+    if (
+        comentario.id &&
+        $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0
+    ) {
         return;
     }
     $seccionHistorico.show();
 
-    const dataAttr = comentario.id ? `data-comentario-id="${comentario.id}"` : "";
+    const dataAttr = comentario.id
+        ? `data-comentario-id="${comentario.id}"`
+        : "";
 
     const elComentario = `
         <div ${dataAttr} class="p-2 rounded-xl border bg-white border-slate-200 transition-all duration-300">
@@ -219,13 +298,20 @@ window.agregarComentarioAlModal = function (comentario) {
             <p class="text-slate-600 font-medium">${comentario.contenido}</p>
         </div>
     `;
-
     $lista.append(elComentario);
     $lista.scrollTop($lista[0].scrollHeight);
 };
 
 //-------------------TICKET------------------
-window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, state, drive, estadoNombre) {
+window.verDetalle = function (
+    idTicket,
+    asunto,
+    descripcion,
+    tipoSolicitud,
+    state,
+    drive,
+    estadoNombre,
+) {
     ticketIdActual = idTicket;
     ticketEstadoActual = estadoNombre;
 
@@ -236,21 +322,9 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, stat
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
 
-    //**********PRELOADER GLOBAL*******************/
-    if (!document.getElementById("preloaderGlobalModal") && modal) {
-        const preloaderHTML = `
-            <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl">
-                <div class="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-3"></div>
-                <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
-            </div>`;
-        const contenedorInterno = modal.querySelector(".bg-white") || modal;
-        if (contenedorInterno) {
-            contenedorInterno.style.position = "relative"; //----POSICIONAMIENTO
-            $(contenedorInterno).prepend(preloaderHTML);
-        }
-    } else {
-        $("#preloaderGlobalModal").removeClass("hidden");
-    }
+    //************************************************/
+    //---preloader estatico
+    $("#preloaderGlobalModal").removeClass("hidden");
     //************************************************/
 
     if (modal && titulo && desc && tipo) {
@@ -263,7 +337,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, stat
         modal.classList.remove("hidden");
         document.body.style.overflow = "hidden";
     }
-
     //----IMAGEN DE EVIDENCIA---------
     if (drive && drive.trim() !== "" && drive !== "null") {
         const pathLimpio = drive.startsWith("/") ? drive.substring(1) : drive;
@@ -275,75 +348,25 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoSolicitud, stat
         if (linkAnchor) linkAnchor.href = "#";
         if (wrapper) wrapper.classList.add("hidden");
     }
-
     $("#contenido-comentario").val("");
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
     $("#modalListaComentarios").html(
         '<p class="text-center text-slate-400 py-2">Cargando comentarios...</p>',
     );
-    
     window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
-
-     //----conectar al canal en tiempo real
+    //----conectar al canal en tiempo real
     if (typeof window.escucharComentariosWebSocket === "function") {
         window.escucharComentariosWebSocket(ticketIdActual);
     }
 };
-
-//--------------NUEVO COMENTARIO---------------------
-$(document).on("submit", "#form-comentario-modal", function (e) {
-    e.preventDefault();
-    if (!ticketIdActual) return;
-
-    const $inputContenido = $("#contenido-comentario");
-    const contenido = $inputContenido.val().trim();
-    if (contenido === "") return;
-
-    const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
-    const $btnSubmit = $(this).find('button[type="submit"]');
-    const textoOriginal = $btnSubmit.html();
-
-    $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
-    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
-
-    $.ajax({
-        url: `/tickets/${ticketIdActual}/comentarios`,
-        method: "POST",
-        data: {
-            _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content'),
-            contenido: contenido,
-            es_privado: esPrivado,
-        },
-    })
-        .done(function (response) {
-            if (response.success || response.comentario) {
-                $inputContenido.val(""); 
-                if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-
-                const comentarioData = response.comentario || response;
-                //---nota privada evitar que salgan para el usuario
-               const esPrivado = comentarioData.es_privado == 1 || comentarioData.es_privado === true || comentarioData.es_privado === "true";
-               if (esPrivado) return;
-                window.agregarComentarioAlModal(comentarioData);
-            }
-        })
-        .fail(function (err) {
-            console.error("Error al guardar comentario:", err);
-            alert("Ocurrió un error al intentar publicar el comentario.");
-        })
-        .always(function () {
-            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
-        });
-});
-
-
+//-------------------CLOSE MODAL--------------------------------
 window.cerrarModal = function () {
     const modal = document.getElementById("modalTicket");
     if (modal) {
         modal.classList.add("hidden");
         document.body.style.overflow = "";
         ticketIdActual = null;
-         //----desconectar el canal del echo al cerrar
+        //----desconectar el canal del echo al cerrar
         if (typeof window.desconectarComentariosWebSocket === "function") {
             window.desconectarComentariosWebSocket();
         }

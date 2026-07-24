@@ -1,6 +1,6 @@
-// =============================================================
-// AUTO-REFRESCO EXCLUSIVO PARA TARJETAS DE RECURSOS (SSE)
-// =============================================================
+// ============================================================================
+// AUTO-REFRESCO EXCLUSIVO PARA TARJETAS DE RECURSOS (SSE) NO ESTA EN USO
+// ============================================================================
 const AutoRefrescoSSE = (() => {
     let evtSource = null;
     let isRefreshing = false;

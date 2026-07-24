@@ -10,6 +10,7 @@ class TipoSolicitud extends Model
 
     protected $fillable = ['nombre_tipo_solicitud', 'descripcion_solicitud', 'categoria_id'];
 
+    //*****relacion con categoria*****/
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id');

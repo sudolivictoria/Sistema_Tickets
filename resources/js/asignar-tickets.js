@@ -4,7 +4,7 @@ let ticketIdActual = null;
 let ticketEstadoActual = null;
 //---echo
 let canalEchoActual = null;
-
+//-------------------------------------------------------------------------------------------------------
 window.inicializarTablaTickets = function (
     selectorId,
     columnaOrden = 0,
@@ -12,12 +12,10 @@ window.inicializarTablaTickets = function (
 ) {
     const tableElement = $(selectorId);
     if (!tableElement.length) return;
-
     //---destruir instancia previa si existe para evitar conflictos
     if ($.fn.DataTable.isDataTable(selectorId)) {
         $(selectorId).DataTable().destroy();
     }
-
     //--configuración de idioma y opciones de DataTables
     $.fn.dataTable.ext.pager.numbers_length = 1;
     table = tableElement.DataTable({
@@ -53,18 +51,15 @@ window.inicializarTablaTickets = function (
         order: [[columnaOrden, sentido]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
-
     //---buscador
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
-
     //---ajuste tamaño de tabla
     const $wrapper = $(tableElement).closest(".dataTables_wrapper");
     $wrapper.addClass("relative w-full");
-    
     //--evita duplicar wrappers si la función se vuelve a invocar
     if (!$(tableElement).parent().hasClass("overflow-x-auto")) {
         $(tableElement)
@@ -72,7 +67,6 @@ window.inicializarTablaTickets = function (
             .wrap('<div class="w-full overflow-x-auto min-h-[400px]"></div>');
     }
 };
-
 //--------------------------LARAVEL ECHO REVERB------------------------
 window.escucharComentariosWebSocket = function (idTicket) {
     if (typeof Echo === "undefined") {
@@ -82,12 +76,12 @@ window.escucharComentariosWebSocket = function (idTicket) {
     window.desconectarComentariosWebSocket();
     canalEchoActual = idTicket;
     //---conexion dinamica del ticket
-    Echo.channel(`ticket.${idTicket}`)
-        .listen('.comentario.creado', (e) => { //--punto inicial
-            if (e && e.comentario) {
-                window.agregarComentarioAlModal(e.comentario);
-            }
-        });
+    Echo.channel(`ticket.${idTicket}`).listen(".comentario.creado", (e) => {
+        //--punto inicial
+        if (e && e.comentario) {
+            window.agregarComentarioAlModal(e.comentario);
+        }
+    });
 };
 window.desconectarComentariosWebSocket = function () {
     if (typeof Echo !== "undefined" && canalEchoActual) {
@@ -95,12 +89,11 @@ window.desconectarComentariosWebSocket = function () {
         canalEchoActual = null;
     }
 };
-
-
 // =====================================================================
 //                       DETALLES E INICIALIZACION
 // =====================================================================
 $(document).ready(function () {
+    //--------------------perfil ver detalle-------------------------
     $(document)
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
@@ -110,18 +103,27 @@ $(document).ready(function () {
             const descripcion = $btn.data("descripcion");
             const tipo = $btn.data("tipo");
             const drive = $btn.data("drive");
-            const estadoNombre = $btn.data("estado"); 
-            const estadoSLA = $btn.data("state");    
+            const estadoNombre = $btn.data("estado");
+            const estadoSLA = $btn.data("state");
 
             const datosSLA = {
                 estadoNombre: estadoNombre,
                 estadoSLA: estadoSLA,
-                fechaLimite: $btn.data("fecha-limite"),         
-                tiempoRespuesta: $btn.data("tiempo-respuesta"), 
+                fechaLimite: $btn.data("fecha-limite"),
+                tiempoRespuesta: $btn.data("tiempo-respuesta"),
             };
-
-            window.verDetalle(idTicket, asunto, descripcion, tipo, drive, estadoNombre, estadoSLA, datosSLA);
+            window.verDetalle(
+                idTicket,
+                asunto,
+                descripcion,
+                tipo,
+                drive,
+                estadoNombre,
+                estadoSLA,
+                datosSLA,
+            );
         });
+    //---------------------perfil usuario--------------------------
     $(document)
         .off("click", ".btn-ver-usuario")
         .on("click", ".btn-ver-usuario", function () {
@@ -139,9 +141,62 @@ $(document).ready(function () {
     if ($(selectorTabla).length) {
         window.inicializarTablaTickets(selectorTabla);
     }
-});
+    //--------------NUEVO COMENTARIO-------------------->
+    $(document)
+        .off("submit", "#form-comentario-modal")
+        .on("submit", "#form-comentario-modal", function (e) {
+            if (!ticketIdActual) return;
 
-//------------------------TIMER SLA-------------------------------------
+            const $inputContenido = $("#contenido-comentario");
+            const contenido = $inputContenido.val().trim();
+            if (contenido === "") return;
+
+            const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
+            const $btnSubmit = $(this).find('button[type="submit"]');
+            const textoOriginal = $btnSubmit.html();
+            //----------------------------------------------
+            $btnSubmit
+                .prop("disabled", true)
+                .addClass("opacity-75 cursor-not-allowed");
+            $btnSubmit.html(
+                '<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...',
+            );
+            $.ajax({
+                url: `/tickets/${ticketIdActual}/comentarios`,
+                method: "POST",
+                data: {
+                    _token:
+                        $('input[name="_token"]').val() ||
+                        $('meta[name="csrf-token"]').attr("content"),
+                    contenido: contenido,
+                    es_privado: esPrivado,
+                },
+            })
+                .done(function (response) {
+                    if (response.success || response.comentario) {
+                        $inputContenido.val("");
+                        if ($("#es_privado").length)
+                            $("#es_privado").prop("checked", false);
+
+                        const comentarioData = response.comentario || response;
+                        window.agregarComentarioAlModal(comentarioData);
+                    }
+                })
+                .fail(function (err) {
+                    console.error("Error al guardar comentario:", err);
+                    alert(
+                        "Ocurrió un error al intentar publicar el comentario.",
+                    );
+                })
+                .always(function () {
+                    $btnSubmit
+                        .prop("disabled", false)
+                        .removeClass("opacity-75 cursor-not-allowed")
+                        .html(textoOriginal);
+                });
+        });
+});
+//------------------------TIMER SLA------------------------------------->
 function iniciarContadorSLA(datosSLA) {
     if (timerSLA) clearInterval(timerSLA);
 
@@ -151,14 +206,16 @@ function iniciarContadorSLA(datosSLA) {
 
     const { estadoSLA, estadoNombre, fechaLimite, tiempoRespuesta } = datosSLA;
     const segundosTranscurridos = Number(tiempoRespuesta) || 0;
-    
-    const estadoCheck = String(estadoNombre || "").toLowerCase().trim();
-    const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
 
+    const estadoCheck = String(estadoNombre || "")
+        .toLowerCase()
+        .trim();
+    const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
     //-----ticket resuelto
     if (estadosCerrados.includes(estadoCheck) || segundosTranscurridos > 0) {
         wrapper.classList.remove("hidden");
-        wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+        wrapper.className =
+            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
 
         if (segundosTranscurridos === 0) {
             display.textContent = "Finalizado";
@@ -169,9 +226,12 @@ function iniciarContadorSLA(datosSLA) {
         const minutos = Math.floor((segundosTranscurridos % 3600) / 60);
         const segundos = segundosTranscurridos % 60;
 
-        if (dias > 0) display.textContent = `Respuesta: ${dias}d ${horas}h ${minutos}m`;
-        else if (horas > 0) display.textContent = `Respuesta: ${horas}h ${minutos}m`;
-        else if (minutos > 0) display.textContent = `Respuesta: ${minutos}m ${segundos}s`;
+        if (dias > 0)
+            display.textContent = `Respuesta: ${dias}d ${horas}h ${minutos}m`;
+        else if (horas > 0)
+            display.textContent = `Respuesta: ${horas}h ${minutos}m`;
+        else if (minutos > 0)
+            display.textContent = `Respuesta: ${minutos}m ${segundos}s`;
         else display.textContent = `Respuesta: ${segundos}s`;
 
         return;
@@ -187,21 +247,23 @@ function iniciarContadorSLA(datosSLA) {
 
     const tick = () => {
         const restante = limite - Date.now();
-
         //------vencido porque paso el tiempo correspondiente
         if (restante <= 0) {
             clearInterval(timerSLA);
             display.textContent = "Vencido";
-            wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
+            wrapper.className =
+                "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
             return;
         }
-        wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+        wrapper.className =
+            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
 
         const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
-        const horas = Math.floor((restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const horas = Math.floor(
+            (restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
         const minutos = Math.floor((restante % (1000 * 60 * 60)) / (1000 * 60));
         const segundos = Math.floor((restante % (1000 * 60)) / 1000);
-
         const pad = (num) => String(num).padStart(2, "0");
 
         if (dias > 0) {
@@ -217,7 +279,6 @@ function iniciarContadorSLA(datosSLA) {
     tick();
     timerSLA = setInterval(tick, 1000);
 }
-
 //=====================================================================
 //                     FUNCIONES MODALES
 //=====================================================================
@@ -228,8 +289,15 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
     if (!idTicket) return;
 
-    const estadosCerradosTextos = ["resuelto", "equivocado", "no corresponde", "cerrado"];
-    const estadoStr = String(estadoNombre || "").toLowerCase().trim();
+    const estadosCerradosTextos = [
+        "resuelto",
+        "equivocado",
+        "no corresponde",
+        "cerrado",
+    ];
+    const estadoStr = String(estadoNombre || "")
+        .toLowerCase()
+        .trim();
     const esCerradoPorTexto = estadosCerradosTextos.includes(estadoStr);
 
     if (esCerradoPorTexto) {
@@ -246,7 +314,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
                 $("#preloaderGlobalModal").addClass("hidden");
                 return;
             }
-
             $seccionHistorico.show();
 
             const fragment = document.createDocumentFragment();
@@ -283,7 +350,6 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
             $("#preloaderGlobalModal").addClass("hidden");
         });
 };
-
 //---------------------------AGREGAR COMENTARIOS DINAMICAMENTE---------------------------
 window.agregarComentarioAlModal = function (comentario) {
     const $lista = $("#modalListaComentarios");
@@ -291,16 +357,21 @@ window.agregarComentarioAlModal = function (comentario) {
 
     if (!$lista.length) return;
 
-    if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
+    if (
+        comentario.id &&
+        $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0
+    ) {
         return;
     }
     $seccionHistorico.show();
-    const dataAttr = comentario.id ? `data-comentario-id="${comentario.id}"` : "";
+    const dataAttr = comentario.id
+        ? `data-comentario-id="${comentario.id}"`
+        : "";
 
     const bg = comentario.es_privado
         ? "bg-lime-50 border-lime-200"
         : "bg-white border-slate-200";
-        
+
     const tag = comentario.es_privado
         ? '<span class="text-green-900 font-bold">[Nota Interna]</span> '
         : "";
@@ -317,9 +388,17 @@ window.agregarComentarioAlModal = function (comentario) {
     $lista.append(elComentario);
     $lista.scrollTop($lista[0].scrollHeight);
 };
-
 //-------------------TICKET------------------
-window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, drive, estadoNombre, estadoSLA, datosSLA = {}) {
+window.verDetalle = function (
+    idTicket,
+    asunto,
+    descripcion,
+    tipoNombre,
+    drive,
+    estadoNombre,
+    estadoSLA,
+    datosSLA = {},
+) {
     ticketIdActual = idTicket;
     ticketEstadoActual = estadoNombre;
 
@@ -330,22 +409,11 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, drive, 
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
 
-    //********** PRELOADER GLOBAL *******************/
-    if (modal && !document.getElementById("preloaderGlobalModal")) {
-        const preloaderHTML = `
-            <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl">
-                <div class="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-3"></div>
-                <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
-            </div>`;
-        const contenedorInterno = modal.querySelector(".bg-white") || modal;
-        if (contenedorInterno) {
-            contenedorInterno.style.position = "relative";
-            $(contenedorInterno).prepend(preloaderHTML);
-        }
-    } else {
-        $("#preloaderGlobalModal").removeClass("hidden");
-    }
-    //***************************************************/
+    //************************************************/
+    //---------------------preloader------------------
+    $("#preloaderGlobalModal").removeClass("hidden");
+    //************************************************/
+
     if (modal && titulo && desc && tipo) {
         titulo.textContent = asunto || "";
         desc.textContent = descripcion || "";
@@ -355,7 +423,9 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, drive, 
     }
     //----------------IMAGEN DE EVIDENCIA--------------
     if (drive && String(drive).trim() !== "" && drive !== "null") {
-        const pathLimpio = String(drive).startsWith("/") ? String(drive).substring(1) : drive;
+        const pathLimpio = String(drive).startsWith("/")
+            ? String(drive).substring(1)
+            : drive;
         const urlImagen = `${window.location.origin}/storage/${pathLimpio}`;
 
         if (linkAnchor) linkAnchor.href = urlImagen;
@@ -368,55 +438,12 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, drive, 
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
 
     window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
-    
     //----conectar al canal en tiempo real
     if (typeof window.escucharComentariosWebSocket === "function") {
         window.escucharComentariosWebSocket(ticketIdActual);
     }
     iniciarContadorSLA(datosSLA);
 };
-
-//--------------NUEVO COMENTARIO---------------------
-$(document).on("submit", "#form-comentario-modal", function (e) {
-    e.preventDefault();
-    if (!ticketIdActual) return;
-
-    const $inputContenido = $("#contenido-comentario");
-    const contenido = $inputContenido.val().trim();
-    if (contenido === "") return;
-
-    const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
-    const $btnSubmit = $(this).find('button[type="submit"]');
-    const textoOriginal = $btnSubmit.html();
-
-    $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
-    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
-    $.ajax({
-        url: `/tickets/${ticketIdActual}/comentarios`,
-        method: "POST",
-        data: {
-            _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content'),
-            contenido: contenido,
-            es_privado: esPrivado,
-        },
-    })
-        .done(function (response) {
-            if (response.success || response.comentario) {
-                $inputContenido.val(""); 
-                if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-
-                const comentarioData = response.comentario || response;
-                window.agregarComentarioAlModal(comentarioData);
-            }
-        })
-        .fail(function (err) {
-            console.error("Error al guardar comentario:", err);
-            alert("Ocurrió un error al intentar publicar el comentario.");
-        })
-        .always(function () {
-            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
-        });
-});
 
 /**
  * Cerrar modal
@@ -427,14 +454,13 @@ window.cerrarModal = function () {
         modal.classList.add("hidden");
         document.body.style.overflow = "auto";
         if (timerSLA) clearInterval(timerSLA);
-        ticketIdAcual = null;
+        ticketIdActual = null;
         //----desconectar el canal del echo al cerrar
         if (typeof window.desconectarComentariosWebSocket === "function") {
             window.desconectarComentariosWebSocket();
         }
     }
 };
-
 //------------------DETALLES USUARIOS-----------------
 window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const modal = document.getElementById("modalUsuario");
@@ -464,7 +490,6 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
         document.body.style.overflow = "hidden";
     }
 };
-
 //------------------CERRAR MODAL USUARIO-----------------
 window.cerrarModalUsuario = function () {
     const modal = document.getElementById("modalUsuario");
@@ -473,3 +498,64 @@ window.cerrarModalUsuario = function () {
         document.body.style.overflow = "auto";
     }
 };
+//-----------------ASIGNAR TÉCNICO VÍA AJAX----------------->
+$(document)
+    .off("change", ".select-tecnico-ajax")
+    .on("change", ".select-tecnico-ajax", function () {
+        const $select = $(this);
+        const ticketId = $select.data("id");
+        const tecnicoId = $select.val();
+        const url = $select.data("url") || `/admin/tickets/${ticketId}/tecnico`;
+        $select.prop("disabled", true).addClass("opacity-50");
+        $.ajax({
+            url: url,
+            method: "PATCH",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            data: { tecnico_id: tecnicoId },
+        })
+            .done(function (response) {
+                window.mostrarFlashMessages({ success: response.message });
+            })
+            .fail(function (xhr) {
+                const errorMsg =
+                    xhr.responseJSON?.message ||
+                    "Ocurrió un error al intentar asignar el técnico.";
+                window.mostrarFlashMessages({ error: errorMsg });
+            })
+            .always(function () {
+                $select.prop("disabled", false).removeClass("opacity-50");
+            });
+    });
+//------------------ACTUALIZAR PRIORIDAD VÍA AJAX----------------->
+$(document)
+    .off("change", ".select-prioridad-ajax")
+    .on("change", ".select-prioridad-ajax", function () {
+        const $select = $(this);
+        const ticketId = $select.data("id");
+        const prioridadId = $select.val();
+        const url =
+            $select.data("url") || `/admin/tickets/${ticketId}/prioridad`;
+        $select.prop("disabled", true).addClass("opacity-50");
+        $.ajax({
+            url: url,
+            method: "PATCH",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            data: { prioridad_id: prioridadId },
+        })
+            .done(function (response) {
+                window.mostrarFlashMessages({ success: response.message });
+            })
+            .fail(function (xhr) {
+                const errorMsg =
+                    xhr.responseJSON?.message ||
+                    "Ocurrió un error al actualizar la prioridad.";
+                window.mostrarFlashMessages({ error: errorMsg });
+            })
+            .always(function () {
+                $select.prop("disabled", false).removeClass("opacity-50");
+            });
+    });

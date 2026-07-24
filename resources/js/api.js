@@ -2,8 +2,13 @@
 // AUTO-REFRESCO UNIVERSAL POR WEBSOCKETS (REVERB)
 // ===================================================
 window.AutoRefresco = (() => {
+    //---indica si se esta refrescando para evitar llamadas en falso
     let isRefreshing = false;
-    //---bloquea refresco si el usuario esta trabajando
+
+    //*** 
+    // comprueba si el usuario esta interactuando
+    // devuelve true si hay modal abierto, busqueda activa
+    //***/
     function hayAccionEnCurso() {
         const modalAbierto = document.querySelector(
             ".modal:not(.hidden), #modalTicket:not(.hidden), #modalUsuario:not(.hidden), #modalAgregar:not(.hidden), #modalEditar:not(.hidden), .swal2-container:not(.hidden)",
@@ -20,6 +25,7 @@ window.AutoRefresco = (() => {
         );
     }
 
+    //-------atualiza un elemento DOM por id, usando textContent o innerHTML según sea necesario.
     function actualizarElemento(id, valor, esHTML = false) {
         const el = document.getElementById(id);
         if (!el || valor === undefined || valor === null) return;
@@ -27,7 +33,7 @@ window.AutoRefresco = (() => {
         else el.textContent = String(valor);
     }
 
-    //---procesamiento y rendimiento
+    //----procesa la tabla recibiendo nuevo html. Mantiene el estado de DataTables y evita refrescar si ya hay otro refresco en curso.
     function procesarTabla(htmlNuevo) {
         if (htmlNuevo === undefined || htmlNuevo === null || isRefreshing)
             return;
@@ -40,7 +46,10 @@ window.AutoRefresco = (() => {
             const tablaId = tablaElement.id;
             const tablaBody = tablaElement.querySelector("tbody");
             if (!tablaBody) return;
+
+            //-----no refresca la tabla de historial aquí; esa tabla tiene un manejo diferente.
             if (tablaId !== "tablaHistorial") {
+                //-----------si no existe DataTables o no es una tabla inicializada, reemplaza el tbody bruto.
                 if (
                     !window.$ ||
                     !$.fn.DataTable ||
@@ -49,20 +58,24 @@ window.AutoRefresco = (() => {
                     tablaBody.innerHTML = htmlNuevo;
                     return;
                 }
+
                 const $tabla = $(tablaElement);
                 let paginaActual = 0;
                 let buscadorTermino = "";
-                //---guarda estado actual y paginacion
+
+                //-------guarda la página actual y el término de búsqueda antes de destruir DataTables.
                 try {
                     const dtInstancia = $tabla.DataTable();
                     paginaActual = dtInstancia.page();
                     buscadorTermino = dtInstancia.search();
                 } catch (_) {}
-                //---destruccion limpia
+
+                //-----destruye la instancia DataTables para poder reemplazar el HTML.
                 try {
                     $tabla.DataTable().destroy();
                 } catch (_) {}
-                //----insercion html
+
+                //-----inserta el nuevo contenido HTML dentro del tbody.
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(
                     "<table>" + htmlNuevo + "</table>",
@@ -70,7 +83,8 @@ window.AutoRefresco = (() => {
                 );
                 const tbodyEl = doc.querySelector("tbody");
                 tablaBody.innerHTML = tbodyEl ? tbodyEl.innerHTML : "";
-                //----reinicializacion
+
+                //----re-inicializa la tabla con la función adecuada según el id.
                 if (
                     tablaId === "userTable" &&
                     typeof window.inicializarUserTable === "function"
@@ -81,7 +95,8 @@ window.AutoRefresco = (() => {
                 ) {
                     window.inicializarTablaTickets("#" + tablaId);
                 }
-                //---clases estaticas e inyección de estados DataTables
+
+                //----restaura el estado de búsqueda/paginación y aplica estilos.
                 try {
                     const dtNuevo = $tabla.DataTable();
                     if (buscadorTermino) {
@@ -104,7 +119,7 @@ window.AutoRefresco = (() => {
         }
     }
 
-    //---estilos paginacion
+    //-----estilos a los controles de paginacion
     function aplicarEstilosPaginacion() {
         const wrappers = document.querySelectorAll(".dataTables_wrapper");
         wrappers.forEach((wrap) => {
@@ -131,7 +146,7 @@ window.AutoRefresco = (() => {
         });
     }
 
-    //---estilos paginacion, reutilizable para cualquier conjunto de links
+    //-----estilos segun activo o desactivado
     function wrapperLinks(links) {
         links.forEach((btn) => {
             btn.removeAttribute("style");
@@ -166,7 +181,7 @@ window.AutoRefresco = (() => {
         });
     }
 
-    //---inicializacion y conexion
+    //------conexion en tiempo real y refersco automatico
     function iniciar() {
         detener();
         const tablaElement = document.querySelector(
@@ -179,7 +194,8 @@ window.AutoRefresco = (() => {
             tablaElement.id === "tablaHistorial"
                 ? "historial"
                 : tablaBody.getAttribute("data-tipo") || "dashboard";
-        //---deteccion filtrados
+
+        //-------determina que filtro esta activo
         let filtroEstado = "todos";
         const botonActivo = document.querySelector(
             '.filtro-btn.bg-secondary, .filtro-btn.active, [id="filtrosEstado"] .bg-secondary',
@@ -189,6 +205,9 @@ window.AutoRefresco = (() => {
         } else {
             filtroEstado = window.filtroSseActual || "todos";
         }
+
+        //-------si el filtro es múltiple y la tabla no es de asignados/dashboard/mis tickets,
+        //-------se fuerza a "cerrado" para evitar estados inválidos.
         if (
             filtroEstado.includes(",") &&
             tipoTabla !== "asignados" &&
@@ -198,7 +217,9 @@ window.AutoRefresco = (() => {
             filtroEstado = "cerrado";
         }
 
-        //==============================CONEXIÓN WEBSOCKETS (REVERB)====================================
+        //------------------------------------------------------------
+        //--------------------CONEXION ECHO---------------------------
+        //------------------------------------------------------------
         if (window.Echo) {
             window.Echo.channel("tickets-publicos").listen(
                 ".TicketActualizado",
@@ -214,7 +235,8 @@ window.AutoRefresco = (() => {
                                 return;
                             }
                             procesarTabla(data.html);
-                            //**********CONTADORES Y METRICAS******************/
+
+                            //-------actualiza los contadores y métricas que el servidor envía.
                             if (data.contadores) {
                                 actualizarElemento(
                                     "contador-abiertos",
@@ -289,6 +311,7 @@ window.AutoRefresco = (() => {
         }
     }
 
+    //---------------deja el canal de Echo cuando se detiene el auto-refresco.
     function detener() {
         if (window.Echo) {
             window.Echo.leaveChannel("tickets-publicos");
@@ -347,12 +370,14 @@ document.addEventListener("DOMContentLoaded", function () {
             window.AutoRefresco.aplicarEstilosPaginacion();
         });
     }
-    //---CONEXION EN TIEMPO REAL
+    //----inicia la conexión de auto-refresco cuando carga la página.
     window.AutoRefresco.iniciar();
 });
 window.addEventListener("beforeunload", () => {
     window.AutoRefresco.detener();
 });
+
+//-----cambia el estilo del filtro activo y fuerza un refresco manual.
 window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
     if (!elementoBoton) return;
     const contenedorFiltros = elementoBoton.closest("#filtrosEstado, .flex");
@@ -374,13 +399,13 @@ window.cambiarFiltroSistema = function (estadoObjetivo, elementoBoton) {
         "text-white",
         "shadow-md",
     );
-    //---ESTADO E INICIAR
+    //----actualiza el filtro global y fuerza un refresco.
     window.filtroSseActual = estadoObjetivo;
     window.AutoRefresco.forzarRefresco();
 };
 
 window.filtroSseActual = "todos";
-//---MANEJA CUALQUIER FILTRO
+//---maneja botones de filtro, guarda el estado y refresca.
 document.addEventListener("click", function (event) {
     const boton = event.target.closest(
         '.filtro-btn, [onclick*="filtrarEstado"]',
@@ -388,7 +413,7 @@ document.addEventListener("click", function (event) {
     if (boton) {
         const estado = boton.getAttribute("data-estado") || "todos";
         window.filtroSseActual = estado;
-        //--EVITA LLAMADA EN FALSO
+        //----retraso para evitar triggers en falso
         setTimeout(() => {
             if (typeof window.AutoRefresco !== "undefined") {
                 window.AutoRefresco.forzarRefresco();

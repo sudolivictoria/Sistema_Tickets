@@ -10,5 +10,4 @@ class Unidad extends Model
 protected $table = 'unidades';
 
 protected $fillable = ['nombre_unidad'];
-    //
 }

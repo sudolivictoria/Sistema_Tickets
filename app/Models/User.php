@@ -13,7 +13,7 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    // Campos que se pueden llenar masivamente
+    //-----campos que se llenan masivamente
 
     protected $table = 'users';
     protected $fillable = [
@@ -33,11 +33,13 @@ class User extends Authenticatable
     ];
 
  
+    //-----------password
     public function getAuthPassword()
     {
         return $this->password;
     }
 
+    //-----------email
     public function getEmailAttribute($value)
     {
         return $value ?? $this->attributes['email'] ?? null;
@@ -51,11 +53,13 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class, 'rol_id');
     }
 
+    //---------unidad a la que pertenece el usuario
     public function unidad(): BelongsTo
     {
         return $this->belongsTo(Unidad::class, 'unidad_id');
     }
 
+    //------metodo para identificar el rol
     public function tieneRol($rolNombre)
     {
         return $this->rol && $this->rol->nombre_rol === $rolNombre;

@@ -14,11 +14,13 @@ use Throwable;
 
 class ApiTableController extends Controller
 {
+    //------------LIMITACIONES-----------
     private const TIPOS_VALIDOS = ['dashboard', 'usuario', 'asignar', 'mis_tickets', 'mis_asignados', 'historial'];
     private const TIPOS_SOLO_CONTENIDO = ['recursos'];
     private const TIPOS_SOLO_STAFF = ['dashboard', 'asignar', 'historial', 'mis_asignados'];
     private const ESTADOS_CERRADOS = [3, 4, 5];
 
+    //-----------------METODO REFRESH----------------
     public function refresh(Request $request): JsonResponse
     {
         $user = Auth::user();
@@ -49,12 +51,12 @@ class ApiTableController extends Controller
             $estadoFiltro = strtolower(trim((string) $request->query('estado', 'todos')));
 
             // =================================
-            //    QUERY EXACTA PARA LA TABLA
+            //          QUERY TABLA
             // =================================
             $queryTickets = Ticket::with(['user.unidad', 'estado', 'prioridad', 'tecnico', 'tipo_solicitud', 'categoria']);
 
             $this->aplicarFiltrosTabla($queryTickets, $user, $tipo, $miUnidadId, $estadoFiltro);
-
+            //----Dashboard usuario solo 5 registros
             $limit = ($tipo === 'usuario') ? 5 : null;
             $ticketsResult = $limit
                 ? $queryTickets->latest()->take($limit)->get()
@@ -68,21 +70,22 @@ class ApiTableController extends Controller
             // =========================================================
             //    GRÁFICOS Y MÉTRICAS EXTRA (SÓLO SI CORRESPONDE)
             // =========================================================
+            //----grafico
             $añoActual = (int) date('Y');
             $graficoHtml = ($user->rol_id != 2 && $tipo === 'dashboard') ? $this->generarGrafico($miUnidadId, $añoActual) : null;
             $contadorMisAsignados = Ticket::where('tecnico_id', $user->id)->where('estado_id', 2)->count();
-
+            //----carga de trabajo
             [$cargaTrabajo, $resueltos24h, $tasaCierre] = ($tipo === 'historial')
                 ? $this->calcularMetricasHistorial($user, $miUnidadId, $añoActual)
                 : [0, 0, 0];
-
+        
             $estadosCerrados = [3, 4, 5];
             $queryPrioridades = Ticket::whereNotIn('estado_id', $estadosCerrados);
 
             if ($miUnidadId) {
                 $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
             }
-
+            //-------prioridades 
             $prioridades = [
                 'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
                 'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
@@ -90,7 +93,7 @@ class ApiTableController extends Controller
                 'baja'    => (clone $queryPrioridades)->where('prioridad_id', 4)->count(),
             ];
 
-
+            //-----------RESPUESTA JSON----------
             return response()->json([
                 'html'              => $this->renderizarVista($tipo, $ticketsResult, $miUnidadId),
                 'contadores'        => $contadores,
@@ -108,7 +111,7 @@ class ApiTableController extends Controller
     }
 
     /**
-     * Filtros de tablas extraídos fielmente de la estructura de tus controladores
+     * Filtros de estados                                                                                                                                                                STADOS para las tablas
      */
     private function aplicarFiltrosTabla($query, $user, string $tipo, $miUnidadId, string $estadoFiltro): void
     {
@@ -116,10 +119,10 @@ class ApiTableController extends Controller
         if ($tipo === 'usuario' || $tipo === 'mis_tickets') {
             $query->where('user_id', $user->id); //-----encapsula la consulta al usuario autenticado (Cliente, Admin o Gestor por igual)
 
+            //----Filtros para estados-----------
             if ($estadoFiltro === 'todos' || $estadoFiltro === '') {
                 return;
             }
-
             if ($estadoFiltro === 'resuelto,equivocado,no corresponde' || $estadoFiltro === 'cerrado') {
                 $query->whereIn('estado_id', self::ESTADOS_CERRADOS);
             } else {
@@ -194,7 +197,7 @@ class ApiTableController extends Controller
                     ->whereYear('created_at', date('Y'))->count(),
             ];
         }
-
+        //---contadores estados
         $queryAbiertos = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
         $queryProceso = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
         $queryResueltos = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
@@ -208,7 +211,7 @@ class ApiTableController extends Controller
             $queryProceso->whereHas('categoria', $filterUnidad);
             $queryResueltos->whereHas('categoria', $filterUnidad);
         }
-
+        //---estados
         return [
             'abiertos'  => $queryAbiertos->count(),
             'proceso'   => $queryProceso->count(),
@@ -258,7 +261,7 @@ class ApiTableController extends Controller
             $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
         }
         $tickets = $query->get(['id', 'estado_id', 'created_at', 'fecha_cierre']);
-
+        //---metricas
         $cargaTrabajo = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isToday())->count();
         $resueltos24h = $tickets->whereIn('estado_id', self::ESTADOS_CERRADOS)
             ->filter(fn($t) => $t->fecha_cierre && Carbon::parse($t->fecha_cierre)->gte(now()->subDay()))
@@ -279,6 +282,7 @@ class ApiTableController extends Controller
             $tecnicos = User::where('unidad_id', $miUnidadId)->where('activo', true)->get();
         }
 
+        //---------renderiza segun el tipo de vista
         return match ($tipo) {
             'dashboard'     => view('partials.filas_dashboard', ['todosLosTickets' => $ticketsResult])->render(),
             'usuario'       => view('partials.filas_usuario', ['todosLosTickets' => $ticketsResult])->render(),

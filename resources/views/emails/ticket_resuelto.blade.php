@@ -8,7 +8,7 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: #1e293b;
-            background-color: #f1f5f9;
+            background-color: #cadef1;
             margin: 0;
             padding: 0;
         }

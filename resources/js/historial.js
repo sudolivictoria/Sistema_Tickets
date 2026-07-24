@@ -42,29 +42,29 @@ window.inicializarHistorialDataTable = function () {
         order: [[0, "desc"]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
-//--------------------------LARAVEL ECHO REVERB------------------------
-window.escucharComentariosWebSocket = function (idTicket) {
-    if (typeof Echo === "undefined") {
-        console.warn("[Reverb] Echo no está inicializado globalmente.");
-        return;
-    }
-    window.desconectarComentariosWebSocket();
-    canalEchoActual = idTicket;
-    //---conexion dinamica del ticket
-    Echo.channel(`ticket.${idTicket}`)
-        .listen('.comentario.creado', (e) => { //--punto inicial
+    //--------------------------LARAVEL ECHO REVERB------------------------
+    window.escucharComentariosWebSocket = function (idTicket) {
+        if (typeof Echo === "undefined") {
+            console.warn("[Reverb] Echo no está inicializado globalmente.");
+            return;
+        }
+        window.desconectarComentariosWebSocket();
+        canalEchoActual = idTicket;
+        //---conexion dinamica del ticket
+        Echo.channel(`ticket.${idTicket}`).listen(".comentario.creado", (e) => {
+            //--punto inicial
             if (e && e.comentario) {
                 window.agregarComentarioAlModal(e.comentario);
             }
         });
-};
-window.desconectarComentariosWebSocket = function () {
-    if (typeof Echo !== "undefined" && canalEchoActual) {
-        Echo.leaveChannel(`ticket.${canalEchoActual}`);
-        canalEchoActual = null;
-    }
-};
-//---------------------MANEJO DE EVENTOS E INICIALIZACION------------------
+    };
+    window.desconectarComentariosWebSocket = function () {
+        if (typeof Echo !== "undefined" && canalEchoActual) {
+            Echo.leaveChannel(`ticket.${canalEchoActual}`);
+            canalEchoActual = null;
+        }
+    };
+    //---------------------MANEJO DE EVENTOS E INICIALIZACION------------------
     $("#tablaHistorial")
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
@@ -82,8 +82,19 @@ window.desconectarComentariosWebSocket = function () {
                 fechaLimite: $(this).data("fecha-limite"),
                 tiempoRespuesta: $(this).data("tiempo-respuesta"),
             };
-            verDetalle(idTicket,asunto,descripcion,tipo,fecha,drive,estadoNombre,estadoSLA,datosSLA,);
+            verDetalle(
+                idTicket,
+                asunto,
+                descripcion,
+                tipo,
+                fecha,
+                drive,
+                estadoNombre,
+                estadoSLA,
+                datosSLA,
+            );
         });
+    //----------------PERFIL USUARIO
     $("#tablaHistorial")
         .off("click", ".btn-ver-usuario")
         .on("click", ".btn-ver-usuario", function () {
@@ -96,7 +107,60 @@ window.desconectarComentariosWebSocket = function () {
         });
     tableHistorial.draw();
 };
-//----------filtros
+//-----evento Guardar Comentario (con .off() para prevenir peticiones dobles) NUEVO COMENTARIO----------
+$(document)
+    .off("submit", "#form-comentario-modal")
+    .on("submit", "#form-comentario-modal", function (e) {
+        e.preventDefault();
+        if (!ticketIdActual) return;
+
+        const $inputContenido = $("#contenido-comentario");
+        const contenido = $inputContenido.val().trim();
+        if (contenido === "") return;
+
+        const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
+        const $btnSubmit = $(this).find('button[type="submit"]');
+        const textoOriginal = $btnSubmit.html();
+
+        $btnSubmit
+            .prop("disabled", true)
+            .addClass("opacity-75 cursor-not-allowed");
+        $btnSubmit.html(
+            '<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...',
+        );
+        $.ajax({
+            url: `/tickets/${ticketIdActual}/comentarios`,
+            method: "POST",
+            data: {
+                _token:
+                    $('input[name="_token"]').val() ||
+                    $('meta[name="csrf-token"]').attr("content"),
+                contenido: contenido,
+                es_privado: esPrivado,
+            },
+        })
+            .done(function (response) {
+                if (response.success || response.comentario) {
+                    $inputContenido.val("");
+                    if ($("#es_privado").length)
+                        $("#es_privado").prop("checked", false);
+
+                    const comentarioData = response.comentario || response;
+                    window.agregarComentarioAlModal(comentarioData);
+                }
+            })
+            .fail(function (err) {
+                console.error("Error al guardar comentario:", err);
+                alert("Ocurrió un error al intentar publicar el comentario.");
+            })
+            .always(function () {
+                $btnSubmit
+                    .prop("disabled", false)
+                    .removeClass("opacity-75 cursor-not-allowed")
+                    .html(textoOriginal);
+            });
+    });
+//----------filtros PARA HISTORIAL
 window.aplicarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     const textoBuscar = document.getElementById("filtroBuscar").value.trim();
@@ -106,9 +170,15 @@ window.aplicarFiltrosHistorial = function () {
     const categoria = document.getElementById("filtroCategoria")
         ? document.getElementById("filtroCategoria").value
         : "todos";
+    //--------------------------------VALIDACIONES------------------------------
     //------validar si todos los parámetros están en su estado vacío por defecto
     if (
-        !textoBuscar && !fechaInicio && !fechaFin && estado === "todos" && categoria === "todos") {
+        !textoBuscar &&
+        !fechaInicio &&
+        !fechaFin &&
+        estado === "todos" &&
+        categoria === "todos"
+    ) {
         Swal.fire({
             title: "¡Búsqueda muy amplia!",
             text: "Para proteger el rendimiento del sistema, debe seleccionar al menos un filtro específico.",
@@ -117,7 +187,7 @@ window.aplicarFiltrosHistorial = function () {
             confirmButtonText: "Entendido",
             confirmButtonColor: "#04003B",
             customClass: {
-                popup: "rounded-3xl p-6", 
+                popup: "rounded-3xl p-6",
                 confirmButton: "rounded-xl px-5 py-2.5 font-bold",
                 cancelButton: "rounded-xl px-5 py-2.5 font-bold",
             },
@@ -134,14 +204,14 @@ window.aplicarFiltrosHistorial = function () {
             confirmButtonText: "Completar rango",
             confirmButtonColor: "#04003B",
             customClass: {
-                popup: "rounded-3xl p-6", 
+                popup: "rounded-3xl p-6",
                 confirmButton: "rounded-xl px-5 py-2.5 font-bold",
                 cancelButton: "rounded-xl px-5 py-2.5 font-bold",
             },
         });
         return;
     }
-    //------rango de fechas, complete ambos campos
+    //------rango de fechas, fecha valida
     if (fechaInicio > fechaFin) {
         Swal.fire({
             title: "Rango de fechas incorrecto",
@@ -151,7 +221,7 @@ window.aplicarFiltrosHistorial = function () {
             confirmButtonText: "Completar rango",
             confirmButtonColor: "#04003B",
             customClass: {
-                popup: "rounded-3xl p-6", 
+                popup: "rounded-3xl p-6",
                 confirmButton: "rounded-xl px-5 py-2.5 font-bold",
                 cancelButton: "rounded-xl px-5 py-2.5 font-bold",
             },
@@ -167,19 +237,19 @@ window.limpiarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     filtrosAplicados = false;
     const elBuscar = document.getElementById("filtroBuscar");
-   
+
     if (elBuscar) elBuscar.value = "";
     const elFechaInicio = document.getElementById("filtroFechaInicio");
-    
+
     if (elFechaInicio) elFechaInicio.value = "";
     const elFechaFin = document.getElementById("filtroFechaFin");
-   
+
     if (elFechaFin) elFechaFin.value = "";
     const elEstado = document.getElementById("filtroEstado");
-    
+
     if (elEstado) elEstado.value = "todos";
     const elCategoria = document.getElementById("filtroCategoria");
-    
+
     if (elCategoria) elCategoria.value = "todos";
     tableHistorial.search("").draw();
 };
@@ -194,7 +264,7 @@ window.exportarHistorial = function (formato) {
             confirmButtonText: "Entendido",
             confirmButtonColor: "#04003B",
             customClass: {
-                popup: "rounded-3xl p-6", 
+                popup: "rounded-3xl p-6",
                 confirmButton: "rounded-xl px-5 py-2.5 font-bold",
                 cancelButton: "rounded-xl px-5 py-2.5 font-bold",
             },
@@ -228,18 +298,21 @@ function iniciarContadorSLA(datosSLA) {
     if (timerSLA) clearInterval(timerSLA);
     const wrapper = document.getElementById("wrapperCountdown");
     const display = document.getElementById("modalCountdown");
-    
+
     if (!wrapper || !display) return;
-   
+
     const { estadoSLA, estadoNombre, fechaLimite, tiempoRespuesta } = datosSLA;
     const segundosTranscurridos = Number(tiempoRespuesta) || 0;
-    const estadoCheck = String(estadoNombre || "").toLowerCase().trim();
+    const estadoCheck = String(estadoNombre || "")
+        .toLowerCase()
+        .trim();
     const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
     //-----ticket resuelto
     if (estadosCerrados.includes(estadoCheck) || segundosTranscurridos > 0) {
         wrapper.classList.remove("hidden");
-        wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
-        
+        wrapper.className =
+            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+
         if (segundosTranscurridos === 0) {
             display.textContent = "Finalizado";
             return;
@@ -248,10 +321,13 @@ function iniciarContadorSLA(datosSLA) {
         const horas = Math.floor((segundosTranscurridos % 86400) / 3600);
         const minutos = Math.floor((segundosTranscurridos % 3600) / 60);
         const segundos = segundosTranscurridos % 60;
-        
-        if (dias > 0) display.textContent = `Respuesta: ${dias}d ${horas}h ${minutos}m`;
-        else if (horas > 0) display.textContent = `Respuesta: ${horas}h ${minutos}m`;
-        else if (minutos > 0) display.textContent = `Respuesta: ${minutos}m ${segundos}s`;
+
+        if (dias > 0)
+            display.textContent = `Respuesta: ${dias}d ${horas}h ${minutos}m`;
+        else if (horas > 0)
+            display.textContent = `Respuesta: ${horas}h ${minutos}m`;
+        else if (minutos > 0)
+            display.textContent = `Respuesta: ${minutos}m ${segundos}s`;
         else display.textContent = `Respuesta: ${segundos}s`;
         return;
     }
@@ -269,12 +345,16 @@ function iniciarContadorSLA(datosSLA) {
         if (restante <= 0) {
             clearInterval(timerSLA);
             display.textContent = "Vencido";
-            wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
+            wrapper.className =
+                "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
             return;
         }
-        wrapper.className = "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+        wrapper.className =
+            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
         const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
-        const horas = Math.floor((restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const horas = Math.floor(
+            (restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
         const minutos = Math.floor((restante % (1000 * 60 * 60)) / (1000 * 60));
         const segundos = Math.floor((restante % (1000 * 60)) / 1000);
         const pad = (num) => String(num).padStart(2, "0");
@@ -298,12 +378,19 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
     const $formularioComentario = $("#form-comentario-modal");
-   
+
     if (!idTicket) return;
-    const estadosCerradosTextos = ["resuelto", "equivocado", "no corresponde", "cerrado"];
-    const estadoStr = String(estadoNombre || "").toLowerCase().trim();
+    const estadosCerradosTextos = [
+        "resuelto",
+        "equivocado",
+        "no corresponde",
+        "cerrado",
+    ];
+    const estadoStr = String(estadoNombre || "")
+        .toLowerCase()
+        .trim();
     const esCerradoPorTexto = estadosCerradosTextos.includes(estadoStr);
-    
+
     if (esCerradoPorTexto) {
         $formularioComentario.hide();
     } else {
@@ -355,12 +442,17 @@ window.agregarComentarioAlModal = function (comentario) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
     if (!$lista.length) return;
-    if (comentario.id && $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0) {
+    if (
+        comentario.id &&
+        $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0
+    ) {
         return;
     }
     $seccionHistorico.show();
 
-    const dataAttr = comentario.id ? `data-comentario-id="${comentario.id}"` : "";
+    const dataAttr = comentario.id
+        ? `data-comentario-id="${comentario.id}"`
+        : "";
 
     const bg = comentario.es_privado
         ? "bg-lime-50 border-lime-200"
@@ -383,7 +475,17 @@ window.agregarComentarioAlModal = function (comentario) {
     $lista.scrollTop($lista[0].scrollHeight);
 };
 //-------------------TICKET------------------
-window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaApertura, drive, estadoNombre, estadoSLA, datosSLA = {}) {
+window.verDetalle = function (
+    idTicket,
+    asunto,
+    descripcion,
+    tipoNombre,
+    fechaApertura,
+    drive,
+    estadoNombre,
+    estadoSLA,
+    datosSLA = {},
+) {
     ticketIdActual = idTicket;
     ticketEstadoActual = estadoNombre;
     const modal = document.getElementById("modalTicket");
@@ -393,22 +495,11 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     const fecha = document.getElementById("modalFechaApertura");
     const wrapper = document.getElementById("wrapperDriveLink");
     const linkAnchor = document.getElementById("modalDriveLink");
+
     //**********PRELOADER GLOBAL*******************/
-    if (!document.getElementById("preloaderGlobalModal") && modal) {
-        const preloaderHTML = `
-            <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl">
-                <div class="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-3"></div>
-                <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
-            </div>`;
-        const contenedorInterno = modal.querySelector(".bg-white") || modal;
-        if (contenedorInterno) {
-            contenedorInterno.style.position = "relative"; //----POSICIONAMIENTO
-            $(contenedorInterno).prepend(preloaderHTML);
-        }
-    } else {
-        $("#preloaderGlobalModal").removeClass("hidden");
-    }
+    $("#preloaderGlobalModal").removeClass("hidden");
     //************************************************/
+
     if (modal && titulo && desc && tipo) {
         titulo.textContent = asunto;
         desc.textContent = descripcion;
@@ -431,7 +522,7 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     }
     $("#contenido-comentario").val("");
     if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-    
+
     window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
     //----conectar al canal en tiempo real
     if (typeof window.escucharComentariosWebSocket === "function") {
@@ -439,46 +530,6 @@ window.verDetalle = function (idTicket, asunto, descripcion, tipoNombre, fechaAp
     }
     iniciarContadorSLA(datosSLA);
 };
-//--------------NUEVO COMENTARIO---------------------
-$(document).on("submit", "#form-comentario-modal", function (e) {
-    e.preventDefault();
-    if (!ticketIdActual) return;
-
-    const $inputContenido = $("#contenido-comentario");
-    const contenido = $inputContenido.val().trim();
-    if (contenido === "") return;
-
-    const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
-    const $btnSubmit = $(this).find('button[type="submit"]');
-    const textoOriginal = $btnSubmit.html();
-
-    $btnSubmit.prop("disabled", true).addClass("opacity-75 cursor-not-allowed");
-    $btnSubmit.html('<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...');
-    $.ajax({
-        url: `/tickets/${ticketIdActual}/comentarios`,
-        method: "POST",
-        data: {
-            _token: $('input[name="_token"]').val() || $('meta[name="csrf-token"]').attr('content'),
-            contenido: contenido,
-            es_privado: esPrivado,
-        },
-    })
-        .done(function (response) {
-            if (response.success || response.comentario) {
-                $inputContenido.val(""); 
-                if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-                const comentarioData = response.comentario || response;
-                window.agregarComentarioAlModal(comentarioData);
-            }
-        })
-        .fail(function (err) {
-            console.error("Error al guardar comentario:", err);
-            alert("Ocurrió un error al intentar publicar el comentario.");
-        })
-        .always(function () {
-            $btnSubmit.prop("disabled", false).removeClass("opacity-75 cursor-not-allowed").html(textoOriginal);
-        });
-});
 //-----------cerrar
 window.cerrarModal = function () {
     const modal = document.getElementById("modalTicket");
@@ -509,9 +560,10 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
         departamento.textContent = unidad || "---";
         puesto.textContent = cargo || "---";
         contacto.textContent = telefono || "---";
+
         //--------------gmail----------------------
         if (email && email !== "---") {
-            elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=Consulta sobre su Ticket&body=Hola ${name},`;
+            elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent("Consulta sobre su Ticket")}&body=${encodeURIComponent(`Hola ${name || ""},`)}`;
             elLinkCorreo.classList.remove("opacity-50", "pointer-events-none");
         } else {
             elLinkCorreo.href = "javascript:void(0)";
@@ -521,6 +573,7 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
         document.body.style.overflow = "hidden";
     }
 };
+//-------------------CLOSE
 window.cerrarModalUsuario = function () {
     const modal = document.getElementById("modalUsuario");
     if (modal) {

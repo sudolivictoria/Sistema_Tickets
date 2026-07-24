@@ -11,24 +11,23 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    //-----------------ACTIVAR Y DESACTIVAR USUARIOS METHOD------------------------------
     public function toggleStatus(int $id)
     {
-
         //---busca el usuario por su ID
         $user = User::findOrFail($id);
 
         if ($user->id === Auth::id()) {
             return redirect()->route('admin.gestion-usuarios')->with('error', 'No puedes desactivar tu propia cuenta.');
         }
-
         //---cambia el estado del usuario (activo/inactivo)
         $user->activo = !$user->activo;
-
         //--guarda el cambio en la base de datos
         $user->save();
         return redirect()->route('admin.gestion-usuarios')->with('success', 'El estado del usuario ha sido actualizado.');
     }
 
+    //---------------------------------------------------------------------------------------
     public function index()
     {
         $usuarios = User::with(['rol', 'unidad'])->get();
@@ -37,6 +36,7 @@ class UserController extends Controller
         return view('admin.gestion-usuarios', compact('usuarios', 'roles', 'unidades'));
     }
 
+    //------------------------CREAR USER-------------------------------------------------
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -69,7 +69,7 @@ class UserController extends Controller
     }
 
 
-
+    //------------------UPDATE USER------------------------------------------------------------
     public function update(Request $request, int $id)
     {
         $user = User::findOrFail($id);

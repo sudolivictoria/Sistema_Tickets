@@ -266,7 +266,7 @@
 @endsection
 
 @push('page-scripts')
-@vite(['resources/js/admin.js'])
+@vite(['resources/js/dashboard.js'])
 @endpush
 
 @push('sse-scripts')

@@ -22,6 +22,7 @@ class ComentarioCreado implements ShouldBroadcast
         $this->comentario = $comentario->load('user');
     }
 
+    //----channel for comments
     public function broadcastOn()
     {
         return new Channel('ticket.' . $this->comentario->ticket_id);

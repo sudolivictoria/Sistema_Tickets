@@ -458,8 +458,7 @@
                                 {{ $ticket->fecha_cierre ? date('d/m/Y', strtotime($ticket->fecha_cierre)) : '-------' }}
                             </td>
                             <td width="33%">
-                                <span class="dates-label">TIEMPO DE RESPUESTA:</span>
-                                <span class="info-value">{{ $ticket->tiempo_respuesta }} s</span>
+                                <span class="dates-label">TIEMPO DE RESPUESTA:</span> {{ $ticket->tiempo_respuesta_formateado }}
                             </td>
                         </tr>
                     </table>

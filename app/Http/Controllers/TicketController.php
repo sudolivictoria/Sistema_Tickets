@@ -15,11 +15,12 @@ use Illuminate\Support\Facades\Mail;
 
 class TicketController extends Controller
 {
+    //-----------METODOS DE RESOLUCION DE TICKETS----------------------
     public function resolver(Request $request, $id)
     {
         $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
         $ahora = Carbon::now();
-
+        //----TICKET RESOLUCION (VENCIDO O CUMPLIDO)
         $estadoSla = 'vencido';
         if ($ticket->fecha_vencimiento_sla && $ahora->lessThanOrEqualTo($ticket->fecha_vencimiento_sla)) {
             $estadoSla = 'cumplido';
@@ -53,7 +54,7 @@ class TicketController extends Controller
 
         $mensaje = 'Ticket marcado como resuelto el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
-        //--- ENVIAR EL CORREO ---
+        //--------ENVIO DE CORREOS----------
         try {
             Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket, $comentarioCierreTexto));
         } catch (\Exception $e) {
@@ -68,6 +69,7 @@ class TicketController extends Controller
         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 
+    //---------------------------------------------------------------------------------------
     public function equivocacion(Request $request, $id)
     {
         $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
@@ -82,7 +84,7 @@ class TicketController extends Controller
 
         $comentarioCierreTexto = null;
 
-        //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
+        //---GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO---
         if ($request->filled('comentario_cierre')) {
             $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
             $comentario = Comentario::create([
@@ -101,6 +103,7 @@ class TicketController extends Controller
 
         $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
+        //-------------ENVIO DE CORREO----------------
         try {
             Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket, $comentarioCierreTexto));
         } catch (\Exception $e) {
@@ -115,6 +118,7 @@ class TicketController extends Controller
         return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 
+    //----------------------------------------------------------------------------------------------------
     public function nocorresponde(Request $request, $id)
     {
         $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
@@ -129,7 +133,7 @@ class TicketController extends Controller
 
         $comentarioCierreTexto = null;
 
-        //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
+        //---GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO---
         if ($request->filled('comentario_cierre')) {
             $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
             $comentario = Comentario::create([
@@ -148,6 +152,7 @@ class TicketController extends Controller
 
         $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
 
+        //---------------------------ENNVIO DE CORREOS---------------------------------------
         try {
             Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket, $comentarioCierreTexto));
         } catch (\Exception $e) {

@@ -10,6 +10,7 @@ class NotificacionTicketMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    //--------------DECLARACION VARIABLES---------------------------------------------
     public $asuntoCorreo;
     public $titulo;
     public $subtitulo;
@@ -21,6 +22,7 @@ class NotificacionTicketMail extends Mailable
     public $nombreUsuario;
     public $nombreUnidad;
 
+    //---------------------INICIALIZACION VARIABLES--------------------------------------
     public function __construct(
         $asuntoCorreo, 
         $titulo, 
@@ -43,6 +45,7 @@ class NotificacionTicketMail extends Mailable
         $this->nombreUnidad = $nombreUnidad;
     }
 
+    //----------------------CREAR LA NOTIFICACION-------------------------------------
     public function build()
     {
         return $this->subject($this->asuntoCorreo)

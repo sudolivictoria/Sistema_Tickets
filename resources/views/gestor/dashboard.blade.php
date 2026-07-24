@@ -312,7 +312,7 @@
 
 
 @push('page-scripts')
-    @vite(['resources/js/gestor.js'])
+    @vite(['resources/js/dashboard.js'])
 @endpush
 
 @push('sse-scripts')

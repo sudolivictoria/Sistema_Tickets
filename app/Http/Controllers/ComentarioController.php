@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 
 class ComentarioController extends Controller
 {
+    //------------METODO PARA TRAER TODOS LOS COMENTARIOS DE LA BASE---------------
     public function obtenerComentarios($ticketId)
     {
         $ticket = Ticket::findOrFail($ticketId);
@@ -25,7 +26,6 @@ class ComentarioController extends Controller
         if (!$user->tieneRol('Admin') && !$user->tieneRol('Gestor')) {
             $query->where('es_privado', false);
         }
-
         $comentarios = $query->oldest()->get()->map(function ($com) {
             return [
                 'user' => [
@@ -40,6 +40,7 @@ class ComentarioController extends Controller
         return response()->json($comentarios);
     }
 
+    //-------metodo para guardar comentarios
     public function store(Request $request, $ticketId)
     {
         $request->validate([
@@ -51,7 +52,7 @@ class ComentarioController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
-
+        //-----logica de notas internas
         $esPrivado = false;
         if ($user && ($user->tieneRol('Admin') || $user->tieneRol('Gestor'))) {
             $esPrivado = $request->has('es_privado') ? filter_var($request->es_privado, FILTER_VALIDATE_BOOLEAN) : false;
@@ -71,8 +72,11 @@ class ComentarioController extends Controller
             broadcast(new ComentarioCreado($comentario))->toOthers();
         }
 
-        //********** LÓGICA DE CORREOS **************
+        //***************************************** */
+        //********** LÓGICA DE CORREOS ***************
+        //*******************************************/
         try {
+            //----Validacion para tickets resueltos
             $estaResuelto = (
                 $ticket->estado_id == 3 ||
                 ($ticket->estado && in_array(strtolower($ticket->estado->nombre_estado), ['resuelto', 'equivocado', 'no corresponde']))
@@ -132,7 +136,9 @@ class ComentarioController extends Controller
                     }
                 }
 
+                //*****************************************************************************/
                 //**********************COMMENT ADMIN O TECNICO********************************/
+                //*****************************************************************************/
                 if ($ticket->user && $ticket->user->id != $user->id && !empty($ticket->user->email)) {
 
                     //------------depende si tiene un tecnico asignado
@@ -140,7 +146,7 @@ class ComentarioController extends Controller
                         Mail::to($ticket->user->email)->queue(new NotificacionTicketMail(
                             "Respuesta a tu Ticket {$ticketCodigo}",
                             "Respuesta a tu Solicitud",
-                            "El técnico asignado ha registrado una respuesta a tu ticket.",
+                            "El técnico asignado ha registrado una respuesta a tu solicitud.",
                             $ticketCodigo,
                             $comentario->contenido,
                             false,
