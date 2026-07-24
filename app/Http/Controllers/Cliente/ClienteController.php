@@ -63,7 +63,7 @@ class ClienteController extends Controller
         // Carga ligera de catálogos para modales de creación
         $categorias = Categoria::select('id', 'nombre_categoria', 'unidad_id')->get();
         $prioridades = Prioridad::select('id', 'nombre_prioridad')->get();
-        $tipos = TipoSolicitud::select('id', 'nombre_tipo')->get();
+        $tipos = TipoSolicitud::select('id', 'nombre_tipo_solicitud')->get();
 
         return view('usuario.dashboard', compact('abiertos', 'enProceso', 'resueltos', 'todosLosTickets', 'categorias', 'prioridades', 'tipos'));
     }
