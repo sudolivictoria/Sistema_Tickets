@@ -60,7 +60,7 @@ class ApiTableController extends Controller
                 'estado:id,nombre_estado', 
                 'prioridad:id,nombre_prioridad', 
                 'tecnico:id,name', 
-                'tipo_solicitud:id,nombre_tipo', 
+                'tipo_solicitud:id,nombre_tipo_solicitud', 
                 'categoria:id,nombre_categoria,unidad_id'
             ]);
 

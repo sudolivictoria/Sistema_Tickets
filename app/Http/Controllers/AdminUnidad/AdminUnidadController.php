@@ -73,7 +73,7 @@ class AdminUnidadController extends Controller
             'estado:id,nombre_estado', 
             'tecnico:id,name', 
             'prioridad:id,nombre_prioridad', 
-            'tipo_solicitud:id,nombre_tipo'
+            'tipo_solicitud:id,nombre_tipo_solicitud'
         ]);
 
         if ($estadoBoton === 'resuelto,equivocado,no corresponde' || $estadoBoton === 'cerrado') {

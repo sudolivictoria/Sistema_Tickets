@@ -51,7 +51,7 @@ class ClienteController extends Controller
         $todosLosTickets = (clone $baseQuery)
             ->with([
                 'categoria:id,nombre_categoria', 
-                'tipo_solicitud:id,nombre_tipo', 
+                'tipo_solicitud:id,nombre_tipo_solicitud', 
                 'prioridad:id,nombre_prioridad', 
                 'estado:id,nombre_estado', 
                 'tecnico:id,name'
@@ -71,7 +71,7 @@ class ClienteController extends Controller
     public function create()
     {
         $categorias = Categoria::select('id', 'nombre_categoria')->get();
-        $tipos = TipoSolicitud::select('id', 'nombre_tipo')->get();
+        $tipos = TipoSolicitud::select('id', 'nombre_tipo_solicitud')->get();
         $prioridades = Prioridad::select('id', 'nombre_prioridad')->get();
 
         return view('usuario.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
@@ -175,7 +175,7 @@ class ClienteController extends Controller
         $misTickets = Ticket::where('user_id', Auth::id())
             ->with([
                 'categoria:id,nombre_categoria', 
-                'tipo_solicitud:id,nombre_tipo', 
+                'tipo_solicitud:id,nombre_tipo_solicitud', 
                 'prioridad:id,nombre_prioridad', 
                 'estado:id,nombre_estado', 
                 'tecnico:id,name'
