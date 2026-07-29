@@ -49,7 +49,7 @@
                         </ul>
                     </div>
                 @endif
-
+                {{-- FORMULARIO DE INICIO DE SESION --}}
                 <form method="POST" action="{{ route('login.post') }}"
                     style="display:flex; flex-direction:column; gap: 15px;">
                     @csrf

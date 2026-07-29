@@ -17,7 +17,7 @@
         }
     </style>
 </head>
-
+{{-- error 419 --}}
 <body class="h-full bg-[#04003B] overflow-hidden">
 
     <main class="h-full relative overflow-hidden flex flex-col items-center justify-center blueprint-grid">

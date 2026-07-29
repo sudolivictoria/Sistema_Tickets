@@ -96,7 +96,7 @@
         </div>
 
         <div class="space-y-6">
-            {{-- Call to Action --}}
+            {{-- Call to Action dr Recursos --}}
             <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div
                     class="absolute top-0 right-0 w-16 h-16 bg-secondary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
@@ -232,7 +232,7 @@
     @vite(['resources/js/usuario.js'])
     @vite(['resources/js/usuario-menu.js'])
 @endpush
-
+{{-- ACTUALIZACION AUTOMATICA --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

@@ -1,6 +1,6 @@
 @foreach($mesesGrafico as $mes)
     <div class="flex-1 flex flex-col items-center gap-3 group h-full justify-end">
-
+        {{-- etiquetas --}}
         <div
             class="relative w-full flex flex-col items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
             <span

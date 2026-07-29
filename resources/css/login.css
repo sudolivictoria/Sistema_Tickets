@@ -18,14 +18,12 @@ body {
     justify-content: center;
     padding: 20px 0;
 }
-
 .login-container {
     width: 80%;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 .login-card {
     width: 90%;
     max-width: 400px;
@@ -41,17 +39,14 @@ body {
     border-radius: 2rem;
     z-index: 1;
 }
-
 .bg1 {
-    background-color: #0c003f;
+    background-color: #0c003f77;
     transform: rotate(6deg) scale(1.02);
 }
-
 .bg2 {
-    background-color: #120064;
+    background-color: #0135498f;
     transform: rotate(-6deg) scale(1.02);
 }
-
 .card-content {
     position: relative;
     z-index: 10;
@@ -67,16 +62,13 @@ body {
     .card-content {
         padding: 40px;
     }
-
     .bg1 {
         transform: rotate(6deg) scale(1.05);
     }
-
     .bg2 {
         transform: rotate(-6deg) scale(1.05);
     }
 }
-
 .card-content h1 {
     text-align: center;
     font-size: 22px;
@@ -85,12 +77,10 @@ body {
     margin-top: 0;
     margin-bottom: 20px;
 }
-
 .field {
     margin-bottom: 14px;
     width: 100%;
 }
-
 .field label {
     display: block;
     font-size: 11px;
@@ -100,7 +90,6 @@ body {
     letter-spacing: 1px;
     margin-bottom: 5px;
 }
-
 .field input {
     width: 100%;
     padding: 12px;
@@ -111,12 +100,10 @@ body {
     font-size: 16px;
     transition: 0.3s;
 }
-
 .field input:focus {
     border-color: #84cc16;
     box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.1);
 }
-
 .button {
     width: 100%;
     background-color: #006625;
@@ -130,16 +117,13 @@ body {
     transition: 0.3s;
     margin-top: 10px;
 }
-
 .button:hover {
     background-color: #84cc16;
     transform: translateY(-1px);
 }
-
 .button:active {
     transform: translateY(0);
 }
-
 .error {
     background-color: #fef2f2;
     border-left: 4px solid #ef4444;
@@ -149,13 +133,11 @@ body {
     border-radius: 8px;
     font-size: 13px;
 }
-
 .logo-img {
     height: 100px;
     width: 100px;
     transition: 0.3s;
 }
-
 @media screen and (min-width: 480px) {
     .logo-img {
         height: 130px;

@@ -27,7 +27,7 @@
                             placeholder="Buscar...">
                     </div>
                 </div>
-
+                {{-- datos --}}
                 <table id="tablaMisAsignados" class="w-full text-left border-separate border-spacing-0">
                     <thead>
                         <tr class="bg-slate-50 text-[13px] uppercase text-[#008F7E] font-black tracking-widest">
@@ -54,11 +54,11 @@
     {{-- detalle usuario --}}
     @include('partials.detalle_usuario')
 @endsection
-
+{{-- logica mis asignados --}}
 @push('page-scripts')
     @vite(['resources/js/mis-asignados.js'])
 @endpush
-
+{{-- actualizacion automatica --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

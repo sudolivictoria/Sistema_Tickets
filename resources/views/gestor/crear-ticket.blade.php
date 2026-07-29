@@ -154,6 +154,7 @@
 @push('scripts')
 
     <script>
+        //-------adjuntar imagen de evidencia
         document.addEventListener("DOMContentLoaded", () => {
             const inputFile = document.getElementById('evidencia');
             const btnSeleccionar = document.getElementById('btn-seleccionar-imagen');
@@ -191,11 +192,11 @@
             }
         });
     </script>
-
+    {{-- tipos de solicitud --}}
     <script>
         window.todosLosTipos = @json($tipos ?? []);
     </script>
-
+{{-- notificaciones --}}
     <script>
         window.__flashMessages = window.__flashMessages || {};
         window.__flashMessages.successTitle = '¡Ticket creado!';
@@ -203,7 +204,7 @@
         window.__flashMessages.redirectTo = "{{ route('gestor.mis-tickets') }}";
     </script>
 @endpush
-
+{{-- logica creacion del ticket --}}
 @push('page-scripts')
     @vite(['resources/js/ticket-form.js'])
 @endpush

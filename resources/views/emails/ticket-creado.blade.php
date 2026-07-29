@@ -7,7 +7,7 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: #1e293b;
-            background-color: #f1f5f9;
+            background-color: #cadef1;
             margin: 0;
             padding: 0;
         }
@@ -20,7 +20,7 @@
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: #cadef1;
+            background: #f1f5f9;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);

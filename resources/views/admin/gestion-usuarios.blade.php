@@ -169,6 +169,7 @@
             </form>
         </div>
     </div>
+    {{-- FIN MODAL AGREGAR --}}
 
     {{-- MODAL EDITAR --}}
     <div id="modalEditar"
@@ -236,8 +237,9 @@
             </form>
         </div>
     </div>
+    {{-- FIN MODAL EDITAR --}}
 @endsection
-
+{{-- LOGICA GESTION DE USERS --}}
 @push('page-scripts')
     @vite(['resources/js/gestion-usuarios.js'])
 @endpush

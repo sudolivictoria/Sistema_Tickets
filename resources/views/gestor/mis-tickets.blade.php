@@ -76,11 +76,11 @@
     {{-- Detalle ticket --}}
     @include('partials.detalle_ticket_usuario')
 @endsection
-
+{{-- logica mis tickets --}}
 @push('page-scripts')
     @vite(['resources/js/mis-tickets.js'])
 @endpush
-
+{{-- actualizacion automatica --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

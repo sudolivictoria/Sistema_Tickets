@@ -149,7 +149,7 @@
 @endsection
 
 @push('scripts')
-
+    {{-- subir evidencia --}}
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const inputFile = document.getElementById('evidencia');
@@ -188,20 +188,19 @@
             }
         });
     </script>
-
-    
+    {{-- tipos de solicitud --}}
     <script>
         window.todosLosTipos = @json($tipos ?? []);
     </script>
-
+    {{-- alertas --}}
     <script>
         window.__flashMessages = window.__flashMessages || {};
         window.__flashMessages.successTitle = '¡Ticket creado!';
         window.__flashMessages.validationTitle = 'No se pudo enviar';
-        window.__flashMessages.redirectTo = "{{ route('admin.crear-ticket') }}";
+        window.__flashMessages.redirectTo = "{{ route('admin.mis-tickets') }}";
     </script>
 @endpush
-
+{{-- logic creacion del ticket --}}
 @push('page-scripts')
     @vite(['resources/js/ticket-form.js'])
 @endpush

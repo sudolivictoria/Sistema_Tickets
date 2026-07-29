@@ -149,11 +149,11 @@
     {{-- detalle usuario --}}
     @include('partials.detalle_usuario')
 @endsection
-
+{{-- logica historial --}}
 @push('page-scripts')
     @vite(['resources/js/historial.js'])
 @endpush
-
+{{-- actualizacion automatica --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

@@ -55,7 +55,7 @@
                     </div>
 
                 </div>
-
+                {{-- DATOS --}}
                 <div class="p-0 w-full overflow-x-auto">
                     <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
                         <thead>
@@ -86,12 +86,12 @@
 
     {{-- detalle usuario --}}
 @endsection
-
+{{-- SCRIPTS --}}
 @push('page-scripts')
     @vite(['resources/js/mis-tickets.js'])
     @vite(['resources/js/usuario-menu.js'])
 @endpush
-
+{{-- ACTUALIZACION AUTOMATICA --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

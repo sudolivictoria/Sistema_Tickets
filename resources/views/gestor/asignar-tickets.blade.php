@@ -26,7 +26,7 @@
                             placeholder="Buscar...">
                     </div>
                 </div>
-
+                {{-- datos --}}
                 <table id="tablaAsignarTickets" class="w-full text-left border-separate border-spacing-0">
                     <thead>
                         <tr
@@ -55,10 +55,11 @@
     {{-- detalle usuario --}}
     @include('partials.detalle_usuario')
 @endsection
+{{-- logica asignar tickets --}}
 @push('page-scripts')
     @vite(['resources/js/asignar-tickets.js'])
 @endpush
-
+{{-- actualizacon automatica --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

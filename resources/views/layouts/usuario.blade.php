@@ -22,33 +22,27 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
         }
-
         .dashed-button {
             border: 2px dashed #cbd5e1;
             transition: all 0.3s ease;
         }
-
         .dashed-button:hover {
             border-color: #84cc16;
             background-color: #f7fee7;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-
         ::-webkit-scrollbar {
             width: 10px;
         }
-
         ::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 10px;
         }
-
         ::-webkit-scrollbar-thumb {
             background: #84cc16;
             border-radius: 10px;
             border: 2px solid #f1f5f9;
         }
-
         ::-webkit-scrollbar-thumb:hover {
             background: #04003B;
         }
@@ -57,6 +51,7 @@
 </head>
 
 <body class="bg-slate-50 font-display text-slate-900 antialiased">
+    {{-- preloader --}}
     <div id="preloader"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-1000">
         <div class="flex flex-col items-center">
@@ -94,7 +89,7 @@
             <span id="relojSistema" class="text-xs font-black text-slate-600 tracking-wider">00:00:00</span>
         </div>
     </header>
-
+    {{-- menu --}}
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-secondary border-r border-blue-800 flex flex-col pt-32 p-4
     transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-50 lg:z-40">
         <nav class="space-y-3 flex-1">
@@ -149,7 +144,6 @@
                 preloader.style.display = 'none';
             }, 1000);
         });
-
         //-----reloj----------- 
         window.iniciarReloj = function () {
             const contenedorReloj = document.getElementById('relojSistema');
@@ -173,7 +167,7 @@
             iniciarReloj();
         });
     </script>
-
+    {{-- notificaciones --}}
     @php
         $flashSuccess = session('sweet_success') ?: session('success');
         $flashError = session('sweet_error') ?: session('error');
@@ -188,6 +182,7 @@
         };
     </script>
 
+    {{-- scripts --}}
     @stack('scripts')
 
     @stack('page-scripts')

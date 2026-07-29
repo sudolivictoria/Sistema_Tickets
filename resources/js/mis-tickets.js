@@ -323,7 +323,7 @@ window.verDetalle = function (
     const linkAnchor = document.getElementById("modalDriveLink");
 
     //************************************************/
-    //---preloader estatico
+    //------------------preloader---------------------
     $("#preloaderGlobalModal").removeClass("hidden");
     //************************************************/
 

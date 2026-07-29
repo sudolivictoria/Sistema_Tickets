@@ -1,7 +1,6 @@
 .dataTables_filter {
     position: relative;
 }
-
 /*icono de busqueda*/
 .dataTables_filter::before {
     content: 'search';
@@ -15,7 +14,6 @@
     pointer-events: none;
     z-index: 10;
 }
-
 /*input de busqueda*/
 .dataTables_filter input {
     border-radius: 16px !important;
@@ -28,13 +26,11 @@
     font-weight: 500;
     color: #1e293b;
 }
-
 .dataTables_filter input:focus {
     border-color: #84cc16 !important;
     background: #ffffff !important;
     box-shadow: 0 4px 12px rgba(34, 197, 94, 0.1) !important;
 }
-
 
 /*Paginacion*/
 .dataTables_paginate {
@@ -44,7 +40,6 @@
     gap: 6px !important;
     margin-top: 1rem !important;
 }
-
 /*estilo para botones y flechas de paginacion*/
 .dataTables_paginate .paginate_button {
     width: 36px !important;
@@ -62,7 +57,6 @@
     transition: all 0.3s ease !important;
     text-decoration: none !important;
 }
-
 /*boton pagina actual*/
 .dataTables_paginate .paginate_button.current {
     background: #84cc16 !important;
@@ -70,27 +64,23 @@
     box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3) !important;
     pointer-events: none;
 }
-
 /*hover de botones que no son actuales*/
 .dataTables_paginate .paginate_button:hover:not(.current):not(.disabled) {
     background: #cdff81 !important;
     color: #166534 !important;
 }
-
 /*deshabilitar botones*/
 .dataTables_paginate .paginate_button.disabled {
     opacity: 0.4 !important;
     cursor: default !important;
     background: #f8fafc !important;
 }
-
 /*icono de busqueda*/
 .dataTables_filter {
     position: relative;
     display: flex;
     align-items: center;
 }
-
 .dataTables_filter::before {
     content: 'search';
     font-family: 'Material Symbols Outlined';
@@ -100,7 +90,6 @@
     color: #94a3b8;
     z-index: 10;
 }
-
 /*informacion de los datos mostrados*/
 .dataTables_info {
     font-size: 11px !important;
@@ -108,17 +97,14 @@
     color: #94a3b8 !important;
     text-transform: uppercase;
 }
-
 .dataTables_wrapper .dataTables_scrollBody {
     overflow-x: auto !important;
     width: 100% !important;
     -webkit-overflow-scrolling: touch;
 }
-
 table.dataTable thead th {
     font-weight: 1000 !important;
 }
-
 /*evitar que el scroll horizontal corte la tabla y deje un espacio en blanco debajo*/
 .dataTables_wrapper,
 .dataTables_scroll,
@@ -128,11 +114,9 @@ table.dataTable thead th {
     max-height: none !important;
     overflow-y: visible !important;
 }
-
 .dataTables_paginate .paginate_button.material-symbols-outlined {
     font-size: 20px !important;
 }
-
 .dataTables_wrapper,
 .dataTables_scroll,
 .dataTables_scrollBody,
@@ -141,16 +125,13 @@ table.dataTable thead th {
     max-height: none !important;
     overflow-y: visible !important;
 }
-
 .overflow-x-auto {
     overflow-y: visible !important;
 }
-
 #tablaMisTickets th,
 #tablaMisTickets td {
     white-space: nowrap;
 }
-
 /*Resetear por completo los botones nativos que inyecta DataTables*/
 .custom-footer-tabla .dataTables_paginate .paginate_button {
     background: #f1f5f9 !important;
@@ -167,7 +148,6 @@ table.dataTable thead th {
     transition: all 0.2s ease !important;
     box-shadow: none !important;
 }
-
 /*Estilo para el botón de la página actual*/
 .custom-footer-tabla .dataTables_paginate .paginate_button.current,
 .custom-footer-tabla .dataTables_paginate .paginate_button.current:hover {
@@ -176,13 +156,11 @@ table.dataTable thead th {
     font-weight: bold !important;
     box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3) !important;
 }
-
 /*Efecto Hover para los botones que no están activos*/
 .custom-footer-tabla .dataTables_paginate .paginate_button:hover:not(.current) {
     background: #cdff81 !important;
     color: #166534 !important;
 }
-
 /* Estilo para el texto de "Mostrando..." */
 .custom-footer-tabla .dataTables_info {
     font-size: 11px !important;
@@ -191,7 +169,6 @@ table.dataTable thead th {
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
 }
-
 /*Limpiar el contenedor interno de números que a veces mete la librería*/
 .custom-footer-tabla .dataTables_paginate span {
     background: transparent !important;
@@ -217,7 +194,6 @@ table.dataTable thead th {
     background-color: #cdff81 !important;
     color: #166534 !important;
 }
-
 [class*="info"] {
     font-size: 11px !important;
     font-weight: 700 !important;
@@ -237,7 +213,6 @@ table.dataTable thead th {
     gap: 6px !important; 
     vertical-align: middle !important;
 }
-
 [class*="paginate"] span,
 [class*="paging"] span {
     display: inline-flex !important;
@@ -293,13 +268,11 @@ table.dataTable thead th {
 [class*="paging"] .last {
     display: none !important;
 }
-
 .no-scrollbar::-webkit-scrollbar {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
 }
-
 .no-scrollbar {
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;

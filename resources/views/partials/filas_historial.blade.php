@@ -1,12 +1,15 @@
 @foreach ($tickets as $ticket)
+
     <tr class="fila-historial hover:bg-slate-50/60 transition-colors" data-id="{{ $ticket->id }}"
         data-usuario="{{ optional($ticket->user)->name }}" data-tecnico="{{ optional($ticket->tecnico)->name }}"
         data-estado-id="{{ $ticket->estado_id }}" data-categoria-id="{{ $ticket->categoria->id }}"
         data-fecha="{{ \Carbon\Carbon::parse($ticket->created_at)->format('Y-m-d') }}">
+        
         {{-- ID --}}
         <td class="px-5 py-4 font-black text-slate-700">
             <span class="text-slate-400 font-semibold">#</span>TK{{ str_pad($ticket->id, 5, '0', STR_PAD_LEFT) }}
         </td>
+       
         <!--datos del usuario-->
         <td class="px-2 py-4">
             <div class="flex flex-col">
@@ -71,6 +74,7 @@
         <td class="px-5 py-4 font-black">
             {{ optional($ticket->tecnico)->name ?? 'Pendiente de asignación' }}
         </td>
+
         {{-- Fechas --}}
         <td class="px-4 py-4 font-black data-order=" {{ $ticket->created_at->timestamp }}">
             {{ $ticket->created_at->format('d/m/Y') }}
@@ -79,7 +83,7 @@
         <td class="px-4 py-4 font-black">
             {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
         </td>
-        {{-- Acciones --}}
+
         {{-- descripcion del ticket --}}
         <td class="px-2 py-4 text-center">
             <button type="button"
@@ -96,6 +100,7 @@
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>
         </td>
+
         {{-- categoria oculta --}}
         <td class="hidden">{{ $ticket->categoria->id }}</td>
     </tr>

@@ -10,7 +10,7 @@
                 </h2>
             </div>
         </div>
-
+        {{-- redireccionar a recursos --}}
         <div
             class="bg-white rounded-2xl md:rounded-3xl shadow-xl border border-slate-200 overflow-hidden w-full h-[450px] sm:h-[600px] lg:h-[800px] relative">
             <iframe src="https://anyflip.com/bookcase/ghert" class="absolute top-0 left-0 w-full h-full border-0"

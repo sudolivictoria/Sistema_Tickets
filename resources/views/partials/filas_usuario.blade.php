@@ -1,4 +1,5 @@
 @foreach($todosLosTickets as $ticket)
+
     <tr class="hover:bg-slate-50/50 transition-colors group">
         <td class="px-2 py-4 font-bold text-slate-900 whitespace-nowrap">
             <div class="flex items-center">
@@ -9,6 +10,8 @@
                 </span>
             </div>
         </td>
+
+        {{-- categoria --}}
         <td class="px-6 py-4 max-w-[150px] font-black text-[13px]">{{ $ticket->categoria->nombre_categoria }}</td>
         </td>
         <td class="px-6 py-4">
@@ -28,7 +31,8 @@
                 {{ ucfirst($estado) }}
             </span>
         </td>
-
+        
+        {{-- prioridad --}}
         <td class="px-6 py-4">
             @php
                 $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';

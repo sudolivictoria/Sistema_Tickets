@@ -12,7 +12,6 @@
             </h2>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-
             {{-- Tabla --}}
             <div class="p-5">
                 {{-- Cabecera con Filtros y Buscador --}}
@@ -25,7 +24,7 @@
                             placeholder="Buscar...">
                     </div>
                 </div>
-
+                {{-- Datos --}}
                 <table id="tablaAsignarTickets" class="w-full text-left border-separate border-spacing-0">
                     <thead>
                         <tr class="bg-slate-50 text-[13px] uppercase text-[#008F7E] font-black tracking-widest">
@@ -52,11 +51,11 @@
     {{-- detalle usuario --}}
     @include('partials.detalle_usuario')
 @endsection
-
+{{-- Logica asignar tickets --}}
 @push('page-scripts')
     @vite(['resources/js/asignar-tickets.js'])
 @endpush
-
+{{-- refresco automatico --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

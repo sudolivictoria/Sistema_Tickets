@@ -176,7 +176,7 @@
                 </span>
             </div>
 
-            {{-- Call to Action --}}
+            {{-- Call to Action Recursos --}}
             <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div
                     class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
@@ -310,11 +310,11 @@
     @include('partials.detalle_usuario')
 @endsection
 
-
+{{-- logica dashboard --}}
 @push('page-scripts')
     @vite(['resources/js/dashboard.js'])
 @endpush
-
+{{-- actualizacion automatica --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

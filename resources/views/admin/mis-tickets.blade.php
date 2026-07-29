@@ -38,7 +38,7 @@
                             </button>
                         </div>
                     </div>
-
+                    {{-- barra busqueda --}}
                     <div class="relative w-full md:w-72">
                         <span
                             class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
@@ -76,11 +76,11 @@
     {{-- Detalle ticket --}}
     @include('partials.detalle_ticket_usuario')
 @endsection
-
+{{-- logica mis tickets --}}
 @push('page-scripts')
     @vite(['resources/js/mis-tickets.js'])
 @endpush
-
+{{-- actualizacion automatica --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

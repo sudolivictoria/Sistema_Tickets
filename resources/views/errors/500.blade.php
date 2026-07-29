@@ -15,7 +15,7 @@
         }
     </style>
 </head>
-
+{{-- error 500 --}}
 <body class="h-full bg-[#04003B] overflow-hidden">
     <main class="h-full flex flex-col items-center justify-center blueprint-grid text-center px-8">
         <div
@@ -30,7 +30,7 @@
         <div class="flex gap-4">
             <a href="{{ route('login') }}"
                 class="px-8 py-4 border border-red-500 text-red-500 font-black uppercase tracking-widest text-sm">
-                Reportar Soporte
+                Reportar a Soporte
             </a>
             <a href="/" class="px-8 py-4 font-black uppercase tracking-widest text-sm"
                 style="background-color: #84cc16; color: #04003B;">

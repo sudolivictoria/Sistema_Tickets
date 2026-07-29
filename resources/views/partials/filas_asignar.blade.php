@@ -1,5 +1,6 @@
 @foreach($tickets as $ticket)
-    <tr class="hover:bg-slate-50/80 transition-all">
+    
+<tr class="hover:bg-slate-50/80 transition-all">
         <td class="px-4 py-4 font-black whitespace-nowrap">
             <div class="flex items-center">
                 {{--prefijo ticket--}}
@@ -12,6 +13,7 @@
                 </span>
             </div>
         </td>
+       
         <!--DATOS DEL USUARIO-->
         <td class="px-4 py-4">
             <div class="flex flex-col">

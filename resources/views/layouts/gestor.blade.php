@@ -23,22 +23,18 @@
             width: 8px;
             height: 8px;
         }
-
         ::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 10px;
         }
-
         ::-webkit-scrollbar-thumb {
              background: #84cc16;
             border-radius: 10px;
             border: 2px solid #f1f5f9;
         }
-
         ::-webkit-scrollbar-thumb:hover {
             background: #04003B;
         }
-
         .table-container::-webkit-scrollbar {
             height: 6px;
         }
@@ -61,6 +57,7 @@
 
 
     <div class="flex h-screen flex-col">
+        {{-- header --}}
         <header
             class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-8 shrink-0 z-20 shadow-sm">
             <div class="flex items-center gap-4">
@@ -83,7 +80,7 @@
         </header>
 
         <div class="flex flex-1 overflow-hidden">
-
+            {{-- menu --}}
             <aside class="w-64 bg-secondary flex flex-col shrink-0 z-10 shadow-2xl overflow-y-auto">
                 <div class="p-4 flex flex-col h-full">
                     <nav class="flex flex-col gap-1.5 flex-1">
@@ -193,14 +190,14 @@
         $flashError = session('sweet_error') ?: session('error');
         $validationErrors = $errors->any() ? $errors->all() : [];
     @endphp
-
+    {{-- notificaciones --}}
     <script>
         window.__flashMessages = window.__flashMessages || {};
         window.__flashMessages.success = @json($flashSuccess);
         window.__flashMessages.error = @json($flashError);
         window.__flashMessages.validationErrors = @json($validationErrors);
     </script>
-
+    {{-- scripts --}}
     @stack('scripts')
 
     @stack('page-scripts')

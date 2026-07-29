@@ -14,14 +14,14 @@
         }
 
         .wrapper {
-            background-color: #f1f5f9;
+            background-color: #cadef1;
             padding: 20px 10px;
         }
 
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: #cadef1;
+            background: #f1f5f9;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);

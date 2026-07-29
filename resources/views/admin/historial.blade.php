@@ -54,6 +54,7 @@
             </div>
         </div>
     </div>
+    {{-- FIN METRICAS DE RESUMEN --}}
 
     <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         {{-- BARRA DE FILTROS --}}
@@ -124,6 +125,7 @@
                     </button>
                 </div>
             </div>
+            {{-- FIN BOTONES DE ACCION --}}
         </div>
 
         {{-- TABLA DE HISTORIA --}}
@@ -150,13 +152,15 @@
         </div>
     </div>
 
+    {{-- LOGICA DETALLES --}}
     @include('partials.detalle_ticket')
     @include('partials.detalle_usuario')
 @endsection
-
+{{-- LOGICA HISTORIAL --}}
 @push('page-scripts')
     @vite(['resources/js/historial.js'])
 @endpush
+{{-- LOGICA ACTUALIZACION --}}
 @push('sse-scripts')
     @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

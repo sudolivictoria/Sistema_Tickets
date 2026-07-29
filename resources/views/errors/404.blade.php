@@ -15,7 +15,7 @@
         }
     </style>
 </head>
-
+{{-- error 404 --}}
 <body class="h-full bg-[#04003B] overflow-hidden">
     <main class="h-full flex flex-col items-center justify-center blueprint-grid text-center px-8">
         <div

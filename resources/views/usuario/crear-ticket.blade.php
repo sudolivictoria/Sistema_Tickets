@@ -151,6 +151,7 @@
 
 @push('scripts')
     <script>
+        //---agregar evidencia a la solicitud imagen
         document.addEventListener("DOMContentLoaded", () => {
             const inputFile = document.getElementById('evidencia');
             const btnSeleccionar = document.getElementById('btn-seleccionar-imagen');
@@ -188,11 +189,11 @@
             }
         });
     </script>
-
+    //-----tipos de solicitud
     <script>
         window.todosLosTipos = @json($tipos ?? []);
     </script>
-
+    //-------logica alertas
     <script>
         window.__flashMessages = window.__flashMessages || {};
         window.__flashMessages.successTitle = '¡Ticket creado!';
@@ -200,7 +201,7 @@
         window.__flashMessages.redirectTo = "{{ route('usuario.dashboard') }}";
     </script>
 @endpush
-
+{{-- logica crear ticket y menu responsivo para moviles --}}
 @push('page-scripts')
     @vite(['resources/js/ticket-form.js'])
     @vite(['resources/js/usuario-menu.js'])

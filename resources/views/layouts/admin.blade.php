@@ -62,7 +62,7 @@
     </div>
 
     <div class="flex h-screen flex-col">
-
+        {{-- header --}}
         <header
             class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-8 shrink-0 z-20 shadow-sm">
             <div class="flex items-center gap-4">
@@ -85,7 +85,7 @@
         </header>
 
         <div class="flex flex-1 overflow-hidden">
-
+            {{-- menu --}}
             <aside class="w-64 bg-secondary flex flex-col shrink-0 z-10 shadow-2xl overflow-y-auto">
                 <div class="p-4 flex flex-col h-full">
                     <nav class="flex flex-col space-y-1.5 flex-1">
@@ -173,7 +173,6 @@
                 preloader.style.display = 'none';
             }, 1000);
         });
-
         //-----reloj---------- 
         window.iniciarReloj = function() {
             const contenedorReloj = document.getElementById('relojSistema');
@@ -197,7 +196,7 @@
             iniciarReloj();
         });
     </script>
-
+    {{-- notificaciones --}}
     @php
         $flashSuccess = session('sweet_success') ?: session('success');
         $flashError = session('sweet_error') ?: session('error');
@@ -211,7 +210,7 @@
             validationErrors: @json($validationErrors)
         };
     </script>
-
+    {{-- scripts --}}
     @stack('scripts')
 
     @stack('page-scripts')

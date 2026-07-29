@@ -17,7 +17,6 @@
             <span class="text-base font-black text-green-900">{{ date('d/m/Y') }}</span>
         </div>
     </div>
-
     <!--estadisticas generales-->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div
@@ -31,7 +30,6 @@
                 </h3>
             </div>
         </div>
-
         <div
             class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-secondary flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0">
@@ -43,7 +41,6 @@
                 </h3>
             </div>
         </div>
-
         <div
             class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-primary flex items-center gap-5 hover:translate-y-[-6px] transition-all duration-300">
             <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center shrink-0">
@@ -209,7 +206,7 @@
                         ],
                     ];
                 @endphp
-
+                {{-- logica prioridades --}}
                 <div class="grid grid-cols-2 gap-3">
                     @foreach($prioConfig as $prio => $clases)
                         <div
@@ -229,7 +226,7 @@
                 </div>
             </div>
 
-            {{-- Call to Action --}}
+            {{-- Call to Action Recursos --}}
             <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div
                     class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full flex items-center justify-center pointer-events-none">
@@ -264,11 +261,11 @@
     {{-- detalle usuario --}}
     @include('partials.detalle_usuario')
 @endsection
-
+{{-- logica dashboard --}}
 @push('page-scripts')
 @vite(['resources/js/dashboard.js'])
 @endpush
-
+{{-- actualizacion automatica --}}
 @push('sse-scripts')
 @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
 @endpush

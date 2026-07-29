@@ -289,6 +289,7 @@
     <div class="titulo-reporte">Historial de Tickets ISTU</div>
 
     <table class="stats-table">
+        <!----------------------estadisticas--------------------------->
         <tr>
             <td width="14%">
                 <div class="stat-card card-abierto">
@@ -355,7 +356,6 @@
                 'no corresponde' => '#a16207',
                 default => '#475569',
             };
-
             //---bg
             $badgeBg = match ($estado) {
                 'abierto' => '#ffedd5',
@@ -365,7 +365,6 @@
                 'no corresponde' => '#fef9c3',
                 default => '#f1f5f9',
             };
-
             //------BORDER------------------
             $badgeBorder = match ($estado) {
                 'abierto' => '#fed7aa',
@@ -375,7 +374,6 @@
                 'no corresponde' => '#fef08a',
                 default => '#e2e8f0',
             };
-
             //-----------PRIORIDADES----------------
             $prioridadId = $ticket->prioridad_id ?? 3; // Media por defecto
             $prioName = $ticket->prioridad->nombre_prioridad ?? 'Media';
@@ -389,7 +387,7 @@
             };
             $prioColor = '#ffffff';   
         @endphp
-
+        <!-------card del ticket-------------->
         <div class="ticket-card" style="border-left: 5px solid {{ $themeColor }};">
             <table class="card-header">
                 <tr>
@@ -416,7 +414,6 @@
                     </td>
                 </tr>
             </table>
-
             <table class="card-body">
                 <tr>
                     <td width="25%">
@@ -437,16 +434,13 @@
                     </td>
                 </tr>
             </table>
-
             <div class="card-footer-container">
                 <div class="inner-box">
                     <div class="desc-row">
                         <span class="desc-label">DESCRIPCIÓN:</span>
                         <span class="desc-text">{{ $ticket->descripcion ?? 'Sin descripción proporcionada.' }}</span>
                     </div>
-
                     <hr class="inner-divider">
-
                     <table class="dates-table">
                         <tr>
                             <td width="33%">
@@ -464,9 +458,7 @@
                     </table>
                 </div>
             </div>
-
         </div>
     @endforeach
 </body>
-
 </html>
