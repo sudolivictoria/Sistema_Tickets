@@ -272,13 +272,21 @@ class AdminController extends Controller
     //----metodo para ver mis tickets
     public function misTickets()
     {
+        $estadosCerrados = [3, 4, 5];
+        $añoActual = date('Y');
+
         $misTickets = Ticket::where('user_id', Auth::id())
+            ->where(function ($query) use ($añoActual, $estadosCerrados) {
+                $query->whereYear('created_at', $añoActual)
+                    ->orWhereNotIn('estado_id', $estadosCerrados);
+            })
             ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         return view('admin.mis-tickets', compact('misTickets'));
     }
+
 
     //----metodo para mostrar recursos (SIN USO)
     public function recursos()

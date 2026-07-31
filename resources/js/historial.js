@@ -271,6 +271,23 @@ window.exportarHistorial = function (formato) {
         });
         return;
     }
+
+    if (tableHistorial && tableHistorial.rows({ filter: "applied" }).count() === 0) {
+        Swal.fire({
+            title: "Sin resultados",
+            text: "No se encontraron registros para exportar con los filtros seleccionados.",
+            icon: "info",
+            iconColor: "#04003B",
+            confirmButtonText: "Entendido",
+            confirmButtonColor: "#04003B",
+            customClass: {
+                popup: "rounded-3xl p-6",
+                confirmButton: "rounded-xl px-5 py-2.5 font-bold",
+            },
+        });
+        return;
+    }
+
     const buscar = document.getElementById("filtroBuscar").value;
     const fechaInicio = document.getElementById("filtroFechaInicio").value;
     const fechaFin = document.getElementById("filtroFechaFin").value;
@@ -278,6 +295,7 @@ window.exportarHistorial = function (formato) {
     const categoria = document.getElementById("filtroCategoria")
         ? document.getElementById("filtroCategoria").value
         : "todos";
+
     const params = new URLSearchParams({
         tipo: formato,
         buscar: buscar,
@@ -286,7 +304,13 @@ window.exportarHistorial = function (formato) {
         estado: estado,
         categoria: categoria,
     });
-    const urlFinal = `/admin/reportes/exportar?${params.toString()}`;
+
+    //----detecta si es admin o es gestor
+    const esGestor = window.location.pathname.startsWith('/gestor');
+    const baseUrl = esGestor ? '/gestor/reportes/exportar' : '/admin/reportes/exportar';
+
+    const urlFinal = `${baseUrl}?${params.toString()}`;
+
     if (formato === "pdf") {
         window.open(urlFinal, "_blank");
     } else {

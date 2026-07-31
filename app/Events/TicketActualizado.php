@@ -11,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class TicketActualizado implements ShouldBroadcastNow 
+class TicketActualizado implements ShouldBroadcast
 {
     use Dispatchable, SerializesModels;
 

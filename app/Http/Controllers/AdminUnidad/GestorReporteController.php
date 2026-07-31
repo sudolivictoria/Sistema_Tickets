@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
-
+namespace App\Http\Controllers\AdminUnidad;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
-class ReporteController extends Controller
+class GestorReporteController extends Controller
 {
     //----------------------------metodo para formatear tiempo de respuesta
     private function formatearTiempoRespuesta($tiempoRespuesta): string
@@ -108,12 +107,13 @@ class ReporteController extends Controller
 
                 $callback = function () use ($query, $columnas) {
                     $file = fopen('php://output', 'w');
-
+                    
+                    //-----UTF-8 para Excel
                     fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
                     fputcsv($file, $columnas, ';');
 
-                    //----consulta lazy 
+                    //----consulta lazy
                     $query->lazy()->each(function ($ticket) use ($file) {
                         $asuntoClean = str_replace(["\r", "\n", ";"], [" ", " ", " "], $ticket->asunto ?? '');
                         $descClean = str_replace(["\r", "\n", ";"], [" ", " ", " "], $ticket->descripcion ?? '');
@@ -151,12 +151,13 @@ class ReporteController extends Controller
                     $ticket->tiempo_respuesta_formateado = $this->formatearTiempoRespuesta($ticket->tiempo_respuesta);
                 });
 
-                $pdf = Pdf::loadView('admin.reportes.pdf_historial', compact('tickets'))
+                $pdf = Pdf::loadView('gestor.reportes.pdf_historial', compact('tickets'))
                     ->setPaper('letter', 'landscape');
                 return $pdf->stream('reporte_historial_' . date('d-m-Y_His') . '.pdf');
             }
+            
         } catch (\Exception $e) {
-            return redirect()->route('admin.historial')
+            return redirect()->route('gestor.historial')
                 ->with('error', 'Ocurrió un error al generar el reporte.');
         }
     }

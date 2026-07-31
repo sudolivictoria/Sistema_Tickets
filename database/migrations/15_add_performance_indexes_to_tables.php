@@ -39,7 +39,7 @@ return new class extends Migration
         // ==========================================
         Schema::table('categorias', function (Blueprint $table) {
             //----Acelera búsquedas de categoria->unidad_id usadas en whereHas('categoria', ...)
-            $table->index(['id', 'unidad_id'], 'idx_categorias_id_unidad');
+            $table->index(['unidad_id'], 'idx_categorias_id_unidad');
         });
 
         // ==========================================

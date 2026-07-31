@@ -78,7 +78,7 @@ class ApiTableController extends Controller
             [$cargaTrabajo, $resueltos24h, $tasaCierre] = ($tipo === 'historial')
                 ? $this->calcularMetricasHistorial($user, $miUnidadId, $añoActual)
                 : [0, 0, 0];
-        
+
             $estadosCerrados = [3, 4, 5];
             $queryPrioridades = Ticket::whereNotIn('estado_id', $estadosCerrados);
 
@@ -117,9 +117,12 @@ class ApiTableController extends Controller
     {
         //-------El cliente solo observa lo que le corresponde
         if ($tipo === 'usuario' || $tipo === 'mis_tickets') {
-            $query->where('user_id', $user->id); //-----encapsula la consulta al usuario autenticado (Cliente, Admin o Gestor por igual)
+            $query->where('user_id', $user->id)
+                ->where(function ($q) {
+                    $q->whereYear('created_at', date('Y'))
+                        ->orWhereNotIn('estado_id', self::ESTADOS_CERRADOS);
+                });
 
-            //----Filtros para estados-----------
             if ($estadoFiltro === 'todos' || $estadoFiltro === '') {
                 return;
             }

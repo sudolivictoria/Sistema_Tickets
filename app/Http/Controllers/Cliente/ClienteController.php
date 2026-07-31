@@ -45,6 +45,9 @@ class ClienteController extends Controller
         return Carbon::now()->addHours($horasSla);
     }
     //-----------------------------------------------------------------
+    //--------------------------CLIENTE--------------------------------
+    //-----------------------------------------------------------------
+
     public function index()
     {
         $userId = Auth::id();
@@ -93,113 +96,114 @@ class ClienteController extends Controller
         return view('usuario.crear-ticket', compact('categorias', 'tipos', 'prioridades'));
     }
 
-    //---metodo para guardar ticket
+    //---metodo para guardar ticket (Cliente/Usuario final)
     public function store(Request $request)
     {
-        $userId = Auth::id();
-        $checkSum = md5($userId . trim($request->asunto));
+        $request->validate([
+            'asunto'            => 'required|string|min:5|max:50',
+            'categoria_id'      => 'required|exists:categorias,id',
+            'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
+            'descripcion'       => 'required|string',
+            'prioridad_id'      => 'required|exists:prioridades,id',
+        ]);
+
+        $userId   = Auth::id() ?? 1;
+        $checkSum = md5($userId . $request->categoria_id . trim($request->asunto) . trim($request->descripcion));
         $cacheKey = 'submit_lock_' . $checkSum;
-        if (!Cache::add($cacheKey, true, 20)) {
-            return redirect()->route('admin.crear-ticket')
+
+        if (!Cache::add($cacheKey, true, 5)) {
+            return redirect()->route('usuario.dashboard')
                 ->with('success', '¡Recibido! Tu solicitud ya se está procesando.');
         }
-        //-----validacion datos
-        $request->validate([
-            'asunto' => 'required|string|min:5|max:50',
-            'categoria_id' => 'required|exists:categorias,id',
-            'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
-            'descripcion' => 'required|string',
-            'prioridad_id' => 'required|exists:prioridades,id',
 
-        ]);
-
-        //----SLA utilizando la función privada
-        $fechaVencimiento = $this->calcularFechaVencimientoSla($request->categoria_id, $request->prioridad_id);
-        //----almacener imagenes de evidencia
-        $rutaEvidencia = null;
-        if ($request->hasFile('evidencia')) {
-            $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
-        }
-
-        //--crear ticket
-        $nuevoTicket = Ticket::create([
-            'asunto' => $request->asunto,
-            'descripcion' => $request->descripcion,
-            'drive_link' => $rutaEvidencia,
-            'categoria_id' => $request->categoria_id,
-            'tipo_solicitud_id' => $request->tipo_solicitud_id,
-            'user_id' => Auth::id() ?? 1, //----asignar el ticket al usuario autenticado
-            'estado_id' => 1, //---abierto
-            'prioridad_id' => $request->prioridad_id,
-            'tecnico_id' => null, //---vacio inicial 
-            'fecha_vencimiento_sla' => $fechaVencimiento,
-            'estado-sla' => 'pendiente',
-
-        ]);
-
-        //---cargar relaciones para el correo
-        $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
-
-        //**************************************************************************************/
-        //-----------------------CORREO CONFIRMACION CLIENTE----------------------------------
-        //**************************************************************************************/
         try {
-            //---obtenemos el email del usuario autenticado
-            $usuario = Auth::user();
-            $destinatario = $usuario->email;
-
-            //---siempre envia el ticket, aunque falle el correo, para no perder la información del ticket creado
-            if (empty($destinatario)) {
-                Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
-                $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
-            } else {
-                Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
-                $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
+            $rutaEvidencia = null;
+            if ($request->hasFile('evidencia')) {
+                $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
             }
-        } catch (\Exception $e) {
-            //--guardar ticket aunque no se cree el correo
-            Log::error("Fallo al enviar correo de Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
-            $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
-        }
 
+            $fechaVencimiento = $this->calcularFechaVencimientoSla($request->categoria_id, $request->prioridad_id);
 
-        //********************************************************************************/
-        //----------------------------NOTIFICACION UNIDAD----------------------------------
-        //********************************************************************************/
-        try {
-            //---identificar unidad por medio de la categoria del ticket
-            $unidadId = $nuevoTicket->categoria->unidad_id;
+            $nuevoTicket = DB::transaction(function () use ($request, $userId, $rutaEvidencia, $fechaVencimiento) {
+                return Ticket::create([
+                    'asunto'                => $request->asunto,
+                    'descripcion'           => $request->descripcion,
+                    'drive_link'            => $rutaEvidencia,
+                    'categoria_id'          => $request->categoria_id,
+                    'tipo_solicitud_id'     => $request->tipo_solicitud_id,
+                    'user_id'               => $userId,
+                    'estado_id'             => 1,
+                    'prioridad_id'          => $request->prioridad_id,
+                    'tecnico_id'            => null,
+                    'fecha_vencimiento_sla' => $fechaVencimiento,
+                    'estado_sla'            => 'pendiente',
+                ]);
+            });
 
-            //---obtener emails de gestores de la unidad
-            $destinatarios = User::where('unidad_id', $unidadId)
-                ->pluck('email')
-                ->toArray();
+            $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
 
-            if (!empty($destinatarios)) {
-                //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
-                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
+            $mensajeFlash = '¡Ticket creado con éxito!';
+            try {
+                $usuario = Auth::user();
+                $destinatario = $usuario?->email;
+
+                if (empty($destinatario)) {
+                    Log::warning("Usuario {$userId} no tiene email configurado. Ticket #" . $nuevoTicket->id);
+                    $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
+                } else {
+                    Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
+                    $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
+                }
+            } catch (\Exception $e) {
+                Log::error("Fallo al enviar correo de Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
+                $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
             }
+
+            try {
+                $unidadId = $nuevoTicket->categoria->unidad_id ?? null;
+                if ($unidadId) {
+                    $destinatarios = User::where('unidad_id', $unidadId)
+                        ->where('activo', true)
+                        ->pluck('email')
+                        ->toArray();
+
+                    if (!empty($destinatarios)) {
+                        Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error("Error avisando a la unidad: " . $e->getMessage());
+            }
+
+            broadcast(new TicketActualizado());
+
+            return redirect()->route('usuario.dashboard')->with('success', $mensajeFlash);
         } catch (\Exception $e) {
-            Log::error("Error avisando a la unidad: " . $e->getMessage());
+            Cache::forget($cacheKey);
+            Log::error("Error al crear ticket (Cliente): " . $e->getMessage());
+            return back()->withInput()->with('sweet_error', 'Ocurrió un error al registrar el ticket.');
         }
-
-        broadcast(new TicketActualizado());
-
-        //--redireccionar con mensaje de exito o error en el correo
-        return redirect()->route('usuario.dashboard')
-            ->with('success', $mensajeFlash);
     }
 
     //----metodo para ver mis tickets
     public function misTickets()
     {
+        $estadosCerrados = [3, 4, 5];
+        $añoActual = date('Y');
+
         $misTickets = Ticket::where('user_id', Auth::id())
+            ->where(function ($query) use ($añoActual, $estadosCerrados) {
+                $query->whereYear('created_at', $añoActual)
+                    ->orWhereNotIn('estado_id', $estadosCerrados);
+            })
             ->with(['categoria', 'tipo_solicitud', 'prioridad', 'estado', 'tecnico'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         return view('usuario.mis-tickets', compact('misTickets'));
     }
+
+
     //--metodo para mostrar recursos (SIN USO)
     public function recursos()
     {

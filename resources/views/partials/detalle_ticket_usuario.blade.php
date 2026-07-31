@@ -1,4 +1,5 @@
-<div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+<div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-hidden" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
 
     <!--backdrop de fondo-->
     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="cerrarModal()"></div>
@@ -7,18 +8,22 @@
     <div class="flex items-center justify-center min-h-screen p-4 sm:p-6">
 
         <!--contenedor principal-->
-        <div class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full flex flex-col max-h-[70vh] transform transition-all border-t-8 border-primary z-10 animate-fade-in overflow-hidden">
+        <div
+            class="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full flex flex-col max-h-[70vh] transform transition-all border-t-8 border-primary z-10 animate-fade-in overflow-hidden">
 
-            <!-- Preloader Global del Modal -->
-            <div id="preloaderGlobalModal" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center z-[100] transition-all duration-300 rounded-3xl hidden">
-                <div class="w-12 h-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-3"></div>
-                <p class="text-slate-500 font-semibold text-xs tracking-wide uppercase">Cargando información del ticket...</p>
+            <!-- Preloader Global del Modal (Optimizado) -->
+            <div id="preloaderGlobalModal"
+                class="absolute inset-0 bg-white/80 flex flex-col items-center justify-center z-[100] transition-opacity duration-150 rounded-3xl hidden pointer-events-auto">
+                <div class="w-8 h-8 border-3 border-slate-200 border-t-primary rounded-full animate-spin mb-2"></div>
+                <p class="text-slate-400 font-bold text-[11px] tracking-wider uppercase">Cargando...</p>
             </div>
 
             <!-- 1. HEADER FIJO -->
             <div class="p-5 sm:p-6 border-b border-slate-100 shrink-0 bg-white relative">
                 <div class="pr-24 space-y-2">
-                    <h3 id="modalTitulo" class="text-lg sm:text-xl font-black text-green-950 uppercase break-words leading-tight">---</h3>
+                    <h3 id="modalTitulo"
+                        class="text-lg sm:text-xl font-black text-green-950 uppercase break-words leading-tight">---
+                    </h3>
                 </div>
             </div>
 
@@ -29,32 +34,42 @@
                 <div>
                     <div class="flex items-center gap-1.5 mb-1.5">
                         <span class="material-symbols-outlined text-[16px] text-primary">category</span>
-                        <label class="text-[10px] font-black uppercase tracking-widest text-green-950">Tipo de Solicitud</label>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-green-950">Tipo de
+                            Solicitud</label>
                     </div>
-                    <div id="modalTipoSolicitud" class="p-3.5 bg-white border border-slate-200/80 rounded-2xl text-slate-700 text-xs font-semibold leading-relaxed whitespace-pre-line shadow-sm">---</div>
+                    <div id="modalTipoSolicitud"
+                        class="p-3.5 bg-white border border-slate-200/80 rounded-2xl text-slate-700 text-xs font-semibold leading-relaxed whitespace-pre-line shadow-sm">
+                        ---</div>
                 </div>
 
                 <!-- Descripción -->
                 <div>
                     <div class="flex items-center gap-1.5 mb-1.5">
                         <span class="material-symbols-outlined text-[16px] text-primary">description</span>
-                        <label class="text-[10px] font-black uppercase tracking-widest text-green-950">Descripción de la solicitud</label>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-green-950">Descripción de la
+                            solicitud</label>
                     </div>
-                    <div id="modalDescripcion" class="p-3.5 bg-white border border-slate-200/80 rounded-2xl text-slate-700 text-xs font-semibold leading-relaxed whitespace-pre-line break-words shadow-sm">---</div>
+                    <div id="modalDescripcion"
+                        class="p-3.5 bg-white border border-slate-200/80 rounded-2xl text-slate-700 text-xs font-semibold leading-relaxed whitespace-pre-line break-words shadow-sm">
+                        ---</div>
                 </div>
 
                 <!-- Evidencia -->
                 <div id="wrapperDriveLink" class="hidden">
                     <div class="flex items-center gap-1.5 mb-1.5">
                         <span class="material-symbols-outlined text-[16px] text-primary">image</span>
-                        <label class="text-[10px] font-black uppercase tracking-widest text-green-950">Evidencia Adjunta</label>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-green-950">Evidencia
+                            Adjunta</label>
                     </div>
-                    <a id="modalDriveLink" href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3.5 bg-white border border-slate-200/80 rounded-2xl text-green-800 text-xs font-bold hover:bg-green-100/50 hover:border-green-300 transition-all shadow-sm group">
+                    <a id="modalDriveLink" href="#" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center justify-between p-3.5 bg-white border border-slate-200/80 rounded-2xl text-green-800 text-xs font-bold hover:bg-green-100/50 hover:border-green-300 transition-all shadow-sm group">
                         <span class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-base text-primary group-hover:scale-110 transition-transform">open_in_new</span>
+                            <span
+                                class="material-symbols-outlined text-base text-primary group-hover:scale-110 transition-transform">open_in_new</span>
                             <span>Abrir evidencia en pestaña nueva</span>
                         </span>
-                        <span class="material-symbols-outlined text-xs text-slate-400 group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+                        <span
+                            class="material-symbols-outlined text-xs text-slate-400 group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
                     </a>
                 </div>
 
@@ -74,20 +89,25 @@
             <div class="p-4 sm:p-5 border-t border-slate-100 bg-white shrink-0 space-y-3">
                 <form id="form-comentario-modal" class="space-y-2">
                     @csrf
-                    <textarea id="contenido-comentario" required placeholder="Escribe un comentario o nota interna..." class="w-full p-2.5 text-xs border border-slate-200 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary resize-none h-11 bg-slate-50 placeholder:text-slate-400"></textarea>
+                    <textarea id="contenido-comentario" required placeholder="Escribe un comentario o nota interna..."
+                        class="w-full p-2.5 text-xs border border-slate-200 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary resize-none h-11 bg-slate-50 placeholder:text-slate-400"></textarea>
 
                     <div class="flex items-center justify-between gap-2">
-                        <label class="inline-flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-green-900 uppercase tracking-wider select-none">
-                            <input type="checkbox" id="es_privado" class="rounded text-primary focus:ring-primary border-slate-300 w-3.5 h-3.5">
+                        <label
+                            class="inline-flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-green-900 uppercase tracking-wider select-none">
+                            <input type="checkbox" id="es_privado"
+                                class="rounded text-primary focus:ring-primary border-slate-300 w-3.5 h-3.5">
                             <span>Nota Interna</span>
                         </label>
-                        <button type="submit" class="ml-auto px-3.5 py-1.5 bg-green-900 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-opacity-90 transition-all flex items-center gap-1 shadow-sm">
+                        <button type="submit"
+                            class="ml-auto px-3.5 py-1.5 bg-green-900 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-opacity-90 transition-all flex items-center gap-1 shadow-sm">
                             Comentar
                         </button>
                     </div>
                 </form>
 
-                <button onclick="cerrarModal()" type="button" class="w-full py-2.5 bg-primary text-green-950 font-black rounded-xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-xs shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30">
+                <button onclick="cerrarModal()" type="button"
+                    class="w-full py-2.5 bg-primary text-green-950 font-black rounded-xl hover:bg-opacity-90 transition-all uppercase tracking-widest text-xs shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30">
                     Cerrar Detalle
                 </button>
             </div>

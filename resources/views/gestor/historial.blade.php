@@ -107,17 +107,30 @@
                 </select>
             </div>
             {{-- Botones de Ejecución --}}
-            <div class="flex gap-2 w-full">
-                <button type="button" onclick="aplicarFiltrosHistorial()"
-                    class="flex-1 h-[38px] bg-secondary text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-md hover:bg-opacity-95 transition-all flex items-center justify-center gap-1.5">
-                    <span class="material-symbols-outlined text-base">filter_alt</span> Filtrar
-                </button>
-                <button type="button" onclick="limpiarFiltrosHistorial()"
-                    class="w-[42px] h-[38px] bg-slate-200 text-slate-600 rounded-xl text-xs font-black hover:bg-slate-300 transition-all flex items-center justify-center"
-                    title="Reiniciar Filtros">
-                    <span class="material-symbols-outlined text-lg">restart_alt</span>
-                </button>
+            <div class="flex flex-col gap-1.5 w-full">
+                <div class="flex gap-1.5 w-full">
+                    <button type="button" onclick="aplicarFiltrosHistorial()"
+                        class="flex-1 h-[36px] bg-secondary text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-md hover:bg-opacity-95 transition-all flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-sm">filter_alt</span> Filtrar
+                    </button>
+                    <button type="button" onclick="limpiarFiltrosHistorial()"
+                        class="w-[36px] h-[36px] bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300 transition-all flex items-center justify-center"
+                        title="Reiniciar Filtros">
+                        <span class="material-symbols-outlined text-base">restart_alt</span>
+                    </button>
+                </div>
+                <div class="flex gap-1.5 w-full">
+                    <button type="button" onclick="exportarHistorial('pdf')"
+                        class="flex-1 h-[32px] bg-red-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-red-700 transition-all flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-xs">picture_as_pdf</span> PDF
+                    </button>
+                    <button type="button" onclick="exportarHistorial('excel')"
+                        class="flex-1 h-[32px] bg-green-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-green-800 transition-all flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-xs">description</span> Excel
+                    </button>
+                </div>
             </div>
+            <!--fin botones accion-->
         </div>
         {{-- TABLA DE HISTORIA --}}
         <div class="overflow-x-auto px-6 pb-6">

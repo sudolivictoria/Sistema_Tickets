@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ReporteController;
+use App\Http\Controllers\AdminUnidad\GestorReporteController;
 use App\Http\Controllers\AdminUnidad\AdminUnidadController;
 use App\Http\Controllers\ApiTableController;
 use App\Http\Controllers\UserController;
@@ -96,7 +97,7 @@ Route::middleware(['auth'])->group(function () {
         //Route::post('/categorias-manuales', [CategoriaManualController::class, 'store'])->name('categorias.store');
 
         //------reportes
-        Route::get('/reportes/exportar', [ReporteController::class, 'exportar'])->name('admin.reportes.exportar');
+        Route::get('/reportes/exportar', [ReporteController::class, 'exportar'])->name('reportes.exportar');
     });
 
     //---Rol Usuario
@@ -146,5 +147,9 @@ Route::middleware(['auth'])->group(function () {
         //---no corresponde
         Route::patch('/tickets/{id}/no-corresponde', [TicketController::class, 'noCorresponde'])
             ->name('tickets.no-corresponde');
+
+
+        //------reportes
+        Route::get('/reportes/exportar', [GestorReporteController::class, 'exportar'])->name('reportes.exportar');
     });
 });

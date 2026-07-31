@@ -10,160 +10,125 @@ use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class TicketController extends Controller
 {
-    //-----------METODOS DE RESOLUCION DE TICKETS----------------------
+    //----------- 1. RESOLVER TICKET (Estado ID: 3) ----------------------
     public function resolver(Request $request, $id)
     {
-        $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
-        $ahora = Carbon::now();
-        //----TICKET RESOLUCION (VENCIDO O CUMPLIDO)
-        $estadoSla = 'vencido';
-        if ($ticket->fecha_vencimiento_sla && $ahora->lessThanOrEqualTo($ticket->fecha_vencimiento_sla)) {
-            $estadoSla = 'cumplido';
-        }
-
-        $ticket->update([
-            'estado_id' => 3,
-            'fecha_cierre' => $ahora,
-            'tiempo_respuesta' => $ticket->created_at ? $ahora->diffInSeconds($ticket->created_at, true) : 0,
-            'estado_sla' => $estadoSla,
-        ]);
-
-        $comentarioCierreTexto = null;
-
-        //--- GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO ---
-        if ($request->filled('comentario_cierre')) {
-            $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
-            $comentario = Comentario::create([
-                'ticket_id'  => $ticket->id,
-                'user_id'    => Auth::id() ?? $ticket->tecnico_id,
-                'contenido'  => $textoFormateado,
-                'es_privado' => false,
-            ]);
-
-            $comentarioCierreTexto = $textoFormateado;
-
-            broadcast(new ComentarioCreado($comentario))->toOthers();
-        }
-
-        broadcast(new TicketActualizado());
-
-        $mensaje = 'Ticket marcado como resuelto el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
-
-        //--------ENVIO DE CORREOS----------
-        try {
-            Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket, $comentarioCierreTexto));
-        } catch (\Exception $e) {
-            Log::error("Error enviando correo de ticket resuelto: " . $e->getMessage());
-        }
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => $mensaje]);
-        }
-
-        $urlOrigen = request()->headers->get('referer');
-        return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
+        return $this->procesarCierreTicket($request, $id, 3, function ($ticket, $ahora) {
+            if ($ticket->fecha_vencimiento_sla && $ahora->lessThanOrEqualTo($ticket->fecha_vencimiento_sla)) {
+                return 'cumplido';
+            }
+            return 'vencido';
+        });
     }
 
-    //---------------------------------------------------------------------------------------
+    //----------- 2. EQUIVOCACION (Estado ID: 4) -------------------------
     public function equivocacion(Request $request, $id)
     {
-        $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
-        $ahora = Carbon::now();
-
-        $ticket->update([
-            'estado_id' => 4,
-            'fecha_cierre' => $ahora,
-            'tiempo_respuesta' => $ticket->created_at ? $ahora->diffInSeconds($ticket->created_at, true) : 0,
-            'estado_sla' => 'no aplica',
-        ]);
-
-        $comentarioCierreTexto = null;
-
-        //---GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO---
-        if ($request->filled('comentario_cierre')) {
-            $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
-            $comentario = Comentario::create([
-                'ticket_id'  => $ticket->id,
-                'user_id'    => Auth::id() ?? $ticket->tecnico_id,
-                'contenido'  => $textoFormateado,
-                'es_privado' => false,
-            ]);
-
-            $comentarioCierreTexto = $textoFormateado;
-
-            broadcast(new ComentarioCreado($comentario))->toOthers();
-        }
-
-        broadcast(new TicketActualizado());
-
-        $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
-
-        //-------------ENVIO DE CORREO----------------
-        try {
-            Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket, $comentarioCierreTexto));
-        } catch (\Exception $e) {
-            Log::error("Error enviando correo de ticket cerrado: " . $e->getMessage());
-        }
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => $mensaje]);
-        }
-
-        $urlOrigen = request()->headers->get('referer');
-        return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
+        return $this->procesarCierreTicket($request, $id, 4, function () {
+            return 'no aplica';
+        });
     }
 
-    //----------------------------------------------------------------------------------------------------
+    //----------- 3. NO CORRESPONDE (Estado ID: 5) -----------------------
     public function nocorresponde(Request $request, $id)
     {
-        $ticket = Ticket::with(['user', 'tecnico'])->findOrFail($id);
-        $ahora = Carbon::now();
+        return $this->procesarCierreTicket($request, $id, 5, function () {
+            return 'no aplica';
+        });
+    }
 
-        $ticket->update([
-            'estado_id' => 5,
-            'fecha_cierre' => $ahora,
-            'tiempo_respuesta' => $ticket->created_at ? $ahora->diffInSeconds($ticket->created_at, true) : 0,
-            'estado_sla' => 'no aplica',
-        ]);
-
-        $comentarioCierreTexto = null;
-
-        //---GUARDAR COMENTARIO DE CIERRE SI FUE INGRESADO---
-        if ($request->filled('comentario_cierre')) {
-            $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
-            $comentario = Comentario::create([
-                'ticket_id'  => $ticket->id,
-                'user_id'    => Auth::id() ?? $ticket->tecnico_id,
-                'contenido'  => $textoFormateado,
-                'es_privado' => false,
-            ]);
-
-            $comentarioCierreTexto = $textoFormateado;
-
-            broadcast(new ComentarioCreado($comentario))->toOthers();
-        }
-
-        broadcast(new TicketActualizado());
-
-        $mensaje = 'Ticket marcado como cerrado el ' . $ticket->fecha_cierre->format('d/m/Y H:i');
-
-        //---------------------------ENNVIO DE CORREOS---------------------------------------
+    /**
+     * Helper privado para procesar el cierre del ticket de forma atómica y concurrente
+     */
+    private function procesarCierreTicket(Request $request, $id, int $nuevoEstadoId, callable $determinarEstadoSla)
+    {
         try {
-            Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket, $comentarioCierreTexto));
+            $resultado = DB::transaction(function () use ($request, $id, $nuevoEstadoId, $determinarEstadoSla) {
+                // Bloqueamos la fila del ticket en BD
+                $ticket = Ticket::where('id', $id)->lockForUpdate()->firstOrFail();
+
+                // Validación concurrente: Verificar si otro usuario ya cambió el estado a cerrado
+                if (in_array($ticket->estado_id, [3, 4, 5])) {
+                    return [
+                        'error' => true,
+                        'message' => '¡Operación rechazada! Este ticket ya ha sido cerrado o resuelto por otro usuario.'
+                    ];
+                }
+
+                $ahora = Carbon::now();
+                $estadoSla = $determinarEstadoSla($ticket, $ahora);
+
+                $ticket->update([
+                    'estado_id'        => $nuevoEstadoId,
+                    'fecha_cierre'     => $ahora,
+                    'tiempo_respuesta' => $ticket->created_at ? $ahora->diffInSeconds($ticket->created_at, true) : 0,
+                    'estado_sla'       => $estadoSla,
+                ]);
+
+                $comentarioCierreTexto = null;
+
+                // Guardar comentario de cierre si fue ingresado
+                if ($request->filled('comentario_cierre')) {
+                    $textoFormateado = '[Cierre]: ' . trim($request->comentario_cierre);
+                    $comentario = Comentario::create([
+                        'ticket_id'  => $ticket->id,
+                        'user_id'    => Auth::id() ?? $ticket->tecnico_id,
+                        'contenido'  => $textoFormateado,
+                        'es_privado' => false,
+                    ]);
+
+                    $comentarioCierreTexto = $textoFormateado;
+                    broadcast(new ComentarioCreado($comentario))->toOthers();
+                }
+
+                return [
+                    'error'           => false,
+                    'ticket'          => $ticket,
+                    'comentarioTexto' => $comentarioCierreTexto,
+                    'fechaCierre'     => $ahora->format('d/m/Y H:i')
+                ];
+            });
+
+            if ($resultado['error']) {
+                return $request->ajax()
+                    ? response()->json(['success' => false, 'message' => $resultado['message']], 422)
+                    : back()->with('sweet_error', $resultado['message']);
+            }
+
+            $ticket = $resultado['ticket'];
+            $mensaje = 'Ticket marcado como cerrado el ' . $resultado['fechaCierre'];
+
+            broadcast(new TicketActualizado());
+
+            // Envío de correo en segundo plano
+            try {
+                if ($ticket->user?->email) {
+                    Mail::to($ticket->user->email)->queue(new TicketResueltoMail($ticket, $resultado['comentarioTexto']));
+                }
+            } catch (\Exception $e) {
+                Log::error("Error enviando correo de cierre en Ticket #{$id}: " . $e->getMessage());
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => $mensaje]);
+            }
+
+            $urlOrigen = request()->headers->get('referer');
+            return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
+
         } catch (\Exception $e) {
-            Log::error("Error enviando correo de ticket cerrado: " . $e->getMessage());
+            Log::error("Error de concurrencia/procesamiento al cerrar ticket #{$id}: " . $e->getMessage());
+            $err = 'No se pudo procesar la solicitud debido a un conflicto de sistema.';
+            
+            return $request->ajax() 
+                ? response()->json(['success' => false, 'message' => $err], 500) 
+                : back()->with('sweet_error', $err);
         }
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => $mensaje]);
-        }
-
-        $urlOrigen = request()->headers->get('referer');
-        return redirect()->to($urlOrigen)->with('sweet_success', $mensaje);
     }
 }
