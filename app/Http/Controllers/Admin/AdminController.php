@@ -210,7 +210,7 @@ class AdminController extends Controller
             'prioridad_id' => $request->prioridad_id,
             'tecnico_id' => null, //---vacio inicial 
             'fecha_vencimiento_sla' => $fechaVencimiento,
-            'estado-sla' => 'pendiente',
+            'estado_sla' => 'pendiente',
 
         ]);
 

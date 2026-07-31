@@ -60,5 +60,5 @@
 @endpush
 {{-- actualizacion auto --}}
 @push('sse-scripts')
-    @vite(['resources/js/api.js', 'resources/js/comentarios.js'])
+    @vite(['resources/js/api.js'])
 @endpush

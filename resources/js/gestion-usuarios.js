@@ -139,7 +139,7 @@ window.filtrarEstado = function (estado, btn) {
         .draw(false);
 };
 //--------------------MODALES--------------------------------
-window.abrirModal = function (tipo, data = null) {
+window.abrirModalUsuario = function (tipo, data = null) {
     if (tipo === "agregar") {
         $("#formAgregar")[0]?.reset();
         $("#modalAgregar").removeClass("hidden");
@@ -157,7 +157,7 @@ window.abrirModal = function (tipo, data = null) {
     $("body").addClass("overflow-hidden");
 };
 //----------------CLOSE
-window.cerrarModal = function (id) {
+window.cerrarModalUsuario = function (id) {
     $("#" + id).addClass("hidden");
     $("body").removeClass("overflow-hidden");
 };

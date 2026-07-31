@@ -1,10 +1,6 @@
 var tableHistorial;
 var filtrosAplicados = false;
-let timerSLA = null;
-let ticketIdActual = null;
-let ticketEstadoActual = null;
-//-------echo
-let canalEchoActual = null;
+
 window.inicializarHistorialDataTable = function () {
     if ($.fn.DataTable.isDataTable("#tablaHistorial")) {
         $("#tablaHistorial").DataTable().destroy();
@@ -42,124 +38,45 @@ window.inicializarHistorialDataTable = function () {
         order: [[0, "desc"]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
-    //--------------------------LARAVEL ECHO REVERB------------------------
-    window.escucharComentariosWebSocket = function (idTicket) {
-        if (typeof Echo === "undefined") {
-            console.warn("[Reverb] Echo no está inicializado globalmente.");
-            return;
-        }
-        window.desconectarComentariosWebSocket();
-        canalEchoActual = idTicket;
-        //---conexion dinamica del ticket
-        Echo.channel(`ticket.${idTicket}`).listen(".comentario.creado", (e) => {
-            //--punto inicial
-            if (e && e.comentario) {
-                window.agregarComentarioAlModal(e.comentario);
-            }
-        });
-    };
-    window.desconectarComentariosWebSocket = function () {
-        if (typeof Echo !== "undefined" && canalEchoActual) {
-            Echo.leaveChannel(`ticket.${canalEchoActual}`);
-            canalEchoActual = null;
-        }
-    };
+
     //---------------------MANEJO DE EVENTOS E INICIALIZACION------------------
     $("#tablaHistorial")
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
-            const idTicket = $(this).data("id");
-            const asunto = $(this).data("asunto");
-            const descripcion = $(this).data("descripcion");
-            const tipo = $(this).data("tipo");
-            const fecha = $(this).data("fecha");
-            const drive = $(this).data("drive");
-            const estadoNombre = $(this).data("estado");
-            const estadoSLA = $(this).data("state");
-            const datosSLA = {
-                estadoNombre: estadoNombre,
-                estadoSLA: estadoSLA,
-                fechaLimite: $(this).data("fecha-limite"),
-                tiempoRespuesta: $(this).data("tiempo-respuesta"),
-            };
-            verDetalle(
-                idTicket,
-                asunto,
-                descripcion,
-                tipo,
-                fecha,
-                drive,
-                estadoNombre,
-                estadoSLA,
-                datosSLA,
-            );
+            const $btn = $(this);
+            window.verDetalle({
+                idTicket: $btn.data("id"),
+                asunto: $btn.data("asunto"),
+                descripcion: $btn.data("descripcion"),
+                tipoNombre: $btn.data("tipo"),
+                fechaApertura: $btn.data("fecha"), // Historial maneja fecha
+                drive: $btn.data("drive"),
+                estadoNombre: $btn.data("estado"),
+                datosSLA: {
+                    estadoNombre: $btn.data("estado"),
+                    fechaLimite: $btn.data("fecha-limite"),
+                    tiempoRespuesta: $btn.data("tiempo-respuesta"),
+                }
+            });
         });
+
     //----------------PERFIL USUARIO
     $("#tablaHistorial")
         .off("click", ".btn-ver-usuario")
         .on("click", ".btn-ver-usuario", function () {
-            const nombre = $(this).data("nombre");
-            const email = $(this).data("email");
-            const unidad = $(this).data("unidad");
-            const cargo = $(this).data("cargo");
-            const telefono = $(this).data("telefono");
-            verUsuario(nombre, email, unidad, cargo, telefono);
+            const $btn = $(this);
+            window.verUsuario(
+                $btn.data("nombre"),
+                $btn.data("email"),
+                $btn.data("unidad"),
+                $btn.data("cargo"),
+                $btn.data("telefono")
+            );
         });
+
     tableHistorial.draw();
 };
-//-----evento Guardar Comentario (con .off() para prevenir peticiones dobles) NUEVO COMENTARIO----------
-$(document)
-    .off("submit", "#form-comentario-modal")
-    .on("submit", "#form-comentario-modal", function (e) {
-        e.preventDefault();
-        if (!ticketIdActual) return;
 
-        const $inputContenido = $("#contenido-comentario");
-        const contenido = $inputContenido.val().trim();
-        if (contenido === "") return;
-
-        const esPrivado = $("#es_privado").is(":checked") ? 1 : 0;
-        const $btnSubmit = $(this).find('button[type="submit"]');
-        const textoOriginal = $btnSubmit.html();
-
-        $btnSubmit
-            .prop("disabled", true)
-            .addClass("opacity-75 cursor-not-allowed");
-        $btnSubmit.html(
-            '<span class="inline-block animate-spin mr-2">⏳</span> Guardando comentario...',
-        );
-        $.ajax({
-            url: `/tickets/${ticketIdActual}/comentarios`,
-            method: "POST",
-            data: {
-                _token:
-                    $('input[name="_token"]').val() ||
-                    $('meta[name="csrf-token"]').attr("content"),
-                contenido: contenido,
-                es_privado: esPrivado,
-            },
-        })
-            .done(function (response) {
-                if (response.success || response.comentario) {
-                    $inputContenido.val("");
-                    if ($("#es_privado").length)
-                        $("#es_privado").prop("checked", false);
-
-                    const comentarioData = response.comentario || response;
-                    window.agregarComentarioAlModal(comentarioData);
-                }
-            })
-            .fail(function (err) {
-                console.error("Error al guardar comentario:", err);
-                alert("Ocurrió un error al intentar publicar el comentario.");
-            })
-            .always(function () {
-                $btnSubmit
-                    .prop("disabled", false)
-                    .removeClass("opacity-75 cursor-not-allowed")
-                    .html(textoOriginal);
-            });
-    });
 //----------filtros PARA HISTORIAL
 window.aplicarFiltrosHistorial = function () {
     if (!tableHistorial) return;
@@ -170,15 +87,9 @@ window.aplicarFiltrosHistorial = function () {
     const categoria = document.getElementById("filtroCategoria")
         ? document.getElementById("filtroCategoria").value
         : "todos";
+
     //--------------------------------VALIDACIONES------------------------------
-    //------validar si todos los parámetros están en su estado vacío por defecto
-    if (
-        !textoBuscar &&
-        !fechaInicio &&
-        !fechaFin &&
-        estado === "todos" &&
-        categoria === "todos"
-    ) {
+    if (!textoBuscar && !fechaInicio && !fechaFin && estado === "todos" && categoria === "todos") {
         Swal.fire({
             title: "¡Búsqueda muy amplia!",
             text: "Para proteger el rendimiento del sistema, debe seleccionar al menos un filtro específico.",
@@ -194,7 +105,7 @@ window.aplicarFiltrosHistorial = function () {
         });
         return;
     }
-    //------rango de fechas, complete ambos campos
+
     if ((fechaInicio && !fechaFin) || (!fechaInicio && fechaFin)) {
         Swal.fire({
             title: "Rango de fechas incompleto",
@@ -211,7 +122,7 @@ window.aplicarFiltrosHistorial = function () {
         });
         return;
     }
-    //------rango de fechas, fecha valida
+
     if (fechaInicio > fechaFin) {
         Swal.fire({
             title: "Rango de fechas incorrecto",
@@ -228,31 +139,35 @@ window.aplicarFiltrosHistorial = function () {
         });
         return;
     }
+
     filtrosAplicados = true;
     tableHistorial.search(textoBuscar);
     tableHistorial.draw();
 };
+
 //--------limpiar filtros historial--------//
 window.limpiarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     filtrosAplicados = false;
+    
     const elBuscar = document.getElementById("filtroBuscar");
-
     if (elBuscar) elBuscar.value = "";
+
     const elFechaInicio = document.getElementById("filtroFechaInicio");
-
     if (elFechaInicio) elFechaInicio.value = "";
+
     const elFechaFin = document.getElementById("filtroFechaFin");
-
     if (elFechaFin) elFechaFin.value = "";
+
     const elEstado = document.getElementById("filtroEstado");
-
     if (elEstado) elEstado.value = "todos";
-    const elCategoria = document.getElementById("filtroCategoria");
 
+    const elCategoria = document.getElementById("filtroCategoria");
     if (elCategoria) elCategoria.value = "todos";
+
     tableHistorial.search("").draw();
 };
+
 //--------exportar historial--------//
 window.exportarHistorial = function (formato) {
     if (!filtrosAplicados) {
@@ -305,10 +220,8 @@ window.exportarHistorial = function (formato) {
         categoria: categoria,
     });
 
-    //----detecta si es admin o es gestor
     const esGestor = window.location.pathname.startsWith('/gestor');
     const baseUrl = esGestor ? '/gestor/reportes/exportar' : '/admin/reportes/exportar';
-
     const urlFinal = `${baseUrl}?${params.toString()}`;
 
     if (formato === "pdf") {
@@ -317,323 +230,31 @@ window.exportarHistorial = function (formato) {
         window.location.href = urlFinal;
     }
 };
-//------------------------TIMER SLA-------------------------------------
-function iniciarContadorSLA(datosSLA) {
-    if (timerSLA) clearInterval(timerSLA);
-    const wrapper = document.getElementById("wrapperCountdown");
-    const display = document.getElementById("modalCountdown");
 
-    if (!wrapper || !display) return;
-
-    const { estadoSLA, estadoNombre, fechaLimite, tiempoRespuesta } = datosSLA;
-    const segundosTranscurridos = Number(tiempoRespuesta) || 0;
-    const estadoCheck = String(estadoNombre || "")
-        .toLowerCase()
-        .trim();
-    const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
-    //-----ticket resuelto
-    if (estadosCerrados.includes(estadoCheck) || segundosTranscurridos > 0) {
-        wrapper.classList.remove("hidden");
-        wrapper.className =
-            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
-
-        if (segundosTranscurridos === 0) {
-            display.textContent = "Finalizado";
-            return;
-        }
-        const dias = Math.floor(segundosTranscurridos / 86400);
-        const horas = Math.floor((segundosTranscurridos % 86400) / 3600);
-        const minutos = Math.floor((segundosTranscurridos % 3600) / 60);
-        const segundos = segundosTranscurridos % 60;
-
-        if (dias > 0)
-            display.textContent = `Respuesta: ${dias}d ${horas}h ${minutos}m`;
-        else if (horas > 0)
-            display.textContent = `Respuesta: ${horas}h ${minutos}m`;
-        else if (minutos > 0)
-            display.textContent = `Respuesta: ${minutos}m ${segundos}s`;
-        else display.textContent = `Respuesta: ${segundos}s`;
-        return;
-    }
-    //---sin fecha limite configurada
-    if (!fechaLimite) {
-        wrapper.classList.add("hidden");
-        return;
-    }
-    //----conteo regresivo
-    wrapper.classList.remove("hidden");
-    const limite = new Date(fechaLimite).getTime();
-    const tick = () => {
-        const restante = limite - Date.now();
-        //------vencido porque paso el tiempo correspondiente
-        if (restante <= 0) {
-            clearInterval(timerSLA);
-            display.textContent = "Vencido";
-            wrapper.className =
-                "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
-            return;
-        }
-        wrapper.className =
-            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
-        const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
-        const horas = Math.floor(
-            (restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-        );
-        const minutos = Math.floor((restante % (1000 * 60 * 60)) / (1000 * 60));
-        const segundos = Math.floor((restante % (1000 * 60)) / 1000);
-        const pad = (num) => String(num).padStart(2, "0");
-        if (dias > 0) {
-            display.textContent = `${dias}d ${pad(horas)}h ${pad(minutos)}m`;
-        } else if (horas > 0) {
-            display.textContent = `${horas}h ${pad(minutos)}m ${pad(segundos)}s`;
-        } else if (minutos > 0) {
-            display.textContent = `${minutos}m ${pad(segundos)}s`;
-        } else {
-            display.textContent = `${segundos}s`;
-        }
-    };
-    tick();
-    timerSLA = setInterval(tick, 1000);
-}
-//=====================================================================
-//                     FUNCIONES MODALES
-//=====================================================================
-window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
-    const $lista = $("#modalListaComentarios");
-    const $seccionHistorico = $("#seccion-historico-comentarios");
-    const $formularioComentario = $("#form-comentario-modal");
-
-    if (!idTicket) return;
-    const estadosCerradosTextos = [
-        "resuelto",
-        "equivocado",
-        "no corresponde",
-        "cerrado",
-    ];
-    const estadoStr = String(estadoNombre || "")
-        .toLowerCase()
-        .trim();
-    const esCerradoPorTexto = estadosCerradosTextos.includes(estadoStr);
-
-    if (esCerradoPorTexto) {
-        $formularioComentario.hide();
-    } else {
-        $formularioComentario.show();
-    }
-    $.get(`/tickets/${idTicket}/comentarios`)
-        .done(function (comentarios) {
-            $lista.empty();
-            if (!comentarios || comentarios.length === 0) {
-                $seccionHistorico.hide();
-                $("#preloaderGlobalModal").addClass("hidden");
-                return;
-            }
-            $seccionHistorico.show();
-            const fragment = document.createDocumentFragment();
-            comentarios.forEach((com) => {
-                const bg = com.es_privado
-                    ? "bg-lime-50/80 border-lime-300"
-                    : "bg-white border-slate-200";
-                const tag = com.es_privado
-                    ? '<span class="text-green-700 font-bold">[Nota Interna]</span> '
-                    : "";
-                const item = document.createElement("div");
-                item.className = `p-2 rounded-xl border ${bg}`;
-
-                if (com.id) item.setAttribute("data-comentario-id", com.id);
-
-                item.innerHTML = `
-                    <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                        <span>${tag}${com.user ? com.user.name : "Usuario"}</span>
-                        <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible || ""}</span>
-                    </div>
-                    <p class="text-slate-600 font-medium">${com.contenido}</p>
-                `;
-                fragment.appendChild(item);
-            });
-            $lista[0].appendChild(fragment);
-            $lista.scrollTop($lista[0].scrollHeight);
-        })
-        .fail(function (err) {
-            console.error("Error al obtener comentarios:", err);
-        })
-        .always(function () {
-            $("#preloaderGlobalModal").addClass("hidden");
-        });
-};
-//---------------------------AGREGAR COMENTARIOS DINAMICAMENTE---------------------------
-window.agregarComentarioAlModal = function (comentario) {
-    const $lista = $("#modalListaComentarios");
-    const $seccionHistorico = $("#seccion-historico-comentarios");
-    if (!$lista.length) return;
-    if (
-        comentario.id &&
-        $lista.find(`[data-comentario-id="${comentario.id}"]`).length > 0
-    ) {
-        return;
-    }
-    $seccionHistorico.show();
-
-    const dataAttr = comentario.id
-        ? `data-comentario-id="${comentario.id}"`
-        : "";
-
-    const bg = comentario.es_privado
-        ? "bg-lime-50 border-lime-200"
-        : "bg-white border-slate-200";
-
-    const tag = comentario.es_privado
-        ? '<span class="text-green-900 font-bold">[Nota Interna]</span> '
-        : "";
-
-    const elComentario = `
-        <div class="p-2 rounded-xl border ${bg} transition-all duration-300">
-            <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                <span>${tag}${comentario.user ? comentario.user.name : "Usuario"}</span>
-                <span class="text-[10px] text-slate-400 font-normal">${comentario.tiempo_legible || "Ahora mismo"}</span>
-            </div>
-            <p class="text-slate-600 font-medium">${comentario.contenido}</p>
-        </div>
-    `;
-    $lista.append(elComentario);
-    $lista.scrollTop($lista[0].scrollHeight);
-};
-//-------------------TICKET------------------
-window.verDetalle = function (
-    idTicket,
-    asunto,
-    descripcion,
-    tipoNombre,
-    fechaApertura,
-    drive,
-    estadoNombre,
-    estadoSLA,
-    datosSLA = {},
-) {
-    ticketIdActual = idTicket;
-    ticketEstadoActual = estadoNombre;
-    const modal = document.getElementById("modalTicket");
-    const titulo = document.getElementById("modalTitulo");
-    const desc = document.getElementById("modalDescripcion");
-    const tipo = document.getElementById("modalTipoSolicitud");
-    const fecha = document.getElementById("modalFechaApertura");
-    const wrapper = document.getElementById("wrapperDriveLink");
-    const linkAnchor = document.getElementById("modalDriveLink");
-
-    //**********PRELOADER GLOBAL*******************/
-    $("#preloaderGlobalModal").removeClass("hidden");
-    //************************************************/
-
-    if (modal && titulo && desc && tipo) {
-        titulo.textContent = asunto;
-        desc.textContent = descripcion;
-        tipo.textContent = tipoNombre;
-        if (fecha) {
-            fecha.textContent = fechaApertura;
-        }
-        modal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-    }
-    //----IMAGEN DE EVIDENCIA-----
-    if (drive && drive.trim() !== "" && drive !== "null") {
-        const pathLimpio = drive.startsWith("/") ? drive.substring(1) : drive;
-        const urlImagen = `${window.location.origin}/storage/${pathLimpio}`;
-        if (linkAnchor) linkAnchor.href = urlImagen;
-        if (wrapper) wrapper.classList.remove("hidden");
-    } else {
-        if (linkAnchor) linkAnchor.href = "#";
-        if (wrapper) wrapper.classList.add("hidden");
-    }
-    $("#contenido-comentario").val("");
-    if ($("#es_privado").length) $("#es_privado").prop("checked", false);
-
-    window.cargarComentariosDelTicket(ticketIdActual, ticketEstadoActual);
-    //----conectar al canal en tiempo real
-    if (typeof window.escucharComentariosWebSocket === "function") {
-        window.escucharComentariosWebSocket(ticketIdActual);
-    }
-    iniciarContadorSLA(datosSLA);
-};
-//-----------cerrar
-window.cerrarModal = function () {
-    const modal = document.getElementById("modalTicket");
-    if (modal) {
-        modal.classList.add("hidden");
-        document.body.style.overflow = "auto";
-        if (timerSLA) clearInterval(timerSLA);
-        ticketIdActual = null;
-        //----desconectar el canal del echo al cerrar
-        if (typeof window.desconectarComentariosWebSocket === "function") {
-            window.desconectarComentariosWebSocket();
-        }
-    }
-};
-//--------ver detalle del usuario historial--------//
-window.verUsuario = function (name, email, unidad, cargo, telefono) {
-    const modal = document.getElementById("modalUsuario");
-    const nombre = document.getElementById("userNombre");
-    const correo = document.getElementById("userEmail");
-    const departamento = document.getElementById("userUnidad");
-    const puesto = document.getElementById("userCargo");
-    const contacto = document.getElementById("userTelefono");
-    const elLinkCorreo = document.getElementById("linkCorreo");
-
-    if (nombre && correo && departamento && puesto && contacto && modal) {
-        nombre.textContent = name || "---";
-        correo.textContent = email || "---";
-        departamento.textContent = unidad || "---";
-        puesto.textContent = cargo || "---";
-        contacto.textContent = telefono || "---";
-
-        //--------------gmail----------------------
-        if (email && email !== "---") {
-            elLinkCorreo.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent("Consulta sobre su Ticket")}&body=${encodeURIComponent(`Hola ${name || ""},`)}`;
-            elLinkCorreo.classList.remove("opacity-50", "pointer-events-none");
-        } else {
-            elLinkCorreo.href = "javascript:void(0)";
-            elLinkCorreo.classList.add("opacity-50", "pointer-events-none");
-        }
-        modal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-    }
-};
-//-------------------CLOSE
-window.cerrarModalUsuario = function () {
-    const modal = document.getElementById("modalUsuario");
-    if (modal) {
-        modal.classList.add("hidden");
-        document.body.style.overflow = "auto";
-    }
-};
 //--------filtros personalizados para historial--------//
 document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaHistorial")) {
         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             if (settings.nTable.id !== "tablaHistorial") return true;
-            if (!filtrosAplicados) {
-                return false;
-            }
+            if (!filtrosAplicados) return false;
+            
             const filaTr = settings.aoData[dataIndex].nTr;
             const fechaFilaRaw = filaTr.getAttribute("data-fecha");
             const estadoFilaId = filaTr.getAttribute("data-estado-id");
             const categoriaFilaId = filaTr.getAttribute("data-categoria-id");
             const estadoSel = document.getElementById("filtroEstado").value;
-            if (estadoSel !== "todos" && estadoFilaId !== estadoSel) {
-                return false;
-            }
+            
+            if (estadoSel !== "todos" && estadoFilaId !== estadoSel) return false;
+            
             const elCategoria = document.getElementById("filtroCategoria");
             if (elCategoria) {
                 const categoriaSel = elCategoria.value;
-                if (
-                    categoriaSel !== "todos" &&
-                    categoriaFilaId !== categoriaSel
-                ) {
-                    return false;
-                }
+                if (categoriaSel !== "todos" && categoriaFilaId !== categoriaSel) return false;
             }
-            const fInicioRaw =
-                document.getElementById("filtroFechaInicio").value;
+            
+            const fInicioRaw = document.getElementById("filtroFechaInicio").value;
             const fFinRaw = document.getElementById("filtroFechaFin").value;
+            
             if (fechaFilaRaw) {
                 const fechaFila = new Date(fechaFilaRaw + "T00:00:00");
                 if (fInicioRaw) {

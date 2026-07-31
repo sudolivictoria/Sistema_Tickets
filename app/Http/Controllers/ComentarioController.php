@@ -29,15 +29,19 @@ class ComentarioController extends Controller
         if (!$user->tieneRol('Admin') && !$user->tieneRol('Gestor')) {
             $query->where('es_privado', false);
         }
-        
+
+        // Usamos select o transformamos directo sin sobrecargar Carbon en bucles masivos
         $comentarios = $query->oldest()->get()->map(function ($com) {
             return [
+                'id' => $com->id,
                 'user' => [
-                    'name' => $com->user ? $com->user->name : 'Usuario Desconocido'
+                    'name' => $com->user->name ?? 'Usuario Desconocido'
                 ],
                 'contenido' => $com->contenido,
                 'es_privado' => $com->es_privado,
-                'tiempo_legible' => $com->created_at->diffForHumans()
+                // Guardamos el formato rápido o dejamos que el cliente lo pinte si es necesario, 
+                // o usamos una fecha cacheada/optimizada:
+                'tiempo_legible' => $com->created_at ? $com->created_at->diffForHumans() : ''
             ];
         });
 
@@ -59,7 +63,7 @@ class ComentarioController extends Controller
         $cacheKey = 'comment_lock_' . $user->id . '_' . $ticketId . '_' . md5(trim($request->contenido));
         if (!Cache::add($cacheKey, true, 5)) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Tu comentario ya se está procesando. Evita presionar dos veces el botón.'
             ], 429);
         }
@@ -165,8 +169,8 @@ class ComentarioController extends Controller
                     // ---- COMENTARIO REALIZADO POR ADMIN O TÉCNICO ----
                     if ($ticket->user && $ticket->user->id != $user->id && !empty($ticket->user->email)) {
 
-                        $subtitulo = $ticket->tecnico 
-                            ? "El técnico asignado ha registrado una respuesta a tu solicitud." 
+                        $subtitulo = $ticket->tecnico
+                            ? "El técnico asignado ha registrado una respuesta a tu solicitud."
                             : "Se ha registrado una nueva respuesta a tu solicitud.";
 
                         Mail::to($ticket->user->email)->queue(new NotificacionTicketMail(
@@ -188,14 +192,13 @@ class ComentarioController extends Controller
             }
 
             return response()->json(['success' => true, 'comentario' => $comentario]);
-
         } catch (\Exception $e) {
             // Liberar candado en caso de fallo catastrófico
             Cache::forget($cacheKey);
             Log::error("Error procesando comentario en ticket #{$ticketId}: " . $e->getMessage());
 
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Ocurrió un error al intentar guardar el comentario.'
             ], 500);
         }

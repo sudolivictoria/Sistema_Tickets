@@ -22,7 +22,7 @@
                 <span class="material-symbols-outlined text-4xl text-primary">group</span>
                 Gestión de Usuarios
             </h2>
-            <button onclick="abrirModal('agregar')"
+            <button onclick="abrirModalUsuario('agregar')"
                 class="flex items-center gap-2 bg-primary text-secondary px-6 py-2.5 rounded-xl font-black shadow-lg hover:scale-[1.02] transition-all uppercase text-[12px] tracking-widest">
                 <span class="material-symbols-outlined">person_add</span> Nuevo Usuario
             </button>
@@ -85,7 +85,7 @@
                             <td class="px-4 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
                                     {{-- Botón Editar --}}
-                                    <button type="button" onclick="abrirModal('editar', {{ json_encode($user) }})"
+                                    <button type="button" onclick="abrirModalUsuario('editar', {{ json_encode($user) }})"
                                         @disabled($user->id === auth()->id())
                                         class="p-2 rounded-xl {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100' }}">
                                         <span class="material-symbols-outlined text-[18px]">edit</span>
@@ -115,7 +115,7 @@
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
             <div class="bg-primary p-6 text-secondary flex justify-between items-center">
                 <h3 class="font-black uppercase tracking-widest text-lg">Nuevo Usuario</h3>
-                <button type="button" onclick="cerrarModal('modalAgregar')"
+                <button type="button" onclick="cerrarModalUsuario('modalAgregar')"
                     class="material-symbols-outlined font-bold">close</button>
             </div>
             <form id="formAgregar" action="{{ route('admin.usuarios.store') }}" method="POST" class="p-6 space-y-4">
@@ -177,7 +177,7 @@
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
             <div class="bg-primary p-6 text-secondary flex justify-between items-center">
                 <h3 class="font-black uppercase tracking-widest text-lg">Editar Usuario</h3>
-                <button type="button" onclick="cerrarModal('modalEditar')"
+                <button type="button" onclick="cerrarModalUsuario('modalEditar')"
                     class="material-symbols-outlined font-bold">close</button>
             </div>
             <form id="formEditar" method="POST" class="p-6 space-y-4">

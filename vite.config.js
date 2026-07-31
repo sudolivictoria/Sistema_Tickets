@@ -20,7 +20,7 @@ export default defineConfig({
                 "resources/js/usuario-menu.js",
                 "resources/js/historial.js",
                 "resources/js/api.js",
-                "resources/js/comentarios.js",
+                "resources/js/ticket-core.js",
             ],
             refresh: true,
         }),
