@@ -17,12 +17,25 @@ use Illuminate\Support\Facades\Log;
 
 class ComentarioController extends Controller
 {
+    //------------AUTORIZACION: solo staff, el dueño del ticket o el tecnico asignado---------------
+    private function autorizarAccesoTicket(Ticket $ticket, User $user): void
+    {
+        $esStaff = $user->tieneRol('Admin') || $user->tieneRol('Gestor');
+        $esPropietario = $ticket->user_id === $user->id;
+        $esTecnicoAsignado = $ticket->tecnico_id !== null && $ticket->tecnico_id === $user->id;
+
+        if (!$esStaff && !$esPropietario && !$esTecnicoAsignado) {
+            abort(403, 'No tienes permiso para acceder a este ticket.');
+        }
+    }
+
     //------------METODO PARA TRAER TODOS LOS COMENTARIOS DE LA BASE---------------
     public function obtenerComentarios($ticketId)
     {
         $ticket = Ticket::findOrFail($ticketId);
         /** @var User $user */
         $user = Auth::user();
+        $this->autorizarAccesoTicket($ticket, $user);
 
         $query = Comentario::with('user')->where('ticket_id', $ticket->id);
 
@@ -58,6 +71,7 @@ class ComentarioController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
+        $this->autorizarAccesoTicket(Ticket::findOrFail($ticketId), $user);
 
         // 1. Candado contra Doble-Clic por usuario + contenido + ticket (Válido por 5 segundos)
         $cacheKey = 'comment_lock_' . $user->id . '_' . $ticketId . '_' . md5(trim($request->contenido));
@@ -103,9 +117,14 @@ class ComentarioController extends Controller
             $comentario->load('user');
             $comentario->tiempo_legible = $comentario->created_at->diffForHumans();
 
-            // Broadcast WebSockets si no es privado
+            // Broadcast WebSockets si no es privado. El comentario ya se guardó;
+            // un fallo de Reverb no debe reportarse como error al usuario.
             if (!$esPrivado) {
-                broadcast(new ComentarioCreado($comentario))->toOthers();
+                try {
+                    broadcast(new ComentarioCreado($comentario))->toOthers();
+                } catch (\Exception $e) {
+                    Log::error("Fallo al emitir broadcast ComentarioCreado en ticket #{$ticketId}: " . $e->getMessage());
+                }
             }
 
             // 3. Lógica de Envíos de Correos (Fuera de la transacción de BD)

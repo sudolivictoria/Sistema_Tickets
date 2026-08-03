@@ -11,7 +11,7 @@
 
         {{-- Formulario de Creación de Ticket --}}
         <form action="{{ route('admin.tickets.store') }}" method="POST" enctype="multipart/form-data"
-            class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+            class="space-y-8 bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100" id="formCrearTicket">
             @csrf
         <!--asunto del ticket-->
             <div class="flex flex-col gap-2.5">

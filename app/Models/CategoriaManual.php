@@ -8,4 +8,9 @@ class CategoriaManual extends Model
 {
     protected $table = 'categoria_manuales';
     protected $fillable = ['nombre_categoria_manual'];
+
+    public function manuales()
+    {
+        return $this->hasMany(Manual::class, 'categoria_id');
+    }
 }

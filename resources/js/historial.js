@@ -39,7 +39,7 @@ window.inicializarHistorialDataTable = function () {
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
 
-    //---------------------MANEJO DE EVENTOS E INICIALIZACION------------------
+    //---------------------MANEJO DE EVENTOS E INICIALIZACION------------------>
     $("#tablaHistorial")
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
@@ -49,7 +49,6 @@ window.inicializarHistorialDataTable = function () {
                 asunto: $btn.data("asunto"),
                 descripcion: $btn.data("descripcion"),
                 tipoNombre: $btn.data("tipo"),
-                fechaApertura: $btn.data("fecha"), // Historial maneja fecha
                 drive: $btn.data("drive"),
                 estadoNombre: $btn.data("estado"),
                 datosSLA: {
@@ -60,7 +59,7 @@ window.inicializarHistorialDataTable = function () {
             });
         });
 
-    //----------------PERFIL USUARIO
+    //----------------PERFIL USUARIO----------------->
     $("#tablaHistorial")
         .off("click", ".btn-ver-usuario")
         .on("click", ".btn-ver-usuario", function () {
@@ -77,7 +76,7 @@ window.inicializarHistorialDataTable = function () {
     tableHistorial.draw();
 };
 
-//----------filtros PARA HISTORIAL
+//----------FILTROS PARA HISTORIAL------------------------------------------>
 window.aplicarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     const textoBuscar = document.getElementById("filtroBuscar").value.trim();
@@ -88,7 +87,7 @@ window.aplicarFiltrosHistorial = function () {
         ? document.getElementById("filtroCategoria").value
         : "todos";
 
-    //--------------------------------VALIDACIONES------------------------------
+    //--------------------------------VALIDACIONES------------------------------>
     if (!textoBuscar && !fechaInicio && !fechaFin && estado === "todos" && categoria === "todos") {
         Swal.fire({
             title: "¡Búsqueda muy amplia!",
@@ -145,7 +144,7 @@ window.aplicarFiltrosHistorial = function () {
     tableHistorial.draw();
 };
 
-//--------limpiar filtros historial--------//
+//--------limpiar filtros historial-------->
 window.limpiarFiltrosHistorial = function () {
     if (!tableHistorial) return;
     filtrosAplicados = false;
@@ -168,7 +167,7 @@ window.limpiarFiltrosHistorial = function () {
     tableHistorial.search("").draw();
 };
 
-//--------exportar historial--------//
+//--------exportar historial-------->
 window.exportarHistorial = function (formato) {
     if (!filtrosAplicados) {
         Swal.fire({
@@ -231,9 +230,17 @@ window.exportarHistorial = function (formato) {
     }
 };
 
-//--------filtros personalizados para historial--------//
+//--------filtros personalizados para historial-------->
 document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector("#tablaHistorial")) {
+        //---Hallazgo B6: evita registrar el mismo filtro dos veces si este script
+        //---se llegara a cargar/ejecutar más de una vez (ext.search es un array global)
+        if (window.__filtroHistorialRegistrado) {
+            window.inicializarHistorialDataTable();
+            return;
+        }
+        window.__filtroHistorialRegistrado = true;
+
         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             if (settings.nTable.id !== "tablaHistorial") return true;
             if (!filtrosAplicados) return false;

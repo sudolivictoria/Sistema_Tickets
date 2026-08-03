@@ -74,7 +74,7 @@ $(document).ready(function () {
         .on("click", ".btn-ver-detalle", function () {
             const $btn = $(this);
             
-            // Usamos el objeto centralizado (ignora la fechaApertura automáticamente)
+            //-----ignora fecha de apertura
             window.verDetalle({
                 idTicket: $btn.data("id"),
                 asunto: $btn.data("asunto"),

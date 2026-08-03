@@ -1,4 +1,4 @@
-//------ Variables Globales -------
+//------variables globales-------
 var table;
 window.filtroSseActual = "todos";
 
@@ -51,13 +51,13 @@ $(document).ready(function () {
         .on("click", ".btn-ver-detalle", function () {
             const $btn = $(this);
 
-            // Implementación centralizada
+            //-----implementación centralizada
             window.verDetalle({
                 idTicket: $btn.data("id"),
                 asunto: $btn.data("asunto"),
                 descripcion: $btn.data("descripcion"),
                 tipoNombre: $btn.data("tipo"),
-                fechaApertura: $btn.data("fecha"), // Dashboard incluye la fecha
+                fechaApertura: $btn.data("fecha"), //---estos dashboard si incluyen fechas
                 drive: $btn.data("drive"),
                 estadoNombre: $btn.data("estado"),
                 datosSLA: {
@@ -82,7 +82,7 @@ $(document).ready(function () {
             window.verUsuario(nombre, email, unidad, cargo, telefono);
         });
 
-    //----DESPLEGABLE CANALES PARA GESTOR----------
+    //----desplegable canales directos---------->
     $(document).on("click", "#toggle-canales", function () {
         const list = document.getElementById("canales-list");
         const icon = this.querySelector(".material-symbols-outlined");

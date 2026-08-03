@@ -4,10 +4,10 @@ const initSidebar = () => {
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("sidebar-overlay");
 
-    //---precaucion para no rompe el codigo
+    //---prevencion que el codigo se rompa--------------------->
     if (!menuToggle || !sidebar || !overlay) return;
 
-    //--funciones para abrir y cerrar el menu
+    //--funciones para abrir y cerrar el menu------------------->
     const abrirMenu = () => {
         sidebar.classList.remove("-translate-x-full");
         overlay.classList.remove("hidden");
@@ -40,7 +40,7 @@ const initSidebar = () => {
     });
 };
 
-//----ejecuta solo si el dom esta listo
+//----ejecuta solo si el dom esta listo---------------------->
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initSidebar);
 } else {

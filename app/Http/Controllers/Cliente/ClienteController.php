@@ -12,6 +12,7 @@ use App\Models\Manual;
 use App\Models\Prioridad;
 use App\Models\Ticket;
 use App\Models\TipoSolicitud;
+use App\Models\Unidad;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -29,17 +30,15 @@ class ClienteController extends Controller
     private function calcularFechaVencimientoSla($categoriaId, $prioridadId)
     {
         $categoria = Categoria::find($categoriaId);
-        $unidadId = $categoria ? $categoria->unidad_id : null;
         $horasSla = 24; //--valor por defecto
 
-        if ($unidadId) {
-            $sla = DB::table('prioridad_unidad')
-                ->where('unidad_id', $unidadId)
-                ->where('prioridad_id', $prioridadId)
-                ->first();
+        if ($categoria && $categoria->unidad_id) {
+            // Relación prioridad_unidad modelada en Eloquent (Unidad::prioridades()) en vez de DB::table crudo.
+            $unidadRef = (new Unidad())->forceFill(['id' => $categoria->unidad_id]);
+            $prioridadPivot = $unidadRef->prioridades()->where('prioridades.id', $prioridadId)->first();
 
-            if ($sla && isset($sla->horas_sla)) {
-                $horasSla = (int)$sla->horas_sla;
+            if ($prioridadPivot) {
+                $horasSla = (int) $prioridadPivot->pivot->horas_sla;
             }
         }
         return Carbon::now()->addHours($horasSla);
@@ -175,7 +174,12 @@ class ClienteController extends Controller
                 Log::error("Error avisando a la unidad: " . $e->getMessage());
             }
 
-            broadcast(new TicketActualizado());
+            // El ticket ya se guardó; un fallo de Reverb no debe reportarse como error al usuario
+            try {
+                broadcast(new TicketActualizado());
+            } catch (\Exception $e) {
+                Log::error("Fallo al emitir broadcast TicketActualizado (Ticket #{$nuevoTicket->id}): " . $e->getMessage());
+            }
 
             return redirect()->route('usuario.dashboard')->with('success', $mensajeFlash);
         } catch (\Exception $e) {

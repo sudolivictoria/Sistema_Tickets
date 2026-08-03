@@ -46,14 +46,14 @@ window.inicializarTablaTickets = function (selectorId) {
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 w-full"<"hidden md:block text-sm text-slate-500 w-full md:w-1/2 text-left"i><"w-full md:w-1/2 flex justify-center md:justify-end"p>>',
     });
     
-    //---buscador
+    //---buscador-------------------->
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
         
-    //---ajuste tamaño de tabla
+    //---ajuste tamaño de tabla------->
     const $wrapper = $(tableElement).closest(".dataTables_wrapper");
     $wrapper.addClass("relative w-full");
     $(tableElement)
@@ -62,7 +62,7 @@ window.inicializarTablaTickets = function (selectorId) {
 };
 
 // =====================================================================
-//                         DETALLES E INICIALIZACION
+//                     DETALLES E INICIALIZACION
 // =====================================================================
 $(document).ready(function () {
     $(document)
@@ -70,7 +70,7 @@ $(document).ready(function () {
         .on("click", ".btn-ver-detalle", function () {
             const $btn = $(this);
             
-            // Usamos el núcleo central. Omitimos datosSLA porque el usuario no debe verlo.
+            //------------TICKET----->
             window.verDetalle({
                 idTicket: $btn.data("id"),
                 asunto: $btn.data("asunto"),
@@ -81,7 +81,7 @@ $(document).ready(function () {
             });
         });
 
-    //------------------AUTO REFRESCO-----------------
+    //------------------AUTO REFRESCO----------------->
     const selectorTabla = "#tablaMisTickets";
     if ($(selectorTabla).length) {
         window.inicializarTablaTickets(selectorTabla);
@@ -98,10 +98,10 @@ window.filtrarEstado = function (estado, btn) {
         .removeClass("bg-slate-100 text-slate-500")
         .addClass("bg-secondary text-white shadow-md");
         
-    //---estado actual para mantener el filtro activo al refrescar
+    //---estado actual para mantener el filtro activo al refrescar------------------>
     window.filtroSseActual = estado;
     
-    //----Reverb del filtro a la tabla
+    //----Reverb del filtro a la tabla---------------------------------------------->
     if (typeof window.AutoRefresco !== "undefined") {
         window.AutoRefresco.forzarRefresco();
     }

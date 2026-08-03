@@ -1,7 +1,7 @@
-//------variable global-------
+//------variable global------->
 var table;
 
-//------------INICIALIZACION----------------
+//------------INICIALIZACION---------------->
 window.inicializarTablaTickets = function (
     selectorId,
     columnaOrden = 0,
@@ -46,13 +46,13 @@ window.inicializarTablaTickets = function (
         order: [[columnaOrden, sentido]],
         dom: 'rt<"flex flex-col md:flex-row justify-between items-center mt-6 gap-4"ip>',
     });
-    //--buscador
+    //--buscador------------->
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
             table.search(this.value).draw(false);
         });
-    //---ajuste tamaño de tabla (Evita el re-wrapping infinito)
+    //---ajuste tamaño de tabla (Evita el re-wrapping infinito)----------->
     if (!tableElement.parent().hasClass("overflow-x-auto")) {
         const $wrapper = tableElement.closest(".dataTables_wrapper");
         $wrapper.addClass("relative w-full");
@@ -76,7 +76,7 @@ $(document).ready(function () {
                 asunto: $btn.data("asunto"),
                 descripcion: $btn.data("descripcion"),
                 tipoNombre: $btn.data("tipo"),
-                fechaApertura: $btn.data("fecha"), // Incluye fecha
+                fechaApertura: $btn.data("fecha"), //---------Incluye fecha
                 drive: $btn.data("drive"),
                 estadoNombre: $btn.data("estado"),
                 datosSLA: {
@@ -87,7 +87,7 @@ $(document).ready(function () {
             });
         });
 
-    //-----------------PERFIL DE USUARIO------------
+    //-----------------PERFIL DE USUARIO------------>
     $(document)
         .off("click", ".btn-ver-usuario")
         .on("click", ".btn-ver-usuario", function () {
@@ -107,7 +107,7 @@ $(document).ready(function () {
     }
 });
 
-//------------------ ACTUALIZAR PRIORIDAD VÍA AJAX -----------------
+//------------------ACTUALIZAR PRIORIDAD VÍA AJAX---------------->
 $(document)
     .off("change", ".select-prioridad-ajax")
     .on("change", ".select-prioridad-ajax", function () {
@@ -148,7 +148,7 @@ $(document)
             });
     });
 
-//------------------ REASIGNAR O DEVOLVER TÉCNICO VÍA AJAX -----------------
+//------------------REASIGNAR O DEVOLVER TÉCNICO VÍA AJAX----------------->
 $(document)
     .off("change", ".select-tecnico-ajax")
     .on("change", ".select-tecnico-ajax", function () {
@@ -266,7 +266,7 @@ function procesarAccionTicket(btn, config) {
 }
 
 // ============================================================================
-//                             BOTONES HTML
+//                                BOTONES 
 // ============================================================================
 window.confirmarResolver = function (btn) {
     procesarAccionTicket(btn, {

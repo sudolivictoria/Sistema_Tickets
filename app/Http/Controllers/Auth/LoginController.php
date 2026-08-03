@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -38,9 +40,21 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
+        //---clave de fuerza bruta: por email + IP, así un atacante no puede
+        //---esquivar el límite rotando solo el email o solo la IP
+        $throttleKey = Str::lower($credentials['email']) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $segundos = RateLimiter::availableIn($throttleKey);
+            return back()->withErrors([
+                'email' => "Demasiados intentos fallidos. Intenta de nuevo en {$segundos} segundos.",
+            ])->onlyInput('email');
+        }
+
         $remember = true;
 
         if (Auth::attempt($credentials, $remember)) {
+            RateLimiter::clear($throttleKey);
 
             if (Auth::user()->activo == 0) {
                 Auth::logout();
@@ -60,6 +74,8 @@ class LoginController extends Controller
             }
             return redirect('/');
         }
+
+        RateLimiter::hit($throttleKey);
 
         //--------si falla el login
         return back()->withErrors([

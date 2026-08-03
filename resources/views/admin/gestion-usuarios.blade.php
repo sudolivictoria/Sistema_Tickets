@@ -22,7 +22,7 @@
                 <span class="material-symbols-outlined text-4xl text-primary">group</span>
                 Gestión de Usuarios
             </h2>
-            <button onclick="abrirModalUsuario('agregar')"
+            <button onclick="openModalUsuario('agregar')"
                 class="flex items-center gap-2 bg-primary text-secondary px-6 py-2.5 rounded-xl font-black shadow-lg hover:scale-[1.02] transition-all uppercase text-[12px] tracking-widest">
                 <span class="material-symbols-outlined">person_add</span> Nuevo Usuario
             </button>
@@ -85,7 +85,7 @@
                             <td class="px-4 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
                                     {{-- Botón Editar --}}
-                                    <button type="button" onclick="abrirModalUsuario('editar', {{ json_encode($user) }})"
+                                    <button type="button" onclick="openModalUsuario('editar', {{ json_encode($user) }})"
                                         @disabled($user->id === auth()->id())
                                         class="p-2 rounded-xl {{ $user->id === auth()->id() ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100' }}">
                                         <span class="material-symbols-outlined text-[18px]">edit</span>
@@ -112,13 +112,14 @@
     {{-- MODAL AGREGAR --}}
     <div id="modalAgregar"
         class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-[#04003B]/40 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
-            <div class="bg-primary p-6 text-secondary flex justify-between items-center">
+        <div class="bg-white w-full max-w-lg max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="bg-primary p-6 text-secondary flex justify-between items-center shrink-0">
                 <h3 class="font-black uppercase tracking-widest text-lg">Nuevo Usuario</h3>
-                <button type="button" onclick="cerrarModalUsuario('modalAgregar')"
+                <button type="button" onclick="closeModalUsuario('modalAgregar')"
                     class="material-symbols-outlined font-bold">close</button>
             </div>
-            <form id="formAgregar" action="{{ route('admin.usuarios.store') }}" method="POST" class="p-6 space-y-4">
+            <form id="formAgregar" action="{{ route('admin.usuarios.store') }}" method="POST"
+                class="p-6 space-y-4 overflow-y-auto">
                 @csrf
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Nombre Completo</label>
@@ -128,13 +129,15 @@
                     <label class="text-[12px] font-black uppercase text-secondary">Email</label>
                     <input type="email" name="email" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                 </div>
-                <div class="relative">
+                <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Contraseña</label>
-                    <input type="password" name="password" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
-                        minlength="6" required>
-                    <button type="button" class="toggle-password absolute right-3 top-[38px]">
-                        <span class="material-symbols-outlined text-slate-400">visibility</span>
-                    </button>
+                    <div class="relative mt-1">
+                        <input type="password" name="password" class="w-full p-3 bg-slate-50 border rounded-xl"
+                            minlength="6" required>
+                        <button type="button" class="toggle-password absolute right-3 top-1/2 -translate-y-1/2">
+                            <span class="material-symbols-outlined text-slate-400">visibility</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -162,11 +165,13 @@
                     <label class="text-[12px] font-black uppercase text-secondary">Teléfono</label>
                     <input type="text" name="telefono" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" maxlength="15">
                 </div>
-                <button type="submit"
-                    class="w-full bg-secondary text-primary font-black py-4 rounded-xl shadow-lg mt-4 uppercase">
+            </form>
+            <div class="p-6 pt-4 border-t border-slate-100 shrink-0">
+                <button type="submit" form="formAgregar"
+                    class="w-full bg-secondary text-primary font-black py-4 rounded-xl shadow-lg uppercase">
                     Guardar Usuario
                 </button>
-            </form>
+            </div>
         </div>
     </div>
     {{-- FIN MODAL AGREGAR --}}
@@ -174,13 +179,13 @@
     {{-- MODAL EDITAR --}}
     <div id="modalEditar"
         class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-[#04003B]/40 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
-            <div class="bg-primary p-6 text-secondary flex justify-between items-center">
+        <div class="bg-white w-full max-w-lg max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="bg-primary p-6 text-secondary flex justify-between items-center shrink-0">
                 <h3 class="font-black uppercase tracking-widest text-lg">Editar Usuario</h3>
-                <button type="button" onclick="cerrarModalUsuario('modalEditar')"
+                <button type="button" onclick="closeModalUsuario('modalEditar')"
                     class="material-symbols-outlined font-bold">close</button>
             </div>
-            <form id="formEditar" method="POST" class="p-6 space-y-4">
+            <form id="formEditar" method="POST" class="p-6 space-y-4 overflow-y-auto">
                 @csrf
                 @method('PATCH')
                 <div>
@@ -193,13 +198,15 @@
                     <input type="email" name="email" id="edit_email" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
                         required>
                 </div>
-                <div class="relative">
+                <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Contraseña (Opcional)</label>
-                    <input type="password" name="password" id="edit_password"
-                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" minlength="6">
-                    <button type="button" class="toggle-password absolute right-3 top-[38px]">
-                        <span class="material-symbols-outlined text-slate-400">visibility</span>
-                    </button>
+                    <div class="relative mt-1">
+                        <input type="password" name="password" id="edit_password"
+                            class="w-full p-3 bg-slate-50 border rounded-xl" minlength="6">
+                        <button type="button" class="toggle-password absolute right-3 top-1/2 -translate-y-1/2">
+                            <span class="material-symbols-outlined text-slate-400">visibility</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -230,11 +237,13 @@
                     <input type="text" name="telefono" id="edit_telefono"
                         class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" maxlength="15">
                 </div>
-                <button type="submit"
-                    class="w-full bg-secondary text-primary font-black py-4 rounded-xl shadow-lg mt-4 uppercase">
+            </form>
+            <div class="p-6 pt-4 border-t border-slate-100 shrink-0">
+                <button type="submit" form="formEditar"
+                    class="w-full bg-secondary text-primary font-black py-4 rounded-xl shadow-lg uppercase">
                     Actualizar Usuario
                 </button>
-            </form>
+            </div>
         </div>
     </div>
     {{-- FIN MODAL EDITAR --}}

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Manual;
 use App\Models\Ticket;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -85,12 +84,17 @@ class ApiTableController extends Controller
             if ($miUnidadId) {
                 $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
             }
-            //-------prioridades 
+            //-------prioridades: un solo GROUP BY en vez de 4 counts separados
+            $conteosPorPrioridad = $queryPrioridades
+                ->selectRaw('prioridad_id, COUNT(*) as total')
+                ->groupBy('prioridad_id')
+                ->pluck('total', 'prioridad_id');
+
             $prioridades = [
-                'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
-                'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
-                'media'   => (clone $queryPrioridades)->where('prioridad_id', 3)->count(),
-                'baja'    => (clone $queryPrioridades)->where('prioridad_id', 4)->count(),
+                'critica' => (int) ($conteosPorPrioridad[1] ?? 0),
+                'alta'    => (int) ($conteosPorPrioridad[2] ?? 0),
+                'media'   => (int) ($conteosPorPrioridad[3] ?? 0),
+                'baja'    => (int) ($conteosPorPrioridad[4] ?? 0),
             ];
 
             //-----------RESPUESTA JSON----------
@@ -186,39 +190,35 @@ class ApiTableController extends Controller
      */
     private function calcularContadores($user, string $tipo, $miUnidadId): array
     {
-        if ($user->rol_id == 2 || $tipo === 'usuario' || $tipo === 'mis_tickets') {
-            return [
-                'abiertos'  => Ticket::where('user_id', $user->id)
-                    ->whereNull('tecnico_id')
-                    ->whereNotIn('estado_id', self::ESTADOS_CERRADOS)->count(),
-                'proceso'   => Ticket::where('user_id', $user->id)
-                    ->whereNotNull('tecnico_id')
-                    ->where('estado_id', 2)->count(),
-                'resueltos' => Ticket::where('user_id', $user->id)
-                    ->whereIn('estado_id', self::ESTADOS_CERRADOS)
-                    ->whereMonth('created_at', date('m'))
-                    ->whereYear('created_at', date('Y'))->count(),
-            ];
-        }
-        //---contadores estados
-        $queryAbiertos = Ticket::whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
-        $queryProceso = Ticket::whereNotNull('tecnico_id')->where('estado_id', 2);
-        $queryResueltos = Ticket::whereIn('estado_id', self::ESTADOS_CERRADOS)
-            ->whereMonth('created_at', date('m'))
-            ->whereYear('created_at', date('Y'));
+        $mesActual = (int) date('m');
+        $añoActual = (int) date('Y');
 
-        //--------restringe contadores por unidad
-        if ($miUnidadId) {
-            $filterUnidad = fn($q) => $q->where('unidad_id', $miUnidadId);
-            $queryAbiertos->whereHas('categoria', $filterUnidad);
-            $queryProceso->whereHas('categoria', $filterUnidad);
-            $queryResueltos->whereHas('categoria', $filterUnidad);
+        //--------un solo query con SUM(CASE...) en vez de 3 counts separados
+        $expresionContadores = "
+            SUM(CASE WHEN tecnico_id IS NULL AND estado_id NOT IN (3,4,5) THEN 1 ELSE 0 END) as abiertos,
+            SUM(CASE WHEN tecnico_id IS NOT NULL AND estado_id = 2 THEN 1 ELSE 0 END) as proceso,
+            SUM(CASE WHEN estado_id IN (3,4,5) AND MONTH(created_at) = ? AND YEAR(created_at) = ? THEN 1 ELSE 0 END) as resueltos
+        ";
+
+        if ($user->rol_id == 2 || $tipo === 'usuario' || $tipo === 'mis_tickets') {
+            $fila = Ticket::where('user_id', $user->id)
+                ->selectRaw($expresionContadores, [$mesActual, $añoActual])
+                ->first();
+        } else {
+            $query = Ticket::query();
+
+            //--------restringe contadores por unidad
+            if ($miUnidadId) {
+                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            }
+
+            $fila = $query->selectRaw($expresionContadores, [$mesActual, $añoActual])->first();
         }
-        //---estados
+
         return [
-            'abiertos'  => $queryAbiertos->count(),
-            'proceso'   => $queryProceso->count(),
-            'resueltos' => $queryResueltos->count(),
+            'abiertos'  => (int) ($fila->abiertos ?? 0),
+            'proceso'   => (int) ($fila->proceso ?? 0),
+            'resueltos' => (int) ($fila->resueltos ?? 0),
         ];
     }
 
@@ -263,16 +263,26 @@ class ApiTableController extends Controller
         if ($user->rol_id == 3 && $miUnidadId) {
             $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
         }
-        $tickets = $query->get(['id', 'estado_id', 'created_at', 'fecha_cierre']);
-        //---metricas
-        $cargaTrabajo = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isToday())->count();
-        $resueltos24h = $tickets->whereIn('estado_id', self::ESTADOS_CERRADOS)
-            ->filter(fn($t) => $t->fecha_cierre && Carbon::parse($t->fecha_cierre)->gte(now()->subDay()))
-            ->count();
-        $delMes     = $tickets->filter(fn($t) => Carbon::parse($t->created_at)->isCurrentMonth());
-        $total      = $delMes->count();
-        $cerrados   = $delMes->whereIn('estado_id', self::ESTADOS_CERRADOS)->count();
-        $tasaCierre = $total > 0 ? (int) round(($cerrados / $total) * 100) : 0;
+
+        //---metricas agregadas en una sola consulta, en vez de traer todos los tickets del año a PHP
+        $hoy = now()->toDateString();
+        $hace24h = now()->subDay()->toDateTimeString();
+        $mesActual = (int) now()->format('m');
+        $añoActual = (int) now()->format('Y');
+
+        $fila = $query->selectRaw(
+            'SUM(CASE WHEN DATE(created_at) = ? THEN 1 ELSE 0 END) as carga_trabajo,
+             SUM(CASE WHEN estado_id IN (3,4,5) AND fecha_cierre IS NOT NULL AND fecha_cierre >= ? THEN 1 ELSE 0 END) as resueltos_24h,
+             SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN 1 ELSE 0 END) as total_mes,
+             SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? AND estado_id IN (3,4,5) THEN 1 ELSE 0 END) as cerrados_mes',
+            [$hoy, $hace24h, $mesActual, $añoActual, $mesActual, $añoActual]
+        )->first();
+
+        $cargaTrabajo = (int) ($fila->carga_trabajo ?? 0);
+        $resueltos24h = (int) ($fila->resueltos_24h ?? 0);
+        $totalMes     = (int) ($fila->total_mes ?? 0);
+        $cerradosMes  = (int) ($fila->cerrados_mes ?? 0);
+        $tasaCierre   = $totalMes > 0 ? (int) round(($cerradosMes / $totalMes) * 100) : 0;
 
         return [$cargaTrabajo, $resueltos24h, $tasaCierre];
     }

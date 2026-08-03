@@ -13,6 +13,7 @@ use App\Models\Manual;
 use App\Models\Prioridad;
 use App\Models\Ticket;
 use App\Models\TipoSolicitud;
+use App\Models\Unidad;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -30,17 +31,15 @@ class AdminUnidadController extends Controller
     private function calcularFechaVencimientoSla($categoriaId, $prioridadId)
     {
         $categoria = Categoria::find($categoriaId);
-        $unidadId = $categoria ? $categoria->unidad_id : null;
         $horasSla = 24; //--valor por defecto
 
-        if ($unidadId) {
-            $sla = DB::table('prioridad_unidad')
-                ->where('unidad_id', $unidadId)
-                ->where('prioridad_id', $prioridadId)
-                ->first();
+        if ($categoria && $categoria->unidad_id) {
+            // Relación prioridad_unidad modelada en Eloquent (Unidad::prioridades()) en vez de DB::table crudo.
+            $unidadRef = (new Unidad())->forceFill(['id' => $categoria->unidad_id]);
+            $prioridadPivot = $unidadRef->prioridades()->where('prioridades.id', $prioridadId)->first();
 
-            if ($sla && isset($sla->horas_sla)) {
-                $horasSla = (int)$sla->horas_sla;
+            if ($prioridadPivot) {
+                $horasSla = (int) $prioridadPivot->pivot->horas_sla;
             }
         }
         return Carbon::now()->addHours($horasSla);
@@ -184,71 +183,73 @@ class AdminUnidadController extends Controller
             $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
         }
 
-        //--crear ticket
-        $nuevoTicket = Ticket::create([
-            'asunto' => $request->asunto,
-            'descripcion' => $request->descripcion,
-            'drive_link' => $rutaEvidencia,
-            'categoria_id' => $request->categoria_id,
-            'tipo_solicitud_id' => $request->tipo_solicitud_id,
-            'user_id' => Auth::id(), //----asignar el ticket al usuario autenticado
-            'estado_id' => 1, //---abierto
-            'prioridad_id' => $request->prioridad_id,
-            'tecnico_id' => null, //---vacio inicial 
-            'fecha_vencimiento_sla' => $fechaVencimiento,
-            'estado_sla' => 'pendiente',
-        ]);
-
-        //---cargar relaciones para el correo
-        $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
-
-        //************************************************************************************/
-        //-----------------------CORREO CONFIRMACION CLIENTE----------------------------------
-        //***********************************************************************************/
         try {
-            //---obtenemos el email del usuario autenticado
-            $usuario = Auth::user();
-            $destinatario = $usuario->email;
+            // Hallazgo M1: insert + relaciones + correos + broadcast son atómicos.
+            // Si el correo o el broadcast lanzan una excepción, se revierte el ticket
+            // en vez de dejar un registro a medias.
+            $resultado = DB::transaction(function () use ($request, $rutaEvidencia, $fechaVencimiento) {
+                //--crear ticket
+                $nuevoTicket = Ticket::create([
+                    'asunto' => $request->asunto,
+                    'descripcion' => $request->descripcion,
+                    'drive_link' => $rutaEvidencia,
+                    'categoria_id' => $request->categoria_id,
+                    'tipo_solicitud_id' => $request->tipo_solicitud_id,
+                    'user_id' => Auth::id(), //----asignar el ticket al usuario autenticado
+                    'estado_id' => 1, //---abierto
+                    'prioridad_id' => $request->prioridad_id,
+                    'tecnico_id' => null, //---vacio inicial
+                    'fecha_vencimiento_sla' => $fechaVencimiento,
+                    'estado_sla' => 'pendiente',
+                ]);
 
-            //---siempre envia el ticket, aunque falle el correo, para no perder la información del ticket creado
-            if (empty($destinatario)) {
-                Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
-                $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
-            } else {
-                Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
-                $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
-            }
+                //---cargar relaciones para el correo
+                $nuevoTicket->load(['user', 'categoria.unidad', 'prioridad', 'tipo_solicitud']);
+
+                //************************************************************************************/
+                //-----------------------CORREO CONFIRMACION CLIENTE----------------------------------
+                //***********************************************************************************/
+                //---obtenemos el email del usuario autenticado
+                $usuario = Auth::user();
+                $destinatario = $usuario->email;
+
+                if (empty($destinatario)) {
+                    Log::warning("Usuario {$usuario->id} no tiene email configurado. Ticket #" . $nuevoTicket->id);
+                    $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo (email no configurado).';
+                } else {
+                    Mail::to($destinatario)->queue(new TicketCreadoMail($nuevoTicket));
+                    $mensajeFlash = '¡Ticket creado con éxito y correo enviado!';
+                }
+
+                //********************************************************************************/
+                //----------------------------NOTIFICACION UNIDAD-----------------------------------
+                //********************************************************************************/
+                //---identificar unidad por medio de la categoria del ticket
+                $unidadId = $nuevoTicket->categoria->unidad_id;
+                //---obtener emails de gestores de la unidad
+                $destinatarios = User::where('unidad_id', $unidadId)
+                    ->where('activo', true)
+                    ->pluck('email')
+                    ->toArray();
+
+                if (!empty($destinatarios)) {
+                    //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
+                    Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
+                }
+
+                broadcast(new TicketActualizado());
+
+                return ['ticket' => $nuevoTicket, 'mensaje' => $mensajeFlash];
+            });
+
+            //--redireccionar con mensaje de exito
+            return redirect()->route('gestor.crear-ticket')
+                ->with('success', $resultado['mensaje']);
         } catch (\Exception $e) {
-            //--guardar ticket aunque no se cree el correo
-            Log::error("Fallo al enviar correo de Ticket #" . $nuevoTicket->id . ": " . $e->getMessage());
-            $mensajeFlash = 'Ticket creado, pero no se pudo enviar el correo de confirmación.';
+            Cache::forget($cacheKey);
+            Log::error("Error al crear ticket (Gestor): " . $e->getMessage());
+            return back()->withInput()->with('sweet_error', 'Ocurrió un error al registrar el ticket.');
         }
-
-        //********************************************************************************/
-        //----------------------------NOTIFICACION UNIDAD-----------------------------------
-        //********************************************************************************/
-        try {
-            //---identificar unidad por medio de la categoria del ticket
-            $unidadId = $nuevoTicket->categoria->unidad_id;
-            //---obtener emails de gestores de la unidad
-            $destinatarios = User::where('unidad_id', $unidadId)
-                ->where('activo', true)
-                ->pluck('email')
-                ->toArray();
-
-            if (!empty($destinatarios)) {
-                //--bcc para enviar a todos los gestores sin mostrar los emails entre ellos
-                Mail::bcc($destinatarios)->queue(new NuevaSolicitudUnidadMail($nuevoTicket));
-            }
-        } catch (\Exception $e) {
-            Log::error("Error avisando a la unidad: " . $e->getMessage());
-        }
-
-        broadcast(new TicketActualizado());
-
-        //--redireccionar con mensaje de exito o error en el correo
-        return redirect()->route('gestor.crear-ticket')
-            ->with('success', $mensajeFlash);
     }
 
     //--metodo para ver mis tickets 
@@ -321,32 +322,51 @@ class AdminUnidadController extends Controller
                 },
             ]
         ]);
-        //-----validacion que no este cerrado
-        if (in_array($ticket->estado_id, [3, 4, 5])) {
-            $errorMsg = '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.';
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+
+        // Transacción + bloqueo de fila: evita que dos usuarios asignen el mismo ticket a la vez
+        $resultado = DB::transaction(function () use ($request, $ticket) {
+            $ticketBloqueado = Ticket::where('id', $ticket->id)->lockForUpdate()->firstOrFail();
+
+            //-----validacion que no este cerrado
+            if (in_array($ticketBloqueado->estado_id, [3, 4, 5])) {
+                return [
+                    'error' => true,
+                    'message' => '¡Operación rechazada! Este ticket fue resuelto o cerrado por otro usuario hace unos momentos.'
+                ];
             }
-            return back()->with('sweet_error', $errorMsg);
-        }
-        //------validacion cola de pendientes
-        if (!$request->filled('tecnico_id') && $ticket->tecnico_id === null) {
-            $errorMsg = 'El ticket ya se encontraba en la cola de pendientes.';
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            //------validacion cola de pendientes
+            if (!$request->filled('tecnico_id') && $ticketBloqueado->tecnico_id === null) {
+                return [
+                    'error' => true,
+                    'message' => 'El ticket ya se encontraba en la cola de pendientes.'
+                ];
             }
-            return back()->with('sweet_error', $errorMsg);
+            //----------cambio de estado o tecnico
+            $ticketBloqueado->update([
+                'tecnico_id' => $request->tecnico_id,
+                'estado_id'  => $request->tecnico_id ? 2 : 1
+            ]);
+
+            return ['error' => false];
+        });
+
+        if ($resultado['error']) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $resultado['message']], 422);
+            }
+            return back()->with('sweet_error', $resultado['message']);
         }
-        //----------cambio de estado o tecnico
-        $ticket->update([
-            'tecnico_id' => $request->tecnico_id,
-            'estado_id'  => $request->tecnico_id ? 2 : 1
-        ]);
+
         $mensaje = $request->tecnico_id
             ? 'Técnico asignado correctamente.'
             : 'Ticket devuelto a la cola de pendientes.';
 
-        broadcast(new TicketActualizado()); //-------------tiempo real
+        // La asignación ya se guardó; un fallo de Reverb no debe mostrarse como error al usuario
+        try {
+            broadcast(new TicketActualizado()); //-------------tiempo real
+        } catch (\Exception $e) {
+            Log::error('Fallo al emitir broadcast TicketActualizado (actualizarTecnico): ' . $e->getMessage());
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json(['success' => true, 'message' => $mensaje]);
@@ -359,23 +379,42 @@ class AdminUnidadController extends Controller
     {
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
 
-        if (in_array($ticket->estado_id, [3, 4, 5])) {
-            $errorMsg = 'No se puede modificar la prioridad, este ticket ha sido resuelto o cerrado.';
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+        // Transacción + bloqueo de fila: evita que un cambio de estado concurrente (p. ej. cierre)
+        // se pise con esta actualización de prioridad, igual que en actualizarTecnico
+        $resultado = DB::transaction(function () use ($request, $ticket) {
+            $ticketBloqueado = Ticket::where('id', $ticket->id)->lockForUpdate()->firstOrFail();
+
+            if (in_array($ticketBloqueado->estado_id, [3, 4, 5])) {
+                return [
+                    'error' => true,
+                    'message' => 'No se puede modificar la prioridad, este ticket ha sido resuelto o cerrado.'
+                ];
             }
-            return back()->with('sweet_error', $errorMsg);
+
+            //---recalcular SLA
+            $nuevaFechaVencimiento = $this->calcularFechaVencimientoSla($ticketBloqueado->categoria_id, $request->prioridad_id);
+
+            $ticketBloqueado->update([
+                'prioridad_id' => $request->prioridad_id,
+                'fecha_vencimiento_sla' => $nuevaFechaVencimiento
+            ]);
+
+            return ['error' => false];
+        });
+
+        if ($resultado['error']) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $resultado['message']], 422);
+            }
+            return back()->with('sweet_error', $resultado['message']);
         }
 
-        //---recalcular SLA
-        $nuevaFechaVencimiento = $this->calcularFechaVencimientoSla($ticket->categoria_id, $request->prioridad_id);
-
-        $ticket->update([
-            'prioridad_id' => $request->prioridad_id,
-            'fecha_vencimiento_sla' => $nuevaFechaVencimiento
-        ]);
-
-        broadcast(new TicketActualizado());
+        // El cambio de prioridad ya se guardó; un fallo de Reverb no debe mostrarse como error al usuario
+        try {
+            broadcast(new TicketActualizado());
+        } catch (\Exception $e) {
+            Log::error('Fallo al emitir broadcast TicketActualizado (actualizarPrioridad): ' . $e->getMessage());
+        }
 
         $mensajeExito = 'Prioridad y tiempo SLA actualizados correctamente';
 

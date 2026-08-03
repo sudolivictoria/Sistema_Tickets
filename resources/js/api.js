@@ -18,10 +18,23 @@ window.AutoRefresco = (() => {
             (document.activeElement.getAttribute("type") === "search" ||
                 document.activeElement.closest(".dataTables_filter"));
         const buscadorGeneral = document.getElementById("inputBusqueda");
+        //---evita que el auto-refresco reemplace la tabla mientras el usuario tiene
+        //---abierto el select de técnico/prioridad o mientras su PATCH sigue en vuelo
+        //---(se deshabilita el select justo durante esa ventana, ver asignar-tickets.js)
+        const selectEnUso =
+            (document.activeElement &&
+                document.activeElement.matches &&
+                document.activeElement.matches(
+                    ".select-tecnico-ajax, .select-prioridad-ajax",
+                )) ||
+            document.querySelector(
+                ".select-tecnico-ajax:disabled, .select-prioridad-ajax:disabled",
+            );
         return !!(
             modalAbierto ||
             buscadorDeTabla ||
-            (buscadorGeneral && buscadorGeneral === document.activeElement)
+            (buscadorGeneral && buscadorGeneral === document.activeElement) ||
+            selectEnUso
         );
     }
 

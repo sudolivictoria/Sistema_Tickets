@@ -32,7 +32,7 @@ window.inicializarTablaTickets = function (selectorId) {
     });
 };
 
-//----desplegable de canales directos---------------------------------
+//----desplegable de canales directos--------------------------------->
 document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.getElementById("toggle-canales");
     if (toggleBtn) {
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
 $(document).ready(function () {
     window.inicializarTablaTickets("#tablaTicketsUsuario");
 
-    //------------------TICKET
+    //------------------TICKET------------------------------------------>
     $(document)
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {

@@ -17,4 +17,14 @@ class Categoria extends Model
     {
         return $this->belongsTo(Unidad::class, 'unidad_id');
     }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'categoria_id');
+    }
+
+    public function tiposSolicitud()
+    {
+        return $this->hasMany(TipoSolicitud::class, 'categoria_id');
+    }
 }

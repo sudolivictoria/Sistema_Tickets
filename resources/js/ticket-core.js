@@ -2,7 +2,7 @@
 //                    NÚCLEO CENTRALIZADO DE TICKETS
 // =====================================================================
 
-// Variables Globales
+// ----------------------------Variables Globales----------------------->
 window.timerSLA = null;
 window.ticketIdActual = null;
 window.ticketEstadoActual = null;
@@ -19,7 +19,8 @@ window.escucharComentariosWebSocket = function (idTicket) {
     window.desconectarComentariosWebSocket();
     window.canalEchoActual = idTicket;
 
-    Echo.channel(`ticket.${idTicket}`).listen(".comentario.creado", (e) => {
+    // Canal privado: requiere autorización vía /broadcasting/auth (routes/channels.php)
+    Echo.private(`ticket.${idTicket}`).listen(".comentario.creado", (e) => {
         if (e && e.comentario) {
             window.agregarComentarioAlModal(e.comentario);
         }
@@ -28,7 +29,8 @@ window.escucharComentariosWebSocket = function (idTicket) {
 
 window.desconectarComentariosWebSocket = function () {
     if (typeof Echo !== "undefined" && window.canalEchoActual) {
-        Echo.leaveChannel(`ticket.${window.canalEchoActual}`);
+        //---.leave() limpia tanto el canal público como el privado/presence, evitando fugas de suscripción
+        Echo.leave(`ticket.${window.canalEchoActual}`);
         window.canalEchoActual = null;
     }
 };
@@ -116,14 +118,14 @@ window.agregarComentarioAlModal = function (comentario) {
     const $lista = $("#modalListaComentarios");
     const $seccionHistorico = $("#seccion-historico-comentarios");
     if (!$lista.length) return;
-
+    //----------LOGICA COMENTARIOS---------------------------------------->
     const esPrivado =
         comentario.es_privado == 1 ||
         comentario.es_privado === true ||
         comentario.es_privado === "true";
     const esVistaAdmin = document.getElementById("es_privado") !== null;
 
-    if (esPrivado && !esVistaAdmin) return; 
+    if (esPrivado && !esVistaAdmin) return;
 
     if (
         comentario.id &&
@@ -159,7 +161,11 @@ window.agregarComentarioAlModal = function (comentario) {
 // ---------------------------------------------------------------------
 //              ENVÍO DE COMENTARIOS (AJAX CENTRALIZADO)
 // ---------------------------------------------------------------------
-$(document).on("submit", "#form-comentario-modal", function (e) {
+//---Hallazgo B6: .off() antes de .on(), igual que el resto de handlers delegados
+//---del proyecto, por si este archivo llegara a cargarse más de una vez
+$(document)
+    .off("submit", "#form-comentario-modal")
+    .on("submit", "#form-comentario-modal", function (e) {
     e.preventDefault();
     if (!window.ticketIdActual) return;
 
@@ -211,7 +217,7 @@ $(document).on("submit", "#form-comentario-modal", function (e) {
 });
 
 // ---------------------------------------------------------------------
-//           . CONTROL DE MODALES (TICKETS Y USUARIOS)
+//              CONTROL DE MODALES (TICKETS Y USUARIOS)
 // ---------------------------------------------------------------------
 
 window.verDetalle = function (datos) {
@@ -271,7 +277,7 @@ window.verDetalle = function (datos) {
         window.iniciarContadorSLA(datos.datosSLA);
     }
 };
-
+//------------cierre modal---------------------------------------------->
 window.cerrarModal = function () {
     const modal = document.getElementById("modalTicket");
     if (modal) {
@@ -283,6 +289,7 @@ window.cerrarModal = function () {
     }
 };
 
+//----------------------------PERFIL USUARIO-------------------------------->
 window.verUsuario = function (name, email, unidad, cargo, telefono) {
     const modal = document.getElementById("modalUsuario");
     if (!modal) return;
@@ -297,7 +304,7 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
     setElemText("userUnidad", unidad);
     setElemText("userCargo", cargo);
     setElemText("userTelefono", telefono);
-
+    //-------------gmail---------------------------------------->
     const elLinkCorreo = document.getElementById("linkCorreo");
     if (elLinkCorreo) {
         if (email && email !== "---") {
@@ -312,6 +319,7 @@ window.verUsuario = function (name, email, unidad, cargo, telefono) {
     document.body.style.overflow = "hidden";
 };
 
+//---------------cierre modal usuario
 window.cerrarModalUsuario = function () {
     const modal = document.getElementById("modalUsuario");
     if (modal) {
@@ -321,7 +329,7 @@ window.cerrarModalUsuario = function () {
 };
 
 // ---------------------------------------------------------------------
-// 5. CRONÓMETRO SLA
+// -----------------------CRONÓMETRO SLA-------------------------------
 // ---------------------------------------------------------------------
 window.iniciarContadorSLA = function (datosSLA) {
     if (window.timerSLA) clearInterval(window.timerSLA);

@@ -1,6 +1,11 @@
 var table;
-//---------------INICIALIZACION--------------------------------
+//---------------INICIALIZACION-------------------------------->
 function inicializarDataTable() {
+    //---Hallazgo M6: guardia propia, igual que en el resto de archivos con DataTables,
+    //---para no depender de que el caller siempre destruya la tabla antes de llamar
+    if ($.fn.DataTable.isDataTable("#userTable")) {
+        $("#userTable").DataTable().destroy();
+    }
     $.fn.dataTable.ext.pager.numbers_length = 1;
     table = $("#userTable").DataTable({
         language: {
@@ -31,7 +36,7 @@ function inicializarDataTable() {
             },
         ],
     });
-    //----------------------BUSQUEDA------------------------
+    //----------------------BUSQUEDA------------------------>
     $("#inputBusqueda")
         .off("keyup")
         .on("keyup", function () {
@@ -40,7 +45,7 @@ function inicializarDataTable() {
 }
 $(document).ready(function () {
     inicializarDataTable();
-    //-----TOGGLE para visibilidad de contraseña
+    //-----TOGGLE para visibilidad de contraseña--------------->
     $(document).on("click", ".toggle-password", function () {
         const input = $(this).siblings("input");
         const icon = $(this).find("span");
@@ -59,10 +64,14 @@ $(document).ready(function () {
         function (e) {
             e.preventDefault();
             const $form = $(this);
-            const $btnSubmit = $form.find("button[type='submit']");
-            //----GUARDAR CONTENIDO EN EL BOTON
+            //---El botón de formAgregar/formEditar vive fuera del <form> (footer fijo del
+            //---modal) y se asocia vía el atributo form="...", por eso no basta con .find()
+            const $btnSubmit = $form
+                .find("button[type='submit']")
+                .add(`button[type="submit"][form="${this.id}"]`);
+            //----GUARDAR CONTENIDO EN EL BOTON-------------------------------------->
             const contenidoOriginal = $btnSubmit.html();
-            //---------------------ESTADO DE CARGA--------------------------------
+            //---------------------ESTADO DE CARGA----------------------------------->
             $btnSubmit
                 .prop("disabled", true)
                 .addClass("opacity-75 cursor-not-allowed");
@@ -81,17 +90,17 @@ $(document).ready(function () {
                 data: $form.serialize(),
                 success: function (responseHtml) {
                     const $html = $(responseHtml);
-                    //--------REEMPLAZAR SOLO LA TABLE
+                    //--------REEMPLAZAR SOLO LA TABLE----->
                     const nuevoTablaHtml = $html
                         .find("#tabla-contenedor")
                         .html();
                     if (table) table.destroy();
                     $("#tabla-contenedor").html(nuevoTablaHtml);
                     inicializarDataTable();
-                    //-------CLOSE MODALS
-                    window.cerrarModal("modalAgregar");
-                    window.cerrarModal("modalEditar");
-                    //-----------ALERTAS FLASH DE APP.JS
+                    //-------CLOSE MODALS--->
+                    window.closeModalUsuario("modalAgregar");
+                    window.closeModalUsuario("modalEditar");
+                    //-----------ALERTAS FLASH DE APP.JS----->
                     const flashDataString = $html.find("#flash-data").html();
                     if (flashDataString) {
                         eval(flashDataString);
@@ -115,7 +124,7 @@ $(document).ready(function () {
                     }
                 },
                 complete: function () {
-                    //-------------RESTAURAR BOTON-----------------------------------
+                    //-------------RESTAURAR BOTON----------------------------------->
                     $btnSubmit
                         .prop("disabled", false)
                         .removeClass("opacity-75 cursor-not-allowed");
@@ -125,7 +134,7 @@ $(document).ready(function () {
         },
     );
 });
-//------------------FILTRO POR ESTADO--------------------------
+//------------------FILTRO POR ESTADO-------------------------->
 window.filtrarEstado = function (estado, btn) {
     $(".filtro-btn")
         .removeClass("bg-secondary text-white shadow-md")
@@ -138,8 +147,8 @@ window.filtrarEstado = function (estado, btn) {
         .search(estado === "" ? "" : `^${estado}$`, true, false)
         .draw(false);
 };
-//--------------------MODALES--------------------------------
-window.abrirModalUsuario = function (tipo, data = null) {
+//--------------------MODALES-------------------------------->
+window.openModalUsuario = function (tipo, data = null) {
     if (tipo === "agregar") {
         $("#formAgregar")[0]?.reset();
         $("#modalAgregar").removeClass("hidden");
@@ -156,20 +165,20 @@ window.abrirModalUsuario = function (tipo, data = null) {
     }
     $("body").addClass("overflow-hidden");
 };
-//----------------CLOSE
-window.cerrarModalUsuario = function (id) {
+//----------------CLOSE-------------------------->
+window.closeModalUsuario = function (id) {
     $("#" + id).addClass("hidden");
     $("body").removeClass("overflow-hidden");
 };
-//--Accesibilidad para cerrar modales
+//--Accesibilidad para cerrar modales------------->
 $(document).on("keydown", function (e) {
     if (e.key === "Escape") {
-        window.cerrarModal("modalAgregar");
-        window.cerrarModal("modalEditar");
+        window.closeModalUsuario("modalAgregar");
+        window.closeModalUsuario("modalEditar");
     }
 });
 $("#modalAgregar, #modalEditar").on("click", function (e) {
     if (e.target === this) {
-        window.cerrarModal($(this).attr("id"));
+        window.closeModalUsuario($(this).attr("id"));
     }
 });

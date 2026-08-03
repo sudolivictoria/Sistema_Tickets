@@ -61,9 +61,11 @@ class Ticket extends Model
     }
 
     //------------relaciones con otras tablas--------------------
+    // Hallazgo B3: FK explícita en vez de dejar que Eloquent la adivine por el
+    // nombre del método, para que un futuro rename no rompa la relación en silencio.
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function tecnico()
@@ -73,22 +75,22 @@ class Ticket extends Model
 
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class);
+        return $this->belongsTo(Categoria::class, 'categoria_id');
     }
 
     public function tipo_solicitud()
     {
-        return $this->belongsTo(TipoSolicitud::class);
+        return $this->belongsTo(TipoSolicitud::class, 'tipo_solicitud_id');
     }
 
     public function prioridad()
     {
-        return $this->belongsTo(Prioridad::class);
+        return $this->belongsTo(Prioridad::class, 'prioridad_id');
     }
 
     public function estado()
     {
-        return $this->belongsTo(Estado::class);
+        return $this->belongsTo(Estado::class, 'estado_id');
     }
 
     public function comentarios()

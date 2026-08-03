@@ -15,43 +15,48 @@
 
     @stack('css')
 
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/ticket-core.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
         }
+
         .dashed-button {
             border: 2px dashed #cbd5e1;
             transition: all 0.3s ease;
         }
+
         .dashed-button:hover {
             border-color: #84cc16;
             background-color: #f7fee7;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
+
         ::-webkit-scrollbar {
             width: 10px;
         }
+
         ::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 10px;
         }
+
         ::-webkit-scrollbar-thumb {
-            background: #84cc16;
+            background: #04003B;
             border-radius: 10px;
             border: 2px solid #f1f5f9;
         }
+
         ::-webkit-scrollbar-thumb:hover {
-            background: #04003B;
+            background: #84cc16;
         }
     </style>
 
 </head>
 
 <body class="bg-slate-50 font-display text-slate-900 antialiased">
-    {{-- preloader --}}
     <div id="preloader"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-1000">
         <div class="flex flex-col items-center">
@@ -77,8 +82,12 @@
             </div>
 
             <div class="min-w-0">
-                <h2 class="text-xl font-bold text-secondary tracking-tight">Help Desk Istu <span
-                        class="text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">{{ auth()->user()->unidad->nombre_unidad ?? 'Usuario' }}</span>
+                <h2 class="text-xl font-bold text-secondary tracking-tight">
+                    Help Desk Istu
+                    <span
+                        class="hidden md:inline-block text-green-900 text-xs uppercase ml-2 tracking-widest px-2 py-0.5 bg-primary/10 rounded-full">
+                        {{ auth()->user()->unidad->nombre_unidad ?? 'Usuario' }}
+                    </span>
                 </h2>
             </div>
         </div>
@@ -89,8 +98,9 @@
             <span id="relojSistema" class="text-xs font-black text-slate-600 tracking-wider">00:00:00</span>
         </div>
     </header>
-    {{-- menu --}}
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-secondary border-r border-blue-800 flex flex-col pt-32 p-4
+
+    <aside id="sidebar"
+        class="fixed top-0 left-0 h-full w-56 xl:w-64 bg-secondary border-r border-blue-800 flex flex-col pt-32 p-4
     transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-50 lg:z-40">
         <nav class="space-y-3 flex-1">
             <a class="flex items-center gap-3 px-4 py-3 mt-2 {{ request()->routeIs('usuario.dashboard') ? 'bg-primary text-secondary' : 'text-slate-300 hover:bg-white/10' }} rounded-xl font-bold transition-all mb-4"
@@ -134,8 +144,8 @@
     </main>
 
     <script>
-        //-----------preloader------------
-        window.addEventListener('load', function () {
+        //-----------preloader 
+        window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -144,10 +154,12 @@
                 preloader.style.display = 'none';
             }, 1000);
         });
-        //-----reloj----------- 
-        window.iniciarReloj = function () {
+
+        //-----reloj 
+        window.iniciarReloj = function() {
             const contenedorReloj = document.getElementById('relojSistema');
             if (!contenedorReloj) return;
+
             //---actualizar hora cada segundo
             const actualizarHora = () => {
                 const ahora = new Date();
@@ -158,16 +170,19 @@
                     hour12: true
                 });
             };
+
             //-----sin delay
             actualizarHora();
+
             //-----corre cada segundo
             setInterval(actualizarHora, 1000);
         }
-        document.addEventListener('DOMContentLoaded', function () {
+
+        document.addEventListener('DOMContentLoaded', function() {
             iniciarReloj();
         });
     </script>
-    {{-- notificaciones --}}
+
     @php
         $flashSuccess = session('sweet_success') ?: session('success');
         $flashError = session('sweet_error') ?: session('error');
@@ -182,7 +197,6 @@
         };
     </script>
 
-    {{-- scripts --}}
     @stack('scripts')
 
     @stack('page-scripts')
@@ -190,4 +204,5 @@
     @stack('sse-scripts')
 
 </body>
+
 </html>

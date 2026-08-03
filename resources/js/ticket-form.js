@@ -1,12 +1,12 @@
-//---------------Immediately Invoked Function Expression
+//---------------Immediately Invoked Function Expression----------------------------------------->
 (function () {
     //--------------Filtrar subcategorías (Global para poder invocarse desde Blade si es necesario)
     window.filtrarTipos = function (categoriaId) {
         const selectTipo = document.querySelector('select[name="tipo_solicitud_id"]');
         if (!selectTipo) return;
-        //--------------------------Reiniciar opciones
+        //--------------------------Reiniciar opciones---------------------------------------------
         selectTipo.innerHTML = '<option value="" disabled selected>Seleccione</option>';
-        //------------------Validación existencia de datos
+        //------------------Validación existencia de datos----------------------------------------
         if (!window.todosLosTipos || window.todosLosTipos.length === 0) return;
 
         const filtrados = window.todosLosTipos.filter(
@@ -19,7 +19,7 @@
             selectTipo.appendChild(option);
         });
     };
-    //---------------------Función de inicialización del formulario------------------
+    //---------------------Función de inicialización del formulario------------------>
     const initForm = () => {
         const categoriaSelect = document.querySelector('select[name="categoria_id"]');
         const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
@@ -35,22 +35,22 @@
             }
         }
     };
-    //-------------Escuchas universales seguras bajo la carga del DOM--------------
+    //-------------Escuchas universales seguras bajo la carga del DOM-------------->
     document.addEventListener("DOMContentLoaded", () => {
         const inputAsunto = document.getElementById("asunto-input");
         const contador = document.getElementById("char-counter");
         const categoriaSelect = document.querySelector('select[name="categoria_id"]');
         const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
-        const formulario = document.querySelector("form"); // Ajustar ID si tienes más de un form
+        const formulario = document.querySelector("formCrearTicket"); 
         const btnEnviar = document.getElementById("btn-enviar");
 
         const contenedorPdf = document.getElementById("contenedor-pdf"); 
         const btnDescargarPdf = document.getElementById("btn-descargar-pdf"); 
-        //-----Retraso controlado para garantizar que Blade cargó window.todosLosTipos-----
+        //-----Retraso controlado para garantizar que Blade cargó window.todosLosTipos----->
         setTimeout(() => {
             initForm();
         }, 150);
-        //--------------------------CONTADOR INFORMATIVO ASUNTO--------------------------
+        //--------------------------CONTADOR INFORMATIVO ASUNTO----------------------------->
         if (inputAsunto && contador) {
             const lenInicial = inputAsunto.value.length;
             contador.textContent = `${lenInicial}/50`;
@@ -68,7 +68,7 @@
                 }
             });
         }
-        // ---------------MANEJO DE ENVÍO AJAX + PREVENCIÓN DE DOBLE CLIC------------------------
+        // ---------------MANEJO DE ENVÍO AJAX + PREVENCIÓN DE DOBLE CLIC------------------------>
         if (formulario && btnEnviar) {
             formulario.addEventListener("submit", function (e) {
                 e.preventDefault(); // Previene el refresco estándar
@@ -76,7 +76,7 @@
                 const $form = $(this);
                 const contenidoOriginal = btnEnviar.innerHTML;
 
-                //--------------Estado de carga: Deshabilitar botón y mostrar animación------------
+                //--------------Estado de carga: Deshabilitar botón y mostrar animación------------>
                 btnEnviar.disabled = true;
                 btnEnviar.classList.add("opacity-75", "cursor-not-allowed");
                 btnEnviar.innerHTML = `
@@ -85,7 +85,7 @@
                         <span>Enviando...</span>
                     </div>
                 `;
-                //--------Envío AJAX usando FormData (Soporta archivos e inputs normales)------------
+                //--------Envío AJAX usando FormData (Soporta archivos e inputs normales)------------>
                 $.ajax({
                     url: $form.attr("action"),
                     method: $form.attr("method") || "POST",
@@ -94,16 +94,16 @@
                     contentType: false,
                     success: function (responseHtml) {
                         const $html = $(responseHtml);
-                        //-----Extraemos las variables window.__flashMessages devueltas por el Controller
+                        //-----Extraemos las variables window.__flashMessages devueltas por el Controller-->
                         const flashDataString = $html.find("#flash-data").html();
                         if (flashDataString) {
                             eval(flashDataString);
-                            //---------Ejecutamos la función de app.js (Maneja redirección o SweetAlert)
+                            //---------Ejecutamos la función de app.js (Maneja redirección o SweetAlert)--->
                             window.mostrarFlashMessages();
                         }
                     },
                     error: function (xhr) {
-                        //---------------------Captura de errores de validación de Laravel (HTTP 422)
+                        //---------------------Captura de errores de validación de Laravel (HTTP 422)------->
                         if (xhr.status === 422 && xhr.responseJSON?.errors) {
                             const errores = Object.values(xhr.responseJSON.errors).flat();
                             window.mostrarFlashMessages({
@@ -118,7 +118,7 @@
                         }
                     },
                     complete: function () {
-                        //-----------------Restaurar botón al finalizar la petición (Éxito o Error)
+                        //-----------------Restaurar botón al finalizar la petición (Éxito o Error)------->
                         btnEnviar.disabled = false;
                         btnEnviar.classList.remove("opacity-75", "cursor-not-allowed");
                         btnEnviar.innerHTML = contenidoOriginal;
@@ -126,13 +126,13 @@
                 });
             });
         }
-        //-- Evento de cambio de categoría
+        //--Evento de cambio de categoría-------------------------------------->
         if (categoriaSelect) {
             categoriaSelect.addEventListener("change", function () {
                 window.filtrarTipos(this.value);
             });
         }
-        //-----------------EVENTO PARA MOSTRAR LA DESCRIPCION DE TIPO DE SOLICITUD
+        //---------EVENTO PARA MOSTRAR LA DESCRIPCION DE TIPO DE SOLICITUD---->
         if (tipoSelect) {
             tipoSelect.addEventListener("change", function () {
                 const infoDiv = document.getElementById("info-extra");
@@ -158,6 +158,7 @@
                                     : bloqueTexto.classList.add("hidden");
                             }
                         }
+                        //----------------pdfs------------------------------------------>
                         if (contenedorPdf && btnDescargarPdf) {
                             if (tieneManual) {
                                 btnDescargarPdf.setAttribute(

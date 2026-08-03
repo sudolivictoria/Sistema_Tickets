@@ -9,4 +9,9 @@ class Estado extends Model
     protected $table = 'estados';
 
     protected $fillable = ['nombre_estado'];
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'estado_id');
+    }
 }

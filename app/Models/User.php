@@ -59,6 +59,18 @@ class User extends Authenticatable
         return $this->belongsTo(Unidad::class, 'unidad_id');
     }
 
+    //---------tickets que este usuario ha creado
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'user_id');
+    }
+
+    //---------tickets asignados a este usuario como técnico
+    public function ticketsAsignados()
+    {
+        return $this->hasMany(Ticket::class, 'tecnico_id');
+    }
+
     //------metodo para identificar el rol
     public function tieneRol($rolNombre)
     {
