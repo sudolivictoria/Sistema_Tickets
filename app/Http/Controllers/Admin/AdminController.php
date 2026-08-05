@@ -34,8 +34,8 @@ class AdminController extends Controller
         $horasSla = 24; //--valor por defecto
 
         if ($categoria && $categoria->unidad_id) {
-            // Relación prioridad_unidad modelada en Eloquent (Unidad::prioridades()) en vez de DB::table crudo.
-            // No hace falta cargar la Unidad completa: basta con su id para consultar el pivot.
+            //---relación prioridad_unidad modelada en Eloquent (Unidad::prioridades()) en vez de DB::table crudo.
+            //---no hace falta cargar la Unidad completa: basta con su id para consultar el pivot.
             $unidadRef = (new Unidad())->forceFill(['id' => $categoria->unidad_id]);
             $prioridadPivot = $unidadRef->prioridades()->where('prioridades.id', $prioridadId)->first();
 
@@ -199,9 +199,8 @@ class AdminController extends Controller
         }
 
         try {
-            // Hallazgo M1: insert + relaciones + correos + broadcast son atómicos.
-            // Si el correo o el broadcast lanzan una excepción, se revierte el ticket
-            // en vez de dejar un registro a medias.
+            //----insert + relaciones + correos + broadcast son atómicos.
+            //----si el correo o el broadcast lanzan una excepción, se revierte el ticket
             $resultado = DB::transaction(function () use ($request, $rutaEvidencia, $fechaVencimiento) {
                 //--crear ticket
                 $nuevoTicket = Ticket::create([
@@ -343,7 +342,7 @@ class AdminController extends Controller
             ]
         ]);
 
-        // Transacción + bloqueo de fila: evita que dos usuarios asignen el mismo ticket a la vez
+        //-----Transacción + bloqueo de fila: evita que dos usuarios asignen el mismo ticket a la vez
         $resultado = DB::transaction(function () use ($request, $ticket) {
             $ticketBloqueado = Ticket::where('id', $ticket->id)->lockForUpdate()->firstOrFail();
 
@@ -381,7 +380,7 @@ class AdminController extends Controller
             ? 'Técnico asignado correctamente.'
             : 'Ticket devuelto a la cola de pendientes.';
 
-        // La asignación ya se guardó; un fallo de Reverb no debe mostrarse como error al usuario
+        //-------La asignación ya se guardó; un fallo de Reverb no debe mostrarse como error al usuario
         try {
             broadcast(new TicketActualizado()); //-------------tiempo real
         } catch (\Exception $e) {
@@ -399,8 +398,7 @@ class AdminController extends Controller
     {
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
 
-        // Transacción + bloqueo de fila: evita que un cambio de estado concurrente (p. ej. cierre)
-        // se pise con esta actualización de prioridad, igual que en actualizarTecnico
+        //--------Transacción + bloqueo de fila: evita que un cambio de estado concurrente 
         $resultado = DB::transaction(function () use ($request, $ticket) {
             $ticketBloqueado = Ticket::where('id', $ticket->id)->lockForUpdate()->firstOrFail();
 
@@ -429,7 +427,7 @@ class AdminController extends Controller
             return back()->with('sweet_error', $resultado['message']);
         }
 
-        // El cambio de prioridad ya se guardó; un fallo de Reverb no debe mostrarse como error al usuario
+        //------El cambio de prioridad ya se guardó; un fallo de Reverb no debe mostrarse como error al usuario
         try {
             broadcast(new TicketActualizado());
         } catch (\Exception $e) {

@@ -7,9 +7,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 /**
- * Hallazgo M5: lógica de exportación de reportes (Excel/PDF) compartida entre
+ *lógica de exportación de reportes (Excel/PDF) compartida entre
  * ReporteController (Admin) y GestorReporteController (Gestor) — antes duplicada
- * casi byte a byte en ambos archivos.
  */
 trait ExportaReporteTickets
 {

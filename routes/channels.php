@@ -7,8 +7,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-// Mismo criterio de visibilidad que ComentarioController::autorizarAccesoTicket:
-// solo staff (Admin/Gestor), el dueño del ticket o el tecnico asignado.
 Broadcast::channel('ticket.{ticketId}', function ($user, $ticketId) {
     $ticket = Ticket::find($ticketId);
     if (!$ticket) {

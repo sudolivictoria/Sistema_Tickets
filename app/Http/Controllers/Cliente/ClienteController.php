@@ -33,7 +33,7 @@ class ClienteController extends Controller
         $horasSla = 24; //--valor por defecto
 
         if ($categoria && $categoria->unidad_id) {
-            // Relación prioridad_unidad modelada en Eloquent (Unidad::prioridades()) en vez de DB::table crudo.
+            //------relación prioridad_unidad modelada en Eloquent 
             $unidadRef = (new Unidad())->forceFill(['id' => $categoria->unidad_id]);
             $prioridadPivot = $unidadRef->prioridades()->where('prioridades.id', $prioridadId)->first();
 
@@ -173,8 +173,6 @@ class ClienteController extends Controller
             } catch (\Exception $e) {
                 Log::error("Error avisando a la unidad: " . $e->getMessage());
             }
-
-            // El ticket ya se guardó; un fallo de Reverb no debe reportarse como error al usuario
             try {
                 broadcast(new TicketActualizado());
             } catch (\Exception $e) {

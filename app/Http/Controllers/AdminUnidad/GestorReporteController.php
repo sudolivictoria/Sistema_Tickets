@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\AdminUnidad;
-
 use App\Http\Controllers\Concerns\ExportaReporteTickets;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

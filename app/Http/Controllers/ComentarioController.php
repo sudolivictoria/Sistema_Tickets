@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class ComentarioController extends Controller
 {
-    //------------AUTORIZACION: solo staff, el dueño del ticket o el tecnico asignado---------------
+    //------------AUTORIZACION---------------
     private function autorizarAccesoTicket(Ticket $ticket, User $user): void
     {
         $esStaff = $user->tieneRol('Admin') || $user->tieneRol('Gestor');
@@ -43,7 +43,7 @@ class ComentarioController extends Controller
             $query->where('es_privado', false);
         }
 
-        // Usamos select o transformamos directo sin sobrecargar Carbon en bucles masivos
+        //-----usamos select o transformamos directo sin sobrecargar Carbon en bucles masivos
         $comentarios = $query->oldest()->get()->map(function ($com) {
             return [
                 'id' => $com->id,
@@ -52,8 +52,6 @@ class ComentarioController extends Controller
                 ],
                 'contenido' => $com->contenido,
                 'es_privado' => $com->es_privado,
-                // Guardamos el formato rápido o dejamos que el cliente lo pinte si es necesario, 
-                // o usamos una fecha cacheada/optimizada:
                 'tiempo_legible' => $com->created_at ? $com->created_at->diffForHumans() : ''
             ];
         });
@@ -73,7 +71,7 @@ class ComentarioController extends Controller
         $user = Auth::user();
         $this->autorizarAccesoTicket(Ticket::findOrFail($ticketId), $user);
 
-        // 1. Candado contra Doble-Clic por usuario + contenido + ticket (Válido por 5 segundos)
+        //====candado contra Doble-Clic por usuario + contenido + ticket (Válido por 5 segundos)
         $cacheKey = 'comment_lock_' . $user->id . '_' . $ticketId . '_' . md5(trim($request->contenido));
         if (!Cache::add($cacheKey, true, 5)) {
             return response()->json([
@@ -83,21 +81,21 @@ class ComentarioController extends Controller
         }
 
         try {
-            // Lógica de notas internas (Privadas)
+            //----lógica de notas internas (Privadas)
             $esPrivado = false;
             if ($user && ($user->tieneRol('Admin') || $user->tieneRol('Gestor'))) {
                 $esPrivado = $request->has('es_privado') ? filter_var($request->es_privado, FILTER_VALIDATE_BOOLEAN) : false;
             }
 
-            // 2. Transacción de BD + Lock Pesimista del Ticket
+            //------transacción de BD + Lock Pesimista del Ticket
             $resultado = DB::transaction(function () use ($ticketId, $user, $request, $esPrivado) {
-                // Bloqueamos el registro del ticket para asegurar la coherencia de estado y asignación
+                //-----bloqueamos el registro del ticket para asegurar la coherencia de estado y asignación
                 $ticket = Ticket::with(['user', 'tecnico', 'estado', 'categoria'])
                     ->where('id', $ticketId)
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                // Crear el comentario
+                //------crear el comentario
                 $comentario = Comentario::create([
                     'ticket_id'  => $ticket->id,
                     'user_id'    => $user->id,
@@ -117,8 +115,7 @@ class ComentarioController extends Controller
             $comentario->load('user');
             $comentario->tiempo_legible = $comentario->created_at->diffForHumans();
 
-            // Broadcast WebSockets si no es privado. El comentario ya se guardó;
-            // un fallo de Reverb no debe reportarse como error al usuario.
+            //-----broadcast WebSockets si no es privado. El comentario ya se guardó;
             if (!$esPrivado) {
                 try {
                     broadcast(new ComentarioCreado($comentario))->toOthers();
@@ -127,7 +124,7 @@ class ComentarioController extends Controller
                 }
             }
 
-            // 3. Lógica de Envíos de Correos (Fuera de la transacción de BD)
+            //---lógica de Envíos de Correos (Fuera de la transacción de BD)
             try {
                 $estaResuelto = (
                     $ticket->estado_id == 3 ||
@@ -143,7 +140,7 @@ class ComentarioController extends Controller
                     // ---- COMENTARIO REALIZADO POR EL CLIENTE ----
                     if ($user->id == $ticket->user_id) {
 
-                        // Con técnico asignado
+                        //---------------con técnico asignado-----------------------
                         if ($ticket->tecnico && $ticket->tecnico->id != $user->id) {
 
                             Mail::to($ticket->tecnico->email)->queue(new NotificacionTicketMail(
@@ -159,7 +156,7 @@ class ComentarioController extends Controller
                             ));
                             Log::info("Correo enviado al técnico asignado: " . $ticket->tecnico->email);
                         }
-                        // Sin técnico asignado -> Notificar a la Unidad
+                        //---------------Sin técnico asignado -> Notificar a la Unidad---------------
                         elseif (!$ticket->tecnico && $ticket->categoria) {
 
                             $unidadId = $ticket->categoria->unidad_id;
@@ -212,7 +209,7 @@ class ComentarioController extends Controller
 
             return response()->json(['success' => true, 'comentario' => $comentario]);
         } catch (\Exception $e) {
-            // Liberar candado en caso de fallo catastrófico
+            //-----liberar candado en caso de fallo catastrófico
             Cache::forget($cacheKey);
             Log::error("Error procesando comentario en ticket #{$ticketId}: " . $e->getMessage());
 
