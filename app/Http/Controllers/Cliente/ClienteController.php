@@ -15,15 +15,37 @@ use App\Models\TipoSolicitud;
 use App\Models\Unidad;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Interfaces\ImageManagerInterface;
 
 class ClienteController extends Controller
 {
+    /**
+     * Comprime (GD, calidad 75, máx. 1920px) y guarda la evidencia del ticket en el disco 'public'.
+     * Devuelve la ruta relativa guardada.
+     */
+    private function guardarEvidenciaComprimida(UploadedFile $archivo, ImageManagerInterface $imageManager): string
+    {
+        $nombre = Str::uuid() . '.jpg';
+
+        $imagenComprimida = $imageManager
+            ->decode($archivo)
+            ->scaleDown(width: 1920, height: 1920)
+            ->encodeUsingFileExtension('jpg', quality: 75);
+
+        Storage::disk('public')->put('tickets/' . $nombre, (string) $imagenComprimida);
+
+        return 'tickets/' . $nombre;
+    }
+
     /**
      * Helper privado para calcular la fecha limite SLA segun Categoria y Prioridad
      */
@@ -96,7 +118,7 @@ class ClienteController extends Controller
     }
 
     //---metodo para guardar ticket (Cliente/Usuario final)
-    public function store(Request $request)
+    public function store(Request $request, ImageManagerInterface $imageManager)
     {
         $request->validate([
             'asunto'            => 'required|string|min:5|max:50',
@@ -104,6 +126,7 @@ class ClienteController extends Controller
             'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
             'descripcion'       => 'required|string',
             'prioridad_id'      => 'required|exists:prioridades,id',
+            'evidencia'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
         ]);
 
         $userId   = Auth::id() ?? 1;
@@ -111,14 +134,17 @@ class ClienteController extends Controller
         $cacheKey = 'submit_lock_' . $checkSum;
 
         if (!Cache::add($cacheKey, true, 5)) {
-            return redirect()->route('usuario.dashboard')
-                ->with('success', '¡Recibido! Tu solicitud ya se está procesando.');
+            $mensajeDuplicado = '¡Recibido! Tu solicitud ya se está procesando.';
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => $mensajeDuplicado]);
+            }
+            return redirect()->route('usuario.dashboard')->with('success', $mensajeDuplicado);
         }
 
         try {
             $rutaEvidencia = null;
             if ($request->hasFile('evidencia')) {
-                $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
+                $rutaEvidencia = $this->guardarEvidenciaComprimida($request->file('evidencia'), $imageManager);
             }
 
             $fechaVencimiento = $this->calcularFechaVencimientoSla($request->categoria_id, $request->prioridad_id);
@@ -179,10 +205,16 @@ class ClienteController extends Controller
                 Log::error("Fallo al emitir broadcast TicketActualizado (Ticket #{$nuevoTicket->id}): " . $e->getMessage());
             }
 
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => $mensajeFlash]);
+            }
             return redirect()->route('usuario.dashboard')->with('success', $mensajeFlash);
         } catch (\Exception $e) {
             Cache::forget($cacheKey);
             Log::error("Error al crear ticket (Cliente): " . $e->getMessage());
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Ocurrió un error al registrar el ticket.'], 500);
+            }
             return back()->withInput()->with('sweet_error', 'Ocurrió un error al registrar el ticket.');
         }
     }

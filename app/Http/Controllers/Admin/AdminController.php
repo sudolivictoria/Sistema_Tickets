@@ -17,14 +17,36 @@ use App\Models\Unidad;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Interfaces\ImageManagerInterface;
 
 class AdminController extends Controller
 {
+    /**
+     * Comprime (GD, calidad 75, máx. 1920px) y guarda la evidencia del ticket en el disco 'public'.
+     * Devuelve la ruta relativa guardada.
+     */
+    private function guardarEvidenciaComprimida(UploadedFile $archivo, ImageManagerInterface $imageManager): string
+    {
+        $nombre = Str::uuid() . '.jpg';
+
+        $imagenComprimida = $imageManager
+            ->decode($archivo)
+            ->scaleDown(width: 1920, height: 1920)
+            ->encodeUsingFileExtension('jpg', quality: 75);
+
+        Storage::disk('public')->put('tickets/' . $nombre, (string) $imagenComprimida);
+
+        return 'tickets/' . $nombre;
+    }
+
     /**
      * Helper privado para calcular la fecha limite SLA segun Categoria y Prioridad
      */
@@ -34,8 +56,7 @@ class AdminController extends Controller
         $horasSla = 24; //--valor por defecto
 
         if ($categoria && $categoria->unidad_id) {
-            //---relación prioridad_unidad modelada en Eloquent (Unidad::prioridades()) en vez de DB::table crudo.
-            //---no hace falta cargar la Unidad completa: basta con su id para consultar el pivot.
+            //----obtener la unidad y buscar la prioridad asociada a esa unidad
             $unidadRef = (new Unidad())->forceFill(['id' => $categoria->unidad_id]);
             $prioridadPivot = $unidadRef->prioridades()->where('prioridades.id', $prioridadId)->first();
 
@@ -62,10 +83,10 @@ class AdminController extends Controller
         $queryProceso = Ticket::whereNotNull('tecnico_id')
             ->where('estado_id', 2);
 
-        //--tickets resueltos por unidad del admin autenticado (mes)
+        //--tickets resueltos por unidad del admin autenticado (mes de cierre, sin importar cuándo se abrieron)
         $queryResueltos = Ticket::whereIn('estado_id', $estadosCerrados)
-            ->whereMonth('created_at', date('m'))
-            ->whereYear('created_at', date('Y'));
+            ->whereMonth('fecha_cierre', date('m'))
+            ->whereYear('fecha_cierre', date('Y'));
 
         //------FILTRO POR UNIDAD DE CATEGORÍA------
         if ($miUnidadId) {
@@ -89,8 +110,8 @@ class AdminController extends Controller
         //----filtrado por estado
         if ($estadoBoton === 'resuelto,equivocado,no corresponde' || $estadoBoton === 'cerrado') {
             $queryTabla->whereIn('estado_id', $estadosCerrados)
-                ->whereMonth('created_at', date('m'))
-                ->whereYear('created_at', date('Y'));
+                ->whereMonth('fecha_cierre', date('m'))
+                ->whereYear('fecha_cierre', date('Y'));
         } else {
             $queryTabla->whereNotIn('estado_id', $estadosCerrados);
         }
@@ -171,14 +192,17 @@ class AdminController extends Controller
     }
 
     //---metodo para guardar ticket
-    public function store(Request $request)
+    public function store(Request $request, ImageManagerInterface $imageManager)
     {
         $userId = Auth::id();
         $checkSum = md5($userId . trim($request->asunto));
         $cacheKey = 'submit_lock_' . $checkSum;
         if (!Cache::add($cacheKey, true, 20)) {
-            return redirect()->route('admin.crear-ticket')
-                ->with('success', '¡Recibido! Tu solicitud ya se está procesando.');
+            $mensajeDuplicado = '¡Recibido! Tu solicitud ya se está procesando.';
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => $mensajeDuplicado]);
+            }
+            return redirect()->route('admin.mis-tickets')->with('success', $mensajeDuplicado);
         }
         //-----validacion datos
         $request->validate([
@@ -187,6 +211,7 @@ class AdminController extends Controller
             'tipo_solicitud_id' => 'required|exists:tipo_solicitudes,id',
             'descripcion' => 'required|string',
             'prioridad_id' => 'required|exists:prioridades,id',
+            'evidencia' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
 
         ]);
 
@@ -195,7 +220,7 @@ class AdminController extends Controller
         //----almacenar imagenes de evidencia
         $rutaEvidencia = null;
         if ($request->hasFile('evidencia')) {
-            $rutaEvidencia = $request->file('evidencia')->store('evidencias', 'public');
+            $rutaEvidencia = $this->guardarEvidenciaComprimida($request->file('evidencia'), $imageManager);
         }
 
         try {
@@ -260,11 +285,16 @@ class AdminController extends Controller
             });
 
             //--redireccionar con mensaje de exito
-            return redirect()->route('admin.crear-ticket')
-                ->with('success', $resultado['mensaje']);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => $resultado['mensaje']]);
+            }
+            return redirect()->route('admin.mis-tickets')->with('success', $resultado['mensaje']);
         } catch (\Exception $e) {
             Cache::forget($cacheKey);
             Log::error("Error al crear ticket (Admin): " . $e->getMessage());
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Ocurrió un error al registrar el ticket.'], 500);
+            }
             return back()->withInput()->with('sweet_error', 'Ocurrió un error al registrar el ticket.');
         }
     }

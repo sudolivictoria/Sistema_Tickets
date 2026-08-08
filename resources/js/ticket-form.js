@@ -41,7 +41,7 @@
         const contador = document.getElementById("char-counter");
         const categoriaSelect = document.querySelector('select[name="categoria_id"]');
         const tipoSelect = document.querySelector('select[name="tipo_solicitud_id"]');
-        const formulario = document.querySelector("formCrearTicket"); 
+        const formulario = document.querySelector("#formCrearTicket");
         const btnEnviar = document.getElementById("btn-enviar");
 
         const contenedorPdf = document.getElementById("contenedor-pdf"); 
@@ -92,14 +92,16 @@
                     data: new FormData(this),
                     processData: false,
                     contentType: false,
-                    success: function (responseHtml) {
-                        const $html = $(responseHtml);
-                        //-----Extraemos las variables window.__flashMessages devueltas por el Controller-->
-                        const flashDataString = $html.find("#flash-data").html();
-                        if (flashDataString) {
-                            eval(flashDataString);
-                            //---------Ejecutamos la función de app.js (Maneja redirección o SweetAlert)--->
-                            window.mostrarFlashMessages();
+                    success: function (response) {
+                        const redirectTo = formulario.dataset.redirectSuccess || null;
+                        window.mostrarFlashMessages({
+                            success: response?.message || "Solicitud enviada correctamente.",
+                            redirectTo: redirectTo,
+                        });
+                        if (!redirectTo) {
+                            btnEnviar.disabled = false;
+                            btnEnviar.classList.remove("opacity-75", "cursor-not-allowed");
+                            btnEnviar.innerHTML = contenidoOriginal;
                         }
                     },
                     error: function (xhr) {
@@ -113,12 +115,10 @@
                         } else {
                             window.mostrarFlashMessages({
                                 errorTitle: 'Ocurrió un error',
-                                error: 'No se pudo enviar la solicitud. Intente nuevamente.'
+                                error: xhr.responseJSON?.message || 'No se pudo enviar la solicitud. Intente nuevamente.'
                             });
                         }
-                    },
-                    complete: function () {
-                        //-----------------Restaurar botón al finalizar la petición (Éxito o Error)------->
+                        //-----------------Restaurar botón para permitir reintentar------------------------->
                         btnEnviar.disabled = false;
                         btnEnviar.classList.remove("opacity-75", "cursor-not-allowed");
                         btnEnviar.innerHTML = contenidoOriginal;
@@ -163,7 +163,7 @@
                             if (tieneManual) {
                                 btnDescargarPdf.setAttribute(
                                     "href",
-                                    `/storage/${tipoSeleccionado.ruta_manual}`
+                                    `/storage/manuales/${tipoSeleccionado.ruta_manual}`
                                 );
                                 contenedorPdf.classList.remove("hidden");
                             } else {

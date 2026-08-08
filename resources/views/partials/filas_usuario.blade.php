@@ -13,7 +13,6 @@
 
         {{-- categoria --}}
         <td class="px-6 py-4 max-w-[150px] font-black text-[13px]">{{ $ticket->categoria->nombre_categoria }}</td>
-        </td>
         <td class="px-6 py-4">
             @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');

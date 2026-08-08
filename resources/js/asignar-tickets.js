@@ -73,7 +73,7 @@ $(document).ready(function () {
         .off("click", ".btn-ver-detalle")
         .on("click", ".btn-ver-detalle", function () {
             const $btn = $(this);
-            
+
             //-----ignora fecha de apertura
             window.verDetalle({
                 idTicket: $btn.data("id"),
@@ -86,7 +86,7 @@ $(document).ready(function () {
                     estadoNombre: $btn.data("estado"),
                     fechaLimite: $btn.data("fecha-limite"),
                     tiempoRespuesta: $btn.data("tiempo-respuesta"),
-                }
+                },
             });
         });
 
@@ -130,6 +130,10 @@ $(document)
         })
             .done(function (response) {
                 window.mostrarFlashMessages({ success: response.message });
+                //---refresca la tabla para quien hizo el cambio: el auto-refresco
+                if (typeof window.AutoRefresco !== "undefined") {
+                    window.AutoRefresco.forzarRefresco();
+                }
             })
             .fail(function (xhr) {
                 const errorMsg =
@@ -162,6 +166,10 @@ $(document)
         })
             .done(function (response) {
                 window.mostrarFlashMessages({ success: response.message });
+                //---refresca la tabla para quien hizo el cambio: el auto-refresco
+                if (typeof window.AutoRefresco !== "undefined") {
+                    window.AutoRefresco.forzarRefresco();
+                }
             })
             .fail(function (xhr) {
                 const errorMsg =

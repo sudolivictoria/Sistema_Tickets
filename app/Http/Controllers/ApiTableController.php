@@ -147,9 +147,10 @@ class ApiTableController extends Controller
         switch ($tipo) {
             case 'dashboard':
                 if ($estadoFiltro === 'resuelto,equivocado,no corresponde' || $estadoFiltro === 'cerrado') {
+                    //---cuenta por mes de cierre, no de apertura (igual que el card de "resueltos")
                     $query->whereIn('estado_id', self::ESTADOS_CERRADOS)
-                        ->whereMonth('created_at', date('m'))
-                        ->whereYear('created_at', date('Y'));
+                        ->whereMonth('fecha_cierre', date('m'))
+                        ->whereYear('fecha_cierre', date('Y'));
                 } else {
                     if ($estadoFiltro === 'abierto' || $estadoFiltro === '1') {
                         $query->whereNull('tecnico_id')->whereNotIn('estado_id', self::ESTADOS_CERRADOS);
@@ -192,15 +193,17 @@ class ApiTableController extends Controller
     {
         $mesActual = (int) date('m');
         $añoActual = (int) date('Y');
+        $esCliente = $user->rol_id == 2 || $tipo === 'usuario' || $tipo === 'mis_tickets';
+        $columnaResueltos = $esCliente ? 'created_at' : 'fecha_cierre';
 
         //--------un solo query con SUM(CASE...) en vez de 3 counts separados
         $expresionContadores = "
             SUM(CASE WHEN tecnico_id IS NULL AND estado_id NOT IN (3,4,5) THEN 1 ELSE 0 END) as abiertos,
             SUM(CASE WHEN tecnico_id IS NOT NULL AND estado_id = 2 THEN 1 ELSE 0 END) as proceso,
-            SUM(CASE WHEN estado_id IN (3,4,5) AND MONTH(created_at) = ? AND YEAR(created_at) = ? THEN 1 ELSE 0 END) as resueltos
+            SUM(CASE WHEN estado_id IN (3,4,5) AND MONTH({$columnaResueltos}) = ? AND YEAR({$columnaResueltos}) = ? THEN 1 ELSE 0 END) as resueltos
         ";
 
-        if ($user->rol_id == 2 || $tipo === 'usuario' || $tipo === 'mis_tickets') {
+        if ($esCliente) {
             $fila = Ticket::where('user_id', $user->id)
                 ->selectRaw($expresionContadores, [$mesActual, $añoActual])
                 ->first();

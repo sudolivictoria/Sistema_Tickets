@@ -89,16 +89,10 @@
             <div class="p-4 sm:p-5 border-t border-slate-100 bg-white shrink-0 space-y-3">
                 <form id="form-comentario-modal" class="space-y-2">
                     @csrf
-                    <textarea id="contenido-comentario" required placeholder="Escribe un comentario o nota interna..."
+                    <textarea id="contenido-comentario" required placeholder="Escribe un comentario..."
                         class="w-full p-2.5 text-xs border border-slate-200 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary resize-none h-11 bg-slate-50 placeholder:text-slate-400"></textarea>
 
-                    <div class="flex items-center justify-between gap-2">
-                        <label
-                            class="inline-flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-green-900 uppercase tracking-wider select-none">
-                            <input type="checkbox" id="es_privado"
-                                class="rounded text-primary focus:ring-primary border-slate-300 w-3.5 h-3.5">
-                            <span>Nota Interna</span>
-                        </label>
+                    <div class="flex items-center justify-end gap-2">
                         <button type="submit"
                             class="ml-auto px-3.5 py-1.5 bg-green-900 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-opacity-90 transition-all flex items-center gap-1 shadow-sm">
                             Comentar

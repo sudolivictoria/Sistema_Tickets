@@ -11,7 +11,8 @@
 
         {{-- Formulario de Creación de Ticket --}}
         <form action="{{ route('usuario.tickets.store') }}" method="POST" enctype="multipart/form-data"
-            class="space-y-6 md:space-y-8 bg-white p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100" id="formCrearTicket">
+            class="space-y-6 md:space-y-8 bg-white p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100" id="formCrearTicket"
+            data-redirect-success="{{ route('usuario.dashboard') }}">
             @csrf
             <!--asunto del ticket-->
             <div class="flex flex-col gap-2.5">
@@ -130,7 +131,7 @@
                         Seleccionar imagen desde tu dispositivo (JPG o PNG)
                     </span>
                 </button>
-                <p class="text-[12px] text-slate-400 italic mt-0.5 font-medium">* Solo se permite una imagen en formato JPG o PNG de hasta 2MB.</p>
+                <p class="text-[12px] text-slate-400 italic mt-0.5 font-medium">* Solo se permite una imagen en formato JPG o PNG de hasta 10MB.</p>
             </div>
 
             <div class="flex flex-col-reverse md:flex-row items-center justify-end gap-4 pt-8 border-t border-slate-100">
@@ -165,10 +166,10 @@
                     if (inputFile.files.length > 0) {
                         const archivo = inputFile.files[0];
                         //--la imagen supera el tamaño permitido
-                        if (archivo.size > 2097152) {
+                        if (archivo.size > 10485760) {
                             Swal.fire({
                                 title: 'Archivo muy pesado',
-                                text: 'La imagen supera el límite permitido de 2MB.',
+                                text: 'La imagen supera el límite permitido de 10MB.',
                                 icon: 'warning',
                                 iconColor: "#84cc16",
                                 confirmButtonColor: '#04003B',
@@ -189,11 +190,9 @@
             }
         });
     </script>
-    //-----tipos de solicitud
     <script>
         window.todosLosTipos = @json($tipos ?? []);
     </script>
-    //-------logica alertas
     <script>
         window.__flashMessages = window.__flashMessages || {};
         window.__flashMessages.successTitle = '¡Ticket creado!';
