@@ -13,7 +13,7 @@
         }
 
         .wrapper {
-            background-color: #f1f5f9;
+            background-color: #cadef1;
             padding: 20px 10px;
         }
 
