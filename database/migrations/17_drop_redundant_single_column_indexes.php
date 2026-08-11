@@ -40,10 +40,6 @@ return new class extends Migration
             $table->dropIndex(['tecnico_id']);
             $table->dropIndex(['created_at']);
         });
-
-        Schema::table('categorias', function (Blueprint $table) {
-            $table->dropIndex(['unidad_id']);
-        });
     }
 
     /**
