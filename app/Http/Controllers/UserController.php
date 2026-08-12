@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -102,6 +103,11 @@ class UserController extends Controller
         }
 
         $user->update($validated);
+
+        if ($user->wasChanged('rol_id') || $user->wasChanged('unidad_id')) {
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
+
         return redirect()->route('admin.gestion-usuarios')->with('success', 'Usuario actualizado.');
     }
 }
