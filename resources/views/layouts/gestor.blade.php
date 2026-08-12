@@ -194,14 +194,12 @@
         $flashError = session('sweet_error') ?: session('error');
         $validationErrors = $errors->any() ? $errors->all() : [];
     @endphp
-        { { --notificaciones --} }
         <script>
             window.__flashMessages = window.__flashMessages || { };
             window.__flashMessages.success = @json($flashSuccess);
             window.__flashMessages.error = @json($flashError);
             window.__flashMessages.validationErrors = @json($validationErrors);
         </script>
-        {{ --scripts --}}
         @stack('scripts')
 
         @stack('page-scripts')
