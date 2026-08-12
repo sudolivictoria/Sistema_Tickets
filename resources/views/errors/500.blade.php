@@ -16,6 +16,7 @@
     </style>
 </head>
 {{-- error 500 --}}
+
 <body class="h-full bg-[#04003B] overflow-hidden">
     <main class="h-full flex flex-col items-center justify-center blueprint-grid text-center px-8">
         <div
@@ -24,15 +25,12 @@
                 style="font-variation-settings: 'FILL' 1;">engineering</span>
         </div>
         <h1 class="text-5xl font-black uppercase mb-4 text-red-500">Error 500</h1>
-        <p class="text-lg font-medium text-blue-200 max-w-lg mb-10 leading-relaxed">Algo falló en el núcleo del sistema. Estamos trabajando en una
+        <p class="text-lg font-medium text-blue-200 max-w-lg mb-10 leading-relaxed">Algo falló en el núcleo del sistema.
+            Estamos trabajando en una
             reparación inmediata.</p>
 
         <div class="flex gap-4">
-            <a href="{{ route('login') }}"
-                class="px-8 py-4 border border-red-500 text-red-500 font-black uppercase tracking-widest text-sm">
-                Reportar a Soporte
-            </a>
-            <a href="/" class="px-8 py-4 font-black uppercase tracking-widest text-sm"
+            <a href="{{ route('logout') }}" class="px-8 py-4 font-black uppercase tracking-widest text-sm"
                 style="background-color: #84cc16; color: #04003B;">
                 Intentar de nuevo
             </a>
