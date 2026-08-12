@@ -21,20 +21,24 @@
         /* Scrollbar personalizado */
         ::-webkit-scrollbar {
             width: 8px;
-            height: 8px;
+            height: 4px;
         }
+
         ::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 10px;
         }
+
         ::-webkit-scrollbar-thumb {
-             background: #84cc16;
+            background: #84cc16;
             border-radius: 10px;
             border: 2px solid #f1f5f9;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #04003B;
         }
+
         .table-container::-webkit-scrollbar {
             height: 6px;
         }
@@ -99,16 +103,16 @@
                             <span class="text-sm">Asignar Tickets</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.mis-asignados') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('gestor.mis-asignados') }}">
-                            <span class="material-symbols-outlined text-xl">assignment_ind</span>
+                        <a class=" flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.mis-asignados') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                                href="{{ route('gestor.mis-asignados') }}">
+                                <span class="material-symbols-outlined text-xl">assignment_ind</span>
                             <span class="text-sm">Mis Asignados</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.historial') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('gestor.historial') }}">
-                            <span class="material-symbols-outlined text-xl">analytics</span>
-                            <span class="text-sm">Historial</span>
+                        <a class=" flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.historial') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                                    href="{{ route('gestor.historial') }}">
+                                    <span class="material-symbols-outlined text-xl">analytics</span>
+                                    <span class="text-sm">Historial</span>
                         </a>
 
                         <p class="text-[10px] uppercase tracking-[0.2em] text-slate-400 mt-2 px-4 font-black">Servicios
@@ -120,10 +124,10 @@
                             <span class="text-sm">Crear Ticket</span>
                         </a>
 
-                        <a class="flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
-                            href="{{ route('gestor.mis-tickets') }}">
-                            <span class="material-symbols-outlined text-xl">history</span>
-                            <span class="text-sm">Mis Tickets</span>
+                        <a class=" flex items-center gap-3 px-4 py-2.5 {{ request()->routeIs('gestor.mis-tickets') ? 'bg-primary text-secondary font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10' }} rounded-lg font-bold transition-all"
+                                href="{{ route('gestor.mis-tickets') }}">
+                                <span class="material-symbols-outlined text-xl">history</span>
+                                <span class="text-sm">Mis Tickets</span>
                         </a>
                     </nav>
 
@@ -152,7 +156,7 @@
 
     <script>
         //------------preloader--------------
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const preloader = document.getElementById('preloader');
             preloader.classList.add('opacity-0');
             document.body.classList.remove('overflow-hidden');
@@ -162,7 +166,7 @@
             }, 1000);
         });
         //-----reloj-------
-        window.iniciarReloj = function() {
+        window.iniciarReloj = function () {
             const contenedorReloj = document.getElementById('relojSistema');
             if (!contenedorReloj) return;
             //---actualizar hora cada segundo
@@ -180,8 +184,8 @@
             //-----corre cada segundo
             setInterval(actualizarHora, 1000);
         }
-        document.addEventListener('DOMContentLoaded', function() {
-            iniciarReloj();
+        document.addEventListener('DOMContentLoaded', function () {
+         iniciarReloj();
         });
     </script>
 
@@ -190,18 +194,18 @@
         $flashError = session('sweet_error') ?: session('error');
         $validationErrors = $errors->any() ? $errors->all() : [];
     @endphp
-    {{-- notificaciones --}}
-    <script>
-        window.__flashMessages = window.__flashMessages || {};
-        window.__flashMessages.success = @json($flashSuccess);
-        window.__flashMessages.error = @json($flashError);
-        window.__flashMessages.validationErrors = @json($validationErrors);
-    </script>
-    {{-- scripts --}}
-    @stack('scripts')
+        { { --notificaciones --} }
+        <script>
+            window.__flashMessages = window.__flashMessages || { };
+            window.__flashMessages.success = @json($flashSuccess);
+            window.__flashMessages.error = @json($flashError);
+            window.__flashMessages.validationErrors = @json($validationErrors);
+        </script>
+        {{ --scripts --}}
+        @stack('scripts')
 
-    @stack('page-scripts')
+        @stack('page-scripts')
 
-    @stack('sse-scripts')
-</body>
-</html>
+        @stack('sse-scripts')
+</body >
+</html >
