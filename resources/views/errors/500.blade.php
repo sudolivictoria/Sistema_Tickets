@@ -26,14 +26,23 @@
         </div>
         <h1 class="text-5xl font-black uppercase mb-4 text-red-500">Error 500</h1>
         <p class="text-lg font-medium text-blue-200 max-w-lg mb-10 leading-relaxed">Algo falló en el núcleo del sistema.
-            Estamos trabajando en una
-            reparación inmediata.</p>
+            Estamos trabajando en una reparación inmediata.</p>
 
         <div class="flex gap-4">
-            <a href="{{ route('logout') }}" class="px-8 py-4 font-black uppercase tracking-widest text-sm"
-                style="background-color: #84cc16; color: #04003B;">
-                Intentar de nuevo
+            <a href="{{ url('/') }}"
+                class="px-8 py-4 font-black uppercase tracking-widest text-sm border border-blue-200 text-blue-200">
+                Volver al inicio
             </a>
+
+            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                class="px-8 py-4 font-black uppercase tracking-widest text-sm"
+                style="background-color: #84cc16; color: #04003B;">
+                Cerrar sesión
+            </a>
+
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
         </div>
     </main>
 </body>
