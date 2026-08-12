@@ -120,6 +120,7 @@ $(document)
         const tecnicoId = $select.val();
         const url = $select.data("url") || `/admin/tickets/${ticketId}/tecnico`;
         $select.prop("disabled", true).addClass("opacity-50");
+        const $fila = $select.closest("tr");
         $.ajax({
             url: url,
             method: "PATCH",
@@ -129,10 +130,15 @@ $(document)
             data: { tecnico_id: tecnicoId },
         })
             .done(function (response) {
-                window.mostrarFlashMessages({ success: response.message });
-                //---refresca la tabla para quien hizo el cambio: el auto-refresco
-                if (typeof window.AutoRefresco !== "undefined") {
-                    window.AutoRefresco.forzarRefresco();
+                if (typeof window.mostrarFlashMessages === "function") {
+                    window.mostrarFlashMessages({ success: response.message });
+                }
+                if (typeof table !== "undefined" && table) {
+                    table.row($fila).remove().draw(false);
+                } else {
+                    $fila.fadeOut(300, function () {
+                        $(this).remove();
+                    });
                 }
             })
             .fail(function (xhr) {
@@ -156,6 +162,8 @@ $(document)
         const url =
             $select.data("url") || `/admin/tickets/${ticketId}/prioridad`;
         $select.prop("disabled", true).addClass("opacity-50");
+        const $td = $select.closest("td");
+        const textoSeleccionado = $select.find("option:selected").text().trim();
         $.ajax({
             url: url,
             method: "PATCH",
@@ -165,10 +173,12 @@ $(document)
             data: { prioridad_id: prioridadId },
         })
             .done(function (response) {
-                window.mostrarFlashMessages({ success: response.message });
-                //---refresca la tabla para quien hizo el cambio: el auto-refresco
-                if (typeof window.AutoRefresco !== "undefined") {
-                    window.AutoRefresco.forzarRefresco();
+                if (typeof window.mostrarFlashMessages === "function") {
+                    window.mostrarFlashMessages({ success: response.message });
+                }
+                $td.attr("data-search", textoSeleccionado);
+                if (typeof table !== "undefined" && table) {
+                    table.cell($td).invalidate().draw(false);
                 }
             })
             .fail(function (xhr) {
