@@ -533,14 +533,9 @@ class AdminController extends Controller
     //---metodo para mostrar historial de tickets con filtros y métricas
     public function historial()
     {
-        $miUnidadId = Auth::user()?->unidad_id; //---obtenemos la unidad del admin autenticado
-
-        //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
+        //--el Admin puede ver el historial de todas las unidades/categorías (selector de categoría en la vista)
         $tickets = Ticket::with(['user.unidad', 'categoria', 'estado', 'tecnico'])
             ->whereYear('created_at', date('Y'))
-            ->when($miUnidadId, function ($query) use ($miUnidadId) {
-                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
-            })
             ->latest()
             ->get();
 
