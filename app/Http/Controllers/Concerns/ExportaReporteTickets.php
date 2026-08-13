@@ -51,6 +51,12 @@ trait ExportaReporteTickets
             //----Eager Loading completo para optimizar las consultas a la base de datos
             $query = Ticket::with(['user.unidad', 'tecnico', 'estado', 'categoria', 'tipo_solicitud', 'prioridad']);
 
+            //----restringe el export a la unidad del usuario autenticado (evita fuga de datos entre unidades)
+            $miUnidadId = auth()->user()?->unidad_id;
+            if ($miUnidadId) {
+                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            }
+
             //------Búsqueda general por ID, nombre de usuario o técnico
             if ($request->filled('buscar')) {
                 $buscar = $request->input('buscar');

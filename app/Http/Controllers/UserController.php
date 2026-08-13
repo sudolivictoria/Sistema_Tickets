@@ -25,6 +25,12 @@ class UserController extends Controller
         $user->activo = !$user->activo;
         //--guarda el cambio en la base de datos
         $user->save();
+
+        //---si fue desactivado, se cierra su sesión activa de inmediato (evita acceso con cuenta desactivada)
+        if (!$user->activo) {
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
+
         return redirect()->route('admin.gestion-usuarios')->with('success', 'El estado del usuario ha sido actualizado.');
     }
 

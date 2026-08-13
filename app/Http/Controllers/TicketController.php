@@ -50,10 +50,18 @@ class TicketController extends Controller
     {
         try {
             $resultado = DB::transaction(function () use ($request, $id, $nuevoEstadoId, $determinarEstadoSla) {
-                // Bloqueamos la fila del ticket en BD
+                //-----bloqueamos la fila del ticket en BD
                 $ticket = Ticket::where('id', $id)->lockForUpdate()->firstOrFail();
 
-                // Validación concurrente: Verificar si otro usuario ya cambió el estado a cerrado
+                $miUnidadId = Auth::user()?->unidad_id;
+                if ($miUnidadId && $ticket->categoria?->unidad_id !== $miUnidadId) {
+                    return [
+                        'error' => true,
+                        'message' => 'No tienes permiso para modificar este ticket.'
+                    ];
+                }
+
+                //----validación concurrente: Verificar si otro usuario ya cambió el estado a cerrado
                 if (in_array($ticket->estado_id, [3, 4, 5])) {
                     return [
                         'error' => true,

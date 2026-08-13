@@ -92,7 +92,7 @@
                 data-fecha="{{ $ticket->created_at->format('d/m/Y') }}" data-drive="{{ $ticket->drive_link }}" {{-- Datos
                 para el temporizador de SLA --}} data-estado="{{ $ticket->estado->nombre_estado }}"
                 data-state="{{ $ticket->estado_sla }}"
-                data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('Y-m-d H:i:s') : '' }}"
+                data-fecha-limite="{{ $ticket->fecha_vencimiento_sla ? $ticket->fecha_vencimiento_sla->format('c') : '' }}"
                 data-tiempo-respuesta="{{ $ticket->tiempo_respuesta ?? 0 }}">
                 <span class="material-symbols-outlined text-[20px]">visibility</span>
             </button>

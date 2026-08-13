@@ -8,6 +8,17 @@ window.ticketIdActual = null;
 window.ticketEstadoActual = null;
 window.canalEchoActual = null;
 
+//---escapa texto proveniente del servidor antes de insertarlo vía innerHTML (previene XSS almacenado)
+function escaparHtml(texto) {
+    return String(texto ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+    })[c]);
+}
+
 // ---------------------------------------------------------------------
 //              GESTIÓN DE WEB SOCKETS (REVERB)
 // ---------------------------------------------------------------------
@@ -63,6 +74,9 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
     $.get(`/tickets/${idTicket}/comentarios`)
         .done(function (comentarios) {
+            //---evita renderizar una respuesta tardía sobre un ticket distinto al que el usuario tiene abierto ahora
+            if (String(window.ticketIdActual) !== String(idTicket)) return;
+
             $lista.empty();
 
             const esVistaAdmin = document.getElementById("es_privado") !== null;
@@ -96,10 +110,10 @@ window.cargarComentariosDelTicket = function (idTicket, estadoNombre) {
 
                 item.innerHTML = `
                     <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                        <span>${tag}${com.user ? com.user.name : "Usuario"}</span>
-                        <span class="text-[10px] text-slate-400 font-normal">${com.tiempo_legible || ""}</span>
+                        <span>${tag}${escaparHtml(com.user ? com.user.name : "Usuario")}</span>
+                        <span class="text-[10px] text-slate-400 font-normal">${escaparHtml(com.tiempo_legible || "")}</span>
                     </div>
-                    <p class="text-slate-600 font-medium">${com.contenido}</p>
+                    <p class="text-slate-600 font-medium">${escaparHtml(com.contenido)}</p>
                 `;
                 fragment.appendChild(item);
             });
@@ -148,10 +162,10 @@ window.agregarComentarioAlModal = function (comentario) {
     const elComentario = `
         <div ${dataAttr} class="p-2 rounded-xl border ${bg} transition-all duration-300">
             <div class="flex justify-between font-bold text-green-950 mb-0.5">
-                <span>${tag}${comentario.user ? comentario.user.name : "Usuario"}</span>
-                <span class="text-[10px] text-slate-400 font-normal">${comentario.tiempo_legible || "Ahora mismo"}</span>
+                <span>${tag}${escaparHtml(comentario.user ? comentario.user.name : "Usuario")}</span>
+                <span class="text-[10px] text-slate-400 font-normal">${escaparHtml(comentario.tiempo_legible || "Ahora mismo")}</span>
             </div>
-            <p class="text-slate-600 font-medium">${comentario.contenido}</p>
+            <p class="text-slate-600 font-medium">${escaparHtml(comentario.contenido)}</p>
         </div>
     `;
     $lista.append(elComentario);
@@ -343,7 +357,7 @@ window.iniciarContadorSLA = function (datosSLA) {
     const estadoCheck = String(estadoNombre || "")
         .toLowerCase()
         .trim();
-    const estadosCerrados = ["resuelto", "equivocado", "no corresponde"];
+    const estadosCerrados = ["resuelto", "equivocado", "no corresponde", "cerrado"];
 
     if (estadosCerrados.includes(estadoCheck) || segundosTranscurridos > 0) {
         wrapper.classList.remove("hidden");

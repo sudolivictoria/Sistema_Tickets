@@ -59,7 +59,7 @@
                 const longitud = inputAsunto.value.length;
                 contador.textContent = `${longitud}/50`;
 
-                if (longitud < 5 || longitud >= 50) {
+                if (longitud < 5 || longitud > 50) {
                     contador.classList.remove("bg-slate-100", "text-slate-400", "border-slate-200");
                     contador.classList.add("bg-red-50", "text-red-500", "border-red-200");
                 } else {

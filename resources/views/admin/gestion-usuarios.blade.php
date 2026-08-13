@@ -5,15 +5,23 @@
         @vite(['resources/css/tickets.css'])
     @endpush
 
-    {{-- Script dinámico para transmitir mensajes Flash de Laravel a JS --}}
-    <script id="flash-data">
-        window.__flashMessages = {
-            successTitle: '¡Usuario Guardado!',
-            validationTitle: 'Campos requeridos',
-            errorTitle: 'Acción No Permitida',
-            success: "{{ session('success') }}",
-            error: "{{ session('error') }}"
-        };
+    {{-- Datos flash de Laravel para JS, como JSON (no ejecutable) para evitar problemas de escape/inyección --}}
+    <script id="flash-data" type="application/json">{!! json_encode(['success' => session('success'), 'error' => session('error')]) !!}</script>
+    <script>
+        (function () {
+            const el = document.getElementById('flash-data');
+            let datos = {};
+            try {
+                datos = el ? JSON.parse(el.textContent) : {};
+            } catch (e) {
+                datos = {};
+            }
+            window.__flashMessages = Object.assign({
+                successTitle: '¡Usuario Guardado!',
+                validationTitle: 'Campos requeridos',
+                errorTitle: 'Acción No Permitida',
+            }, datos);
+        })();
     </script>
 
     <div class="space-y-6">

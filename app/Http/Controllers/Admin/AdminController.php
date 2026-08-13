@@ -105,7 +105,7 @@ class AdminController extends Controller
         $estadoBoton = request()->query('estado', 'todos');
 
         //-----tickets
-        $queryTabla = Ticket::with(['user', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
+        $queryTabla = Ticket::with(['user.unidad', 'categoria', 'estado', 'tecnico', 'prioridad', 'tipo_solicitud']);
 
         //----filtrado por estado
         if ($estadoBoton === 'resuelto,equivocado,no corresponde' || $estadoBoton === 'cerrado') {
@@ -336,7 +336,7 @@ class AdminController extends Controller
         $miUnidadId = Auth::user()->unidad_id; //---obtenemos la unidad del admin autenticado
 
         //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
-        $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
+        $tickets = Ticket::with(['user.unidad', 'categoria', 'estado', 'tecnico'])
             ->whereHas('categoria', function ($q) use ($miUnidadId) {
                 $q->where('unidad_id', $miUnidadId);
             })
@@ -357,15 +357,22 @@ class AdminController extends Controller
     //---Actualizar Técnico------------------------------------------->
     public function actualizarTecnico(Request $request, Ticket $ticket)
     {
+        $miUnidadId = Auth::user()?->unidad_id;
+
         $request->validate([
             'tecnico_id' => [
                 'nullable',
                 'exists:users,id',
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail) use ($ticket, $miUnidadId) {
                     if ($value) {
                         $user = User::find($value);
                         if ($user && !$user->activo) {
                             $fail('El técnico seleccionado no está activo.');
+                            return;
+                        }
+                        $unidadTicket = $miUnidadId ?: $ticket->categoria?->unidad_id;
+                        if ($user && $unidadTicket && $user->unidad_id !== $unidadTicket) {
+                            $fail('El técnico seleccionado no pertenece a la unidad de este ticket.');
                         }
                     }
                 },
@@ -373,8 +380,16 @@ class AdminController extends Controller
         ]);
 
         //-----Transacción + bloqueo de fila: evita que dos usuarios asignen el mismo ticket a la vez
-        $resultado = DB::transaction(function () use ($request, $ticket) {
+        $resultado = DB::transaction(function () use ($request, $ticket, $miUnidadId) {
             $ticketBloqueado = Ticket::where('id', $ticket->id)->lockForUpdate()->firstOrFail();
+
+            //-----validacion de unidad: solo aplica a admins con unidad asignada (evita IDOR)
+            if ($miUnidadId && $ticketBloqueado->categoria?->unidad_id !== $miUnidadId) {
+                return [
+                    'error' => true,
+                    'message' => 'No tienes permiso para modificar este ticket.'
+                ];
+            }
 
             //-----validacion que no este cerrado
             if (in_array($ticketBloqueado->estado_id, [3, 4, 5])) {
@@ -428,9 +443,19 @@ class AdminController extends Controller
     {
         $request->validate(['prioridad_id' => 'required|exists:prioridades,id']);
 
-        //--------Transacción + bloqueo de fila: evita que un cambio de estado concurrente 
-        $resultado = DB::transaction(function () use ($request, $ticket) {
+        $miUnidadId = Auth::user()?->unidad_id;
+
+        //--------Transacción + bloqueo de fila: evita que un cambio de estado concurrente
+        $resultado = DB::transaction(function () use ($request, $ticket, $miUnidadId) {
             $ticketBloqueado = Ticket::where('id', $ticket->id)->lockForUpdate()->firstOrFail();
+
+            //-----validacion de unidad: solo aplica a admins con unidad asignada (evita IDOR)
+            if ($miUnidadId && $ticketBloqueado->categoria?->unidad_id !== $miUnidadId) {
+                return [
+                    'error' => true,
+                    'message' => 'No tienes permiso para modificar este ticket.'
+                ];
+            }
 
             if (in_array($ticketBloqueado->estado_id, [3, 4, 5])) {
                 return [
@@ -508,9 +533,14 @@ class AdminController extends Controller
     //---metodo para mostrar historial de tickets con filtros y métricas
     public function historial()
     {
+        $miUnidadId = Auth::user()?->unidad_id; //---obtenemos la unidad del admin autenticado
+
         //--obtener todos los tickets de la unidad del admin autenticado, con sus relaciones para mostrar en la vista
-        $tickets = Ticket::with(['user', 'categoria', 'estado', 'tecnico'])
+        $tickets = Ticket::with(['user.unidad', 'categoria', 'estado', 'tecnico'])
             ->whereYear('created_at', date('Y'))
+            ->when($miUnidadId, function ($query) use ($miUnidadId) {
+                $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+            })
             ->latest()
             ->get();
 

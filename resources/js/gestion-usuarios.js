@@ -101,9 +101,19 @@ $(document).ready(function () {
                     window.closeModalUsuario("modalAgregar");
                     window.closeModalUsuario("modalEditar");
                     //-----------ALERTAS FLASH DE APP.JS----->
-                    const flashDataString = $html.find("#flash-data").html();
-                    if (flashDataString) {
-                        eval(flashDataString);
+                    const $flashData = $html.find("#flash-data");
+                    if ($flashData.length) {
+                        let datos = {};
+                        try {
+                            datos = JSON.parse($flashData.text()) || {};
+                        } catch (e) {
+                            datos = {};
+                        }
+                        window.__flashMessages = Object.assign({
+                            successTitle: "¡Usuario Guardado!",
+                            validationTitle: "Campos requeridos",
+                            errorTitle: "Acción No Permitida",
+                        }, datos);
                         window.mostrarFlashMessages();
                     }
                 },
