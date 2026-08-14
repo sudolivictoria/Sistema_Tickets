@@ -16,7 +16,7 @@ set -euo pipefail
 # ----------------------- Configuración (ajustar) --------------------------
 APP_DIR="/var/www/sistema-tickets"
 BRANCH="main"
-PHP_FPM_SERVICE="php8.2-fpm"     # ajustar a la versión de PHP real del servidor
+PHP_FPM_SERVICE="php8.4-fpm"     # ajustar a la versión de PHP real del servidor
 HEALTH_URL="http://127.0.0.1/up" # ruta de health-check de Laravel 11 (bootstrap/app.php)
 # ----------------------------------------------------------------------------
 
