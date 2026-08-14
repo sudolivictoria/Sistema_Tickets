@@ -54,7 +54,7 @@
         {{-- Prioridad --}}
         <td class="px-4 py-4" data-search="{{ $ticket->prioridad->nombre_prioridad }}">
             <select data-id="{{ $ticket->id }}"
-                data-url="{{ route(request()->is('admin*') ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad', $ticket->id) }}"
+                data-url="{{ route(auth()->user()->tieneRol('Admin') ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad', $ticket->id) }}"
                 class="select-prioridad-ajax bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer">
                 <option value="1" {{ $ticket->prioridad_id == 1 ? 'selected' : '' }}>Critica</option>
                 <option value="2" {{ $ticket->prioridad_id == 2 ? 'selected' : '' }}>Alta</option>
@@ -66,7 +66,7 @@
         {{-- Técnico --}}
         <td class="px-4 py-4">
             <select data-id="{{ $ticket->id }}"
-                data-url="{{ route(request()->is('admin*') ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico', $ticket->id) }}"
+                data-url="{{ route(auth()->user()->tieneRol('Admin') ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico', $ticket->id) }}"
                 class="select-tecnico-ajax bg-transparent font-black text-secondary text-[12px] border-none focus:ring-0 cursor-pointer w-32">
                 <option class="font-black" value="">Pendiente</option>
                 @foreach($tecnicos as $tecnico)

@@ -51,7 +51,7 @@
         {{-- Prioridad (AJAX) --}}
         <td class="px-4 py-4" data-search="{{ $ticket->prioridad->nombre_prioridad }}">
             @php
-                $rutaPrioridad = route(request()->is('admin*') ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad', $ticket->id);
+                $rutaPrioridad = route(auth()->user()->tieneRol('Admin') ? 'admin.actualizar-prioridad' : 'gestor.actualizar-prioridad', $ticket->id);
                 $estaCerrado = in_array($ticket->estado_id, [3, 4, 5]);
             @endphp
             <select data-id="{{ $ticket->id }}"
@@ -69,7 +69,7 @@
         {{-- Reasignar o Devolver (AJAX) --}}
         <td class="px-4 py-4">
             @php
-                $rutaTecnico = route(request()->is('admin*') ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico', $ticket->id);
+                $rutaTecnico = route(auth()->user()->tieneRol('Admin') ? 'admin.actualizar-tecnico' : 'gestor.actualizar-tecnico', $ticket->id);
             @endphp
             <select data-id="{{ $ticket->id }}"
                     data-url="{{ $rutaTecnico }}"
@@ -109,7 +109,7 @@
         {{-- Acciones (AJAX) --}}
         <td class="px-4 py-4">
             @php
-                $prefix = request()->is('admin*') ? 'admin' : 'gestor';
+                $prefix = auth()->user()->tieneRol('Admin') ? 'admin' : 'gestor';
                 $rutaResolver = route($prefix . '.tickets.resolver', $ticket->id);
                 $rutaEquivocacion = route($prefix . '.tickets.equivocacion', $ticket->id);
                 $rutaNoCorresponde = route($prefix . '.tickets.no-corresponde', $ticket->id);

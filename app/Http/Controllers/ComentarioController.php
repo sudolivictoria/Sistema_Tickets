@@ -20,7 +20,10 @@ class ComentarioController extends Controller
     //------------AUTORIZACION---------------
     private function autorizarAccesoTicket(Ticket $ticket, User $user): void
     {
-        $esStaff = $user->tieneRol('Admin') || $user->tieneRol('Gestor');
+        $esGestorDeSuUnidad = $user->tieneRol('Gestor')
+            && $user->unidad_id
+            && $ticket->categoria?->unidad_id === $user->unidad_id;
+        $esStaff = $user->tieneRol('Admin') || $esGestorDeSuUnidad;
         $esPropietario = $ticket->user_id === $user->id;
         $esTecnicoAsignado = $ticket->tecnico_id !== null && $ticket->tecnico_id === $user->id;
 
