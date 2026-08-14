@@ -11,7 +11,7 @@ use App\Models\Rol;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasFactory, Notifiable;
 
     //-----campos que se llenan masivamente
 
