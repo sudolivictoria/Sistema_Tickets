@@ -1,5 +1,5 @@
 config:
-  target: "http://sistema-tickets.test" # Cambia esto por tu URL de Laragon
+  target: "http://172.16.116.80"
   phases:
     - duration: 60
       arrivalRate: 5
@@ -11,4 +11,4 @@ config:
 scenarios:
   - flow:
       - get:
-          url: "/test-performance"
+          url: "/login"
