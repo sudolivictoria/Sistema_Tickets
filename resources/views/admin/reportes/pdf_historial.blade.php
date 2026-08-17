@@ -165,6 +165,12 @@
             text-align: right;
             white-space: nowrap;
         }
+        .col-sla {
+            width: 1%;
+            text-align: right;
+            white-space: nowrap;
+            padding-right: 8px !important;
+        }
         /*******************BADGES****************/
         .badge {
             padding: 3px 8px;
@@ -385,7 +391,14 @@
                 4 => '#10b981',
                 default => '#94a3b8',
             };
-            $prioColor = '#ffffff';   
+            $prioColor = '#ffffff';
+
+            //-----------BADGE DE CUMPLIMIENTO SLA (solo si el ticket ya se resolvió con ese dato)----------------
+            $slaBadge = match ($ticket->estado_sla ?? null) {
+                'cumplido' => ['texto' => 'Cumplido', 'bg' => '#f0fdfa', 'color' => '#0d9488', 'border' => '#99f6e4'],
+                'vencido'  => ['texto' => 'Vencido', 'bg' => '#fef2f2', 'color' => '#dc2626', 'border' => '#fecaca'],
+                default    => null,
+            };
         @endphp
         <!-------card del ticket-------------->
         <div class="ticket-card" style="border-left: 5px solid {{ $themeColor }};">
@@ -406,6 +419,14 @@
                             </span>
                         </div>
                     </td>
+                    @if($slaBadge)
+                        <td class="col-sla">
+                            <span class="badge"
+                                style="background-color: {{ $slaBadge['bg'] }}; color: {{ $slaBadge['color'] }}; border: 1px solid {{ $slaBadge['border'] }};">
+                                {{ $slaBadge['texto'] }}
+                            </span>
+                        </td>
+                    @endif
                     <td class="col-status">
                         <span class="badge"
                             style="background-color: {{ $badgeBg }}; color: {{ $themeColor }}; border: 1px solid {{ $badgeBorder }};">
