@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->redirectGuestsTo(fn() => route('login'));
+
+        //---revalida en cada request que la cuenta siga activa; sin esto, un usuario
+        //---desactivado con la cookie "recuérdame" todavía válida podía re-loguearse solo
+        $middleware->web(append: [EnsureUserIsActive::class]);
 
         $middleware->alias([
             'role' => CheckRole::class,

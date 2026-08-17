@@ -133,8 +133,10 @@ $(document)
                 }
                 $td.attr("data-search", textoSeleccionado);
                 if (response.fecha_vencimiento_sla) {
-                    $(`.btn-ver-detalle[data-id="${ticketId}"]`).attr(
-                        "data-fecha-limite",
+                    //---.data(), no .attr(): ticket-core.js lee este valor vía $btn.data("fecha-limite"),
+                    //---que jQuery cachea en su primer acceso e ignora cambios al atributo del DOM después
+                    $(`.btn-ver-detalle[data-id="${ticketId}"]`).data(
+                        "fecha-limite",
                         response.fecha_vencimiento_sla
                     );
                 }

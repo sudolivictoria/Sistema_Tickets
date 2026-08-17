@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -29,6 +30,11 @@ class UserController extends Controller
         //---si fue desactivado, se cierra su sesión activa de inmediato (evita acceso con cuenta desactivada)
         if (!$user->activo) {
             DB::table('sessions')->where('user_id', $user->id)->delete();
+
+            //---rota el remember_token: el login siempre marca "recuérdame" (LoginController),
+            //---así que sin esto la cookie persistente re-loguea solo al usuario en su siguiente request
+            $user->setRememberToken(Str::random(60));
+            $user->save();
         }
 
         return redirect()->route('admin.gestion-usuarios')->with('success', 'El estado del usuario ha sido actualizado.');
