@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Concerns;
 use App\Models\Ticket;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  *lógica de exportación de reportes (Excel/PDF) compartida entre
@@ -171,6 +172,7 @@ trait ExportaReporteTickets
                 return $pdf->stream('reporte_historial_' . date('d-m-Y_His') . '.pdf');
             }
         } catch (\Exception $e) {
+            Log::error('Error al generar reporte de tickets: ' . $e->getMessage());
             return redirect()->route($rutaRedirectError)
                 ->with('error', 'Ocurrió un error al generar el reporte.');
         }
