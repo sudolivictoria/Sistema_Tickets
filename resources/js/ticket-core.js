@@ -219,12 +219,16 @@ $(document)
                 );
             }
         })
-        .fail((xhr) =>
-            alert(
+        .fail((xhr) => {
+            const errorMsg =
                 xhr.responseJSON?.message ||
-                    "Ocurrió un error al intentar publicar el comentario.",
-            ),
-        )
+                "Ocurrió un error al intentar publicar el comentario.";
+            if (typeof window.mostrarFlashMessages === "function") {
+                window.mostrarFlashMessages({ error: errorMsg });
+            } else {
+                alert(errorMsg);
+            }
+        })
         .always(() =>
             $btnSubmit
                 .prop("disabled", false)
