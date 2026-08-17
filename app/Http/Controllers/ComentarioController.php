@@ -98,6 +98,14 @@ class ComentarioController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
 
+                //-----si el ticket se cerró mientras el modal seguía abierto en el navegador (el formulario ahí no se entera del cambio), igual se rechaza aquí
+                if (in_array($ticket->estado_id, [3, 4, 5])) {
+                    return [
+                        'error' => true,
+                        'message' => 'No se puede comentar, este ticket ya fue resuelto o cerrado.',
+                    ];
+                }
+
                 //------crear el comentario
                 $comentario = Comentario::create([
                     'ticket_id'  => $ticket->id,
@@ -107,10 +115,19 @@ class ComentarioController extends Controller
                 ]);
 
                 return [
+                    'error'      => false,
                     'comentario' => $comentario,
                     'ticket'     => $ticket,
                 ];
             });
+
+            if ($resultado['error']) {
+                Cache::forget($cacheKey);
+                return response()->json([
+                    'success' => false,
+                    'message' => $resultado['message'],
+                ], 422);
+            }
 
             $comentario = $resultado['comentario'];
             $ticket     = $resultado['ticket'];

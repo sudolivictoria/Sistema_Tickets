@@ -219,8 +219,11 @@ $(document)
                 );
             }
         })
-        .fail(() =>
-            alert("Ocurrió un error al intentar publicar el comentario."),
+        .fail((xhr) =>
+            alert(
+                xhr.responseJSON?.message ||
+                    "Ocurrió un error al intentar publicar el comentario.",
+            ),
         )
         .always(() =>
             $btnSubmit
@@ -300,6 +303,11 @@ window.cerrarModal = function () {
         if (window.timerSLA) clearInterval(window.timerSLA);
         window.ticketIdActual = null;
         window.desconectarComentariosWebSocket();
+
+        //---al cerrar el modal ya no hay "acción en curso" que proteger: recupera cualquier actualización de la tabla que haya llegado (y se haya salteado) mientras el modal estuvo abierto, en vez de esperar al próximo evento o a que el usuario refresque a mano
+        if (typeof window.AutoRefresco !== "undefined") {
+            window.AutoRefresco.forzarRefresco();
+        }
     }
 };
 
