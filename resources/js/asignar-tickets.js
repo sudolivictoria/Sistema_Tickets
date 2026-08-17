@@ -177,6 +177,12 @@ $(document)
                     window.mostrarFlashMessages({ success: response.message });
                 }
                 $td.attr("data-search", textoSeleccionado);
+                if (response.fecha_vencimiento_sla) {
+                    $(`.btn-ver-detalle[data-id="${ticketId}"]`).attr(
+                        "data-fecha-limite",
+                        response.fecha_vencimiento_sla
+                    );
+                }
                 if (typeof table !== "undefined" && table) {
                     table.cell($td).invalidate().draw(false);
                 }

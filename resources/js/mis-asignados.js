@@ -113,11 +113,12 @@ $(document)
     .on("change", ".select-prioridad-ajax", function () {
         const $select = $(this);
         const url = $select.data("url");
+        const ticketId = $select.data("id");
         const prioridadId = $select.val();
         const $td = $select.closest("td");
         const textoSeleccionado = $select.find("option:selected").text().trim();
         $select.prop("disabled", true).addClass("opacity-50");
-        
+
         $.ajax({
             url: url,
             method: "PATCH",
@@ -131,6 +132,12 @@ $(document)
                     window.mostrarFlashMessages({ success: response.message });
                 }
                 $td.attr("data-search", textoSeleccionado);
+                if (response.fecha_vencimiento_sla) {
+                    $(`.btn-ver-detalle[data-id="${ticketId}"]`).attr(
+                        "data-fecha-limite",
+                        response.fecha_vencimiento_sla
+                    );
+                }
                 if (typeof table !== "undefined" && table) {
                     table.cell($td).invalidate().draw(false);
                 }

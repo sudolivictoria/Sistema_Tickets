@@ -451,7 +451,7 @@ class AdminUnidadController extends Controller
                 'fecha_vencimiento_sla' => $nuevaFechaVencimiento
             ]);
 
-            return ['error' => false];
+            return ['error' => false, 'fecha_vencimiento_sla' => $nuevaFechaVencimiento];
         });
 
         if ($resultado['error']) {
@@ -471,7 +471,11 @@ class AdminUnidadController extends Controller
         $mensajeExito = 'Prioridad y tiempo SLA actualizados correctamente';
 
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['success' => true, 'message' => $mensajeExito]);
+            return response()->json([
+                'success' => true,
+                'message' => $mensajeExito,
+                'fecha_vencimiento_sla' => $resultado['fecha_vencimiento_sla']->format('c'),
+            ]);
         }
 
         return back()->with('sweet_success', $mensajeExito);
