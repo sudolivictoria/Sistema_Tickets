@@ -13,10 +13,7 @@ Broadcast::channel('ticket.{ticketId}', function ($user, $ticketId) {
         return false;
     }
 
-    $esGestorDeSuUnidad = $user->tieneRol('Gestor')
-        && $user->unidad_id
-        && $ticket->categoria?->unidad_id === $user->unidad_id;
-    $esStaff = $user->tieneRol('Admin') || $esGestorDeSuUnidad;
+    $esStaff = $user->esStaffDelTicket($ticket);
     $esPropietario = $ticket->user_id === $user->id;
     $esTecnicoAsignado = $ticket->tecnico_id !== null && $ticket->tecnico_id === $user->id;
 

@@ -24,8 +24,6 @@ class UserController extends Controller
         }
         //---cambia el estado del usuario (activo/inactivo)
         $user->activo = !$user->activo;
-        //--guarda el cambio en la base de datos
-        $user->save();
 
         //---si fue desactivado, se cierra su sesión activa de inmediato (evita acceso con cuenta desactivada)
         if (!$user->activo) {
@@ -34,8 +32,10 @@ class UserController extends Controller
             //---rota el remember_token: el login siempre marca "recuérdame" (LoginController),
             //---así que sin esto la cookie persistente re-loguea solo al usuario en su siguiente request
             $user->setRememberToken(Str::random(60));
-            $user->save();
         }
+
+        //--guarda el cambio en la base de datos (un solo UPDATE)
+        $user->save();
 
         return redirect()->route('admin.gestion-usuarios')->with('success', 'El estado del usuario ha sido actualizado.');
     }

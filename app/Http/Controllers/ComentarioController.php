@@ -20,10 +20,7 @@ class ComentarioController extends Controller
     //------------AUTORIZACION---------------
     private function autorizarAccesoTicket(Ticket $ticket, User $user): void
     {
-        $esGestorDeSuUnidad = $user->tieneRol('Gestor')
-            && $user->unidad_id
-            && $ticket->categoria?->unidad_id === $user->unidad_id;
-        $esStaff = $user->tieneRol('Admin') || $esGestorDeSuUnidad;
+        $esStaff = $user->esStaffDelTicket($ticket);
         $esPropietario = $ticket->user_id === $user->id;
         $esTecnicoAsignado = $ticket->tecnico_id !== null && $ticket->tecnico_id === $user->id;
 
@@ -42,7 +39,7 @@ class ComentarioController extends Controller
 
         $query = Comentario::with('user')->where('ticket_id', $ticket->id);
 
-        if (!$user->tieneRol('Admin') && !$user->tieneRol('Gestor')) {
+        if (!$user->esStaffDelTicket($ticket)) {
             $query->where('es_privado', false);
         }
 
@@ -72,7 +69,8 @@ class ComentarioController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
-        $this->autorizarAccesoTicket(Ticket::findOrFail($ticketId), $user);
+        $ticketParaAutorizar = Ticket::findOrFail($ticketId);
+        $this->autorizarAccesoTicket($ticketParaAutorizar, $user);
 
         //====candado contra Doble-Clic por usuario + contenido + ticket (Válido por 5 segundos)
         $cacheKey = 'comment_lock_' . $user->id . '_' . $ticketId . '_' . md5(trim($request->contenido));
@@ -84,9 +82,9 @@ class ComentarioController extends Controller
         }
 
         try {
-            //----lógica de notas internas (Privadas)
+            //----lógica de notas internas (Privadas): solo puede marcarla como tal quien es staff DE ESTE ticket puntual
             $esPrivado = false;
-            if ($user && ($user->tieneRol('Admin') || $user->tieneRol('Gestor'))) {
+            if ($user->esStaffDelTicket($ticketParaAutorizar)) {
                 $esPrivado = $request->has('es_privado') ? filter_var($request->es_privado, FILTER_VALIDATE_BOOLEAN) : false;
             }
 

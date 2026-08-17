@@ -76,4 +76,16 @@ class User extends Authenticatable
     {
         return $this->rol && $this->rol->nombre_rol === $rolNombre;
     }
+
+    //------metodo para identificar si el usuario es staff del ticket------
+    public function esStaffDelTicket(Ticket $ticket): bool
+    {
+        $esGestorDeSuUnidad = $this->tieneRol('Gestor')
+            && $this->unidad_id
+            && $ticket->categoria?->unidad_id === $this->unidad_id;
+
+        $esTecnicoAsignado = $ticket->tecnico_id !== null && $ticket->tecnico_id === $this->id;
+
+        return $this->tieneRol('Admin') || $esGestorDeSuUnidad || $esTecnicoAsignado;
+    }
 }
