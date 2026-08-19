@@ -187,8 +187,11 @@ class ClienteController extends Controller
             try {
                 $unidadId = $nuevoTicket->categoria->unidad_id ?? null;
                 if ($unidadId) {
+                    //---se excluye al propio usuario (es quien comentó, dueño del ticket) y se limita a solo avisos operativos
                     $destinatarios = User::where('unidad_id', $unidadId)
                         ->where('activo', true)
+                        ->where('id', '!=', $usuario->id)
+                        ->whereHas('rol', fn($q) => $q->whereIn('nombre_rol', ['Admin', 'Gestor']))
                         ->pluck('email')
                         ->toArray();
 

@@ -266,10 +266,11 @@ class AdminController extends Controller
                 //********************************************************************************/
                 //---identificar unidad por medio de la categoria del ticket
                 $unidadId = $nuevoTicket->categoria->unidad_id;
-
-                //---obtener emails de gestores de la unidad
+                //---se excluye al propio usuario (es quien comentó, dueño del ticket) y se limita a solo avisos operativos
                 $destinatarios = User::where('unidad_id', $unidadId)
                     ->where('activo', true)
+                    ->where('id', '!=', $usuario->id)
+                    ->whereHas('rol', fn($q) => $q->whereIn('nombre_rol', ['Admin', 'Gestor']))
                     ->pluck('email')
                     ->toArray();
 

@@ -178,8 +178,11 @@ class ComentarioController extends Controller
                         elseif (!$ticket->tecnico && $ticket->categoria) {
 
                             $unidadId = $ticket->categoria->unidad_id;
+                            //---se excluye al propio usuario (es quien comentó, dueño del ticket) y se limita a solo avisos operativos
                             $destinatariosUnidad = User::where('unidad_id', $unidadId)
                                 ->where('activo', true)
+                                ->where('id', '!=', $user->id)
+                                ->whereHas('rol', fn($q) => $q->whereIn('nombre_rol', ['Admin', 'Gestor']))
                                 ->pluck('email')
                                 ->toArray();
 
