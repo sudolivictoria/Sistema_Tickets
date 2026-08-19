@@ -11,12 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // ==========================================
-        // Hallazgo A1 de auditoría: 'categoria_id' solo tenía el índice
-        // implícito de la FK (single-column). Los reportes filtran por
-        // categoria + estado combinados (ReporteController, GestorReporteController),
-        // así que agregamos un compuesto para cubrir ese patrón de filtro.
-        // ==========================================
+        //-----Los reportes filtran por categoria + estado combinados (ReporteController, GestorReporteController),
         Schema::table('tickets', function (Blueprint $table) {
             $table->index(['categoria_id', 'estado_id'], 'idx_tickets_categoria_estado');
         });

@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Hallazgo B2: obtenerComentarios() siempre filtra por ticket_id y ordena
-        // por created_at (->oldest()); el índice implícito de la FK solo cubre
-        // ticket_id, no el orden. Este compuesto sirve exactamente ese patrón.
+        //-----obtenerComentarios() siempre filtra por ticket_id y ordenapor created_at (->oldest()); el índice implícito de la FK solo cubre ticket_id
         Schema::table('comentarios', function (Blueprint $table) {
             $table->index(['ticket_id', 'created_at'], 'idx_comentarios_ticket_created');
         });

@@ -130,9 +130,6 @@ class ClienteController extends Controller
         ]);
 
         $userId   = Auth::id() ?? 1;
-        //---se obtiene una sola vez aquí arriba (antes vivía dentro de un try y se
-        //---volvía a usar en otro try separado más abajo, generando un aviso de
-        //---"variable posiblemente indefinida" si el primer try llegaba a fallar antes de asignarla)
         $usuario  = Auth::user();
         $checkSum = md5($userId . $request->categoria_id . trim($request->asunto) . trim($request->descripcion));
         $cacheKey = 'submit_lock_' . $checkSum;
