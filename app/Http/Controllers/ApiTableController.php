@@ -293,9 +293,13 @@ class ApiTableController extends Controller
     //----------OBTIENE TODAS LAS VISTAS
     private function renderizarVista(string $tipo, $ticketsResult, $miUnidadId): string
     {
+        //------obtener tecnicos
         $tecnicos = [];
         if (in_array($tipo, ['asignar', 'mis_asignados']) && $miUnidadId) {
-            $tecnicos = User::where('unidad_id', $miUnidadId)->where('activo', true)->get();
+            $tecnicos = User::where('unidad_id', $miUnidadId)
+                ->where('activo', true)
+                ->whereHas('rol', fn($q) => $q->whereIn('nombre_rol', ['Admin', 'Gestor']))
+                ->get();
         }
 
         //---------renderiza segun el tipo de vista

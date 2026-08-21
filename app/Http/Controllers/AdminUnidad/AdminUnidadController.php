@@ -327,8 +327,10 @@ class AdminUnidadController extends Controller
             ->latest()
             ->get();
 
+        //-----obtener tecnicos
         $tecnicos = User::where('unidad_id', $miUnidadId)
             ->where('activo', true)
+            ->whereHas('rol', fn($q) => $q->whereIn('nombre_rol', ['Admin', 'Gestor']))
             ->get();
 
         return view('gestor.asignar-tickets', compact('tickets', 'tecnicos'));
@@ -497,6 +499,7 @@ class AdminUnidadController extends Controller
         $prioridades = Prioridad::all();
         $tecnicos = User::where('unidad_id', $user->unidad_id)
             ->where('activo', true)
+            ->whereHas('rol', fn($q) => $q->whereIn('nombre_rol', ['Admin', 'Gestor']))
             ->get();
         return view('gestor.mis_asignados', compact('tickets', 'tecnicos', 'prioridades'));
     }
