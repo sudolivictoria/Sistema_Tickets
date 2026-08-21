@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="{{ asset('vendor/select2/select2.min.css') }}">
         <style>
             .select-rol {
-                height: 2rem;
+                height: 3.25rem;
             }
             .select2-container--default {
                 box-sizing: border-box;
