@@ -18,7 +18,7 @@
                 box-sizing: border-box;
                 display: flex !important;
                 align-items: center;
-                height: 3.25rem !important;
+                height: 2rem !important;
                 padding: 0 0.9rem;
                 border: 1px solid #04003b;
                 border-radius: 0.75rem;
