@@ -1,8 +1,6 @@
 var table;
 //---------------INICIALIZACION-------------------------------->
 function inicializarDataTable() {
-    //---Hallazgo M6: guardia propia, igual que en el resto de archivos con DataTables,
-    //---para no depender de que el caller siempre destruya la tabla antes de llamar
     if ($.fn.DataTable.isDataTable("#userTable")) {
         $("#userTable").DataTable().destroy();
     }
@@ -64,8 +62,6 @@ $(document).ready(function () {
         function (e) {
             e.preventDefault();
             const $form = $(this);
-            //---El botón de formAgregar/formEditar vive fuera del <form> (footer fijo del
-            //---modal) y se asocia vía el atributo form="...", por eso no basta con .find()
             const $btnSubmit = $form
                 .find("button[type='submit']")
                 .add(`button[type="submit"][form="${this.id}"]`);
@@ -161,6 +157,7 @@ window.filtrarEstado = function (estado, btn) {
 window.openModalUsuario = function (tipo, data = null) {
     if (tipo === "agregar") {
         $("#formAgregar")[0]?.reset();
+        $("#unidad_id_agregar").trigger("change"); //---resincroniza el texto que muestra Select2 tras el reset()
         $("#modalAgregar").removeClass("hidden");
     } else if (tipo === "editar" && data) {
         $("#modalEditar").removeClass("hidden");
@@ -169,7 +166,7 @@ window.openModalUsuario = function (tipo, data = null) {
         $("#edit_email").val(data.email);
         $("#edit_cargo").val(data.cargo);
         $("#edit_rol").val(data.rol_id);
-        $("#edit_unidad").val(data.unidad_id);
+        $("#edit_unidad").val(data.unidad_id).trigger("change"); //---actualiza el texto visible de Select2
         $("#edit_telefono").val(data.telefono);
         $("#edit_password").val("");
     }
@@ -192,3 +189,19 @@ $("#modalAgregar, #modalEditar").on("click", function (e) {
         window.closeModalUsuario($(this).attr("id"));
     }
 });
+
+//---------------SELECT2 PARA EL SELECT DE UNIDAD ------->
+if (typeof $.fn.select2 === "function") {
+    $(".select-unidad").each(function () {
+        const $select = $(this);
+        $select.select2({
+            width: "100%",
+            dropdownParent: $select.closest(".fixed"),
+            language: {
+                noResults: () => "No encontrado",
+            },
+        });
+    });
+} else {
+    console.warn("Select2 no está disponible; el selector de unidad usa el <select> nativo.");
+}

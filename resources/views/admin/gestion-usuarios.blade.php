@@ -3,10 +3,57 @@
 @section('content')
     @push('css')
         @vite(['resources/css/tickets.css'])
+        {{-- Select2 servido local (public/vendor/select2), sin CDN externo ni paso de build --}}
+        <link rel="stylesheet" href="{{ asset('vendor/select2/select2.min.css') }}">
+        <style>
+            .select-rol {
+                height: 3.25rem;
+            }
+            .select2-container--default {
+                box-sizing: border-box;
+                font-size: 1rem;
+                font-family: inherit;
+            }
+            .select2-container--default .select2-selection--single {
+                box-sizing: border-box;
+                display: flex !important;
+                align-items: center;
+                height: 3.25rem !important;
+                padding: 0 0.9rem;
+                border: 1px solid #04003b;
+                border-radius: 0.75rem;
+                background-color: #f8fafc;
+            }
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                padding: 0;
+                line-height: normal !important;
+                color: #1e293b;
+            }
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                top: 50% !important;
+                right: 10px !important;
+                transform: translateY(-50%);
+                height: auto !important;
+            }
+            .select2-dropdown {
+                border-radius: 0.75rem;
+                overflow: hidden;
+                border-color: #e2e8f0;
+                font-size: 1rem;
+            }
+            .select2-search--dropdown .select2-search__field {
+                border-radius: 0.5rem;
+                padding: 0.5rem 0.75rem;
+            }
+            .select2-container--default .select2-results__option--highlighted[aria-selected] {
+                background-color: #84cc16;
+            }
+        </style>
     @endpush
 
     {{-- Datos flash de Laravel para JS, como JSON (no ejecutable) para evitar problemas de escape/inyección --}}
-    <script id="flash-data" type="application/json">{!! json_encode(['success' => session('success'), 'error' => session('error')]) !!}</script>
+    <script id="flash-data"
+        type="application/json">{!! json_encode(['success' => session('success'), 'error' => session('error')]) !!}</script>
     <script>
         (function () {
             const el = document.getElementById('flash-data');
@@ -150,7 +197,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-[12px] font-black uppercase text-secondary">Rol</label>
-                        <select name="rol_id" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
+                        <select name="rol_id" class="select-rol w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
                             @foreach ($roles as $rol)
                                 <option value="{{ $rol->id }}">{{ $rol->nombre_rol }}</option>
                             @endforeach
@@ -158,7 +205,7 @@
                     </div>
                     <div>
                         <label class="text-[12px] font-black uppercase text-secondary">Unidad</label>
-                        <select name="unidad_id" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
+                        <select name="unidad_id" id="unidad_id_agregar" class="select-unidad w-full mt-1" required>
                             @foreach ($unidades as $u)
                                 <option value="{{ $u->id }}">{{ $u->nombre_unidad }}</option>
                             @endforeach
@@ -219,7 +266,8 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-[12px] font-black uppercase text-secondary">Rol</label>
-                        <select name="rol_id" id="edit_rol" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" required>
+                        <select name="rol_id" id="edit_rol" class="select-rol w-full mt-1 p-3 bg-slate-50 border rounded-xl"
+                            required>
                             @foreach ($roles as $rol)
                                 <option value="{{ $rol->id }}">{{ $rol->nombre_rol }}</option>
                             @endforeach
@@ -227,8 +275,7 @@
                     </div>
                     <div>
                         <label class="text-[12px] font-black uppercase text-secondary">Unidad</label>
-                        <select name="unidad_id" id="edit_unidad" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl"
-                            required>
+                        <select name="unidad_id" id="edit_unidad" class="select-unidad w-full mt-1" required>
                             @foreach ($unidades as $u)
                                 <option value="{{ $u->id }}">{{ $u->nombre_unidad }}</option>
                             @endforeach
@@ -258,5 +305,6 @@
 @endsection
 {{-- LOGICA GESTION DE USERS --}}
 @push('page-scripts')
+    <script defer src="{{ asset('vendor/select2/select2.min.js') }}"></script>
     @vite(['resources/js/gestion-usuarios.js'])
 @endpush
