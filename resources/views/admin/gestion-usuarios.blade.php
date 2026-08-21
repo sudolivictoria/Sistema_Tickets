@@ -48,6 +48,9 @@
             .select2-container--default .select2-results__option--highlighted[aria-selected] {
                 background-color: #84cc16;
             }
+            .select2-container--default .select2-results__options {
+                max-height: 100px !important;
+            }
         </style>
     @endpush
 
