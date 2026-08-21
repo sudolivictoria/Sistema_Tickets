@@ -221,7 +221,7 @@
                 </div>
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Teléfono</label>
-                    <input type="text" name="telefono" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" maxlength="50">
+                    <input type="text" name="telefono" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" maxlength="30">
                 </div>
             </form>
             <div class="p-6 pt-4 border-t border-slate-100 shrink-0">
@@ -293,7 +293,7 @@
                 <div>
                     <label class="text-[12px] font-black uppercase text-secondary">Teléfono</label>
                     <input type="text" name="telefono" id="edit_telefono"
-                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" maxlength="50">
+                        class="w-full mt-1 p-3 bg-slate-50 border rounded-xl" maxlength="30">
                 </div>
             </form>
             <div class="p-6 pt-4 border-t border-slate-100 shrink-0">

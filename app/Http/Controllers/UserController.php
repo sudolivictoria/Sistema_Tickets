@@ -59,7 +59,7 @@ class UserController extends Controller
             'rol_id' => 'required|exists:roles,id',
             'unidad_id' => 'required|exists:unidades,id',
             'cargo' => 'required|string|max:255',
-            'telefono' => 'nullable|string|max:15',
+            'telefono' => 'nullable|string|max:30',
         ], [
             'name.required' => 'El nombre completo es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
@@ -70,7 +70,7 @@ class UserController extends Controller
             'rol_id.required' => 'Debe seleccionar un rol válido.',
             'unidad_id.required' => 'Debe seleccionar una unidad válida.',
             'cargo.required' => 'El cargo es obligatorio.',
-            'telefono.max' => 'El teléfono no puede tener más de 15 caracteres.',
+            'telefono.max' => 'Los teléfonos ingresados no deben superar los 30 caracteres en total.',
         ]);
 
         $validated['password'] = Hash::make($request->password);
@@ -94,7 +94,7 @@ class UserController extends Controller
             'rol_id' => 'required|exists:roles,id',
             'unidad_id' => 'required|exists:unidades,id',
             'cargo' => 'required|string|max:255',
-            'telefono' => 'nullable|string|max:15',
+            'telefono' => 'nullable|string|max:30',
         ], [
             'name.required' => 'El nombre completo es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
@@ -105,7 +105,7 @@ class UserController extends Controller
             'rol_id.required' => 'Debe seleccionar un rol válido.',
             'unidad_id.required' => 'Debe seleccionar una unidad válida.',
             'cargo.required' => 'El cargo es obligatorio.',
-            'telefono.max' => 'El teléfono no puede tener más de 15 caracteres.',
+            'telefono.max' => 'Los teléfonos ingresados no deben superar los 30 caracteres en total.',
         ]);
 
         if ($request->filled('password')) {
