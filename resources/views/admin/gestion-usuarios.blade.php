@@ -133,7 +133,7 @@
                             <td class="px-4 py-4 font-black">{{ $user->email }}</td>
                             <td class="px-4 py-4 font-black">{{ $user->unidad->nombre_unidad ?? '' }}</td>
                             <td class="px-4 py-4 font-black">{{ $user->cargo }}</td>
-                            <td class="px-4 py-4 font-black">{{ $user->telefono ?? 'N/A' }}</td>
+                            <td class="px-4 py-4 font-black whitespace-nowrap">{{ $user->telefono ?? 'N/A' }}</td>
                             <td class="px-4 py-4">
                                 <span
                                     class="px-2 py-1 rounded-full border font-black text-[9px] uppercase {{ $user->activo == 1 ? 'bg-green-100 text-[#008F7E] border-green-200' : 'bg-red-100 text-red-700 border-red-200' }}">
