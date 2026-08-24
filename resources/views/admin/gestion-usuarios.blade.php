@@ -120,7 +120,7 @@
                         <th class="px-4 py-4 border-b border-slate-200">Email</th>
                         <th class="px-4 py-4 border-b border-slate-200">Unidad</th>
                         <th class="px-4 py-4 border-b border-slate-200">Cargo</th>
-                        <th class="px-4 py-4 border-b border-slate-200">Teléfono</th>
+                        <th class="px-4 py-4 border-b border-slate-200">Teléfono | Ext.</th>
                         <th class="px-4 py-4 border-b border-slate-200">Estado</th>
                         <th class="px-4 py-4 border-b border-slate-200 text-center">Acción</th>
                     </tr>
