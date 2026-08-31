@@ -122,6 +122,12 @@ $(document).ready(function () {
                             validationTitle: "Campos Inválidos",
                             validationErrors: errores,
                         });
+                    } else if (xhr.status === 419) {
+                        window.mostrarFlashMessages({
+                            errorTitle: "Sesión Expirada",
+                            error: "Tu sesión venció por inactividad. La página se va a recargar.",
+                        });
+                        setTimeout(() => window.location.reload(), 2500);
                     } else {
                         window.mostrarFlashMessages({
                             errorTitle: "Error del Servidor",
