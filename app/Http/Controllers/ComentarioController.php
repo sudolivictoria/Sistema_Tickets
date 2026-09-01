@@ -188,7 +188,7 @@ class ComentarioController extends Controller
 
                             if (!empty($destinatariosUnidad)) {
                                 Mail::bcc($destinatariosUnidad)->queue(new NotificacionTicketMail(
-                                    "Atención Requerida! nuevo comentario en Ticket #{$ticketCodigo} (Sin Asignar)",
+                                    "Atención Requerida! nuevo comentario en Ticket {$ticketCodigo} (Sin Asignar)",
                                     "Ticket Pendiente con Actividad",
                                     "El solicitante ha comentado en una solicitud pendiente de atención asignada a tu área.",
                                     $ticketCodigo,
