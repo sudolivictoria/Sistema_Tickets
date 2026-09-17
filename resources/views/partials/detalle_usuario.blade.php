@@ -1,4 +1,4 @@
-<div id="modalUsuario" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
+<div id="modalUsuario" class="fixed inset-0 z-[60] hidden overflow-y-auto modal-anim" role="dialog" aria-modal="true">
     <div class="flex items-center justify-center min-h-screen px-4 py-6">
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModalUsuario()"></div>
         <div

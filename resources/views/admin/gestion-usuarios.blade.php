@@ -169,7 +169,7 @@
 
     {{-- MODAL AGREGAR --}}
     <div id="modalAgregar"
-        class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-[#04003B]/40 backdrop-blur-sm">
+        class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-[#04003B]/40 backdrop-blur-sm modal-anim">
         <div class="bg-white w-full max-w-lg max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
             <div class="bg-primary p-6 text-secondary flex justify-between items-center shrink-0">
                 <h3 class="font-black uppercase tracking-widest text-lg">Nuevo Usuario</h3>
@@ -236,7 +236,7 @@
 
     {{-- MODAL EDITAR --}}
     <div id="modalEditar"
-        class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-[#04003B]/40 backdrop-blur-sm">
+        class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4 bg-[#04003B]/40 backdrop-blur-sm modal-anim">
         <div class="bg-white w-full max-w-lg max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
             <div class="bg-primary p-6 text-secondary flex justify-between items-center shrink-0">
                 <h3 class="font-black uppercase tracking-widest text-lg">Editar Usuario</h3>

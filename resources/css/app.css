@@ -12,3 +12,13 @@
     z-index: 10050 !important;
 }
 
+/*----Entrada suave para modales: se reproduce sola cada vez que el modal pasa de "hidden" a visible, no requiere cambios en el JS que los abre/cierra---*/
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-anim {
+    animation: modalFadeIn 0.18s ease-out;
+}
+

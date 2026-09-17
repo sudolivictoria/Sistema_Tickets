@@ -1,4 +1,4 @@
-<div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-hidden" aria-labelledby="modal-title" role="dialog"
+<div id="modalTicket" class="fixed inset-0 z-50 hidden overflow-hidden modal-anim" aria-labelledby="modal-title" role="dialog"
     aria-modal="true">
 
     <!--backdrop de fondo-->
