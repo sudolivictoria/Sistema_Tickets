@@ -49,6 +49,18 @@ trait ExportaReporteTickets
     private function generarReporteTickets(Request $request, string $vistaPdf, string $rutaRedirectError)
     {
         try {
+            //----seguro de servidor boton exportar sin filtros, para proteger el rendimiento del sistema
+            $tieneFiltro = $request->filled('buscar')
+                || $request->filled('fecha_inicio')
+                || $request->filled('fecha_fin')
+                || ($request->filled('estado') && $request->input('estado') !== 'todos')
+                || ($request->filled('categoria') && $request->input('categoria') !== 'todos');
+
+            if (!$tieneFiltro) {
+                return redirect()->route($rutaRedirectError)
+                    ->with('error', 'Para proteger el rendimiento del sistema, debe seleccionar al menos un filtro específico antes de generar el reporte.');
+            }
+
             //----Eager Loading completo para optimizar las consultas a la base de datos
             $query = Ticket::with(['user.unidad', 'tecnico', 'estado', 'categoria', 'tipo_solicitud', 'prioridad']);
 
