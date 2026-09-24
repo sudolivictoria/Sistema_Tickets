@@ -173,6 +173,13 @@ trait ExportaReporteTickets
 
             //-------PDF
             if ($formato === 'pdf') {
+                //----límite de seguridad: un PDF con miles de tickets satura memoria/CPU y puede colapsar el servidor, así que limitamos a 500 registros
+                $totalRegistros = (clone $query)->count();
+                if ($totalRegistros > 500) {
+                    return redirect()->route($rutaRedirectError)
+                        ->with('error', "El reporte tiene {$totalRegistros} registros, demasiados para generar en PDF. Aplique filtros de fecha para reducir el rango, o use el formato Excel.");
+                }
+
                 $tickets = $query->get();
 
                 $tickets->each(function ($ticket) {
