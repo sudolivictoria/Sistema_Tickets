@@ -14,13 +14,12 @@
         <td class="px-2 py-4">
             <div class="flex flex-col">
                 <button type="button"
-                    onclick="verUsuario(
-                                    '{{ $ticket->user->name }}', 
-                                    '{{ $ticket->user->email }}', 
-                                    '{{ $ticket->user->unidad->nombre_unidad }}', 
-                                    '{{ $ticket->user->cargo }}', 
-                                    '{{ $ticket->user->telefono ?? '----' }}'
-                                )"
+                    onclick="verUsuario(this.dataset.nombre, this.dataset.email, this.dataset.unidad, this.dataset.cargo, this.dataset.telefono)"
+                    data-nombre="{{ $ticket->user->name }}"
+                    data-email="{{ $ticket->user->email }}"
+                    data-unidad="{{ trim($ticket->user->unidad->nombre_unidad) }}"
+                    data-cargo="{{ $ticket->user->cargo }}"
+                    data-telefono="{{ trim($ticket->user->telefono ?? '') ?: '----' }}"
                     class="font-black hover:text-primary transition-all text-left flex items-center gap-1 group">
                     {{ $ticket->user->name }}
                     <span
