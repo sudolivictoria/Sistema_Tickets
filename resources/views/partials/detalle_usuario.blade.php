@@ -20,7 +20,7 @@
                                 class="text-[10px] font-black text-secondary uppercase tracking-widest block">
                                 Correo
                             </label>
-                            <p id="userEmail" class="text-sm text-slate-700 font-bold">---</p>
+                            <p id="userEmail" class="text-xs text-slate-700 font-bold">---</p>
                             <span
                                 class="text-[9px] text-slate-400 font-medium italic hidden group-hover:block transition-all">
                                 Abrir en Gmail
@@ -37,7 +37,7 @@
                         <div>
                             <label class="text-[10px] font-black text-secondary uppercase tracking-widest block">Unidad
                                 / Parque</label>
-                            <p id="userUnidad" class="text-sm text-slate-700 font-bold">---</p>
+                            <p id="userUnidad" class="text-xs text-slate-700 font-bold">---</p>
                         </div>
                     </div>
                     {{-- Cargo --}}
@@ -57,7 +57,7 @@
                                 class="text-[10px] font-black text-secondary uppercase tracking-widest block">Teléfono
                                 /
                                 Ext.</label>
-                            <p id="userTelefono" class="text-sm text-slate-700 font-bold">---</p>
+                            <p id="userTelefono" class="text-xs text-slate-700 font-bold">---</p>
                         </div>
                     </div>
                 </div>
