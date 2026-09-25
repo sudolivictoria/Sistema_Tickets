@@ -1,0 +1,518 @@
+<title>Manual del Gestor</title>
+<meta name="description" content="Guía rápida de capacitación para el rol Gestor en Help Desk ISTU: asignar, atender, cerrar y reportar tickets.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+
+<style>
+  :root{
+    --bg:#F5F6F4;
+    --surface:#FFFFFF;
+    --surface-2:#ECEEEA;
+    --ink:#04003B;
+    --ink-soft:#54566E;
+    --border:#DEE1DA;
+    --accent-fill:#9FD82B;
+    --accent-ink:#1C3000;
+    --accent-deep:#5C8A0A;
+
+    --st-abierto:#EA7F17;
+    --st-abierto-bg:#FDEEDD;
+    --st-procesando:#2F6FE4;
+    --st-procesando-bg:#E6EEFD;
+    --st-resuelto:#008F7E;
+    --st-resuelto-bg:#DFF3EF;
+    --st-equivocado:#DC3B3B;
+    --st-equivocado-bg:#FBE4E4;
+    --st-nocorresponde:#B08900;
+    --st-nocorresponde-bg:#FBF1D6;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B0A1A;
+      --surface:#15142A;
+      --surface-2:#1E1D38;
+      --ink:#EDEDF5;
+      --ink-soft:#A9AAC4;
+      --border:#2C2B4A;
+      --accent-fill:#9FD82B;
+      --accent-ink:#16260A;
+      --accent-deep:#B9EE49;
+
+      --st-abierto:#FF9C4A;
+      --st-abierto-bg:#3A2712;
+      --st-procesando:#6FA1FF;
+      --st-procesando-bg:#16233F;
+      --st-resuelto:#39C7B2;
+      --st-resuelto-bg:#0E2E29;
+      --st-equivocado:#FF7373;
+      --st-equivocado-bg:#3A1616;
+      --st-nocorresponde:#E8C34A;
+      --st-nocorresponde-bg:#372D0C;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B0A1A;
+    --surface:#15142A;
+    --surface-2:#1E1D38;
+    --ink:#EDEDF5;
+    --ink-soft:#A9AAC4;
+    --border:#2C2B4A;
+    --accent-fill:#9FD82B;
+    --accent-ink:#16260A;
+    --accent-deep:#B9EE49;
+
+    --st-abierto:#FF9C4A;
+    --st-abierto-bg:#3A2712;
+    --st-procesando:#6FA1FF;
+    --st-procesando-bg:#16233F;
+    --st-resuelto:#39C7B2;
+    --st-resuelto-bg:#0E2E29;
+    --st-equivocado:#FF7373;
+    --st-equivocado-bg:#3A1616;
+    --st-nocorresponde:#E8C34A;
+    --st-nocorresponde-bg:#372D0C;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Source Sans 3", system-ui, sans-serif;
+    padding-inline:20px;
+    padding-block:0 48px;
+    max-width:840px;
+    margin-inline:auto;
+  }
+  h1,h2,h3{
+    font-family:"Archivo", system-ui, sans-serif;
+    text-wrap:balance;
+    margin:0;
+  }
+  p{ line-height:1.55; margin:0; }
+  .eyebrow{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--accent-deep);
+  }
+
+  /* ---- top bar ---- */
+  .topbar{
+    position:sticky;
+    top:env(safe-area-inset-top,0px);
+    z-index:10;
+    background:var(--bg);
+    padding-block:14px 10px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-title{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .topbar-title h1{ font-size:20px; font-weight:900; }
+  .topbar-title span{ font-size:13px; color:var(--ink-soft); }
+  .nav{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding-bottom:2px;
+    scrollbar-width:none;
+  }
+  .nav::-webkit-scrollbar{ display:none; }
+  .nav a{
+    flex:none;
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:6px 12px;
+    border-radius:999px;
+    text-decoration:none;
+    white-space:nowrap;
+  }
+  .nav a:hover{ border-color:var(--accent-deep); }
+
+  /* ---- hero ---- */
+  .hero{
+    padding-block:28px 8px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .hero h1{ font-size:clamp(28px,5vw,38px); font-weight:900; }
+  .hero p{ font-size:15px; color:var(--ink-soft); max-width:60ch; }
+  .hero-tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+  .tag{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    padding:5px 10px;
+    border-radius:8px;
+    background:var(--surface-2);
+    color:var(--ink-soft);
+  }
+
+  /* ---- sections ---- */
+  section{ padding-block:28px; scroll-margin-top:96px; border-top:1px solid var(--border); }
+  section:first-of-type{ border-top:none; }
+  .section-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:16px; }
+  .step-no{
+    font-family:"Archivo", system-ui, sans-serif;
+    font-size:13px;
+    font-weight:900;
+    color:var(--accent-ink);
+    background:var(--accent-fill);
+    width:26px; height:26px;
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    flex:none;
+  }
+  h2{ font-size:20px; font-weight:800; }
+  .lede{ color:var(--ink-soft); font-size:14px; margin-top:6px; max-width:62ch; }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 20px;
+  }
+  .grid{ display:grid; gap:12px; }
+  .grid.cols-2{ grid-template-columns:repeat(2,1fr); }
+  @media (max-width:520px){ .grid.cols-2{ grid-template-columns:1fr; } }
+
+  ol.steps, ul.list{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; }
+  ol.steps li, ul.list li{
+    display:flex; gap:10px; align-items:flex-start;
+    font-size:14px; line-height:1.5;
+  }
+  ol.steps{ counter-reset:step; }
+  ol.steps li::before{
+    counter-increment:step;
+    content:counter(step);
+    font-family:"Archivo", sans-serif;
+    font-weight:800;
+    font-size:12px;
+    color:var(--ink-soft);
+    background:var(--surface-2);
+    width:20px; height:20px; border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    flex:none;
+    margin-top:1px;
+  }
+  ul.list li::before{
+    content:"";
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--accent-deep);
+    flex:none;
+    margin-top:7px;
+  }
+
+  strong{ color:var(--ink); }
+  code{
+    font-family:ui-monospace, "SFMono-Regular", Menlo, monospace;
+    background:var(--surface-2);
+    padding:1px 6px;
+    border-radius:6px;
+    font-size:.9em;
+  }
+
+  /* ---- status legend ---- */
+  .legend{ display:flex; flex-wrap:wrap; gap:8px; }
+  .pill{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid transparent;
+  }
+  .pill.abierto{ color:var(--st-abierto); background:var(--st-abierto-bg); }
+  .pill.procesando{ color:var(--st-procesando); background:var(--st-procesando-bg); }
+  .pill.resuelto{ color:var(--st-resuelto); background:var(--st-resuelto-bg); }
+  .pill.equivocado{ color:var(--st-equivocado); background:var(--st-equivocado-bg); }
+  .pill.nocorresponde{ color:var(--st-nocorresponde); background:var(--st-nocorresponde-bg); }
+
+  /* ---- kpi row ---- */
+  .kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  @media (max-width:640px){ .kpis{ grid-template-columns:repeat(2,1fr); } }
+  .kpi{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-top:3px solid var(--accent-fill);
+    border-radius:12px;
+    padding:12px 14px;
+  }
+  .kpi .n{ font-family:"Archivo",sans-serif; font-size:22px; font-weight:900; }
+  .kpi .l{ font-size:10.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); }
+
+  /* ---- callout ---- */
+  .callout{
+    display:flex; gap:12px;
+    background:var(--surface-2);
+    border-radius:14px;
+    padding:16px 18px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .callout b{ color:var(--ink); }
+  .callout .mark{
+    font-family:"Archivo",sans-serif;
+    font-weight:900;
+    color:var(--accent-deep);
+    flex:none;
+  }
+
+  /* ---- notif table ---- */
+  .notif{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .notif th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--ink-soft);
+    padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+  }
+  .notif td{
+    padding-block:10px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  .notif tr:last-child td{ border-bottom:none; }
+  .yn{ font-weight:800; }
+  .yn.si{ color:var(--st-resuelto); }
+  .yn.no{ color:var(--ink-soft); }
+
+  footer{
+    padding-top:28px;
+    border-top:1px solid var(--border);
+    margin-top:8px;
+    font-size:12px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  @media (prefers-reduced-motion:no-preference){
+    html{ scroll-behavior:smooth; }
+  }
+</style>
+
+<div class="topbar">
+  <div class="topbar-title">
+    <h1>Help Desk ISTU</h1>
+    <span>Manual del Gestor · v1</span>
+  </div>
+  <nav class="nav">
+    <a href="#dashboard">Dashboard</a>
+    <a href="#asignar">Asignar</a>
+    <a href="#atender">Atender y comentar</a>
+    <a href="#cerrar">Cerrar un ticket</a>
+    <a href="#historial">Historial y reportes</a>
+    <a href="#propios">Tus propios tickets</a>
+    <a href="#correos">Correos</a>
+    <a href="#recordatorios">Recordatorios</a>
+  </nav>
+</div>
+
+<div class="hero">
+  <p class="eyebrow">Guía de capacitación</p>
+  <h1>Todo lo que hace un Gestor, en un solo recorrido</h1>
+  <p>Como Gestor sos responsable de las solicitudes que llegan a tu unidad: las asignás, les das seguimiento, las cerrás y podés reportar sobre ellas. Esta guía sigue el mismo orden en que vas a usar el sistema día a día.</p>
+  <div class="hero-tags">
+    <span class="tag">Rol: Gestor</span>
+    <span class="tag">Alcance: tu unidad</span>
+    <span class="tag">Acceso: correo institucional + contraseña</span>
+  </div>
+</div>
+
+<section id="dashboard">
+  <div class="section-head">
+    <span class="step-no">1</span>
+    <div>
+      <h2>Tu Dashboard</h2>
+      <p class="lede">Es lo primero que ves al entrar. Te da la fotografía del momento de tu unidad.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="kpis">
+      <div class="kpi"><div class="n">—</div><div class="l">Sin asignar</div></div>
+      <div class="kpi"><div class="n">—</div><div class="l">En proceso</div></div>
+      <div class="kpi"><div class="n">—</div><div class="l">Resueltos (mes)</div></div>
+      <div class="kpi"><div class="n">—</div><div class="l">Mis asignados</div></div>
+    </div>
+    <p class="lede" style="margin-top:14px;">Más abajo verás también una gráfica del año (resueltos vs. pendientes por mes) y una tabla de tickets que podés filtrar por estado con los botones de arriba de la tabla.</p>
+  </div>
+</section>
+
+<section id="asignar">
+  <div class="section-head">
+    <span class="step-no">2</span>
+    <div>
+      <h2>Asignar Tickets</h2>
+      <p class="lede">Acá aparecen las solicitudes de tu unidad que todavía no tienen técnico.</p>
+    </div>
+  </div>
+  <div class="card">
+    <ol class="steps">
+      <li>Entrá a <strong>Asignar Tickets</strong> en el menú lateral. Vas a ver únicamente los tickets sin asignar de tu unidad.</li>
+      <li>Abrí el ticket para leer la descripción y, si adjuntaron, la evidencia.</li>
+      <li>Elegí la <strong>prioridad</strong> (Baja, Media, Alta, Crítica) — de esto depende cuánto tiempo de respuesta (SLA) tiene el ticket.</li>
+      <li>Elegí el <strong>técnico</strong> responsable. Solo aparecen ahí los Gestores/Admin de tu unidad — nunca cuentas de tipo Usuario.</li>
+    </ol>
+  </div>
+  <div class="callout" style="margin-top:12px;">
+    <span class="mark">→</span>
+    <span>En cuanto asignás técnico, el ticket pasa a <span class="pill procesando">Procesando</span> y empieza a correr el tiempo de respuesta (SLA) para esa prioridad.</span>
+  </div>
+</section>
+
+<section id="atender">
+  <div class="section-head">
+    <span class="step-no">3</span>
+    <div>
+      <h2>Mis Asignados y cómo comentar</h2>
+      <p class="lede">Los tickets donde vos sos el técnico responsable viven en <strong>Mis Asignados</strong>.</p>
+    </div>
+  </div>
+  <div class="grid cols-2">
+    <div class="card">
+      <h3 style="font-size:14px;margin-bottom:10px;">Comentario público</h3>
+      <p style="font-size:13.5px;color:var(--ink-soft);">Lo ve el usuario que abrió el ticket. Úsalo para pedir información, avisar avances o explicar la solución.</p>
+    </div>
+    <div class="card">
+      <h3 style="font-size:14px;margin-bottom:10px;">Nota interna (privada)</h3>
+      <p style="font-size:13.5px;color:var(--ink-soft);">Solo la ve el personal de tu unidad (Gestores/Admin). Úsala para coordinación interna que el usuario no necesita ver.</p>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:12px;">
+    <span class="mark">!</span>
+    <span>Un ticket ya <span class="pill resuelto">Resuelto</span>, <span class="pill equivocado">Equivocado</span> o <span class="pill nocorresponde">No corresponde</span> no acepta más comentarios — el sistema lo bloquea aunque lo tengas abierto en pantalla.</span>
+  </div>
+</section>
+
+<section id="cerrar">
+  <div class="section-head">
+    <span class="step-no">4</span>
+    <div>
+      <h2>Cerrar un ticket</h2>
+      <p class="lede">Tres formas de cerrar, según lo que realmente pasó con la solicitud.</p>
+    </div>
+  </div>
+  <div class="card">
+    <ul class="list">
+      <li><span class="pill resuelto">Resuelto</span> — la solicitud se atendió. El sistema registra si se cumplió o se venció el SLA.</li>
+      <li><span class="pill equivocado">Equivocado</span> — el usuario se equivocó de categoría o unidad al crearlo.</li>
+      <li><span class="pill nocorresponde">No corresponde</span> — la solicitud no es competencia de tu unidad.</li>
+    </ul>
+    <p class="lede" style="margin-top:14px;">En cualquiera de los tres podés dejar un comentario de cierre explicando el motivo — queda guardado en el historial del ticket.</p>
+  </div>
+</section>
+
+<section id="historial">
+  <div class="section-head">
+    <span class="step-no">5</span>
+    <div>
+      <h2>Historial y reportes</h2>
+      <p class="lede">El registro completo del año de tu unidad, con filtros y exportación.</p>
+    </div>
+  </div>
+  <div class="card">
+    <ol class="steps">
+      <li>En <strong>Historial</strong> podés buscar por ID, usuario o técnico, y filtrar por fecha, estado o categoría.</li>
+      <li>Para exportar (Excel o PDF), aplicá al menos un filtro primero — es un candado de seguridad, evita que el sistema tenga que procesar el año completo de una sola vez.</li>
+      <li>El PDF está pensado para reportes puntuales (hasta 500 registros); para volúmenes más grandes, usá Excel.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="propios">
+  <div class="section-head">
+    <span class="step-no">6</span>
+    <div>
+      <h2>Vos también podés pedir soporte</h2>
+      <p class="lede">Como Gestor tenés, además, las mismas opciones que un usuario común.</p>
+    </div>
+  </div>
+  <div class="grid cols-2">
+    <div class="card">
+      <h3 style="font-size:14px;margin-bottom:8px;">Crear Ticket / Mis Tickets</h3>
+      <p style="font-size:13.5px;color:var(--ink-soft);">Si vos necesitás soporte de otra unidad, creás tu propia solicitud igual que cualquier usuario, y le das seguimiento en Mis Tickets.</p>
+    </div>
+    <div class="card">
+      <h3 style="font-size:14px;margin-bottom:8px;">Recursos</h3>
+      <p style="font-size:13.5px;color:var(--ink-soft);">Manuales y guías disponibles para consulta cuando las necesites.</p>
+    </div>
+  </div>
+</section>
+
+<section id="correos">
+  <div class="section-head">
+    <span class="step-no">7</span>
+    <div>
+      <h2>Qué te llega por correo</h2>
+      <p class="lede">Como Gestor recibís avisos operativos de tu unidad, con estas reglas.</p>
+    </div>
+  </div>
+  <div class="card">
+    <table class="notif">
+      <thead>
+        <tr><th>Evento</th><th>¿Te llega?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Nueva solicitud sin técnico asignado en tu unidad</td><td class="yn si">Sí</td></tr>
+        <tr><td>Comentario nuevo en un ticket sin técnico de tu unidad</td><td class="yn si">Sí</td></tr>
+        <tr><td>Respuesta a un ticket que vos mismo creaste</td><td class="yn si">Sí</td></tr>
+        <tr><td>Una acción que vos mismo hiciste (tu propio ticket o comentario)</td><td class="yn no">No</td></tr>
+        <tr><td>Cuentas de tipo Usuario en tu unidad</td><td class="yn no">No reciben ni cuentan como técnico</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="recordatorios">
+  <div class="section-head">
+    <span class="step-no">8</span>
+    <div>
+      <h2>Recordatorios rápidos</h2>
+    </div>
+  </div>
+  <div class="card">
+    <p class="lede" style="margin-bottom:12px;">Leyenda de estados que vas a ver en todo el sistema:</p>
+    <div class="legend">
+      <span class="pill abierto">Abierto</span>
+      <span class="pill procesando">Procesando</span>
+      <span class="pill resuelto">Resuelto</span>
+      <span class="pill equivocado">Equivocado</span>
+      <span class="pill nocorresponde">No corresponde</span>
+    </div>
+    <ul class="list" style="margin-top:16px;">
+      <li>Solo ves y administrás los tickets de <strong>tu unidad</strong>.</li>
+      <li>Tu sesión se mantiene abierta automáticamente — no hace falta volver a escribir la contraseña cada vez.</li>
+      <li>Si algo no aparece o se ve raro, avisá antes de reintentar varias veces.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <span>Help Desk ISTU · Manual del Gestor</span>
+  <span>Instituto Salvadoreño de Turismo</span>
+</footer>

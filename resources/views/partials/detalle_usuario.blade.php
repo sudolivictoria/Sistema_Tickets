@@ -2,7 +2,7 @@
     <div class="flex items-center justify-center min-h-screen px-4 py-6">
         <div class="fixed inset-0 bg-slate-900/60 transition-opacity" onclick="cerrarModalUsuario()"></div>
         <div
-            class="relative bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all border-b-8 border-t-8 border-secondary z-10 animate-fade-in">
+            class="relative bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all border-b-8 border-t-8 border-secondary z-10 animate-fade-in">
             <div class="p-8 text-center">
                 <div
                     class="w-20 h-20 bg-blue-100/50 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md">
@@ -15,7 +15,7 @@
                         class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-start gap-3 transition-all hover:bg-blue-50 hover:border-blue-200 group cursor-pointer no-underline block">
                         <span
                             class="material-symbols-outlined text-blue-950 group-hover:text-xl">email</span>
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <label
                                 class="text-[10px] font-black text-secondary uppercase tracking-widest block">
                                 Correo
