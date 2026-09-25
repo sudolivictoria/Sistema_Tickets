@@ -46,7 +46,7 @@
                         <div>
                             <label
                                 class="text-[10px] font-black text-secondary uppercase tracking-widest block">Cargo</label>
-                            <p id="userCargo" class="text-sm text-slate-700 font-bold">---</p>
+                            <p id="userCargo" class="text-xs text-slate-700 font-bold">---</p>
                         </div>
                     </div>
                     {{-- Teléfono --}}
