@@ -187,7 +187,7 @@
                     <h4
                         class="text-[12px] font-black uppercase tracking-[0.2em] text-green-900 mb-2 flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-primary/50 rounded-full"></span>
-                        Recursos
+                        Biblioteca 
                     </h4>
                     <p class="text-[12px] text-slate-500 font-medium mb-6">
                         Explora nuestros recursos diaponibles.
@@ -203,101 +203,58 @@
             </div>
             {{-- Final Call to Action --}}
 
-            {{-- Canales de Atención --}}
-            <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-100">
+            {{-- Prioridades --}}
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
                 <div
                     class="absolute top-0 right-0 w-16 h-16 bg-blue-100/50 rounded-bl-full flex items-center justify-center pointer-events-none">
-                    <span class="material-symbols-outlined text-blue-200">contact_mail</span>
+                    <span class="material-symbols-outlined text-blue-200">low_priority</span>
                 </div>
+                <h4 class="text-[12px] font-black uppercase tracking-[0.2em] text-secondary mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-4 bg-blue-200 rounded-full"></span>
+                    Prioridades
+                </h4>
 
-                <div class="relative z-10">
-                    <h4
-                        class="text-[12px] font-black uppercase tracking-[0.2em] text-secondary mb-2 flex items-center gap-2">
-                        <span class="w-1.5 h-4 bg-blue-200 rounded-full"></span>
-                        USTS
-                    </h4>
-                    <p class="text-[12px] text-slate-500 font-medium mb-6">
-                        Contacto Directo.
-                    </p>
+                @php
+                    $prioConfig = [
+                        'critica' => [
+                            'border' => 'border-red-300',
+                            'numero' => 'text-red-500',
+                            'texto' => 'text-red-800'
+                        ],
+                        'alta' => [
+                            'border' => 'border-orange-300',
+                            'numero' => 'text-orange-500',
+                            'texto' => 'text-orange-800'
+                        ],
+                        'media' => [
+                            'border' => 'border-amber-300',
+                            'numero' => 'text-amber-500',
+                            'texto' => 'text-amber-800'
+                        ],
+                        'baja' => [
+                            'border' => 'border-green-300',
+                            'numero' => 'text-green-500',
+                            'texto' => 'text-green-800'
+                        ],
+                    ];
+                @endphp
+                {{-- logica prioridades --}}
+                <div class="grid grid-cols-2 gap-3">
+                    @foreach($prioConfig as $prio => $clases)
+                        <div
+                            class="flex flex-col items-center justify-center p-4 rounded-xl bg-white border-2 border-dashed {{ $clases['border'] }} hover:scale-105 transition-transform shadow-sm">
 
-                    <button id="toggle-canales"
-                        class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-blue-400 hover:text-blue-400 transition-all flex items-center justify-center mb-4">
-                        <span class="material-symbols-outlined">expand_more</span> Ver Canales
-                    </button>
+                            <span id="prio-{{$prio}}"
+                                class="text-[24px] font-black {{ $clases['numero'] }} tabular-nums leading-none">
+                                {{ $prioridades[$prio] ?? 0 }}
+                            </span>
 
-                    <div id="canales-list" class="space-y-4" style="display: none;">
-                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ljalvarez@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
-                            <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
-                                <span class="material-symbols-outlined">mail</span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div
-                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
-                                    ljalvarez@istu.gob.sv</div>
-                            </div>
-                        </a>
+                            <span class="font-black text-[9px] uppercase tracking-widest {{ $clases['texto'] }} mt-2">
+                                {{ ucfirst($prio) }}
+                            </span>
 
-                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mnrodriguez@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
-                            <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
-                                <span class="material-symbols-outlined">mail</span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div
-                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
-                                    mnrodriguez@istu.gob.sv</div>
-                            </div>
-                        </a>
-
-                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=matorres@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
-                            <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
-                                <span class="material-symbols-outlined">mail</span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div
-                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
-                                    matorres@istu.gob.sv</div>
-                            </div>
-                        </a>
-
-                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jjramirez@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
-                            <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
-                                <span class="material-symbols-outlined">mail</span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div
-                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
-                                    jjramirez@istu.gob.sv</div>
-                            </div>
-                        </a>
-
-                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ovquintanilla@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
-                            <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
-                                <span class="material-symbols-outlined">mail</span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div
-                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
-                                    ovquintanilla@istu.gob.sv</div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div class="mt-8 p-2 bg-blue-100/50 rounded-xl border border-slate-200/60 flex gap-1.5 items-start">
-                        <span class="material-symbols-outlined text-blue-900 mt-0.5 text-[16px]">info</span>
-                        <p class="text-[11px] text-blue-900 leading-relaxed font-medium">
-                            Al hacer clic en un correo, se redirige automáticamente.
-                        </p>
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>

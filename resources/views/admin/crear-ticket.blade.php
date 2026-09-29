@@ -78,7 +78,7 @@
             <div id="contenedor-pdf" class="hidden border-t border-blue-100 pt-4 mt-1">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-blue-100 shadow-sm">
                     <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-red-500 text-3xl">picture_as_pdf</span>
+                        <span class="material-symbols-outlined text-red-500 text-3xl">description</span>
                         <div>
                             <h5 class="text-xs font-black text-secondary uppercase tracking-wider">Formato</h5>
                             <p class="text-xs text-slate-400 font-medium">Llena el formato y acercate a RRHH para entregarlo.</p>
@@ -87,7 +87,7 @@
                     <a id="btn-descargar-pdf" href="#" target="_blank"
                         class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-secondary/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-secondary/10">
                         <span class="material-symbols-outlined text-sm">download</span>
-                        Descargar PDF
+                        Descargar Formato
                     </a>
                 </div>
             </div>

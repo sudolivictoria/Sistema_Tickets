@@ -32,12 +32,29 @@ window.inicializarTablaTickets = function (selectorId) {
     });
 };
 
-//----desplegable de canales directos--------------------------------->
+//----desplegable de canales directos USTS--------------------------------->
 document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.getElementById("toggle-canales");
     if (toggleBtn) {
         toggleBtn.addEventListener("click", function () {
             const list = document.getElementById("canales-list");
+            const icon = this.querySelector(".material-symbols-outlined");
+
+            if (list.style.display === "none" || list.style.display === "") {
+                list.style.display = "block";
+                icon.textContent = "expand_less";
+            } else {
+                list.style.display = "none";
+                icon.textContent = "expand_more";
+            }
+        });
+    }
+
+    //----desplegable de contactos RRHH--------------------------------->
+    const toggleBtnRrhh = document.getElementById("toggle-canales-rrhh");
+    if (toggleBtnRrhh) {
+        toggleBtnRrhh.addEventListener("click", function () {
+            const list = document.getElementById("canales-list-rrhh");
             const icon = this.querySelector(".material-symbols-outlined");
 
             if (list.style.display === "none" || list.style.display === "") {

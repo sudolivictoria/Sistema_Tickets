@@ -107,7 +107,7 @@
                     <h4
                         class="text-[12px] font-black uppercase tracking-[0.2em] text-blue-900 mb-2 flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-secondary/50 rounded-full"></span>
-                        Recursos
+                        Biblioteca 
                     </h4>
                     <p class="text-[12px] text-slate-500 font-medium mb-6">
                         Explora nuestros recursos disponibles.
@@ -147,9 +147,9 @@
 
                     <div id="canales-list" class="space-y-4" style="display: none;">
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ljalvarez@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-blue-50 border border-slate-100 hover:border-blue-300 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-blue-600 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -160,9 +160,9 @@
                         </a>
 
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mnrodriguez@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-blue-50 border border-slate-100 hover:border-blue-300 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-blue-600 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -173,9 +173,9 @@
                         </a>
 
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=matorres@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-blue-50 border border-slate-100 hover:border-blue-300 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-blue-600 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -186,9 +186,9 @@
                         </a>
 
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jjramirez@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
+                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-blue-50 border border-slate-100 hover:border-blue-300 transition-all group shadow-sm">
                             <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
+                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-blue-600 transition-colors">
                                 <span class="material-symbols-outlined">mail</span>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -197,25 +197,110 @@
                                     jjramirez@istu.gob.sv</div>
                             </div>
                         </a>
-
-                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ovquintanilla@istu.gob.sv" target="_blank"
-                            class="flex items-center gap-1 p-1 rounded-2xl bg-white hover:bg-primary/5 border border-slate-100 hover:border-primary/20 transition-all group shadow-sm">
-                            <div
-                                class="size-8 rounded-lg flex items-center justify-center text-blue-200 group-hover:text-primary/50 transition-colors">
-                                <span class="material-symbols-outlined">mail</span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div
-                                    class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] truncate transition-colors">
-                                    ovquintanilla@istu.gob.sv</div>
-                            </div>
-                        </a>
                     </div>
 
                     <div class="mt-8 p-2 bg-blue-100/50 rounded-xl border border-slate-200/60 flex gap-1.5 items-start">
                         <span class="material-symbols-outlined text-blue-900 mt-0.5 text-[16px]">info</span>
                         <p class="text-[11px] text-blue-900 leading-relaxed font-medium">
                             Al hacer clic en un correo, se redirige automáticamente.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Canales RRHH --}}
+            <div class="relative overflow-hidden bg-white p-6 rounded-2xl border border-slate-100">
+                <div
+                    class="absolute top-0 right-0 w-16 h-16 bg-lime-100/50 rounded-bl-full flex items-center justify-center pointer-events-none">
+                    <span class="material-symbols-outlined text-lime-300">person</span>
+                </div>
+
+                <div class="relative z-10">
+                    <h4
+                        class="text-[12px] font-black uppercase tracking-[0.2em] text-lime-800 mb-2 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-lime-400 rounded-full"></span>
+                        RRHH
+                    </h4>
+                    <p class="text-[12px] text-slate-500 font-medium mb-6">
+                        Contacto Directo.
+                    </p>
+
+                    <button id="toggle-canales-rrhh"
+                        class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-lime-500 hover:text-lime-700 transition-all flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined">expand_more</span> Ver Contactos
+                    </button>
+
+                    <div id="canales-list-rrhh" class="space-y-4" style="display: none;">
+                        <div
+                            class="flex items-center gap-2 p-1 rounded-2xl bg-white hover:bg-lime-50 border border-slate-100 hover:border-lime-300 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-lime-400 group-hover:text-lime-600 transition-colors">
+                                <span class="material-symbols-outlined">call</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] transition-colors">
+                                    Irene Coto <span class="text-slate-400 font-medium">(Jefe)</span></div>
+                                <div class="text-lime-700 font-black text-[12px]">2121-6750</div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-2 p-1 rounded-2xl bg-white hover:bg-lime-50 border border-slate-100 hover:border-lime-300 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-lime-400 group-hover:text-lime-600 transition-colors">
+                                <span class="material-symbols-outlined">call</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] transition-colors">
+                                    Karen Ascencio <span class="text-slate-400 font-medium">(Reclutamiento)</span></div>
+                                <div class="text-lime-700 font-black text-[12px]">2121-6769</div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-2 p-1 rounded-2xl bg-white hover:bg-lime-50 border border-slate-100 hover:border-lime-300 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-lime-400 group-hover:text-lime-600 transition-colors">
+                                <span class="material-symbols-outlined">call</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] transition-colors">
+                                    Elida Torres <span class="text-slate-400 font-medium">(Planilla)</span></div>
+                                <div class="text-lime-700 font-black text-[12px]">2121-6749</div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-2 p-1 rounded-2xl bg-white hover:bg-lime-50 border border-slate-100 hover:border-lime-300 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-lime-400 group-hover:text-lime-600 transition-colors">
+                                <span class="material-symbols-outlined">call</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] transition-colors">
+                                    Narcisa Alvarado <span class="text-slate-400 font-medium">(Prestaciones)</span></div>
+                                <div class="text-lime-700 font-black text-[12px]">2121-6746</div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-2 p-1 rounded-2xl bg-white hover:bg-lime-50 border border-slate-100 hover:border-lime-300 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-lime-400 group-hover:text-lime-600 transition-colors">
+                                <span class="material-symbols-outlined">call</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] transition-colors">
+                                    Heydi Diaz <span class="text-slate-400 font-medium">(Capacitaciones)</span></div>
+                                <div class="text-lime-700 font-black text-[12px]">2121-6784</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-2 bg-lime-100/50 rounded-xl border border-slate-200/60 flex gap-1.5 items-start">
+                        <span class="material-symbols-outlined text-lime-900 mt-0.5 text-[16px]">info</span>
+                        <p class="text-[11px] text-lime-900 leading-relaxed font-medium">
+                            Estos son los contactos directos de RRHH, por si necesitás comunicarte directamente con la unidad.
                         </p>
                     </div>
                 </div>

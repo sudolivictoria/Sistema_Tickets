@@ -154,11 +154,23 @@ class AdminUnidadController extends Controller
             ];
         }
 
+        //------------------prioridades (tickets abiertos de la unidad, sin importar estado de asignación)----------------------
+        $queryPrioridades = Ticket::whereNotIn('estado_id', $estadosCerrados);
+        if ($miUnidadId) {
+            $queryPrioridades->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));
+        }
+        $prioridades = [
+            'critica' => (clone $queryPrioridades)->where('prioridad_id', 1)->count(),
+            'alta'    => (clone $queryPrioridades)->where('prioridad_id', 2)->count(),
+            'media'   => (clone $queryPrioridades)->where('prioridad_id', 3)->count(),
+            'baja'    => (clone $queryPrioridades)->where('prioridad_id', 4)->count(),
+        ];
+
         //----manuales
         //$categorias = CategoriaManual::orderBy('nombre_categoria_manual')->get();
         //$manuales = Manual::with('categoria')->latest()->get();
 
-        return view('gestor.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'ticketsAsignados'));
+        return view('gestor.dashboard', compact('noAsignados', 'pendientes', 'resueltos', 'todosLosTickets', 'mesesGrafico', 'ticketsAsignados', 'prioridades'));
     }
 
 
