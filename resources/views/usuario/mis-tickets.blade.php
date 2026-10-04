@@ -49,15 +49,10 @@
                             placeholder="Buscar...">
                     </div>
 
-                    <div class="flex items-center gap-2 mb-2 lg:hidden text-slate-400">
-                        <span class="material-symbols-outlined text-[18px] animate-bounce-x">swipe_left</span>
-                        <span class="text-[11px] font-medium italic">Desliza para ver más detalles</span>
-                    </div>
-
                 </div>
                 {{-- DATOS --}}
                 <div class="p-0 w-full overflow-x-auto">
-                    <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0">
+                    <table id="tablaMisTickets" class="w-full text-left border-separate border-spacing-0 tabla-card-mobile">
                         <thead>
                             <tr class="bg-slate-50 text-[13px] uppercase text-[#008F7E] font-black tracking-widest">
                                 <th class="px-4 py-4 border-b border-slate-200 font-black whitespace-nowrap">ID</th>

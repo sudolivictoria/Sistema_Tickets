@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Concerns;
 use App\Models\Ticket;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -66,7 +67,8 @@ trait ExportaReporteTickets
 
             //----el Gestor solo exporta tickets de su propia unidad (evita fuga de datos entre unidades);
             //----el Admin exporta acorde a lo que ve en la tabla, sin restricción de unidad
-            $usuarioActual = auth()->user();
+            /** @var \App\Models\User|null $usuarioActual */
+            $usuarioActual = Auth::user();
             $miUnidadId = $usuarioActual?->unidad_id;
             if ($miUnidadId && $usuarioActual->tieneRol('Gestor')) {
                 $query->whereHas('categoria', fn($q) => $q->where('unidad_id', $miUnidadId));

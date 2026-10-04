@@ -39,7 +39,7 @@ window.inicializarTablaTickets = function (selectorId) {
                     '<span class="material-symbols-outlined text-[20px] leading-none">chevron_left</span>',
             },
         },
-        responsive: true,
+        responsive: false,
         autoWidth: false,
         pageLength: 5,
         order: [[0, "desc"]],

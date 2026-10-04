@@ -15,7 +15,7 @@ window.inicializarTablaTickets = function (selectorId) {
         paging: false,
         searching: false,
         info: false,
-        responsive: true,
+        responsive: false,
         autoWidth: false,
         stateSave: false,
         order: [[0, "desc"]],

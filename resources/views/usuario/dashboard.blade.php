@@ -70,13 +70,8 @@
                     </h3>
                 </div>
 
-                <div class="flex items-center gap-2 mb-2 lg:hidden text-slate-400">
-                    <span class="material-symbols-outlined text-[18px] animate-bounce-x">swipe_left</span>
-                    <span class="text-[11px] font-medium italic">Desliza para ver más detalles</span>
-                </div>
-
                 <div class="overflow-x-auto text-[13px] md:text-[14px]">
-                    <table class="w-full min-w-[760px] text-left" id="tablaTicketsUsuario">
+                    <table class="w-full text-left tabla-card-mobile" id="tablaTicketsUsuario">
                         <thead class="bg-slate-50/50 border-b border-slate-100 uppercase font-black text-[#008F7E]">
                             <tr>
                                 <th class="px-6 py-4 font-black">ID</th>

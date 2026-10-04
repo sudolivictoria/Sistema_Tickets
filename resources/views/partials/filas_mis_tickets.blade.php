@@ -1,7 +1,7 @@
 @foreach($misTickets as $ticket)
     <tr class="hover:bg-slate-50/80 transition-all">
 
-        <td class="px-4 py-4 font-bold text-slate-900 whitespace-nowrap">
+        <td class="px-4 py-4 font-bold text-slate-900 whitespace-nowrap" data-label="ID">
             <div class="flex items-center">
                 {{-- Prefijo con estilo sutil --}}
                 <span class="text-[#04003B] font-black text-[12px]">#</span>
@@ -15,12 +15,12 @@
         </td>
 
         {{-- Categoría --}}
-        <td class="px-4 py-4 font-black uppercase">
+        <td class="px-4 py-4 font-black uppercase" data-label="Categoría">
             {{ $ticket->categoria->nombre_categoria ?? 'N/A' }}
         </td>
 
         {{-- Estado --}}
-        <td class="px-4 py-4">
+        <td class="px-4 py-4" data-label="Estado">
             @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
                 $claseEstado = match ($estado) {
@@ -37,7 +37,7 @@
         </td>
 
         {{-- Prioridad --}}
-        <td class="px-4 py-4">
+        <td class="px-4 py-4" data-label="Prioridad">
             @php
                 $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
                 $clasePrio = match ($prio) {
@@ -54,21 +54,21 @@
         </td>
 
         {{-- Técnico --}}
-        <td class="px-4 py-4 font-black">
+        <td class="px-4 py-4 font-black" data-label="Técnico">
             {{ $ticket->tecnico->name ?? 'Pendiente de Asignación' }}
         </td>
 
         {{-- Fechas --}}
-        <td class="px-4 py-4 font-black" data-order="{{ $ticket->created_at->timestamp }}">
+        <td class="px-4 py-4 font-black" data-order="{{ $ticket->created_at->timestamp }}" data-label="Apertura">
             {{ $ticket->created_at->format('d/m/Y') }}
         </td>
 
-        <td class="px-4 py-4 font-black">
+        <td class="px-4 py-4 font-black" data-label="Cierre">
             {{ $ticket->fecha_cierre ? \Carbon\Carbon::parse($ticket->fecha_cierre)->format('d/m/Y') : '---' }}
         </td>
 
         {{-- Botón Detalle (Descripción) --}}
-        <td class="px-4 py-4 text-center">
+        <td class="px-4 py-4 text-center acciones" data-label="Detalle">
             <button type="button"
                 class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
                 data-id="{{ $ticket->id }}"

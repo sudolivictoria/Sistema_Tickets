@@ -1,7 +1,7 @@
 @foreach($todosLosTickets as $ticket)
 
     <tr class="hover:bg-slate-50/50 transition-colors group">
-        <td class="px-2 py-4 font-bold text-slate-900 whitespace-nowrap">
+        <td class="px-2 py-4 font-bold text-slate-900 whitespace-nowrap" data-label="ID">
             <div class="flex items-center">
                 <span class="text-secondary font-black text-[12px]">#</span>
                 <span class="text-secondary font-black text-[12px] tracking-tighter">TK</span>
@@ -12,8 +12,8 @@
         </td>
 
         {{-- categoria --}}
-        <td class="px-6 py-4 max-w-[150px] font-black text-[13px]">{{ $ticket->categoria->nombre_categoria }}</td>
-        <td class="px-6 py-4">
+        <td class="px-6 py-4 max-w-[150px] font-black text-[13px]" data-label="Categoría">{{ $ticket->categoria->nombre_categoria }}</td>
+        <td class="px-6 py-4" data-label="Estado">
             @php
                 $estado = strtolower($ticket->estado->nombre_estado ?? 'abierto');
                 $claseEstado = match ($estado) {
@@ -32,7 +32,7 @@
         </td>
         
         {{-- prioridad --}}
-        <td class="px-6 py-4">
+        <td class="px-6 py-4" data-label="Prioridad">
             @php
                 $prio = $ticket->prioridad->nombre_prioridad ?? 'Baja';
                 $clasePrio = match ($prio) {
@@ -48,10 +48,10 @@
             </span>
         </td>
 
-        <td class="px-6 py-4 font-black text-[13px]">{{ $ticket->created_at->format('d/m/Y') }}</td>
+        <td class="px-6 py-4 font-black text-[13px]" data-label="Apertura">{{ $ticket->created_at->format('d/m/Y') }}</td>
 
         {{-- Botón Detalle (Descripción) --}}
-        <td class="px-4 py-4 text-center">
+        <td class="px-4 py-4 text-center acciones" data-label="Detalle">
             <button type="button"
                 class="btn-ver-detalle p-2 bg-blue-100/50 text-secondary rounded-xl hover:bg-secondary hover:text-white transition-all shadow-sm flex items-center justify-center mx-auto"
                 data-id="{{ $ticket->id }}"
