@@ -59,6 +59,8 @@
         text-align: left !important;
         white-space: normal !important;
         justify-items: start;
+        /*----algunas celdas traen max-w-[...] pensado para la tabla de escritorio (ej. Categoría); en la tarjeta móvil eso le quita espacio real al valor y lo parte en 2 líneas----*/
+        max-width: none !important;
     }
 
     table.tabla-card-mobile tr > td:last-child {
