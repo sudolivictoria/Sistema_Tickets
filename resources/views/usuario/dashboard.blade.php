@@ -234,8 +234,21 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] transition-colors">
-                                    Irene Coto <span class="text-slate-400 font-medium">(Jefe)</span></div>
+                                    Irene Coto <span class="text-slate-400 font-medium">(Jefe RRHH)</span></div>
                                 <div class="text-lime-700 font-black text-[12px]">2121-6750</div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-2 p-1 rounded-2xl bg-white hover:bg-lime-50 border border-slate-100 hover:border-lime-300 transition-all group shadow-sm">
+                            <div
+                                class="size-8 rounded-lg flex items-center justify-center text-lime-400 group-hover:text-lime-600 transition-colors">
+                                <span class="material-symbols-outlined">call</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-slate-600 group-hover:text-slate-800 text-[12px] transition-colors">
+                                    Gladis Córdova <span class="text-slate-400 font-medium">(Jefe Género)</span></div>
+                                <div class="text-lime-700 font-black text-[12px]">6860-4204</div>
                             </div>
                         </div>
 
