@@ -184,7 +184,8 @@ class AdminController extends Controller
     //--metodo para crear ticket
     public function create()
     {
-        $categorias = Categoria::all();
+        //----categoría 2 (Medio Ambiente) oculta temporalmente del formulario, sigue intacta en la base
+        $categorias = Categoria::where('id', '!=', 2)->get();
         $tipos = TipoSolicitud::all();
         $prioridades = Prioridad::all();
 
