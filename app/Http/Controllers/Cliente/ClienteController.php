@@ -110,8 +110,7 @@ class ClienteController extends Controller
     //---metodo para mostrar formulario de creacion de ticket
     public function create()
     {
-        //----categoría 2 (Medio Ambiente) oculta temporalmente del formulario, sigue intacta en la base
-        $categorias = Categoria::where('id', '!=', 2)->get();
+        $categorias = Categoria::all();
         $tipos = TipoSolicitud::all();
         $prioridades = Prioridad::all();
 
