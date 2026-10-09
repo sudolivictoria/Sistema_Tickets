@@ -246,7 +246,7 @@
                         Biblioteca 
                     </h4>
                     <p class="text-[12px] text-slate-500 font-medium mb-6">
-                        Explora nuestros recursos diaponibles.
+                        Explora nuestros recursos disponibles.
                     </p>
                     <a href="https://anyflip.com/bookcase/ghert" target="_blank"
                         class="group w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center bg-slate-50/50 hover:bg-white gap-2">
