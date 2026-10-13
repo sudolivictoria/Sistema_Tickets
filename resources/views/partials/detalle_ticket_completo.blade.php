@@ -19,23 +19,24 @@
             </div>
 
             <!-- 1. HEADER FIJO -->
-            <div class="p-5 sm:p-6 border-b border-slate-100 shrink-0 bg-white relative">
-                <div class="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-green-50 border border-green-100 rounded-full text-green-600 font-black text-[11px] uppercase tracking-wider shadow-sm animate-pulse"
-                    id="wrapperCountdown">
-                    <span class="material-symbols-outlined text-sm">alarm</span>
-                    <span id="modalCountdown">--:--:--</span>
-                </div>
-
-                <div class="pr-32 space-y-2">
-                    <h3 id="modalTitulo"
-                        class="text-lg sm:text-xl font-black text-green-950 uppercase break-words leading-tight">---
-                    </h3>
-                    <div class="flex items-center gap-1.5 text-slate-500 font-semibold text-xs">
-                        <span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
-                        <label class="text-[10px] font-black uppercase tracking-widest text-green-950">Fecha de
-                            Apertura:</label>
-                        <span id="modalFechaApertura"
-                            class="font-black text-green-900 bg-lime-100/50 px-2 py-0.5 rounded-md">---</span>
+            <div class="p-5 sm:p-6 border-b border-slate-100 shrink-0 bg-white">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1 space-y-2">
+                        <h3 id="modalTitulo"
+                            class="text-lg sm:text-xl font-black text-green-950 uppercase break-words leading-tight">---
+                        </h3>
+                        <div class="flex items-center gap-1.5 text-slate-500 font-semibold text-xs">
+                            <span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+                            <label class="text-[10px] font-black uppercase tracking-widest text-green-950">Fecha de
+                                Apertura:</label>
+                            <span id="modalFechaApertura"
+                                class="font-black text-green-900 bg-lime-100/50 px-2 py-0.5 rounded-md">---</span>
+                        </div>
+                    </div>
+                    <div class="shrink-0 flex items-center gap-1.5 px-3 py-1 bg-green-50 border border-green-100 rounded-full text-green-600 font-black text-[11px] uppercase tracking-wider shadow-sm animate-pulse"
+                        id="wrapperCountdown">
+                        <span class="material-symbols-outlined text-sm">alarm</span>
+                        <span id="modalCountdown">--:--:--</span>
                     </div>
                 </div>
             </div>
