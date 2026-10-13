@@ -26,7 +26,7 @@
                     <span id="modalCountdown">--:--:--</span>
                 </div>
 
-                <div class="pr-32 space-y-2">
+                <div class="pr-[13rem] space-y-2">
                     <h3 id="modalTitulo"
                         class="text-lg sm:text-xl font-black text-green-950 uppercase break-words leading-tight">---
                     </h3>

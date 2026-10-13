@@ -374,7 +374,7 @@ window.iniciarContadorSLA = function (datosSLA) {
     if (estadosCerrados.includes(estadoCheck) || segundosTranscurridos > 0) {
         wrapper.classList.remove("hidden");
         wrapper.className =
-            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+            "absolute top-4 right-4 max-w-[170px] overflow-hidden flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
 
         if (segundosTranscurridos === 0) {
             display.textContent = "Finalizado";
@@ -410,12 +410,12 @@ window.iniciarContadorSLA = function (datosSLA) {
             clearInterval(window.timerSLA);
             display.textContent = "Vencido";
             wrapper.className =
-                "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
+                "absolute top-4 right-4 max-w-[170px] overflow-hidden flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full text-red-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300 animate-pulse";
             return;
         }
 
         wrapper.className =
-            "absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
+            "absolute top-4 right-4 max-w-[170px] overflow-hidden flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full text-green-600 font-bold text-xs uppercase tracking-wider shadow-sm transition-all duration-300";
 
         const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
         const horas = Math.floor(
