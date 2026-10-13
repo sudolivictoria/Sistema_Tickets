@@ -19,14 +19,16 @@
             </div>
 
             <!-- 1. HEADER FIJO -->
-            <div class="p-5 sm:p-6 border-b border-slate-100 shrink-0 bg-white relative">
-                <div class="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-green-50 border border-green-100 rounded-full text-green-600 font-black text-[11px] uppercase tracking-wider shadow-sm animate-pulse"
-                    id="wrapperCountdown">
-                    <span class="material-symbols-outlined text-sm">alarm</span>
-                    <span id="modalCountdown">--:--:--</span>
+            <div class="p-5 sm:p-6 border-b border-slate-100 shrink-0 bg-white">
+                <div class="flex justify-end mb-2">
+                    <div class="flex items-center gap-1.5 px-3 py-1 bg-green-50 border border-green-100 rounded-full text-green-600 font-black text-[11px] uppercase tracking-wider shadow-sm animate-pulse"
+                        id="wrapperCountdown">
+                        <span class="material-symbols-outlined text-sm">alarm</span>
+                        <span id="modalCountdown">--:--:--</span>
+                    </div>
                 </div>
 
-                <div class="pr-[13rem] space-y-2">
+                <div class="space-y-2">
                     <h3 id="modalTitulo"
                         class="text-lg sm:text-xl font-black text-green-950 uppercase break-words leading-tight">---
                     </h3>
